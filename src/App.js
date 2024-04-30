@@ -1,10 +1,10 @@
 import './App.css';
-import Login from './components/Login';
+import PO_Details from './components/PO-details';
 
 function App() {
   return (
     <>
-    <Login/>
+    <PO_Details/>
     </>
   );
 }
