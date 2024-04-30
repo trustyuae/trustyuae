@@ -1,4 +1,20 @@
-export const USER_LOGIN_REQUEST = 'USER_LOGIN_REQUEST';
-export const USER_LOGIN_SUCCESS = 'USER_LOGIN_SUCCESS';
-export const USER_LOGIN_FAIL = 'USER_LOGIN_FAIL';
-export const CLEAR_STORE = 'CLEAR_STORE';
+import { combineReducers, applyMiddleware, createStore } from "redux";
+import  thunk from "redux-thunk";
+import { UserReducer } from "./reducers/UserReducer";
+import { composeWithDevTools } from "redux-devtools-extension";
+
+const reducer = combineReducers({
+  loginUser: UserReducer,
+});
+
+let initialState = {};
+
+const middleware = [thunk];
+
+const store = createStore(
+  reducer,
+  initialState,
+  composeWithDevTools(applyMiddleware(...middleware))
+);
+
+export default store;
