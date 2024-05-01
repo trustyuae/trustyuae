@@ -25,5 +25,7 @@ export const Color = {
     lightBrown: "#38202AB2",
     lightText: "#292929b2",
     lightBlue: "#EAF5FE",
+
+    global_theme:"#f6f1eb"
   };
   
