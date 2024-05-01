@@ -1,7 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import OrderDetails from "./components/OrderDetails";
 import Login from "./components/Login";
+import Dashboard from "./components/Dashboardd";
+import OrderSystem from "./components/OrderSystem";
 
 function App() {
   return (
@@ -9,8 +10,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Login />} />
-          <Route exact path="/order-details" element={<OrderDetails />} />
-          <Route exact path="/ordersystem" element={<OrderDetails />} />
+          <Route exact path="/dashboard" element={<Dashboard />} />
+          <Route exact path="/ordersystem" element={<OrderSystem />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -33,7 +33,7 @@ const Login = () => {
     (state) => state?.loginUser
   );
    if (data?.data?.data?.user_data?.user_role === 'administrator') {
-      navigate("/ordersystem");
+      navigate("/dashboard");
     } else {
       console.log('error while login')
     }
@@ -51,22 +51,22 @@ const Login = () => {
         <MDBCol col="4" md="4" className="align-items-center">
           <MDBInput
             wrapperClass="mb-4"
-            placeholder="enter your email"
+            placeholder="Enter username..."
             value={username}
             id="formControlLg"
             type="text"
             size="lg"
-            style={{ fontSize: "18px" }}
+            style={{ fontSize: "15px" }}
             onChange={handleUsername}
           />
           <MDBInput
             wrapperClass="mb-4"
-            placeholder="enter your password"
+            placeholder="Enter password..."
             value={password}
             id="formControlLg"
             type="password"
             size="lg"
-            style={{ fontSize: "18px"}}
+            style={{ fontSize: "15px"}}
             onChange={handlePassword}
           />
           <div className="d-flex justify-content-between mx-4 mb-4">
@@ -77,7 +77,6 @@ const Login = () => {
               label="Remember me"
               labelClass="custom-label-style1"
             />
-            <a href="!#">Forgot password?</a>
           </div>
           <Button
             className="w-100"
