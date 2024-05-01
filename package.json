@@ -6,6 +6,8 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-free": "^6.5.2",
+    "@material-ui/icons": "^4.11.3",
+    "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@redux-devtools/extension": "^3.3.0",
     "@reduxjs/toolkit": "^2.2.3",
@@ -22,10 +24,10 @@
     "react-router-dom": "^6.23.0",
     "react-scripts": "5.0.1",
     "redux": "^4.2.1",
+    "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.4.2",
     "styled-components": "^6.1.8",
-    "web-vitals": "^2.1.4",
-    "redux-devtools-extension": "^2.13.9"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
