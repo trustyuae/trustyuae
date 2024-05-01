@@ -19,6 +19,7 @@ import { InputAdornment, TextField } from "@mui/material";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import AppsIcon from "@mui/icons-material/Apps";
 import OrderSystem from "./OrderSystem";
+import { Link } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -165,12 +166,27 @@ export default function Dashboard() {
             }}
           >
             <List component="nav" sx={{justifyContent:'space-between'}}>
-            <Typography sx={{mt:'10px'}}><strong>Factory Form</strong></Typography>    
+            {/* <Typography sx={{mt:'10px'}}><strong>Factory Form</strong></Typography>    
             <Typography sx={{mt:'10px'}}><strong>PO Management System</strong></Typography>    
             <Typography sx={{mt:'10px'}}><strong>Add Factory</strong></Typography>   
             <Typography sx={{mt:'10px'}}><strong>Add Factory</strong></Typography>    
             <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>   
-            <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>           
+            <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>            */}
+              <Link to="/ordersystem">
+                <Typography sx={{mt:'10px'}}><strong>Order System</strong></Typography>
+              </Link>
+              <Link to="/factory_form">
+                <Typography sx={{mt:'10px'}}><strong>Factory Form</strong></Typography>
+              </Link>
+              <Link to="/PO_details">
+                <Typography sx={{mt:'10px'}}><strong>PO Details</strong></Typography>
+              </Link>
+              <Link to="/order_management_system">
+                <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>
+              </Link>
+              {/* <Link to="/all-products">
+                <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>
+              </Link> */}
           </List>
           </Toolbar>
         </Drawer>
@@ -187,43 +203,6 @@ export default function Dashboard() {
           }}
         >
           <Toolbar />
-          {/* <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-            
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 240,
-                  }}
-                >
-                  {"Chart"}
-                </Paper>
-              </Grid>
-             
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 240,
-                  }}
-                >
-                  
-                </Paper>
-              </Grid>
-              
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                  Orders
-                </Paper>
-              </Grid>
-            </Grid>
-            <Copyright sx={{ pt: 4 }} />
-          </Container> */}
           <OrderSystem/>
         </Box>
       </Box>
