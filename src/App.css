@@ -41,3 +41,8 @@
   color: blue; 
   font-size: 16px;
 }
+.form-select:focus {
+  border-color: none !important;
+  outline: 0;
+  box-shadow: none !important;
+}
