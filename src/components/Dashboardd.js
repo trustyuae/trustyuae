@@ -25,6 +25,19 @@ import { useDispatch } from "react-redux";
 import { logoutUser, userLogout } from "../redux/actions/UserActions";
 import { logoutURL } from "../utils/constants";
 import axios from "axios";
+import SearchIcon from "@mui/icons-material/Search";
+import ListSubheader from "@mui/material/ListSubheader";
+// import List from '@mui/material/List';
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Collapse from "@mui/material/Collapse";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import DraftsIcon from "@mui/icons-material/Drafts";
+import SendIcon from "@mui/icons-material/Send";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import StarBorder from "@mui/icons-material/StarBorder";
 
 const drawerWidth = 240;
 
@@ -82,19 +95,24 @@ export default function Dashboard() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  // const [open, setOpen] = React.useState(true);
 
-  const handleLogOut = async() => {
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
+  const handleLogOut = async () => {
     try {
       await axios.post(`${logoutURL}`, null, {
         headers: {
-          'Content-type': 'application/json',
+          "Content-type": "application/json",
           // Authorization: `Bearer ${token}`,
         },
       });
       dispatch(userLogout(navigate));
     } catch (error) {
-      console.error('Logout error:', error);
-    } 
+      console.error("Logout error:", error);
+    }
   };
 
   const handleLinkClick = (path) => {
@@ -140,7 +158,23 @@ export default function Dashboard() {
               InputProps={{
                 type: "search",
                 startAdornment: (
-                  <InputAdornment position="start">icon</InputAdornment>
+                  <InputAdornment position="start">
+                    <SearchIcon>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 10"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.063 16.658l.26-1.477m2.605-14.772l.26-1.477m0 17.726l-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205L12 12m6.894 5.785l-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864l-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495"
+                        />
+                      </svg>
+                    </SearchIcon>
+                  </InputAdornment>
                 ),
               }}
               className="inputt"
@@ -190,7 +224,7 @@ export default function Dashboard() {
                     />
                   </Dropdown.Toggle>
                   <Dropdown.Menu className="shadow border-0">
-                    <Dropdown.Item  onClick={handleLogOut}>
+                    <Dropdown.Item onClick={handleLogOut}>
                       <LogoutIcon>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -231,66 +265,112 @@ export default function Dashboard() {
             }}
           >
             <List component="nav" sx={{ justifyContent: "space-between" }}>
-              {/* <Typography sx={{mt:'10px'}}><strong>Factory Form</strong></Typography>    
-            <Typography sx={{mt:'10px'}}><strong>PO Management System</strong></Typography>    
-            <Typography sx={{mt:'10px'}}><strong>Add Factory</strong></Typography>   
-            <Typography sx={{mt:'10px'}}><strong>Add Factory</strong></Typography>    
-            <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>   
-            <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>            */}
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/factory_form")}
-              >
-                <strong>Factory Form</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/PO_details")}
-              >
-                <strong>PO Details</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/order_management_system")}
-              >
-                <strong>Order Management System</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/all_products_list")}
-              >
-                <strong>All Products</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/order_not_available")}
-              >
-                <strong>Order Not Available</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/order_details")}
-              >
-                <strong>Order Details</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/all_factory")}
-              >
-                <strong>All Factory</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/PO_ManagementSystem")}
-              >
-                <strong>PO Management System</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/image_upload")}
-              >
-                <strong>Image Uplaod</strong>
-              </Typography>
+              <ListItemButton>
+                <ListItemIcon>
+                  <InboxIcon />
+                </ListItemIcon>
+                <ListItemText primary="P1 System" />
+              </ListItemButton>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText primary="Starred" />
+                  </ListItemButton>
+                </List>
+              </Collapse>
+              <ListItemButton>
+                <ListItemIcon>
+                  <InboxIcon />
+                </ListItemIcon>
+                <ListItemText primary="P2 System" />
+              </ListItemButton>
+              <Collapse in={open} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Order Management System"
+                      onClick={() =>
+                        handleLinkClick("/order_management_system")
+                      }
+                    />
+                  </ListItemButton>
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="PO management System"
+                      onClick={() => handleLinkClick("/PO_ManagementSystem")}
+                    />
+                  </ListItemButton>
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="PO details"
+                      onClick={() => handleLinkClick("/PO_details")}
+                    />
+                  </ListItemButton>
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Order Not Available"
+                      onClick={() => handleLinkClick("/order_not_available")}
+                    />
+                  </ListItemButton>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="P3 System" />
+                  </ListItemButton>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="All factory"
+                      onClick={() => handleLinkClick("/all_factory")}
+                    />
+                  </ListItemButton>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <InboxIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="All Products"
+                      onClick={() => handleLinkClick("/all_products_list")}
+                    />
+                  </ListItemButton>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <SendIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Factory Form"
+                      onClick={() => handleLinkClick("/factory_form")}
+                    />
+                  </ListItemButton>
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <DraftsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Order Details"
+                      onClick={() => handleLinkClick("/order_details")}
+                    />
+                  </ListItemButton>
+                </List>
+              </Collapse>
             </List>
           </Toolbar>
         </Drawer>
