@@ -361,4 +361,4 @@ function AllFactory() {
     )
 }
 
-export default AllFactory
+export default AllFactory;
