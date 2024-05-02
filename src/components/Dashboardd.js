@@ -18,8 +18,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { InputAdornment, TextField } from "@mui/material";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import AppsIcon from "@mui/icons-material/Apps";
-import OrderSystem from "./OrderSystem";
-import { Link } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -76,11 +75,21 @@ export default function Dashboard() {
     setOpen(!open);
   };
 
+  const navigate = useNavigate();
+
+  const handleLinkClick = (path) => {
+    navigate(path);
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
-        <AppBar position="absolute" open={open} style={{ width: "100%",backgroundColor:'#f6f1eb' }}>
+        <AppBar
+          position="absolute"
+          open={open}
+          style={{ width: "100%", backgroundColor: "#f6f1eb" }}
+        >
           <Toolbar
             sx={{
               pr: "24px",
@@ -122,17 +131,21 @@ export default function Dashboard() {
                 alignItems: "center",
               }}
             >
-              <IconButton color="inherit">
-                <Badge badgeContent={4} color="secondary" sx={{color:'black'}}>
+              {/* <IconButton color="inherit">
+                <Badge
+                  badgeContent={4}
+                  color="secondary"
+                  sx={{ color: "black" }}
+                >
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
-              <IconButton color="inherit" sx={{color:'black'}}>
+              <IconButton color="inherit" sx={{ color: "black" }}>
                 <LightModeIcon />
               </IconButton>
-              <IconButton color="inherit" sx={{color:'black'}}>
+              <IconButton color="inherit" sx={{ color: "black" }}>
                 <AppsIcon />
-              </IconButton>
+              </IconButton> */}
               <Box
                 sx={{
                   height: "50px",
@@ -153,41 +166,57 @@ export default function Dashboard() {
             </Box>
           </Toolbar>
         </AppBar>
-        <Drawer variant="permanent" open={open} style={{ marginTop: "64px",backgroundColor:'#f6f1eb' }}>
+        <Drawer
+          variant="permanent"
+          open={open}
+          style={{ marginTop: "64px", backgroundColor: "#f6f1eb" }}
+        >
           <Toolbar
             sx={{
-                display: "flex",
-                flexDirection: "column", // Set flex direction to column
-                alignItems: "flex-start", // Align items to start
-                justifyContent: "flex-start", // Justify content to start
-                px: [1],
-                backgroundColor:'#f6f1eb',
-                height:'100%'
+              display: "flex",
+              flexDirection: "column", // Set flex direction to column
+              alignItems: "flex-start", // Align items to start
+              justifyContent: "flex-start", // Justify content to start
+              px: [1],
+              backgroundColor: "#f6f1eb",
+              height: "100%",
             }}
           >
-            <List component="nav" sx={{justifyContent:'space-between'}}>
-            {/* <Typography sx={{mt:'10px'}}><strong>Factory Form</strong></Typography>    
+            <List component="nav" sx={{ justifyContent: "space-between" }}>
+              {/* <Typography sx={{mt:'10px'}}><strong>Factory Form</strong></Typography>    
             <Typography sx={{mt:'10px'}}><strong>PO Management System</strong></Typography>    
             <Typography sx={{mt:'10px'}}><strong>Add Factory</strong></Typography>   
             <Typography sx={{mt:'10px'}}><strong>Add Factory</strong></Typography>    
             <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>   
             <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>            */}
-              <Link to="/ordersystem">
-                <Typography sx={{mt:'10px'}}><strong>Order System</strong></Typography>
-              </Link>
-              <Link to="/factory_form">
-                <Typography sx={{mt:'10px'}}><strong>Factory Form</strong></Typography>
-              </Link>
-              <Link to="/PO_details">
-                <Typography sx={{mt:'10px'}}><strong>PO Details</strong></Typography>
-              </Link>
-              <Link to="/order_management_system">
-                <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>
-              </Link>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/ordersystem")}
+              >
+                <strong>Order System</strong>
+              </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/factory_form")}
+              >
+                <strong>Factory Form</strong>
+              </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/PO_details")}
+              >
+                <strong>PO Details</strong>
+              </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/order_management_system")}
+              >
+                <strong>Order Management System</strong>
+              </Typography>
               {/* <Link to="/all-products">
                 <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>
               </Link> */}
-          </List>
+            </List>
           </Toolbar>
         </Drawer>
         <Box
@@ -202,8 +231,6 @@ export default function Dashboard() {
             overflow: "auto",
           }}
         >
-          <Toolbar />
-          <OrderSystem/>
         </Box>
       </Box>
     </ThemeProvider>

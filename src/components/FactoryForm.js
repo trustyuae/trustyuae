@@ -6,6 +6,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Card } from "react-bootstrap";
 import axios from "axios";
+
 function FactoryForm() {
   const [factory, setFactory] = useState({
     factory_name: "",
@@ -15,6 +16,7 @@ function FactoryForm() {
     contact_email: "",
     bank_account_details: "",
   });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFactory((prevFactory) => ({
@@ -22,6 +24,7 @@ function FactoryForm() {
       [name]: value,
     }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -43,17 +46,16 @@ function FactoryForm() {
       console.error("Error adding factory:", error);
     }
   };
+
   return (
-    <Container
-      fluid
-      className="p-5"
-      style={{
-        backgroundColor: "#F6F1EB",
-        height: "98vh",
-        maxHeight: "100%",
-        minHeight: "100vh",
-      }}
-    >
+    // <Container
+    //   fluid
+    //   className="p-5"
+    //   style={{
+    //     height: "100vh",
+    //   }}
+    // >
+    <div>
       <style>
         {`
                     .factory-card {
@@ -181,7 +183,9 @@ function FactoryForm() {
           </Card>
         </Col>
       </Row>
-    </Container>
+      </div>
+    // </Container>
+
   );
 }
 export default FactoryForm;
