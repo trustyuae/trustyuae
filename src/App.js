@@ -7,6 +7,8 @@ import FactoryForm from "./components/FactoryForm";
 import OrderManagementSystem from "./components/OrderManagementSystem";
 import PoDetails from "./components/PoDetails";
 import AllProductList from "./components/AllProductList";
+import ImageUpload from "./components/ImageUpload ";
+
 function App() {
   return (
     <>
@@ -19,6 +21,7 @@ function App() {
           <Route exact path="/order_management_system" element={<OrderManagementSystem />} />
           <Route exact path="/PO_details" element={<PoDetails />} />
           <Route exact path="/all-products" element={<AllProductList />} />
+          <Route exact path="/ImageUpload" element={<ImageUpload />} />
         </Routes>
       </BrowserRouter>
     </>
