@@ -7,7 +7,7 @@ import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import axios from 'axios';
-
+import { Link } from 'react-router-dom'; // Import Link
 function OrderSystem() {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
@@ -239,7 +239,9 @@ function OrderSystem() {
                                 <td className='text-center'>{order.shipping.country}</td>
                                 <td className='text-center'>Dispatch</td>
                                 <td className='text-center'>
+                                <Link to={`/order_details/${order.id}`}>
                                     <Button type="button" className='w-auto'>View</Button>
+                                </Link>
                                 </td>
                             </tr>
                         ))}
