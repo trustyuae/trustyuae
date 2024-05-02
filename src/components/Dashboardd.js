@@ -8,17 +8,23 @@ import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 // import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
+// import IconButton from "@mui/material/IconButton";
+// import Badge from "@mui/material/Badge";
 // import Container from "@mui/material/Container";
 // import Grid from "@mui/material/Grid";
 // import Paper from "@mui/material/Paper";
 // import Link from "@mui/material/Link";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+// import NotificationsIcon from "@mui/icons-material/Notifications";
 import { InputAdornment, TextField } from "@mui/material";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import AppsIcon from "@mui/icons-material/Apps";
-import {useNavigate } from "react-router-dom";
+// import LightModeIcon from "@mui/icons-material/LightMode";
+// import AppsIcon from "@mui/icons-material/Apps";
+import { useNavigate } from "react-router-dom";
+import { Dropdown } from "react-bootstrap";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useDispatch } from "react-redux";
+import { logoutUser, userLogout } from "../redux/actions/UserActions";
+import { logoutURL } from "../utils/constants";
+import axios from "axios";
 
 const drawerWidth = 240;
 
@@ -71,11 +77,25 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  const navigate = useNavigate();
+  const handleLogOut = async() => {
+    try {
+      await axios.post(`${logoutURL}`, null, {
+        headers: {
+          'Content-type': 'application/json',
+          // Authorization: `Bearer ${token}`,
+        },
+      });
+      dispatch(userLogout(navigate));
+    } catch (error) {
+      console.error('Logout error:', error);
+    } 
+  };
 
   const handleLinkClick = (path) => {
     navigate(path);
@@ -152,16 +172,44 @@ export default function Dashboard() {
                   width: "50px",
                 }}
               >
-                <img
-                  //   src={require("../assets/logo-large-main.webp")}
-                  src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
-                  alt="Logo"
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                    borderRadius: "50%",
-                  }}
-                />
+                <Dropdown>
+                  <Dropdown.Toggle
+                    className="bg-transparent border-0 p-0"
+                    split
+                    variant="success"
+                  >
+                    <img
+                      //   src={require("../assets/logo-large-main.webp")}
+                      src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+                      alt="Logo"
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu className="shadow border-0">
+                    <Dropdown.Item  onClick={handleLogOut}>
+                      <LogoutIcon>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 10 10"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.063 16.658l.26-1.477m2.605-14.772l.26-1.477m0 17.726l-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205L12 12m6.894 5.785l-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864l-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495"
+                          />
+                        </svg>
+                      </LogoutIcon>
+                      Logout
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </Box>
             </Box>
           </Toolbar>
@@ -231,9 +279,6 @@ export default function Dashboard() {
               >
                 <strong>Image Uplaod</strong>
               </Typography>
-              {/* <Link to="/all-products">
-                <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>
-              </Link> */}
             </List>
           </Toolbar>
         </Drawer>
@@ -248,8 +293,7 @@ export default function Dashboard() {
             height: "100vh",
             overflow: "auto",
           }}
-        >
-        </Box>
+        ></Box>
       </Box>
     </ThemeProvider>
   );

@@ -8,7 +8,7 @@ import {
   MDBCardImage,
 } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 import { loginUser } from "../redux/actions/UserActions";
 import { useNavigate } from "react-router-dom";
 const Login = () => {
@@ -26,17 +26,8 @@ const Login = () => {
   };
 
   const handleSubmit = () => {
-    dispatch(loginUser({ username, password }));
+    dispatch(loginUser({ username, password },navigate));
   };
-  
-  const data = useSelector(
-    (state) => state?.loginUser
-  );
-   if (data?.data?.data?.user_data?.user_role === 'subscriber') {
-      navigate("/ordersystem");
-    } else {
-      console.log('error while login')
-    }
 
   return (
     <MDBContainer fluid className="p-3 my-5">
