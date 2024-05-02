@@ -81,7 +81,7 @@ const PoDetails = () => {
     const totalEstdCostAED = PODetails.reduce((acc, cur) => acc + (cur.qtyOrdered * cur.estimatedCostAED), 0);
     const availabilityStatus = ['Confirmed','1 week', '2 week', '3 weeks','1 month', 'Out of Stock'];
     return (
-        <Container fluid className='px-5'style={{backgroundColor:'#F6F1EB', height:'98vh'}}>
+        <Container fluid className='px-5'style={{ height:'100vh'}}>
             <h3 className='fw-bold text-center my-3'>PO Details</h3>
             <h6 className='fw-bold text-center'>XYZ Guangzhon</h6>
             <p className='text-center my-3'>PO Number: {PONumber}</p>

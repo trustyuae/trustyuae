@@ -32,8 +32,8 @@ const Login = () => {
   const data = useSelector(
     (state) => state?.loginUser
   );
-   if (data?.data?.data?.user_data?.user_role === 'administrator') {
-      navigate("/dashboard");
+   if (data?.data?.data?.user_data?.user_role === 'subscriber') {
+      navigate("/ordersystem");
     } else {
       console.log('error while login')
     }
