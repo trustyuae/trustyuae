@@ -6,6 +6,8 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-free": "^6.5.2",
+    "@material-ui/icons": "^4.11.3",
+    "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@redux-devtools/extension": "^3.3.0",
     "@reduxjs/toolkit": "^2.2.3",
