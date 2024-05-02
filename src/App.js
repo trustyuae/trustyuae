@@ -10,6 +10,7 @@ import PoDetails from "./components/PoDetails";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import AllProductList from "./components/AllProductList";
 import OrderNotAvailable from "./components/OrderNotAvailable";
+import ImageUpload from "./components/ImageUpload";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route exact path="/PO_details" element={<PoDetails />} />
               <Route exact path="/all_products_list" element={<AllProductList />} />
               <Route exact path="/order_not_available" element={<OrderNotAvailable/>} />
+              <Route exact path="/image_upload" element={<ImageUpload/>} />
             </Route>
           </Route>
         </Routes>
