@@ -213,6 +213,18 @@ export default function Dashboard() {
               >
                 <strong>Order Management System</strong>
               </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/all_products_list")}
+              >
+                <strong>All Products</strong>
+              </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/order_not_available")}
+              >
+                <strong>Order Not Available</strong>
+              </Typography>
               {/* <Link to="/all-products">
                 <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>
               </Link> */}
