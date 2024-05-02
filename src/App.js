@@ -11,6 +11,8 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import AllProductList from "./components/AllProductList";
 import OrderNotAvailable from "./components/OrderNotAvailable";
 import ImageUpload from "./components/ImageUpload";
+import OrderDetails from "./components/OrderDetails";
+import AllFactory from "./components/AllFactory";
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
               <Route exact path="/all_products_list" element={<AllProductList />} />
               <Route exact path="/order_not_available" element={<OrderNotAvailable/>} />
               <Route exact path="/image_upload" element={<ImageUpload/>} />
+              <Route exact path="/order_details" element={<OrderDetails/>} />
+              <Route exact path="/all_factory" element={<AllFactory/>} />
             </Route>
           </Route>
         </Routes>
