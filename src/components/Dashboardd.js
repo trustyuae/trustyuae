@@ -239,12 +239,6 @@ export default function Dashboard() {
             <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>            */}
               <Typography
                 sx={{ mt: "10px", cursor: "pointer" }}
-                onClick={() => handleLinkClick("/ordersystem")}
-              >
-                <strong>Order System</strong>
-              </Typography>
-              <Typography
-                sx={{ mt: "10px", cursor: "pointer" }}
                 onClick={() => handleLinkClick("/factory_form")}
               >
                 <strong>Factory Form</strong>
@@ -272,6 +266,18 @@ export default function Dashboard() {
                 onClick={() => handleLinkClick("/order_not_available")}
               >
                 <strong>Order Not Available</strong>
+              </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/order_details")}
+              >
+                <strong>Order Details</strong>
+              </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/all_factory")}
+              >
+                <strong>All Factory</strong>
               </Typography>
               <Typography
                 sx={{ mt: "10px", cursor: "pointer" }}
