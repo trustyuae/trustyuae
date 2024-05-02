@@ -13,7 +13,7 @@ import OrderNotAvailable from "./components/OrderNotAvailable";
 import ImageUpload from "./components/ImageUpload";
 import OrderDetails from "./components/OrderDetails";
 import AllFactory from "./components/AllFactory";
-
+import POManagementSystem from "./components/POManagementSystem";
 function App() {
   return (
     <>
@@ -36,6 +36,7 @@ function App() {
               <Route exact path="/image_upload" element={<ImageUpload/>} />
               <Route exact path="/order_details" element={<OrderDetails/>} />
               <Route exact path="/all_factory" element={<AllFactory/>} />
+              <Route exact path="/PO_ManagementSystem" element={<POManagementSystem/>} />
             </Route>
           </Route>
         </Routes>

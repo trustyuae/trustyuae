@@ -143,25 +143,6 @@ function POManagementSystem() {
                     </tbody>
                 </Table>
             </Row>
-            {/* <Row className='mb-4 mt-4'>
-                <Form inline>
-                    <Row className='mt-4'>
-                        <Col xs="auto" lg="3" className=' d-flex  align-items-end'>
-                            <Button type="button" className='mr-2 mx-3 w-50' >Select All Orders</Button>
-                            <Button type="button" className='mr-2 mx-3 w-50' >Create PO</Button>
-                        </Col>
-                    </Row>
-                </Form>
-            </Row> */}
-            {/* <Pagination className="mt-3 justify-content-center">
-            <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-            {[...Array(totalPages).keys()].map(number => (
-                <Pagination.Item key={number + 1} active={number + 1 === currentPage} onClick={() => handlePageChange(number + 1)}>
-                    {number + 1}
-                </Pagination.Item>
-            ))}
-            <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-        </Pagination> */}
         </Container>
     )
 }

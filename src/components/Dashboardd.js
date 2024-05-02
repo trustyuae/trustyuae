@@ -281,6 +281,12 @@ export default function Dashboard() {
               </Typography>
               <Typography
                 sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/PO_ManagementSystem")}
+              >
+                <strong>PO Management System</strong>
+              </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
                 onClick={() => handleLinkClick("/image_upload")}
               >
                 <strong>Image Uplaod</strong>
