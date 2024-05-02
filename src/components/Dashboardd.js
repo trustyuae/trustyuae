@@ -225,6 +225,12 @@ export default function Dashboard() {
               >
                 <strong>Order Not Available</strong>
               </Typography>
+              <Typography
+                sx={{ mt: "10px", cursor: "pointer" }}
+                onClick={() => handleLinkClick("/image_upload")}
+              >
+                <strong>Image Uplaod</strong>
+              </Typography>
               {/* <Link to="/all-products">
                 <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>
               </Link> */}
