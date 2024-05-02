@@ -34,7 +34,7 @@ function App() {
               <Route exact path="/all_products_list" element={<AllProductList />} />
               <Route exact path="/order_not_available" element={<OrderNotAvailable/>} />
               <Route exact path="/image_upload" element={<ImageUpload/>} />
-              <Route exact path="/order_details" element={<OrderDetails/>} />
+              <Route exact path="/order_details/:id" element={<OrderDetails/>} />
               <Route exact path="/all_factory" element={<AllFactory/>} />
               <Route exact path="/PO_ManagementSystem" element={<POManagementSystem/>} />
             </Route>
