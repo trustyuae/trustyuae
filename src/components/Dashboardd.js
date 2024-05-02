@@ -184,6 +184,9 @@ export default function Dashboard() {
               <Link to="/order_management_system">
                 <Typography sx={{mt:'10px'}}><strong>Order Management System</strong></Typography>
               </Link>
+              <Link to="/order_not_available">
+                <Typography sx={{mt:'10px'}}><strong>Order Not Available</strong></Typography>
+              </Link>
               {/* <Link to="/all-products">
                 <Typography sx={{mt:'10px'}}><strong>All Products</strong></Typography>
               </Link> */}

@@ -6,7 +6,7 @@ import OrderSystem from "./components/OrderSystem";
 import FactoryForm from "./components/FactoryForm";
 import OrderManagementSystem from "./components/OrderManagementSystem";
 import PoDetails from "./components/PoDetails";
-
+import OrderNotAvailable from "./components/OrderNotAvailable";
 function App() {
   return (
     <>
@@ -18,6 +18,7 @@ function App() {
           <Route exact path="/factory_form" element={<FactoryForm />} />
           <Route exact path="/order_management_system" element={<OrderManagementSystem />} />
           <Route exact path="/PO_details" element={<PoDetails />} />
+          <Route exact path="/order_not_available" element={<OrderNotAvailable />} />
         </Routes>
       </BrowserRouter>
     </>
