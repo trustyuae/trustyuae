@@ -84,8 +84,8 @@ function OrderNotAvailable() {
     // const selectedDetails = selectProduct
 
     return (
-        <Container fluid className='px-5' style={{ backgroundColor: '#F6F1EB', height: '98vh' }}>
-            <h3 className='fw-bold text-center my-3'>Order Not Available</h3>
+        <Container fluid className='px-5' style={{ height: '98vh' }}>
+            <h3 className='fw-bold text-center py-3'>Order Not Available</h3>
             <MDBRow className='d-flex justify-content-start align-items-center my-3'>
                 <Button variant="primary w-25" onClick={handleShowModal}>
                     Release Scheduled PO
