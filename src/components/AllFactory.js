@@ -48,29 +48,29 @@ function AllFactory() {
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
   const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
 
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(
+        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/fetch-factories",
+        {
+          auth: {
+            username: username,
+            password: password,
+          },
+        }
+      );
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/fetch-factories",
-          {
-            auth: {
-              username: username,
-              password: password,
-            },
-          }
-        );
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
     fetchProducts();
   }, []);
 
   const handleEdit = (productId) => {
     const product = products.find((p) => p.id === productId);
-    console.log(product,'product');
+    console.log(product, 'product');
     setSelectedProduct(product);
     setShowEditModal(true);
   };
@@ -79,10 +79,31 @@ function AllFactory() {
     setShowEditModal(false);
   };
 
-  const handleSaveEdit = () => {
-    // Logic to save edited product
-    console.log("Product saved:", selectedProduct);
-    setShowEditModal(false);
+  const handleSaveEdit = async () => {
+    try {
+      const response = await axios.post(
+        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/update-factory/${selectedProduct.id}`,
+        {
+          factory_name: selectedProduct.factory_name,
+          address: selectedProduct.address,
+          contact_person: selectedProduct.contact_person,
+          contact_number: selectedProduct.contact_number,
+          contact_email: selectedProduct.contact_email,
+          bank_account_details: selectedProduct.bank_account_details
+        },
+        // {
+        //   auth: {
+        //     username: username,
+        //     password: password
+        //   }
+        // }
+      );
+      console.log('Updated factory:', response.data);
+      setShowEditModal(false);
+      fetchProducts()
+    } catch (error) {
+      console.error('Error updating factory:', error);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -266,28 +287,41 @@ function AllFactory() {
       </MDBRow> */}
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={handleCloseEditModal} className="d-flex  justify-content-center" style={{marginTop:'130px'}}>
+      <Modal show={showEditModal} onHide={handleCloseEditModal} className="d-flex  justify-content-center" style={{ marginTop: '130px' }}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Product</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form style={{width:'466px'}}>
-            <Form.Group className="mb-3 " controlId="factory_name">
+          <Form style={{ width: '466px' }}>
+            {/* <Form.Group className="mb-3 " controlId="factory_name">
               <Form.Label>Factory Name</Form.Label>
               <Form.Control
                 type="text"
                 value={selectedProduct?.factory_name}
+              />
+            </Form.Group> */}
+            <Form.Group className="mb-3 " controlId="factory_name">
+              <Form.Label>Factory Name</Form.Label>
+              <Form.Control
+                type="text"
+                defaultValue={selectedProduct?.factory_name}
+                onChange={(e) =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    factory_name: e.target.value,
+                  })
+                }
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="address">
               <Form.Label>address</Form.Label>
               <Form.Control
                 type="text"
-                value={selectedProduct?.address}
+                defaultValue={selectedProduct?.address}
                 onChange={(e) =>
                   setSelectedProduct({
                     ...selectedProduct,
-                    name: e.target.value,
+                    address: e.target.value,
                   })
                 }
               />
@@ -296,11 +330,11 @@ function AllFactory() {
               <Form.Label>contact person</Form.Label>
               <Form.Control
                 type="text"
-                value={selectedProduct?.contact_person}
+                defaultValue={selectedProduct?.contact_person}
                 onChange={(e) =>
                   setSelectedProduct({
                     ...selectedProduct,
-                    name: e.target.value,
+                    contact_person: e.target.value,
                   })
                 }
               />
@@ -309,11 +343,11 @@ function AllFactory() {
               <Form.Label>contact number</Form.Label>
               <Form.Control
                 type="text"
-                value={selectedProduct?.contact_number}
+                defaultValue={selectedProduct?.contact_number}
                 onChange={(e) =>
                   setSelectedProduct({
                     ...selectedProduct,
-                    name: e.target.value,
+                    contact_number: e.target.value,
                   })
                 }
               />
@@ -322,11 +356,11 @@ function AllFactory() {
               <Form.Label>contact email</Form.Label>
               <Form.Control
                 type="text"
-                value={selectedProduct?.contact_email}
+                defaultValue={selectedProduct?.contact_email}
                 onChange={(e) =>
                   setSelectedProduct({
                     ...selectedProduct,
-                    name: e.target.value,
+                    contact_email: e.target.value,
                   })
                 }
               />
@@ -335,11 +369,11 @@ function AllFactory() {
               <Form.Label>bank account details</Form.Label>
               <Form.Control
                 type="text"
-                value={selectedProduct?.bank_account_details}
+                defaultValue={selectedProduct?.bank_account_details}
                 onChange={(e) =>
                   setSelectedProduct({
                     ...selectedProduct,
-                    name: e.target.value,
+                    bank_account_details: e.target.value,
                   })
                 }
               />
