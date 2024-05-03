@@ -48,6 +48,7 @@ function AllProductList() {
             },
           }
         );
+        console.log(response.data,'response.data');
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -113,7 +114,7 @@ function AllProductList() {
     <Container
       fluid
       className="px-5"
-      style={{ backgroundColor: "#F6F1EB", height: "98vh" }}
+      style={{  height: "98vh" }}
     >
       <h3 className="fw-bold text-center py-3 ">All Product List</h3>
       <MDBRow className="d-flex justify-content-start align-items-center mb-3">
@@ -203,6 +204,24 @@ function AllProductList() {
                   textAlign: "center",
                 }}
               >
+                Quantity
+              </th>
+              <th
+                style={{
+                  backgroundColor: "#DEE2E6",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
+                Status
+              </th>
+              <th
+                style={{
+                  backgroundColor: "#DEE2E6",
+                  padding: "8px",
+                  textAlign: "center",
+                }}
+              >
                 Action
               </th>
             </tr>
@@ -227,6 +246,8 @@ function AllProductList() {
                     )?.factory_name
                   }
                 </td>
+                <td className="text-center">{product.quantity}</td>
+                <td className="text-center">{product.quantity}</td>
                 <td className="text-center">
                   <button
                     type="button"

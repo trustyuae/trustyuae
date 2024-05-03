@@ -104,19 +104,19 @@ function OrderSystem() {
             sorted.sort((a, b) => {
                 let aValue = a[sortConfig.key];
                 let bValue = b[sortConfig.key];
-    
+
                 // For 'billing_full_name' key, concatenate first and last name
                 if (sortConfig.key === 'billing.first_name') {
                     aValue = `${a.billing.first_name} ${a.billing.last_name}`;
                     bValue = `${b.billing.first_name} ${b.billing.last_name}`;
                 }
-    
+
                 // For 'shipping_country' key, access country under shipping object
                 if (sortConfig.key === 'shipping.country') {
                     aValue = a.shipping.country;
                     bValue = b.shipping.country;
                 }
-    
+
                 if (aValue < bValue) {
                     return sortConfig.direction === 'ascending' ? -1 : 1;
                 }
@@ -177,11 +177,10 @@ function OrderSystem() {
                         <Col xs="auto" lg="4">
                             <Form.Group>
                                 <Form.Label>Dispatch type:</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter Dispatch Type"
-                                    className="mr-sm-2"
-                                />
+                                <Form.Select className="mr-sm-2">
+                                    <option value="Standard">Dispatch</option>
+                                    <option value="Express">Reserve</option>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                     </Row>
@@ -239,9 +238,9 @@ function OrderSystem() {
                                 <td className='text-center'>{order.shipping.country}</td>
                                 <td className='text-center'>Dispatch</td>
                                 <td className='text-center'>
-                                <Link to={`/order_details/${order.id}`}>
-                                    <Button type="button" className='w-auto'>View</Button>
-                                </Link>
+                                    <Link to={`/order_details/${order.id}`}>
+                                        <Button type="button" className='w-auto'>View</Button>
+                                    </Link>
                                 </td>
                             </tr>
                         ))}

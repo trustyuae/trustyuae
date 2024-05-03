@@ -14,6 +14,7 @@ import ImageUpload from "./components/ImageUpload";
 import OrderDetails from "./components/OrderDetails";
 import AllFactory from "./components/AllFactory";
 import POManagementSystem from "./components/POManagementSystem";
+import GRNManagement from "./components/GRNManagement";
 function App() {
   return (
     <>
@@ -37,6 +38,7 @@ function App() {
               <Route exact path="/order_details/:id" element={<OrderDetails/>} />
               <Route exact path="/all_factory" element={<AllFactory/>} />
               <Route exact path="/PO_ManagementSystem" element={<POManagementSystem/>} />
+              <Route exact path="/GRN_Management" element={<GRNManagement/>} />
             </Route>
           </Route>
         </Routes>

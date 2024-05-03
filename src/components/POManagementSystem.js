@@ -59,7 +59,7 @@ function POManagementSystem() {
     const POStatusFilter = ['Open', 'Checking with factory', 'Closed'];
     const factoryFilter = ['Factory A', 'Factory B', 'Factory c'];
     return (
-        <Container fluid className='p-5' style={{ backgroundColor:'#f6f1eb', height:'98vh',maxHeight: "100%", minHeight: "100vh" }}>
+        <Container fluid className='p-5' style={{ height:'98vh',maxHeight: "100%", minHeight: "100vh" }}>
             <div className="mb-9">
                 <div className="row g-3 mb-4 justify-content-center ">
                     <div className="col-auto">

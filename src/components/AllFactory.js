@@ -10,7 +10,7 @@ import Pagination from "react-bootstrap/Pagination";
 
 function AllFactory() {
 
-    const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [factories, setFactories] = useState([]);
@@ -34,15 +34,15 @@ function AllFactory() {
       (product.address
         ? product.address.toLowerCase().includes(address.toLowerCase())
         : true) &&
-        (product.contact_person
-            ? product.contact_person.toLowerCase().includes(contactperson.toLowerCase())
-            : true) &&
-        (product.contact_person
-            ? product.contact_number.toLowerCase().includes(contactnumber.toLowerCase())
-            : true) &&
-        (product.contact_email
-            ? product.contact_email.toLowerCase().includes(email.toLowerCase())
-            : true)
+      (product.contact_person
+        ? product.contact_person.toLowerCase().includes(contactperson.toLowerCase())
+        : true) &&
+      (product.contact_person
+        ? product.contact_number.toLowerCase().includes(contactnumber.toLowerCase())
+        : true) &&
+      (product.contact_email
+        ? product.contact_email.toLowerCase().includes(email.toLowerCase())
+        : true)
   );
 
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
@@ -96,11 +96,11 @@ function AllFactory() {
   };
 
 
-    return (
-        <Container
+  return (
+    <Container
       fluid
       className="px-5"
-      style={{ backgroundColor: "#F6F1EB", height: "98vh" }}
+      style={{ height: "98vh" }}
     >
       <h3 className="fw-bold text-center py-3 ">All Factory List</h3>
       <MDBRow className="d-flex justify-content-start align-items-center mb-3">
@@ -344,8 +344,8 @@ function AllFactory() {
                 }
               />
             </Form.Group>
-            
-            
+
+
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -358,7 +358,7 @@ function AllFactory() {
         </Modal.Footer>
       </Modal>
     </Container>
-    )
+  )
 }
 
 export default AllFactory;
