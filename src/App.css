@@ -50,3 +50,10 @@ margin-top: '55px';
   justify-content: 'center';
   align-items: 'center';
 }
+
+/* .css-10hburv-MuiTypography-root{
+  font-weight: 600 !important;
+} */
+.subList{
+  font-weight: 600 !important;
+}
