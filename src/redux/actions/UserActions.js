@@ -42,6 +42,15 @@ export const logoutUser = (navigate) => async (dispatch) => {
   }
 };
 
+export const loginUserWithToken = (navigate,token) => async (dispatch) => {
+  if(token){
+    navigate('/ordersystem');
+  }else{
+    navigate('/');
+  } 
+};
+
+
 export const userLogout = (navigate) => async (dispatch) => {
   dispatch({ type: CLEAR_STORE }); 
  await localStorage.clear();

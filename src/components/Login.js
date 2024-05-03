@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, {useEffect, useState } from "react";
 import {
   MDBContainer,
   MDBCol,
@@ -9,7 +9,7 @@ import {
 } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
 import { useDispatch} from "react-redux";
-import { loginUser } from "../redux/actions/UserActions";
+import { loginUser, loginUserWithToken } from "../redux/actions/UserActions";
 import { useNavigate } from "react-router-dom";
 const Login = () => {
   const navigate = useNavigate();
@@ -28,6 +28,11 @@ const Login = () => {
   const handleSubmit = () => {
     dispatch(loginUser({ username, password },navigate));
   };
+
+  useEffect(()=>{
+    const token = localStorage.getItem('token')
+    dispatch(loginUserWithToken(navigate,token))
+  })
 
   return (
     <MDBContainer fluid className="p-3 my-5">
