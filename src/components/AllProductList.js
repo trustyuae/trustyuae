@@ -14,9 +14,7 @@ function AllProductList() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [factories, setFactories] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState("");
-  const [selectFile, setFile] = useState({
-    factoryImage: null,
-  });
+  const [selectFile, setFile] = useState(null);
 
   const [searchId, setSearchId] = useState("");
   const [searchName, setSearchName] = useState("");
@@ -48,7 +46,7 @@ function AllProductList() {
             },
           }
         );
-        console.log(response.data,'response.data');
+        console.log(response.data, 'response.data');
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -81,15 +79,74 @@ function AllProductList() {
     setShowEditModal(false);
   };
 
-  const handleSaveEdit = () => {
-    // Logic to save edited product
+  const handleSaveEdit = async  () => {
+    try {
     console.log("Product saved:", selectedProduct);
+    const data = {
+      ...selectedProduct,
+      factory_image: selectFile
+    }
+    console.log("Product selectFile:", selectFile);
+    console.log("Product data 2222:", data);
+
+    // const response = await fetch(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${data.product_id}`, {
+    //     method: 'POST',
+    //     body: data,
+    //   });
+
+    const response = await axios.post(
+      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${data.product_id}`,
+      data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+    console.log('Product saved:', response.data);
     setShowEditModal(false);
+    } catch (error) {
+      console.error('Error saving product:', error);
+    }
+
+    // try {
+    //   const formData = new FormData();
+    //   formData.append('factory_name', selectedProduct.factory_name);
+    //   formData.append('address', selectedProduct.address);
+    //   formData.append('contact_person', selectedProduct.contact_person);
+    //   formData.append('contact_number', selectedProduct.contact_number);
+    //   formData.append('contact_email', selectedProduct.contact_email);
+    //   formData.append('bank_account_details', selectedProduct.bank_account_details);
+      
+    //   // Check if factory image exists before appending
+    //   if (selectFile.factoryImage) {
+    //     formData.append('factory_image', selectFile);
+    //   }
+  
+    //   const response = await fetch(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${selectedProduct.id}`, {
+    //     method: 'POST',
+    //     body: formData,
+    //   });
+  
+    //   if (!response.ok) {
+    //     throw new Error('Failed to save product');
+    //   }
+  
+    //   console.log('Product saved successfully');
+    //   setShowEditModal(false);
+    // } catch (error) {
+    //   console.error('Error saving product:', error);
+    //   // Handle error, maybe show a notification to the user
+    // }
+    
   };
 
-  const handleFileChange = (e) => {
-    setFile({ ...selectFile, factoryImage: e.target.files[0] });
-    console.log(selectFile, "selectFile");
+  const handleFileChange =   (e) => {
+    console.log(e.target.files[0]);
+    setFile(e.target.files[0]);
+    // setFile({ ...selectFile, factoryImage: e.target.files[0] });
+    setTimeout(() => {
+      console.log(selectFile, "selectFile");
+    }, 2000);
   };
 
   const handlePageSizeChange = (e) => {
@@ -114,7 +171,7 @@ function AllProductList() {
     <Container
       fluid
       className="px-5"
-      style={{  height: "98vh" }}
+      style={{ height: "98vh" }}
     >
       <h3 className="fw-bold text-center py-3 ">All Product List</h3>
       <MDBRow className="d-flex justify-content-start align-items-center mb-3">
@@ -233,7 +290,7 @@ function AllProductList() {
                 <td className="text-center">{product.product_name}</td>
                 <td className="text-center">
                   <img
-                    src={product.product_image}
+                    src={product.factory_image}
                     alt={product.product_name}
                     style={{ maxWidth: "100px" }}
                   />
@@ -246,8 +303,8 @@ function AllProductList() {
                     )?.factory_name
                   }
                 </td>
-                <td className="text-center">{product.quantity}</td>
-                <td className="text-center">{product.quantity}</td>
+                <td className="text-center">{product.stock_quantity}</td>
+                <td className="text-center">{product.stock_status}</td>
                 <td className="text-center">
                   <button
                     type="button"
@@ -279,7 +336,7 @@ function AllProductList() {
       </MDBRow>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={handleCloseEditModal}>
+      <Modal show={showEditModal} onHide={handleCloseEditModal} style={{ marginTop: '130px' }}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Product</Modal.Title>
         </Modal.Header>
@@ -298,30 +355,51 @@ function AllProductList() {
               <Form.Label>Product Name</Form.Label>
               <Form.Control
                 type="text"
-                value={selectedProduct?.product_name}
+                defaultValue={selectedProduct?.product_name}
                 onChange={(e) =>
                   setSelectedProduct({
                     ...selectedProduct,
-                    name: e.target.value,
+                    product_name: e.target.value,
+                  })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="stock_quantity">
+              <Form.Label>Quantity</Form.Label>
+              <Form.Control
+                type="text"
+                defaultValue={selectedProduct?.stock_quantity}
+                onChange={(e) =>
+                  setSelectedProduct({
+                    ...selectedProduct,
+                    stock_quantity: e.target.value,
                   })
                 }
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="factoryImage">
               <Form.Label>Factory Image</Form.Label>
+              {/* <Form.Check
+                type="checkbox"
+                className="me-2"
+              /> */}
               {/* <Form.Control type="text" value={selectedProduct?.factoryImage} onChange={(e) => setSelectedProduct({ ...selectedProduct, factoryImage: e.target.value })} /> */}
               <Form.Control type="file" onChange={handleFileChange} />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="factory">
+            <Form.Group className="mb-3" controlId="factory_id">
               <Form.Label>Factory</Form.Label>
               <Form.Control
                 as="select"
-                value={selectedFactory}
-                onChange={(e) => setSelectedFactory(e.target.value)}
+                defaultValue={selectedFactory}
+                onChange={(e) => setSelectedProduct({
+                
+                ...selectedProduct,
+                factory_id:e.target.value
+                })}
               >
                 <option value="">Select Factory</option>
                 {factories.map((factory) => (
-                  <option key={factory.id} value={factory.factory_name}>
+                  <option key={factory.id} value={factory.id}>
                     {factory.factory_name}
                   </option>
                 ))}
