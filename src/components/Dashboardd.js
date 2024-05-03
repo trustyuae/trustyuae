@@ -264,20 +264,20 @@ export default function Dashboard() {
               height: "100%",
             }}
           >
-            <List component="nav" sx={{ justifyContent: "space-between" }}>
+            <List component="nav" sx={{ justifyContent: "space-between",width:'100%',textWrap:'wrap' }}>
               <ListItemButton>
                 <ListItemIcon>
                   <InboxIcon />
                 </ListItemIcon>
-                <ListItemText primary="P1 System" />
+                <ListItemText primary="P1 System"/>
               </ListItemButton>
               <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <ListItemButton sx={{ pl: 4 }}>
                     <ListItemIcon>
                       <StarBorder />
-                    </ListItemIcon>
-                    <ListItemText primary="Starred" />
+                    </ListItemIcon> 
+                    <ListItemText primary="ordersystem"  onClick={() => handleLinkClick("/ordersystem")}/>
                   </ListItemButton>
                 </List>
               </Collapse>
@@ -285,7 +285,7 @@ export default function Dashboard() {
                 <ListItemIcon>
                   <InboxIcon />
                 </ListItemIcon>
-                <ListItemText primary="P2 System" />
+                <ListItemText primary="P2 System"/>
               </ListItemButton>
               <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
@@ -306,6 +306,7 @@ export default function Dashboard() {
                     </ListItemIcon>
                     <ListItemText
                       primary="PO management System"
+                      sx={{textWrap:'wrap'}}  
                       onClick={() => handleLinkClick("/PO_ManagementSystem")}
                     />
                   </ListItemButton>
