@@ -18,7 +18,7 @@ import Typography from "@mui/material/Typography";
 import { InputAdornment, TextField } from "@mui/material";
 // import LightModeIcon from "@mui/icons-material/LightMode";
 // import AppsIcon from "@mui/icons-material/Apps";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useDispatch } from "react-redux";
@@ -89,17 +89,15 @@ const Drawer = styled(MuiDrawer, {
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
-  const [open, setOpen] = React.useState(true);
+  const open = true;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-  // const [open, setOpen] = React.useState(true);
+  const location = useLocation();
+  const [activeTab, setActiveTab] = React.useState("");
 
-  const handleClick = () => {
-    setOpen(!open);
-  };
+  React.useEffect(() => {
+    setActiveTab(location.pathname);
+  }, [location.pathname]);
 
   const handleLogOut = async () => {
     try {
@@ -264,33 +262,85 @@ export default function Dashboard() {
               height: "100%",
             }}
           >
-            <List component="nav" sx={{ justifyContent: "space-between",width:'100%',textWrap:'wrap' }}>
+            <List
+              component="nav"
+              sx={{
+                justifyContent: "space-between",
+                width: "100%",
+                textWrap: "wrap",
+                color: "#75787b",
+              }}
+            >
               <ListItemButton>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <InboxIcon
+                    className="w-auto"
+                    sx={{
+                      minWidth: "20px",
+                      color: "#00008b",
+                    }}
+                  />
                 </ListItemIcon>
-                <ListItemText primary="P1 System"/>
+                <ListItemText
+                  primary="P1 System"
+                  primaryTypographyProps={{
+                    fontSize: "18px",
+                    fontWeight: 700,
+                    color: "#00008b", // Change color as needed
+                  }}
+                />
               </ListItemButton>
               <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
+                    <ListItemIcon
+                      className="w-auto me-2"
+                      sx={{
+                        minWidth: "unset",
+                      }}
+                    >
                       <StarBorder />
-                    </ListItemIcon> 
-                    <ListItemText primary="ordersystem"  onClick={() => handleLinkClick("/ordersystem")}/>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Order System"
+                      className="subList"
+                      onClick={() => handleLinkClick("/ordersystem")}
+                      primaryTypographyProps={{
+                        color:
+                          activeTab === "/ordersystem" ? "#ff8c00" : "#000",
+                        fontFamily: "monospace",
+                        fontWeight: 700,
+                        letterSpacing: "normal",
+                      }}
+                      sx={{
+                        textShadow: "0 0 black",
+                      }}
+                    />
                   </ListItemButton>
                 </List>
               </Collapse>
               <ListItemButton>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <InboxIcon sx={{ color: "#00008b" }} />
                 </ListItemIcon>
-                <ListItemText primary="P2 System"/>
+                <ListItemText
+                  primary="P2 System"
+                  primaryTypographyProps={{
+                    fontSize: "18px",
+                    fontWeight: 700,
+                    color: "#00008b", // Change color as needed
+                  }}
+                />
               </ListItemButton>
               <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
+                    <ListItemIcon
+                      className="w-auto me-2"
+                      sx={{
+                        minWidth: "unset",
+                      }}
+                    >
                       <StarBorder />
                     </ListItemIcon>
                     <ListItemText
@@ -298,76 +348,162 @@ export default function Dashboard() {
                       onClick={() =>
                         handleLinkClick("/order_management_system")
                       }
+                      primaryTypographyProps={{
+                        color:
+                          activeTab === "/order_management_system"
+                            ? "#ff8c00"
+                            : "#000",
+                        fontFamily: "monospace",
+                        fontWeight: 700,
+                        letterSpacing: "normal",
+                      }}
+                      sx={{
+                        textShadow: "0 0 black",
+                      }}
                     />
                   </ListItemButton>
                   <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
+                    <ListItemIcon
+                      className="w-auto me-2"
+                      sx={{
+                        minWidth: "unset",
+                      }}
+                    >
                       <StarBorder />
                     </ListItemIcon>
                     <ListItemText
                       primary="PO management System"
-                      sx={{textWrap:'wrap'}}  
                       onClick={() => handleLinkClick("/PO_ManagementSystem")}
+                      primaryTypographyProps={{
+                        color:
+                          activeTab === "/PO_ManagementSystem"
+                            ? "#ff8c00"
+                            : "#000",
+                        fontFamily: "monospace",
+                        fontWeight: 700,
+                        letterSpacing: "normal",
+                      }}
+                      sx={{
+                        textShadow: "0 0 black",
+                      }}
                     />
                   </ListItemButton>
                   <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
+                    <ListItemIcon
+                      className="w-auto me-2"
+                      sx={{
+                        minWidth: "unset",
+                      }}
+                    >
                       <StarBorder />
                     </ListItemIcon>
                     <ListItemText
                       primary="PO details"
                       onClick={() => handleLinkClick("/PO_details")}
+                      primaryTypographyProps={{
+                        color: activeTab === "/PO_details" ? "#ff8c00" : "#000",
+                        fontFamily: "monospace",
+                        fontWeight: 700,
+                        letterSpacing: "normal",
+                      }}
+                      sx={{
+                        textShadow: "0 0 black",
+                      }}
                     />
                   </ListItemButton>
                   <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
+                    <ListItemIcon
+                      className="w-auto me-2"
+                      sx={{
+                        minWidth: "unset",
+                      }}
+                    >
                       <StarBorder />
                     </ListItemIcon>
                     <ListItemText
                       primary="Order Not Available"
                       onClick={() => handleLinkClick("/order_not_available")}
+                      primaryTypographyProps={{
+                        color:
+                          activeTab === "/order_not_available"
+                            ? "#ff8c00"
+                            : "#000",
+                        fontFamily: "monospace",
+                        fontWeight: 700,
+                        letterSpacing: "normal",
+                      }}
+                      sx={{
+                        textShadow: "0 0 black",
+                      }}
                     />
                   </ListItemButton>
                   <ListItemButton>
                     <ListItemIcon>
-                      <InboxIcon />
+                      <InboxIcon sx={{ color: "#00008b" }} />
                     </ListItemIcon>
-                    <ListItemText primary="P3 System" />
+                    <ListItemText
+                      primary="P3 System"
+                      primaryTypographyProps={{
+                        fontSize: "18px",
+                        fontWeight: 700,
+                        color: "#00008b", // Change color as needed
+                      }}
+                    />
                   </ListItemButton>
                   <ListItemButton>
                     <ListItemIcon>
-                      <InboxIcon />
+                      <InboxIcon sx={{ color: "#00008b" }} />
                     </ListItemIcon>
                     <ListItemText
                       primary="All factory"
                       onClick={() => handleLinkClick("/all_factory")}
+                      primaryTypographyProps={{
+                        fontSize: "18px",
+                        fontWeight: 700,
+                        color: "#00008b", // Change color as needed
+                      }}
                     />
                   </ListItemButton>
                   <ListItemButton>
                     <ListItemIcon>
-                      <InboxIcon />
+                      <InboxIcon sx={{ color: "#00008b" }} />
                     </ListItemIcon>
                     <ListItemText
                       primary="All Products"
                       onClick={() => handleLinkClick("/all_products_list")}
+                      primaryTypographyProps={{
+                        fontSize: "18px",
+                        fontWeight: 700,
+                        color: "#00008b", // Change color as needed
+                      }}
                     />
                   </ListItemButton>
                   <ListItemButton>
                     <ListItemIcon>
-                      <SendIcon />
+                      <SendIcon sx={{ color: "#00008b" }} />
                     </ListItemIcon>
                     <ListItemText
                       primary="Factory Form"
                       onClick={() => handleLinkClick("/factory_form")}
+                      primaryTypographyProps={{
+                        fontSize: "18px",
+                        fontWeight: 700,
+                        color: "#00008b", // Change color as needed
+                      }}
                     />
                   </ListItemButton>
                   <ListItemButton>
                     <ListItemIcon>
-                      <DraftsIcon />
+                      <DraftsIcon sx={{ color: "#00008b" }} />
                     </ListItemIcon>
                     <ListItemText
                       primary="Order Details"
                       onClick={() => handleLinkClick("/order_details")}
+                      primaryTypographyProps={{
+                        fontSize: "18px",
+                        fontWeight: 700,
+                        color: "#00008b", // Change color as needed
+                      }}
                     />
                   </ListItemButton>
                 </List>
