@@ -17,6 +17,8 @@ import POManagementSystem from "./components/POManagementSystem";
 import GRNManagement from "./components/GRNManagement";
 import OnHoldManagement from "./components/OnHoldManagement";
 import OnHoldManegementSystem from "./components/OnHoldManegementSystem";
+import { ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function App() {
   return (
     <>
@@ -46,6 +48,7 @@ function App() {
             </Route>
           </Route>
         </Routes>
+        <ToastContainer />
       </BrowserRouter>
     </>
   );

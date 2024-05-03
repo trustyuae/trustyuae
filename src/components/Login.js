@@ -11,11 +11,16 @@ import Button from "react-bootstrap/Button";
 import { useDispatch} from "react-redux";
 import { loginUser, loginUserWithToken } from "../redux/actions/UserActions";
 import { useNavigate } from "react-router-dom";
+import { isValidUserName } from "../utils/validation";
+import styled from 'styled-components';
+
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameError, setUserNameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const handleUsername = (e) => {
     setUserName(e.target.value);
@@ -26,8 +31,30 @@ const Login = () => {
   };
 
   const handleSubmit = () => {
-    dispatch(loginUser({ username, password },navigate));
+    let isValid = true;
+  
+    if (!username) {
+      setUserNameError("Username is required");
+      isValid = false;
+    } else if (!isValidUserName(username)) {
+      setUserNameError("Please enter a valid Username");
+      isValid = false;
+    } else {
+      setUserNameError(""); 
+    }
+  
+    if (!password) {
+      setPasswordError("Please enter valid password");
+      isValid = false;
+    } else {
+      setPasswordError(""); 
+    }
+  
+    if (isValid) {
+      dispatch(loginUser({ username, password }, navigate));
+    }
   };
+  
 
   useEffect(()=>{
     const token = localStorage.getItem('token')
@@ -46,7 +73,7 @@ const Login = () => {
         </MDBCol>
         <MDBCol col="4" md="4" className="align-items-center">
           <MDBInput
-            wrapperClass="mb-4"
+            // wrapperClass="mb-4"
             placeholder="Enter username..."
             value={username}
             id="formControlLg"
@@ -55,8 +82,9 @@ const Login = () => {
             style={{ fontSize: "15px" }}
             onChange={handleUsername}
           />
+          {usernameError && <Error>{usernameError}</Error>}
           <MDBInput
-            wrapperClass="mb-4"
+            wrapperClass="mt-4"
             placeholder="Enter password..."
             value={password}
             id="formControlLg"
@@ -65,7 +93,8 @@ const Login = () => {
             style={{ fontSize: "15px"}}
             onChange={handlePassword}
           />
-          <div className="d-flex justify-content-between mx-4 mb-4">
+          {passwordError && <Error>{passwordError}</Error>}
+          <div className="d-flex justify-content-between mx-4 mt-3 mb-4">
             <MDBCheckbox
               name="flexCheck"
               value={""}
@@ -89,3 +118,10 @@ const Login = () => {
 };
 
 export default Login;
+
+
+const Error = styled.p`
+  font-size:16px;
+  color: red;
+  fontWeight:400;
+`;
