@@ -8,42 +8,47 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import Pagination from "react-bootstrap/Pagination";
 import { useParams } from 'react-router-dom';
-
-function OrderDetails() {
-    const { id } = useParams();
-    const [orderData, setOrderData] = useState(null);
-    const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders/${id}`;
-    const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-    const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
-    useEffect(() => {
-        const fetchOrder = async () => {
-            try {
-                const response = await axios.get(apiUrl,
-                    {
-                        auth: {
-                            username: username,
-                            password: password,
-                        },
-                    }
-                );
-                console.log([response.data], 'response');
-                setOrderData([response.data]);
-            } catch (error) {
-                console.error('Error fetching order data:', error);
-            }
-        };
-
-        fetchOrder();
-    }, [apiUrl]);
+function OnHoldManagement() {
     return (
         <Container
             fluid
             className="px-5"
             style={{height: "98vh" }}
         >
-            <h3 className="fw-bold text-center py-3 ">Order ID -{id}</h3>
-            
-            <MDBRow>
+            <h3 className="fw-bold text-center py-3 ">On Hold Management</h3>
+            {/* <MDBRow className="d-flex justify-content-start align-items-center mb-3">
+                <MDBCol md="2">
+                    <Form.Label className="me-2">Product ID:</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Search by Product ID"
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value)}
+                    />
+                </MDBCol>
+                <MDBCol md="2">
+                    <Form.Label className="me-2">Product Name:</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Search by Product Name"
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                    />
+                </MDBCol>
+                <MDBCol md="1">
+                    <Form.Label className="me-2">Page Size:</Form.Label>
+                    <Form.Control
+                        as="select"
+                        value={itemsPerPage}
+                        onChange={handlePageSizeChange}
+                    >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                    </Form.Control>
+                </MDBCol>
+            </MDBRow> */}
+            {/* <MDBRow>
                 <MDBCol md="12" className="d-flex justify-content-end">
                     <Button variant="primary" className="me-3">
                         Print
@@ -59,7 +64,7 @@ function OrderDetails() {
                         Shipping Address
                     </h3>
                 </MDBCol>
-            </MDBRow>
+            </MDBRow> */}
 
             <MDBRow className="d-flex justify-content-center align-items-center">
                 <MDBCol col="10" md="12" sm="12"></MDBCol>
@@ -78,7 +83,7 @@ function OrderDetails() {
                                     textAlign: "center",
                                 }}
                             >
-                                Address
+                                Product Name
                             </th>
                             <th
                                 style={{
@@ -87,27 +92,18 @@ function OrderDetails() {
                                     textAlign: "center",
                                 }}
                             >
-                                City
+                               Image
                             </th>
-                            <th
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}
-                            >
-                                Country
-                            </th>
-
                         </tr>
                     </thead>
                     <tbody>
-                        {/* <tr>
-                            <td className="text-center">123 Main st</td>
-                            <td className="text-center">CityVille</td>
-                            <td className="text-center">Countryland</td>
-                        </tr> */}
-                        {
+                        <tr>
+                            <td className="text-center">Chanel Double Flap</td>
+                            <td className="text-center">
+                                <img src="/" style={{ maxWidth: "100px" }}/>
+                            </td>
+                        </tr>
+                        {/* {
                             orderData?.map((order, index) => (
                                 <tr key={index}>
                                     <td className="text-center">{order.billing?.address_1}</td>
@@ -115,13 +111,13 @@ function OrderDetails() {
                                     <td className="text-center">{order.billing?.country}</td>
                                 </tr>
                             ))
-                        }
+                        } */}
                     </tbody>
 
                 </Table>
             </MDBRow>
             <MDBRow>
-                <MDBCol md="4">
+                <MDBCol md="12">
                     <h3 className="fw-bold text-center py-3 ">
                         Order Details
                     </h3>
@@ -145,7 +141,7 @@ function OrderDetails() {
                                     textAlign: "center",
                                 }}
                             >
-                                Name
+                               Order ID
                             </th>
                             <th
                                 style={{
@@ -154,7 +150,7 @@ function OrderDetails() {
                                     textAlign: "center",
                                 }}
                             >
-                                Variant Details
+                                Shipping Country
                             </th>
                             <th
                                 style={{
@@ -163,22 +159,67 @@ function OrderDetails() {
                                     textAlign: "center",
                                 }}
                             >
-                                Image
+                                Item Received
                             </th>
                             <th
                                 style={{
                                     backgroundColor: "#DEE2E6",
                                     padding: "8px",
                                     textAlign: "center",
+                                    display:'flex',
+                                    justifyContent:'center'
                                 }}
                             >
-                                Qty
+                              <Form.Check
+                                    type="checkbox"
+                                   className="me-2"
+                                />  
+                                Select All
                             </th>
 
                         </tr>
                     </thead>
                     <tbody>
-                        {
+                        <tr>
+                            <td className="text-center">86700</td>
+                            <td className="text-center">Saudia Arabia</td>
+                            <td className="text-center">
+                                1/1
+                            </td>
+                            <td className="text-center">
+                                <Form.Check
+                                    type="checkbox"
+                                   className="me-2"
+                                />
+                                 </td>
+                        </tr>
+                        <tr>
+                            <td className="text-center">88802</td>
+                            <td className="text-center">Kuwait</td>
+                            <td className="text-center">
+                               1/1
+                            </td>
+                            <td className="text-center">
+                            <Form.Check
+                                    type="checkbox"
+                                   className="me-2"
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="text-center">89065</td>
+                            <td className="text-center">UAE</td>
+                            <td className="text-center">
+                                1/2
+                            </td>
+                            <td className="text-center">
+                            <Form.Check
+                                    type="checkbox"
+                                   className="me-2"
+                                />
+                            </td>
+                        </tr>
+                        {/* {
                             orderData?.map((order, index) => (
                                 order.line_items?.map((item, subIndex) => {
                                     const sizeObject = item.meta_data.find(meta => meta.key === 'pa_size');
@@ -201,19 +242,17 @@ function OrderDetails() {
                                     );
                                 })
                             ))
-                        }
+                        } */}
                     </tbody>
 
                 </Table>
             </MDBRow>
             <MDBRow>
-                <MDBCol md="12" className="d-flex justify-content-end">
-                    <Button variant="primary" className="  me-3">
-                        Attach
+                <MDBCol md="12" className="d-flex justify-content-center">
+                    <Button variant="success" className="  me-3">
+                    Send for Preparation
                     </Button>
-                    <Button variant="danger" >
-                        Finish
-                    </Button>
+                    
                 </MDBCol>
             </MDBRow>
 
@@ -221,6 +260,4 @@ function OrderDetails() {
     )
 }
 
-
-
-export default OrderDetails
+export default OnHoldManagement
