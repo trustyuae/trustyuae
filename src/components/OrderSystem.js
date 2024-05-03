@@ -178,8 +178,9 @@ function OrderSystem() {
                             <Form.Group>
                                 <Form.Label>Dispatch type:</Form.Label>
                                 <Form.Select className="mr-sm-2">
-                                    <option value="Standard">Dispatch</option>
-                                    <option value="Express">Reserve</option>
+                                    <option value="All">All</option>
+                                    <option value="Dispatch">Dispatch</option>
+                                    <option value="Reserve">Reserve</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
@@ -206,38 +207,70 @@ function OrderSystem() {
                 <Table striped bordered hover>
                     <thead>
                         <tr>
-                            <th className='text-center' onClick={() => requestSort('date_created')}>
+                            <th className='text-center'
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }} onClick={() => requestSort('date_created')}>
                                 Date{' '}
                                 <span className={getClassNamesFor('date_created')}></span>
                             </th>
-                            <th className='text-center' onClick={() => requestSort('id')}>
+                            <th className='text-center'
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }} onClick={() => requestSort('id')}>
                                 Order ID{' '}
                                 <span className={getClassNamesFor('id')}></span>
                             </th>
-                            <th className='text-center' onClick={() => requestSort('billing.first_name')}>
+                            <th className='text-center'
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }}
+                                onClick={() => requestSort('billing.first_name')}>
                                 Customer Name{' '}
                                 <span className={getClassNamesFor('billing.first_name')}></span>
                             </th>
-                            <th className='text-center' onClick={() => requestSort('shipping.country')}>
+                            <th className='text-center'
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }}
+                                onClick={() => requestSort('shipping.country')}>
                                 Shipping Country{' '}
                                 <span className={getClassNamesFor('shipping.country')}></span>
                             </th>
-                            <th className='text-center' onClick={() => requestSort('dispatch_type')}>
+                            <th className='text-center'
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }} onClick={() => requestSort('dispatch_type')}>
                                 Dispatch Type{' '}
                                 <span className={getClassNamesFor('dispatch_type')}></span>
                             </th>
-                            <th className='text-center'>View Items</th>
+                            <th className='text-center'
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }}>View Items</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentOrders.map(order => (
                             <tr key={order.id}>
-                                <td className='text-center'>{formatDate(order.date_created)}</td>
-                                <td className='text-center'>{order.id}</td>
-                                <td className='text-center'>{order.billing.first_name} {order.billing.last_name}</td>
-                                <td className='text-center'>{order.shipping.country}</td>
-                                <td className='text-center'>Dispatch</td>
-                                <td className='text-center'>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{formatDate(order.date_created)}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.id}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.billing.first_name} {order.billing.last_name}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.shipping.country}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>Dispatch</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>
                                     <Link to={`/order_details/${order.id}`}>
                                         <Button type="button" className='w-auto'>View</Button>
                                     </Link>

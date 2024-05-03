@@ -8,10 +8,14 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import Pagination from "react-bootstrap/Pagination";
 import { useParams } from 'react-router-dom';
+import { Card } from "react-bootstrap";
 
 function OrderDetails() {
     const { id } = useParams();
     const [orderData, setOrderData] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [imageURL,setImageURL]=useState('')
+
     const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders/${id}`;
     const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
     const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
@@ -35,14 +39,24 @@ function OrderDetails() {
 
         fetchOrder();
     }, [apiUrl]);
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
+    };
+
+    const ImageModule =(url)=>{
+        console.log(url,'url');
+        setImageURL(url)
+        setShowEditModal(true);
+    }
     return (
         <Container
             fluid
             className="px-5"
-            style={{height: "98vh" }}
+            style={{ height: "98vh" }}
         >
             <h3 className="fw-bold text-center py-3 ">Order ID -{id}</h3>
-            
+
             <MDBRow>
                 <MDBCol md="12" className="d-flex justify-content-end">
                     <Button variant="primary" className="me-3">
@@ -174,6 +188,24 @@ function OrderDetails() {
                             >
                                 Qty
                             </th>
+                            <th
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }}
+                            >
+                                Status
+                            </th>
+                            <th
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }}
+                            >
+                                Customer Note
+                            </th>
 
                         </tr>
                     </thead>
@@ -189,7 +221,7 @@ function OrderDetails() {
                                         <tr key={`${index}-${subIndex}`}>
                                             <td className="text-center">{item.name}</td>
                                             <td className="text-center">Size:{size} , Reduced Stock:{reducedStock} </td>
-                                            <td className="text-center">
+                                            <td className="text-center" onClick={(e) => ImageModule(item.image.src)}>
                                                 <img
                                                     src={item.image.src}
                                                     alt={item.name}
@@ -197,6 +229,8 @@ function OrderDetails() {
                                                 />
                                             </td>
                                             <td className="text-center">{item.quantity}</td>
+                                            <td className="text-center"></td>
+                                            <td className="text-center"></td>
                                         </tr>
                                     );
                                 })
@@ -216,6 +250,29 @@ function OrderDetails() {
                     </Button>
                 </MDBCol>
             </MDBRow>
+
+            <Modal show={showEditModal} onHide={handleCloseEditModal} style={{ marginTop: '130px' }}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Product</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                <Card className="factory-card">
+                        <img
+                            src={imageURL}
+                            
+                            // style={{ maxWidth: "100px" }}
+                        />
+                </Card>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary">
+                        Close
+                    </Button>
+                    <Button variant="primary">
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
         </Container>
     )
