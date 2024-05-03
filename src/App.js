@@ -16,6 +16,7 @@ import AllFactory from "./components/AllFactory";
 import POManagementSystem from "./components/POManagementSystem";
 import GRNManagement from "./components/GRNManagement";
 import OnHoldManagement from "./components/OnHoldManagement";
+import OnHoldManegementSystem from "./components/OnHoldManegementSystem";
 function App() {
   return (
     <>
@@ -41,6 +42,7 @@ function App() {
               <Route exact path="/PO_ManagementSystem" element={<POManagementSystem/>} />
               <Route exact path="/GRN_Management" element={<GRNManagement/>} />
               <Route exact path="/On_Hold_Management" element={<OnHoldManagement/>} />
+              <Route exact path="/On_Hold_Manegement_System" element={<OnHoldManegementSystem/>} />
             </Route>
           </Route>
         </Routes>
