@@ -18,11 +18,11 @@ export const loginUser = (data, navigate) => async (dispatch) => {
       headers: { "content-type": "application/json" },
     });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data.token });
-    localStorage.setItem("token", JSON.stringify(res?.data?.token));
+    await localStorage.setItem("token", JSON.stringify(res?.data?.token));
     if (res.data.token) {
       toast(`${res?.data?.message}`, {
         position: "top-right",
-        autoClose: 5000,
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -37,7 +37,7 @@ export const loginUser = (data, navigate) => async (dispatch) => {
   } catch (error) {
     toast(`${error?.response?.data?.message}`, {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
