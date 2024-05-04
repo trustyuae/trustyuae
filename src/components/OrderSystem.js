@@ -18,25 +18,39 @@ function OrderSystem() {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' }); // Sort configuration
     const pageSizeOptions = [5, 10, 20, 50]; // Options for page size
 
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
     const username = 'ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a';
     const password = 'cs_8dcdba11377e29282bd2b898d4a517cddd6726fe';
 
+    const [dispatchType, setdispatchType] = useState([]);
+
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await axios.get('https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders', {
-                    auth: {
-                        username: username,
-                        password: password
-                    }
-                });
-                setOrders(response.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchOrders();
+        fetch('https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-api/dispatch-status/')
+            .then(response => response.json())
+            .then(data => setdispatchType(data))
+            .catch(error => console.error('Error fetching orders:', error));
     }, []);
+
+    const fetchOrders = async () => {
+        try {
+            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders?page=${page}&per_page=10`, {
+                auth: {
+                    username: username,
+                    password: password
+                }
+            });
+            setOrders(response.data);
+            const totalPagesHeader = response.headers.get('X-WP-TotalPages');
+            setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+    useEffect(() => {
+        fetchOrders();
+    }, [page]);
 
     useEffect(() => {
         setFilteredOrders(orders);
@@ -46,40 +60,8 @@ function OrderSystem() {
         const date = new Date(dateString);
         return date.toLocaleDateString();
     };
-
-    // const handleSearch = () => {
-    //     let filtered = orders;
-
-    //     if (searchOrderID) {
-    //         filtered = filtered.filter(order => order.id.toString() === searchOrderID);
-    //     }
-
-    //     if (startDate) {
-    //         // Extract day, month, and year from startDate
-    //         const startDateObj = new Date(startDate);
-    //         const startDay = startDateObj.getDate();
-    //         const startMonth = startDateObj.getMonth();
-    //         const startYear = startDateObj.getFullYear();
-
-    //         // Filter orders based on date comparison
-    //         filtered = filtered.filter(order => {
-    //             // Extract day, month, and year from order date
-    //             const orderDateObj = new Date(order.date_created);
-    //             const orderDay = orderDateObj.getDate();
-    //             const orderMonth = orderDateObj.getMonth();
-    //             const orderYear = orderDateObj.getFullYear();
-
-    //             // Compare day, month, and year
-    //             return startDay === orderDay && startMonth === orderMonth && startYear === orderYear;
-    //         });
-    //     }
-
-    //     setFilteredOrders(filtered);
-    //     setCurrentPage(1); // Reset current page to 1 after filtering
-    // };
-
     const handleSearch = async () => {
-        let apiUrl = 'https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders';
+        let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders`;
 
         if (searchOrderID) {
             apiUrl += `?include=${searchOrderID}`;
@@ -90,13 +72,17 @@ function OrderSystem() {
         }
 
         try {
-            const response = await axios.get(apiUrl, {
+            const response = await axios.get(`${apiUrl}&page=${page}&per_page=10`, {
                 auth: {
                     username: username,
                     password: password
                 }
             });
-            setFilteredOrders(response.data);
+            // setFilteredOrders(response.data);
+            setOrders(response.data);
+            const totalPagesHeader = response.headers.get('X-WP-TotalPages');
+            setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
+            setCurrentPage(1); // Reset current page to 1 after filtering
         } catch (error) {
             console.error('Error fetching filtered data:', error);
         }
@@ -107,6 +93,7 @@ function OrderSystem() {
         setStartDate('');
         setFilteredOrders(orders);
         setCurrentPage(1); // Reset current page to 1 after resetting filters
+        fetchOrders()
     };
 
     const handlePageSizeChange = (e) => {
@@ -163,6 +150,22 @@ function OrderSystem() {
     const indexOfLastOrder = currentPage * pageSize;
     const indexOfFirstOrder = indexOfLastOrder - pageSize;
     const currentOrders = sortedOrders().slice(indexOfFirstOrder, indexOfLastOrder);
+
+    const goToPage = (newPage) => {
+        setPage(newPage);
+      };
+
+      const getDispatchStatus = (order) => {
+        console.log(order,'order');
+        dispatchType.map(type=>{
+            if(type.order_id==order){
+                return type?.dispatch_status
+            }
+        })
+        // Assuming the API returns the dispatch status as a property named 'dispatchStatus'
+        // return dispatchType.dispatchStatus || 'Not available'; // You can change the fallback text as needed
+    };
+    
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
             <div className="mb-9">
@@ -287,7 +290,7 @@ function OrderSystem() {
                         </tr>
                     </thead>
                     <tbody>
-                        {currentOrders.map(order => (
+                        {/* {currentOrders.map(order => (
                             <tr key={order.id}>
                                 <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{formatDate(order.date_created)}</td>
                                 <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.id}</td>
@@ -300,10 +303,24 @@ function OrderSystem() {
                                     </Link>
                                 </td>
                             </tr>
+                        ))} */}
+                        {orders.map(order => (
+                            <tr key={order.id}>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{formatDate(order.date_created)}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.id}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.billing.first_name} {order.billing.last_name}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.shipping.country}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{getDispatchStatus(order.id)}</td>
+                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>
+                                    <Link to={`/order_details/${order.id}`}>
+                                        <Button type="button" className='w-auto'>View</Button>
+                                    </Link>
+                                </td>
+                            </tr>
                         ))}
                     </tbody>
                 </Table>
-                <Pagination className="mt-3 justify-content-center">
+                {/* <Pagination className="mt-3 justify-content-center">
                     <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
                     <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
                     {[...Array(Math.ceil(filteredOrders.length / pageSize)).keys()].map(number => (
@@ -313,7 +330,16 @@ function OrderSystem() {
                     ))}
                     <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(filteredOrders.length / pageSize)} />
                     <Pagination.Last onClick={() => setCurrentPage(Math.ceil(filteredOrders.length / pageSize))} disabled={currentPage === Math.ceil(filteredOrders.length / pageSize)} />
-                </Pagination>
+                </Pagination> */}
+                <div>
+        <Row>
+        <Col className='d-flex'>
+        <Button type="button" className='mr-2 mx-3 w-25' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
+        <span>{page} of {totalPages}</span>
+        <Button type="button" className='mr-2 mx-3 w-25' onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
+        </Col>
+        </Row>
+      </div>
             </div>
         </Container>
     )
