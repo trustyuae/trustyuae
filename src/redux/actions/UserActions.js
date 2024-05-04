@@ -9,7 +9,7 @@ import {
   CLEAR_STORE,
 } from "../constants/Constants";
 import { loginURL, logoutURL } from "../../utils/constants";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
@@ -20,30 +20,23 @@ export const loginUser = (data, navigate) => async (dispatch) => {
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data.token });
     await localStorage.setItem("token", JSON.stringify(res?.data?.token));
     if (res.data.token) {
-      toast(`${res?.data?.message}`, {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
+      Swal.fire({
+        icon: "success",
+        title: res?.data?.message,
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/ordersystem");
+        }
       });
-      navigate("/ordersystem");
     } else {
       console.log("error while login");
     }
   } catch (error) {
-    toast(`${error?.response?.data?.message}`, {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error?.response?.data?.message,
     });
     dispatch({ type: USER_LOGIN_FAIL });
     console.log("error occurred");
@@ -73,6 +66,6 @@ export const loginUserWithToken = (navigate, token) => async (dispatch) => {
 
 export const userLogout = (navigate) => async (dispatch) => {
   dispatch({ type: CLEAR_STORE });
-  await localStorage.clear();
+  localStorage.clear();
   navigate("/");
 };
