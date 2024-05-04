@@ -43,8 +43,8 @@ export const Layout = () => {
         {/* <Dashboard /> */}
         <Header/>
         <SideBar/>
-        <StyledMain>
-          <Outlet />
+        <StyledMain id="main">
+          <Outlet/>
         </StyledMain>
       </InnerContainer>
     </OuterContainer>

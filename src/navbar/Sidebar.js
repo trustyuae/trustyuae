@@ -9,7 +9,7 @@ const Sidebar = () => {
       <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
           <li class="nav-item">
-            <a class="nav-link " href="index.html">
+            <a class="nav-link " href="/ordersystem">
               <i class="bi bi-grid"></i>
               <span>Dashboard</span>
             </a>
@@ -23,7 +23,7 @@ const Sidebar = () => {
               href="/"
             >
               <i class="bi bi-menu-button-wide"></i>
-              <span>Components</span>
+              <span>P2 System</span>
               <i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul
@@ -32,87 +32,27 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <a href="components-alerts.html">
+                <a href="/order_management_system">
                   <i class="bi bi-circle"></i>
-                  <span>Alerts</span>
+                  <span>Order Management System</span>
                 </a>
               </li>
               <li>
-                <a href="components-accordion.html">
+                <a href="/PO_ManagementSystem">
                   <i class="bi bi-circle"></i>
-                  <span>Accordion</span>
+                  <span>PO management System</span>
                 </a>
               </li>
               <li>
-                <a href="components-badges.html">
+                <a href="/PO_details">
                   <i class="bi bi-circle"></i>
-                  <span>Badges</span>
+                  <span>PO details</span>
                 </a>
               </li>
               <li>
-                <a href="components-breadcrumbs.html">
+                <a href="/order_not_available">
                   <i class="bi bi-circle"></i>
-                  <span>Breadcrumbs</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-buttons.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Buttons</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-cards.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Cards</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-carousel.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Carousel</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-list-group.html">
-                  <i class="bi bi-circle"></i>
-                  <span>List group</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-modal.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Modal</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-tabs.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Tabs</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-pagination.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Pagination</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-progress.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Progress</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-spinners.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Spinners</span>
-                </a>
-              </li>
-              <li>
-                <a href="components-tooltips.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Tooltips</span>
+                  <span>Order Not Available</span>
                 </a>
               </li>
             </ul>
@@ -126,7 +66,7 @@ const Sidebar = () => {
               href="/"
             >
               <i class="bi bi-journal-text"></i>
-              <span>Forms</span>
+              <span>P3 System</span>
               <i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul
@@ -164,43 +104,12 @@ const Sidebar = () => {
           <li class="nav-item">
             <a
               class="nav-link collapsed"
-              data-bs-target="#tables-nav"
-              data-bs-toggle="collapse"
-              href="/"
-            >
-              <i class="bi bi-layout-text-window-reverse"></i>
-              <span>Tables</span>
-              <i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul
-              id="tables-nav"
-              class="nav-content collapse "
-              data-bs-parent="#sidebar-nav"
-            >
-              <li>
-                <a href="tables-general.html">
-                  <i class="bi bi-circle"></i>
-                  <span>General Tables</span>
-                </a>
-              </li>
-              <li>
-                <a href="tables-data.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Data Tables</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-
-          <li class="nav-item">
-            <a
-              class="nav-link collapsed"
               data-bs-target="#charts-nav"
               data-bs-toggle="collapse"
               href="/"
             >
               <i class="bi bi-bar-chart"></i>
-              <span>Charts</span>
+              <span>Factory Management</span>
               <i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul
@@ -209,21 +118,15 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <a href="charts-chartjs.html">
+                <a href="/all_factory">
                   <i class="bi bi-circle"></i>
-                  <span>Chart.js</span>
+                  <span>All Factories</span>
                 </a>
               </li>
               <li>
-                <a href="charts-apexcharts.html">
+                <a href="/factory_form">
                   <i class="bi bi-circle"></i>
-                  <span>ApexCharts</span>
-                </a>
-              </li>
-              <li>
-                <a href="charts-echarts.html">
-                  <i class="bi bi-circle"></i>
-                  <span>ECharts</span>
+                  <span>Add Factory</span>
                 </a>
               </li>
             </ul>
@@ -232,89 +135,28 @@ const Sidebar = () => {
           <li class="nav-item">
             <a
               class="nav-link collapsed"
-              data-bs-target="#icons-nav"
+              data-bs-target="#charts-navv"
               data-bs-toggle="collapse"
               href="/"
             >
-              <i class="bi bi-gem"></i>
-              <span>Icons</span>
+              <i class="bi bi-bar-chart"></i>
+              <span>Product management</span>
               <i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul
-              id="icons-nav"
+              id="charts-navv"
               class="nav-content collapse "
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <a href="icons-bootstrap.html">
+                <a href="/all_products_list">
                   <i class="bi bi-circle"></i>
-                  <span>Bootstrap Icons</span>
-                </a>
-              </li>
-              <li>
-                <a href="icons-remix.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Remix Icons</span>
-                </a>
-              </li>
-              <li>
-                <a href="icons-boxicons.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Boxicons</span>
+                  <span>All Products</span>
                 </a>
               </li>
             </ul>
           </li>
 
-          <li class="nav-heading">Pages</li>
-
-          <li class="nav-item">
-            <a class="nav-link collapsed" href="users-profile.html">
-              <i class="bi bi-person"></i>
-              <span>Profile</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-faq.html">
-              <i class="bi bi-question-circle"></i>
-              <span>F.A.Q</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-contact.html">
-              <i class="bi bi-envelope"></i>
-              <span>Contact</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-register.html">
-              <i class="bi bi-card-list"></i>
-              <span>Register</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-login.html">
-              <i class="bi bi-box-arrow-in-right"></i>
-              <span>Login</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-error-404.html">
-              <i class="bi bi-dash-circle"></i>
-              <span>Error 404</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-blank.html">
-              <i class="bi bi-file-earmark"></i>
-              <span>Blank</span>
-            </a>
-          </li>
         </ul>
       </aside>
     </>
