@@ -34,43 +34,44 @@ function AllProductList() {
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
   const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
 
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(
+        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-products-api/v1/fetch-products",
+        {
+          auth: {
+            username: username,
+            password: password,
+          },
+        }
+      );
+      console.log(response.data, 'response.data');
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-products-api/v1/fetch-products",
-          {
-            auth: {
-              username: username,
-              password: password,
-            },
-          }
-        );
-        console.log(response.data, 'response.data');
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
     fetchProducts();
   }, []);
 
+  const fetchFactories = async () => {
+    try {
+      const response = await axios.get(
+        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/fetch-factories"
+      );
+      setFactories(response.data);
+    } catch (error) {
+      console.error("Error fetching factories:", error);
+    }
+  };
   useEffect(() => {
-    const fetchFactories = async () => {
-      try {
-        const response = await axios.get(
-          "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/fetch-factories"
-        );
-        setFactories(response.data);
-      } catch (error) {
-        console.error("Error fetching factories:", error);
-      }
-    };
     fetchFactories();
   }, []);
 
   const handleEdit = (productId) => {
     const product = products.find((p) => p.id === productId);
+    console.log(product,'product');
     setSelectedProduct(product);
     setShowEditModal(true);
   };
@@ -89,54 +90,54 @@ function AllProductList() {
     console.log("Product selectFile:", selectFile);
     console.log("Product data 2222:", data);
 
-    // const response = await fetch(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${data.product_id}`, {
-    //     method: 'POST',
-    //     body: data,
-    //   });
+
+    const formData = new FormData();
+    const formData2 = new FormData();
+
+    formData.append("factory_id", selectedProduct.factory_id);
+    formData.append("id", selectedProduct.id);
+    formData.append("product_id", selectedProduct.product_id);
+    formData.append("product_image", selectedProduct.product_image);
+    formData.append("product_name", selectedProduct.product_name);
+    formData.append("stock_quantity", selectedProduct.stock_quantity);
+    formData.append("stock_status", selectedProduct.stock_status);
+    formData2.append("name", selectedProduct?.product_name);
+
+    if(selectFile){
+      formData.append("factory_image", selectFile);
+    }else{
+      console.log(selectedProduct.factory_image,'selectedProduct.factory_image');
+      formData.append("factory_image", selectedProduct.factory_image);
+    }
+
+    
+    const response1 = await axios.post(
+      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/products/${selectedProduct?.product_id}`,
+      formData2, {
+        auth: {
+            username: username,
+            password: password
+        },
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+    });
 
     const response = await axios.post(
-      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${data.product_id}`,
-      data, {
+      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-proimage-update/v1/update-product/${selectedProduct.product_id}`,
+      formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }
     );
-    console.log('Product saved:', response.data);
+
     setShowEditModal(false);
+    fetchProducts();
+    fetchFactories()
     } catch (error) {
       console.error('Error saving product:', error);
     }
-
-    // try {
-    //   const formData = new FormData();
-    //   formData.append('factory_name', selectedProduct.factory_name);
-    //   formData.append('address', selectedProduct.address);
-    //   formData.append('contact_person', selectedProduct.contact_person);
-    //   formData.append('contact_number', selectedProduct.contact_number);
-    //   formData.append('contact_email', selectedProduct.contact_email);
-    //   formData.append('bank_account_details', selectedProduct.bank_account_details);
-      
-    //   // Check if factory image exists before appending
-    //   if (selectFile.factoryImage) {
-    //     formData.append('factory_image', selectFile);
-    //   }
-  
-    //   const response = await fetch(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${selectedProduct.id}`, {
-    //     method: 'POST',
-    //     body: formData,
-    //   });
-  
-    //   if (!response.ok) {
-    //     throw new Error('Failed to save product');
-    //   }
-  
-    //   console.log('Product saved successfully');
-    //   setShowEditModal(false);
-    // } catch (error) {
-    //   console.error('Error saving product:', error);
-    //   // Handle error, maybe show a notification to the user
-    // }
     
   };
 
@@ -384,13 +385,13 @@ function AllProductList() {
                 className="me-2"
               /> */}
               {/* <Form.Control type="text" value={selectedProduct?.factoryImage} onChange={(e) => setSelectedProduct({ ...selectedProduct, factoryImage: e.target.value })} /> */}
-              <Form.Control type="file" onChange={handleFileChange} />
+              <Form.Control type="file"  onChange={handleFileChange} />
             </Form.Group>
             <Form.Group className="mb-3" controlId="factory_id">
               <Form.Label>Factory</Form.Label>
               <Form.Control
                 as="select"
-                defaultValue={selectedFactory}
+                defaultValue={selectedProduct?.factory_id}
                 onChange={(e) => setSelectedProduct({
                 
                 ...selectedProduct,

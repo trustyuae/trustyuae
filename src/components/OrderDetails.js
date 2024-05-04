@@ -195,7 +195,7 @@ function OrderDetails() {
                                     textAlign: "center",
                                 }}
                             >
-                                Status
+                                Dispatch type
                             </th>
                             <th
                                 style={{
@@ -253,7 +253,7 @@ function OrderDetails() {
 
             <Modal show={showEditModal} onHide={handleCloseEditModal} style={{ marginTop: '130px' }}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit Product</Modal.Title>
+                    <Modal.Title>Product Image</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                 <Card className="factory-card">
@@ -264,14 +264,14 @@ function OrderDetails() {
                         />
                 </Card>
                 </Modal.Body>
-                <Modal.Footer>
+                {/* <Modal.Footer>
                     <Button variant="secondary">
                         Close
                     </Button>
                     <Button variant="primary">
                         Save Changes
                     </Button>
-                </Modal.Footer>
+                </Modal.Footer> */}
             </Modal>
 
         </Container>

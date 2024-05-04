@@ -27,7 +27,7 @@ function App() {
           <Route exact path="/" element={<Login />} />
           <Route element={<Layout />}>
             <Route element={<ProtectedRoute />}>
-              <Route exact path="/ordersystem" element={<OrderSystem />} />
+              <Route exact path="/ordersystem" element={<OrderSystem/>} />
 
               <Route exact path="/factory_form" element={<FactoryForm />} />
               <Route
