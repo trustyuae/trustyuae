@@ -6,9 +6,12 @@ import {
   USER_LOGOUT_FAIL,
   USER_LOGOUT_REQUEST,
   USER_LOGOUT_SUCCESS,
-} from '../constants/Constants';
+} from "../constants/Constants";
 
-export const UserReducer = (state = { loading: false, data: {} }, { payload, type }) => {
+export const UserLoginReducer = (
+  state = { loading: false, data: {} },
+  { payload, type }
+) => {
   switch (type) {
     case USER_LOGIN_REQUEST:
       return { ...state, loading: true };
@@ -17,6 +20,19 @@ export const UserReducer = (state = { loading: false, data: {} }, { payload, typ
     case USER_LOGIN_FAIL:
       return { ...state, loading: false };
 
+    case CLEAR_STORE:
+      return { ...state, data: {} };
+
+    default:
+      return state;
+  }
+};
+
+export const UserLogoutReducer = (
+  state = { loading: false, data: {} },
+  { payload, type }
+) => {
+  switch (type) {
     case USER_LOGOUT_REQUEST:
       return { ...state, loading: true };
     case USER_LOGOUT_SUCCESS:
@@ -26,7 +42,7 @@ export const UserReducer = (state = { loading: false, data: {} }, { payload, typ
 
     case CLEAR_STORE:
       return { ...state, data: {} };
-      
+
     default:
       return state;
   }

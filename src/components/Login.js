@@ -56,10 +56,10 @@ const Login = () => {
   };
   
 
-  useEffect(()=>{
-    const token = localStorage.getItem('token')
-    dispatch(loginUserWithToken(navigate,token))
-  })
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    dispatch(loginUserWithToken(navigate, token));
+  }, []);
 
   return (
     <MDBContainer fluid className="p-3 my-5">
