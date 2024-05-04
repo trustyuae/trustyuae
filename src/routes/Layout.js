@@ -3,6 +3,8 @@ import React from "react";
 import styled from "styled-components";
 import Dashboard from "../components/Dashboardd";
 import { Outlet } from "react-router-dom";
+import Header from "../navbar/Header";
+import SideBar from "../navbar/Sidebar";
 
 const OuterContainer = styled(Box)(({ theme }) => ({
   backgroundColor: "#FCFCFC",
@@ -38,7 +40,9 @@ export const Layout = () => {
   return (
     <OuterContainer>
       <InnerContainer>
-        <Dashboard />
+        {/* <Dashboard /> */}
+        <Header/>
+        <SideBar/>
         <StyledMain>
           <Outlet />
         </StyledMain>
