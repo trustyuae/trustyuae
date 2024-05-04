@@ -47,35 +47,59 @@ function OrderSystem() {
         return date.toLocaleDateString();
     };
 
-    const handleSearch = () => {
-        let filtered = orders;
+    // const handleSearch = () => {
+    //     let filtered = orders;
+
+    //     if (searchOrderID) {
+    //         filtered = filtered.filter(order => order.id.toString() === searchOrderID);
+    //     }
+
+    //     if (startDate) {
+    //         // Extract day, month, and year from startDate
+    //         const startDateObj = new Date(startDate);
+    //         const startDay = startDateObj.getDate();
+    //         const startMonth = startDateObj.getMonth();
+    //         const startYear = startDateObj.getFullYear();
+
+    //         // Filter orders based on date comparison
+    //         filtered = filtered.filter(order => {
+    //             // Extract day, month, and year from order date
+    //             const orderDateObj = new Date(order.date_created);
+    //             const orderDay = orderDateObj.getDate();
+    //             const orderMonth = orderDateObj.getMonth();
+    //             const orderYear = orderDateObj.getFullYear();
+
+    //             // Compare day, month, and year
+    //             return startDay === orderDay && startMonth === orderMonth && startYear === orderYear;
+    //         });
+    //     }
+
+    //     setFilteredOrders(filtered);
+    //     setCurrentPage(1); // Reset current page to 1 after filtering
+    // };
+
+    const handleSearch = async () => {
+        let apiUrl = 'https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders';
 
         if (searchOrderID) {
-            filtered = filtered.filter(order => order.id.toString() === searchOrderID);
+            apiUrl += `?include=${searchOrderID}`;
         }
 
         if (startDate) {
-            // Extract day, month, and year from startDate
-            const startDateObj = new Date(startDate);
-            const startDay = startDateObj.getDate();
-            const startMonth = startDateObj.getMonth();
-            const startYear = startDateObj.getFullYear();
-
-            // Filter orders based on date comparison
-            filtered = filtered.filter(order => {
-                // Extract day, month, and year from order date
-                const orderDateObj = new Date(order.date_created);
-                const orderDay = orderDateObj.getDate();
-                const orderMonth = orderDateObj.getMonth();
-                const orderYear = orderDateObj.getFullYear();
-
-                // Compare day, month, and year
-                return startDay === orderDay && startMonth === orderMonth && startYear === orderYear;
-            });
+            apiUrl += `?after=${startDate}T00:00:00&before=${startDate}T23:59:59`;
         }
 
-        setFilteredOrders(filtered);
-        setCurrentPage(1); // Reset current page to 1 after filtering
+        try {
+            const response = await axios.get(apiUrl, {
+                auth: {
+                    username: username,
+                    password: password
+                }
+            });
+            setFilteredOrders(response.data);
+        } catch (error) {
+            console.error('Error fetching filtered data:', error);
+        }
     };
 
     const handleReset = () => {

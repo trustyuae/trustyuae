@@ -89,54 +89,73 @@ function AllProductList() {
     console.log("Product selectFile:", selectFile);
     console.log("Product data 2222:", data);
 
-    // const response = await fetch(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${data.product_id}`, {
-    //     method: 'POST',
-    //     body: data,
-    //   });
 
-    const response = await axios.post(
-      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${data.product_id}`,
-      data, {
+    const formData = new FormData();
+    const formData2 = new FormData();
+    formData.append("factory_id", selectedProduct.factory_id);
+    formData.append("id", selectedProduct.id);
+    formData.append("product_id", selectedProduct.product_id);
+    formData.append("product_image", selectedProduct.product_image);
+    formData.append("product_name", selectedProduct.product_name);
+    formData.append("stock_quantity", selectedProduct.stock_quantity);
+    formData.append("stock_status", selectedProduct.stock_status);
+    formData.append("factory_id", selectedProduct.factory_id);
+    // formData.append("factory_image", selectFile);
+    formData2.append("factory_image", selectFile);
+
+
+    // const response = await axios.post(
+    //   `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${data.product_id}`,
+    //   data, {
+    //     headers: {
+    //       'Content-Type': 'multipart/form-data'
+    //     }
+    //   }
+    // );
+
+    // const response = await axios.post(
+    //   `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${selectedProduct.product_id}`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data",
+    //       // "Content-Type": "application/json",
+    //       // Authorization: `Bearer ${localStorage.getItem("token")}` // If your API requires authentication
+    //     }
+    //   }
+    // );
+
+    // const response1 = await axios.post(
+    //   `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/upload-factory-image/${selectedProduct.product_id}`,
+    //   formData2,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data",
+    //       // "Content-Type": "application/json",
+    //       // Authorization: `Bearer ${localStorage.getItem("token")}` // If your API requires authentication
+    //     }
+    //   }
+    // );
+
+    const response2 = await axios.post(
+      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${selectedProduct.product_id}`,
+      formData,
+      {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          "Content-Type": "multipart/form-data",
+          // "Content-Type": "application/json",
+          // Authorization: `Bearer ${localStorage.getItem("token")}` // If your API requires authentication
         }
       }
     );
-    console.log('Product saved:', response.data);
+
+    // console.log('Product saved:', response.data);
+    // console.log('Product saved:', response1.data);
+    console.log('Product saved:', response2.data);
     setShowEditModal(false);
     } catch (error) {
       console.error('Error saving product:', error);
     }
-
-    // try {
-    //   const formData = new FormData();
-    //   formData.append('factory_name', selectedProduct.factory_name);
-    //   formData.append('address', selectedProduct.address);
-    //   formData.append('contact_person', selectedProduct.contact_person);
-    //   formData.append('contact_number', selectedProduct.contact_number);
-    //   formData.append('contact_email', selectedProduct.contact_email);
-    //   formData.append('bank_account_details', selectedProduct.bank_account_details);
-      
-    //   // Check if factory image exists before appending
-    //   if (selectFile.factoryImage) {
-    //     formData.append('factory_image', selectFile);
-    //   }
-  
-    //   const response = await fetch(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-product/v1/update-product/${selectedProduct.id}`, {
-    //     method: 'POST',
-    //     body: formData,
-    //   });
-  
-    //   if (!response.ok) {
-    //     throw new Error('Failed to save product');
-    //   }
-  
-    //   console.log('Product saved successfully');
-    //   setShowEditModal(false);
-    // } catch (error) {
-    //   console.error('Error saving product:', error);
-    //   // Handle error, maybe show a notification to the user
-    // }
     
   };
 
