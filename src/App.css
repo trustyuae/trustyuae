@@ -57,3 +57,22 @@ margin-top: '55px';
 .subList{
   font-weight: 600 !important;
 }
+
+@media print {
+  /* Hide all elements outside the modal when printing */
+  body * {
+    display: none,
+  }
+
+  /* Display only the modal content */
+  .modal-content {
+    display: block !important;
+  }
+
+  /* Ensure the modal content takes up the full page */
+  .modal-dialog {
+    max-width: 100%;
+    width: auto;
+    margin: 0;
+  }
+}
