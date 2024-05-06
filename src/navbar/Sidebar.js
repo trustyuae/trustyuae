@@ -11,7 +11,7 @@ const Sidebar = () => {
           <li class="nav-item">
             <a class="nav-link " href="/ordersystem">
               <i class="bi bi-grid"></i>
-              <span>Dashboard</span>
+              <span>P1 System</span>
             </a>
           </li>
 
