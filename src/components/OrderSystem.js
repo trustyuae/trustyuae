@@ -35,7 +35,7 @@ function OrderSystem() {
 
     const fetchOrders = async () => {
         try {
-            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders?page=${page}&per_page=10`, {
+            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders?page=${page}&per_page=${pageSize}`, {
                 auth: {
                     username: username,
                     password: password
@@ -50,7 +50,7 @@ function OrderSystem() {
     };
     useEffect(() => {
         fetchOrders();
-    }, [page]);
+    }, [page,pageSize]);
 
     useEffect(() => {
         setFilteredOrders(orders);
@@ -157,11 +157,11 @@ function OrderSystem() {
 
       const getDispatchStatus = (order) => {
         console.log(order,'order');
-        dispatchType.map(type=>{
-            if(type.order_id==order){
-                return type?.dispatch_status
-            }
-        })
+        // dispatchType.map(type=>{
+        //     if(type.order_id==order){
+        //         return type?.dispatch_status
+        //     }
+        // })
         // Assuming the API returns the dispatch status as a property named 'dispatchStatus'
         // return dispatchType.dispatchStatus || 'Not available'; // You can change the fallback text as needed
     };
@@ -290,20 +290,6 @@ function OrderSystem() {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* {currentOrders.map(order => (
-                            <tr key={order.id}>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{formatDate(order.date_created)}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.id}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.billing.first_name} {order.billing.last_name}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.shipping.country}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>Dispatch</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>
-                                    <Link to={`/order_details/${order.id}`}>
-                                        <Button type="button" className='w-auto'>View</Button>
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))} */}
                         {orders.map(order => (
                             <tr key={order.id}>
                                 <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{formatDate(order.date_created)}</td>
@@ -320,23 +306,12 @@ function OrderSystem() {
                         ))}
                     </tbody>
                 </Table>
-                {/* <Pagination className="mt-3 justify-content-center">
-                    <Pagination.First onClick={() => setCurrentPage(1)} disabled={currentPage === 1} />
-                    <Pagination.Prev onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} />
-                    {[...Array(Math.ceil(filteredOrders.length / pageSize)).keys()].map(number => (
-                        <Pagination.Item key={number + 1} active={number + 1 === currentPage} onClick={() => setCurrentPage(number + 1)}>
-                            {number + 1}
-                        </Pagination.Item>
-                    ))}
-                    <Pagination.Next onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === Math.ceil(filteredOrders.length / pageSize)} />
-                    <Pagination.Last onClick={() => setCurrentPage(Math.ceil(filteredOrders.length / pageSize))} disabled={currentPage === Math.ceil(filteredOrders.length / pageSize)} />
-                </Pagination> */}
                 <div>
         <Row>
-        <Col className='d-flex'>
-        <Button type="button" className='mr-2 mx-3 w-25' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
+        <Col className='d-flex justify-content-end align-items-center' >
+        <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
         <span>{page} of {totalPages}</span>
-        <Button type="button" className='mr-2 mx-3 w-25' onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
+        <Button type="button" className='mr-2 mx-3 '  onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
         </Col>
         </Row>
       </div>
