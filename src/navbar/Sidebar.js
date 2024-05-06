@@ -3,16 +3,17 @@
 
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Link } from "react-router-dom";
 const Sidebar = () => {
   return (
     <>
       <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
           <li class="nav-item">
-            <a class="nav-link " href="/ordersystem">
+            <Link class="nav-link " to="/ordersystem">
               <i class="bi bi-grid"></i>
               <span>P1 System</span>
-            </a>
+            </Link>
           </li>
 
           <li class="nav-item">
@@ -32,28 +33,28 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <a href="/order_management_system">
+                <Link to="/order_management_system">
                   <i class="bi bi-circle"></i>
                   <span>Order Management System</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/PO_ManagementSystem">
+                <Link to="/PO_ManagementSystem">
                   <i class="bi bi-circle"></i>
                   <span>PO management System</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/PO_details">
+                <Link to="/PO_details">
                   <i class="bi bi-circle"></i>
                   <span>PO details</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/order_not_available">
+                <Link to="/order_not_available">
                   <i class="bi bi-circle"></i>
                   <span>Order Not Available</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </li>
@@ -118,16 +119,16 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <a href="/all_factory">
+                <Link to="/all_factory">
                   <i class="bi bi-circle"></i>
                   <span>All Factories</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/factory_form">
+                <Link to="/factory_form">
                   <i class="bi bi-circle"></i>
                   <span>Add Factory</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </li>
@@ -149,10 +150,10 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <a href="/all_products_list">
+                <Link to="/all_products_list">
                   <i class="bi bi-circle"></i>
                   <span>All Products</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </li>
