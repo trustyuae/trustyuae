@@ -43,7 +43,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData, backdrop }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClosePrintModal} centered ref={modalRef}>
+    <Modal show={show} onHide={handleClosePrintModal} centered ref={modalRef} backdrop>
       <Modal.Header closeButton>
         <Modal.Title className="text-center">Invoice</Modal.Title>
       </Modal.Header>
