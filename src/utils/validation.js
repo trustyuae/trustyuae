@@ -1,4 +1,4 @@
-export const isValidUserName = (username) => {
+export const isValidEmail = (username) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;;
     return emailPattern.test(username);
   };

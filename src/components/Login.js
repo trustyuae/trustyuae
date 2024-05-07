@@ -11,7 +11,7 @@ import Button from "react-bootstrap/Button";
 import { useDispatch} from "react-redux";
 import { loginUser, loginUserWithToken } from "../redux/actions/UserActions";
 import { useNavigate } from "react-router-dom";
-import { isValidUserName } from "../utils/validation";
+import { isValidEmail } from "../utils/validation";
 import styled from 'styled-components';
 
 const Login = () => {
@@ -36,7 +36,7 @@ const Login = () => {
     if (!username) {
       setUserNameError("Username is required");
       isValid = false;
-    } else if (!isValidUserName(username)) {
+    } else if (!isValidEmail(username)) {
       setUserNameError("Please enter a valid Username");
       isValid = false;
     } else {
