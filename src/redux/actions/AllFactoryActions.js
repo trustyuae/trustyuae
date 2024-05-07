@@ -36,7 +36,6 @@ export const FactoryEdit = (factoryId, data) => async (dispatch) => {
         }
       }
     );
-    console.log(response,'factory res')
     dispatch({ type: EDIT_FACTORY_SUCCESS, payload: response?.data });
   } catch (error) {
     dispatch({ type: EDIT_FACTORY_FAIL, error: error.message });
@@ -44,7 +43,7 @@ export const FactoryEdit = (factoryId, data) => async (dispatch) => {
 };
 
 
-export const FactoryAdd = (factData) => async (dispatch) => {
+export const FactoryAdd = (factData, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_FACTORY_REQUEST });
 
@@ -57,8 +56,8 @@ export const FactoryAdd = (factData) => async (dispatch) => {
         }
       }
     );
-    console.log(response,'added factory data')
     dispatch({ type: ADD_FACTORY_SUCCESS, payload: response?.data });
+    navigate("/all_factory");
   } catch (error) {
     dispatch({ type: ADD_FACTORY_FAIL, error: error.message });
   }

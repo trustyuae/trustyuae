@@ -6,9 +6,12 @@ import Button from "react-bootstrap/Button";
 import { Card } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { FactoryAdd } from "../../redux/actions/AllFactoryActions";
+import { useNavigate } from "react-router-dom";
+import { isValidEmail } from "../../utils/validation";
 
 function FactoryForm() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [factory, setFactory] = useState({
     factory_name: "",
     address: "",
@@ -28,11 +31,17 @@ function FactoryForm() {
   };
 
   const handleSubmit = async (event) => {
+    event.preventDefault()
     const form = event?.currentTarget;
     if (form?.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
     }
+
+    if (factory.contact_email && !isValidEmail(factory.contact_email)) {
+      return
+    }
+
     setValidated(true);
     const factData = {
       factory_name: factory.factory_name,
@@ -44,7 +53,7 @@ function FactoryForm() {
     };
     try {
       if (form?.checkValidity()) {
-        dispatch(FactoryAdd(factData));
+        dispatch(FactoryAdd(factData, navigate));
         setFactory({
           factory_name: "",
           address: "",
