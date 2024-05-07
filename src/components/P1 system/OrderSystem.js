@@ -42,6 +42,7 @@ function OrderSystem() {
                 }
             });
             setOrders(response.data);
+            console.log(dispatchType,'dispatchType===>>>>');
             const totalPagesHeader = response.headers.get('X-WP-TotalPages');
             setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
         } catch (error) {
@@ -155,16 +156,18 @@ function OrderSystem() {
         setPage(newPage);
     };
 
-    const getDispatchStatus = (order) => {
-        console.log(order, 'order');
-        // dispatchType.map(type=>{
-        //     if(type.order_id==order){
-        //         return type?.dispatch_status
-        //     }
-        // })
-        // Assuming the API returns the dispatch status as a property named 'dispatchStatus'
-        // return dispatchType.dispatchStatus || 'Not available'; // You can change the fallback text as needed
-    };
+    // const getDispatchStatus = (order) => {
+    //     console.log(order, 'order');
+    //     console.log(dispatchType,'dispatchType');
+    //     console.log(dispatchType.find(type=>type.order_id===order));
+    //     // dispatchType.map(type=>{
+    //     //     if(type.order_id==order){
+    //     //         return type?.dispatch_status
+    //     //     }
+    //     // })
+    //     // Assuming the API returns the dispatch status as a property named 'dispatchStatus'
+    //     // return dispatchType.dispatchStatus || 'Not available'; // You can change the fallback text as needed
+    // };
 
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
@@ -290,20 +293,25 @@ function OrderSystem() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map(order => (
-                            <tr key={order.id}>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{formatDate(order.date_created)}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.id}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.billing.first_name} {order.billing.last_name}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{order.shipping.country}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>{getDispatchStatus(order.id)}</td>
-                                <td className='text-center ' style={{ backgroundColor: order.shipping.country === 'IS' ? '#8ceb8c' : '#ffff00' }}>
-                                    <Link to={`/order_details/${order.id}`}>
-                                        <Button type="button" className='w-auto'>View</Button>
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
+                        {orders.map((order,index) => {
+                            const subItem = dispatchType.find(sub=>sub.order_id==order.id)
+                            const backgroundColor=subItem && subItem.dispatch_type==="Dispatch"?'#8ceb8c':'#ffff00'
+                            // console.log(subItem,'subItem');
+                            return (
+                                <tr key={order.id} style={{backgroundColor}}>
+                                    <td className='text-center ' style={{backgroundColor}}>{formatDate(order.date_created)}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{order.id}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{order.billing.first_name} {order.billing.last_name}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{order.shipping.country}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{subItem ? subItem.dispatch_type:''}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>
+                                        <Link to={`/order_details/${order.id}`}>
+                                            <Button type="button" className='w-auto'>View</Button>
+                                        </Link>
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </Table>
                 <div>
