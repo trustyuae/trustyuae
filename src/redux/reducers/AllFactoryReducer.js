@@ -6,6 +6,9 @@ import {
     EDIT_FACTORY_REQUEST,
     EDIT_FACTORY_SUCCESS,
     EDIT_FACTORY_FAIL,
+    ADD_FACTORY_REQUEST,
+    ADD_FACTORY_SUCCESS,
+    ADD_FACTORY_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -14,6 +17,8 @@ const initialState = {
     error: null,
     editFactory:[],
     isEditFactory:false,
+    addFactory:[],
+    isAddFactory:false,
   };
 
 const AllFactoryReducer = (state=initialState, action) => {
@@ -31,6 +36,13 @@ const AllFactoryReducer = (state=initialState, action) => {
           return { ...state, isEditFactory: false, factory: action.payload };
         case EDIT_FACTORY_FAIL:
           return { ...state, isEditFactory: false, error: action.payload };
+
+          case ADD_FACTORY_REQUEST:
+            return { ...state, isAddFactory: true };
+          case ADD_FACTORY_SUCCESS:
+            return { ...state, isAddFactory: false, factory: action.payload };
+          case ADD_FACTORY_FAIL:
+            return { ...state, isAddFactory: false, error: action.payload };
     
         case CLEAR_ERRORS:
           return { ...state, error: null };

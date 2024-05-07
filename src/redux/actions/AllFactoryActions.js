@@ -6,6 +6,9 @@ import {
   EDIT_FACTORY_REQUEST,
   EDIT_FACTORY_SUCCESS,
   EDIT_FACTORY_FAIL,
+  ADD_FACTORY_REQUEST,
+  ADD_FACTORY_SUCCESS,
+  ADD_FACTORY_FAIL,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -37,5 +40,26 @@ export const FactoryEdit = (factoryId, data) => async (dispatch) => {
     dispatch({ type: EDIT_FACTORY_SUCCESS, payload: response?.data });
   } catch (error) {
     dispatch({ type: EDIT_FACTORY_FAIL, error: error.message });
+  }
+};
+
+
+export const FactoryAdd = (factData) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_FACTORY_REQUEST });
+
+    const response = await axios.post(
+      `${url}custom-factory/v1/add-factory`,
+      factData,
+      {
+        headers: {
+          "Content-Type": "application/json" // Corrected the syntax
+        }
+      }
+    );
+    console.log(response,'added factory data')
+    dispatch({ type: ADD_FACTORY_SUCCESS, payload: response?.data });
+  } catch (error) {
+    dispatch({ type: ADD_FACTORY_FAIL, error: error.message });
   }
 };
