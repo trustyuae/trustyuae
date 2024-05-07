@@ -4,11 +4,8 @@ import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AllFactoryActions,
-  FactoryEdit,
-} from "../../redux/actions/AllFactoryActions";
 import EditFactoryModal from "./EditFactoryModal";
+import { AllFactoryActions, FactoryEdit } from "../../redux/actions/AllFactoryActions";
 
 function AllFactory() {
   const dispatch = useDispatch();
