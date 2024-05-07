@@ -60,8 +60,8 @@ margin-top: '55px';
 
 @media print {
   /* Hide all elements outside the modal when printing */
-  body * {
-    display: none,
+  body > *:not(.modal) {
+    display: none !important;
   }
 
   /* Display only the modal content */
@@ -74,5 +74,25 @@ margin-top: '55px';
     max-width: 100%;
     width: auto;
     margin: 0;
+  }
+
+  .modal-header, .modal-footer {
+    display: none !important;
+  }
+
+  /* Adjust margins for better printing */
+  @page {
+    margin: 0;
+  }
+
+  /* Adjust padding and background */
+  .modal-body {
+    padding: 1rem;
+    background: none;
+  }
+
+  /* Remove borders */
+  .modal-content, .modal-dialog, .modal-body {
+    border: none;
   }
 }

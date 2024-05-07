@@ -283,6 +283,7 @@ function OrderDetails() {
         showModal={showModal}
         selectedOrder={selectedOrder}
         orderData={orderData}
+        backdrop="static"
       />
       </Container>
     </>
