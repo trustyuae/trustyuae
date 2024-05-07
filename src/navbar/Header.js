@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logoutUser, userLogout } from "../redux/actions/UserActions";
-import axios from "axios";
-import { logoutURL } from "../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser} from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
 
 const Header = () => {
@@ -11,16 +9,15 @@ const Header = () => {
   const dispatch = useDispatch();
   const handleLogOut = async () => {
     try {
-      await axios.post(`${logoutURL}`, null, {
-        headers: {
-          "Content-type": "application/json",
-        },
-      });
       dispatch(logoutUser(navigate));
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
+
+  const userData = useSelector(
+    (state) => state?.loginUser?.data?.user_data
+  );
   return (
     <header id="header" className="header fixed-top d-flex align-items-center">
       <div className="d-flex align-items-center justify-content-between">
@@ -214,17 +211,17 @@ const Header = () => {
               data-bs-toggle="dropdown"
             >
               <img
-                src="assets/img/profile-img.jpg"
+                src={userData?.user_image_url}
                 alt="Profile"
                 className="rounded-circle"
               />
               <span className="d-none d-md-block dropdown-toggle ps-2">
-                K. Anderson
+              {userData?.first_name} {userData?.last_name}
               </span>
             </a>
             <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
               <li className="dropdown-header">
-                <h6>Kevin Anderson</h6>
+                <h6> {userData?.first_name} {userData?.last_name}</h6>
                 <span>Web Designer</span>
               </li>
               <li>
