@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import Container from "react-bootstrap/Container";
+import React, { useEffect, useState } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Card } from "react-bootstrap";
-import axios from "axios";
+import { useDispatch } from "react-redux";
+import { FactoryAdd } from "../redux/actions/AllFactoryActions";
 
 function FactoryForm() {
+  const dispatch = useDispatch();
   const [factory, setFactory] = useState({
     factory_name: "",
     address: "",
@@ -17,6 +18,10 @@ function FactoryForm() {
     bank_account_details: "",
   });
 
+  useEffect(() => {
+    handleSubmit();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFactory((prevFactory) => ({
@@ -25,15 +30,17 @@ function FactoryForm() {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    const factData = {
+      factory_name: factory.factory_name,
+      address: factory.address,
+      contact_person: factory.contact_person,
+      contact_number: factory.contact_number,
+      contact_email: factory.contact_email,
+      bank_account_details: factory.bank_account_details,
+    };
     try {
-      const response = await axios.post(
-        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/add-factory",
-        factory
-      );
-      console.log("Factory added successfully:", response.data);
-      // Optionally, you can reset the form fields after successful submission
+      dispatch(FactoryAdd(factData));
       setFactory({
         factory_name: "",
         address: "",
@@ -48,13 +55,6 @@ function FactoryForm() {
   };
 
   return (
-    // <Container
-    //   fluid
-    //   className="p-5"
-    //   style={{
-    //     height: "100vh",
-    //   }}
-    // >
     <div>
       <style>
         {`
@@ -183,9 +183,8 @@ function FactoryForm() {
           </Card>
         </Col>
       </Row>
-      </div>
+    </div>
     // </Container>
-
   );
 }
 export default FactoryForm;
