@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Card } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { FactoryAdd } from "../redux/actions/AllFactoryActions";
+import { FactoryAdd } from "../../redux/actions/AllFactoryActions";
 
 function FactoryForm() {
   const dispatch = useDispatch();
