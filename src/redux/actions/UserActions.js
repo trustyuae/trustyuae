@@ -67,6 +67,7 @@ export const logoutUser = (navigate) => async (dispatch) => {
         navigate("/");
       }
     });
+    dispatch({ type: CLEAR_STORE });
   } catch (error) {
     dispatch({ type: USER_LOGOUT_FAIL });
     console.log("error occurred");
@@ -81,28 +82,4 @@ export const loginUserWithToken = (navigate, token) => async (dispatch) => {
   }
 };
 
-export const userLogout = (navigate) => async (dispatch) => {
-  // dispatch({ type: CLEAR_STORE });
-  // localStorage.clear();
-  // navigate("/");
-  dispatch({ type: USER_LOGOUT_REQUEST });
-  try {
-    const res = await axios.post(`${logoutURL}`, null);
-    console.log(res, "logout res");
-    dispatch({ type: USER_LOGOUT_SUCCESS });
-    localStorage.clear();
-    Swal.fire({
-      icon: "success",
-      title: res?.data?.message,
-      showConfirmButton: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        navigate("/");
-      }
-    });
-    // navigate("/");
-  } catch (error) {
-    dispatch({ type: USER_LOGOUT_FAIL });
-    console.log("error occurred");
-  }
-};
+
