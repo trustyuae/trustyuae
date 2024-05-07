@@ -30,9 +30,9 @@ const Header = () => {
               />
             </Box>
         </a>
-        <i className="bi bi-list toggle-sidebar-btn"></i>
+        {/* <i className="bi bi-list toggle-sidebar-btn"></i> */}
       </div>
-      <div className="search-bar">
+      {/* <div className="search-bar">
         <form
           className="search-form d-flex align-items-center"
           method="POST"
@@ -48,10 +48,10 @@ const Header = () => {
             <i className="bi bi-search"></i>
           </button>
         </form>
-      </div>
+      </div> */}
       <nav className="header-nav ms-auto">
         <ul className="d-flex align-items-center">
-          <li className="nav-item d-block d-lg-none">
+          {/* <li className="nav-item d-block d-lg-none">
             <a className="nav-link nav-icon search-bar-toggle " href="/">
               <i className="bi bi-search"></i>
             </a>
@@ -203,7 +203,7 @@ const Header = () => {
                 <a href="/">Show all messages</a>
               </li>
             </ul>
-          </li>
+          </li> */}
           <li className="nav-item dropdown pe-3">
             <a
               className="nav-link nav-profile d-flex align-items-center pe-0"

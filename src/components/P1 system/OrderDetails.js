@@ -8,6 +8,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { Card } from "react-bootstrap";
 import PrintModal from "./PrintModal";
+import countries from 'iso-3166-1-alpha-2';
 
 function OrderDetails() {
   const { id } = useParams();
@@ -22,6 +23,10 @@ function OrderDetails() {
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
   const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
 
+  const getCountryName = code => {
+    const country = countries.getCountry(code);
+    return country ? country : 'Unknown';
+  };
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -141,7 +146,7 @@ function OrderDetails() {
                 <tr key={index}>
                   <td className="text-center">{order.billing?.address_1}</td>
                   <td className="text-center">{order.billing?.city}</td>
-                  <td className="text-center">{order.billing?.country}</td>
+                  <td className="text-center">{getCountryName(order.billing?.country)}</td>
                 </tr>
               ))}
             </tbody>
