@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { userLogout } from "../redux/actions/UserActions";
+import { logoutUser, userLogout } from "../redux/actions/UserActions";
 import axios from "axios";
 import { logoutURL } from "../utils/constants";
 import { Box } from "@mui/material";
@@ -14,10 +14,9 @@ const Header = () => {
       await axios.post(`${logoutURL}`, null, {
         headers: {
           "Content-type": "application/json",
-          // Authorization: `Bearer ${token}`,
         },
       });
-      dispatch(userLogout(navigate));
+      dispatch(logoutUser(navigate));
     } catch (error) {
       console.error("Logout error:", error);
     }

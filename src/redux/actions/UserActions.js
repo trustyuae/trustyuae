@@ -46,10 +46,27 @@ export const loginUser = (data, navigate) => async (dispatch) => {
 export const logoutUser = (navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGOUT_REQUEST });
   try {
-    await axios.post(`${logoutURL}`, null);
+    const res = await axios.post(`${logoutURL}`, null);
+    console.log(res, "logout res");
     dispatch({ type: USER_LOGOUT_SUCCESS });
     localStorage.clear();
-    navigate("/");
+    Swal.fire({
+      title: "Do You Want Logged Out?",
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          icon: "success",
+          title: res?.data?.message,
+          showConfirmButton: false,
+          timer: 1500, // Set a timer to automatically close the alert after 1.5 seconds
+        });
+        navigate("/");
+      }
+    });
   } catch (error) {
     dispatch({ type: USER_LOGOUT_FAIL });
     console.log("error occurred");
@@ -65,7 +82,27 @@ export const loginUserWithToken = (navigate, token) => async (dispatch) => {
 };
 
 export const userLogout = (navigate) => async (dispatch) => {
-  dispatch({ type: CLEAR_STORE });
-  localStorage.clear();
-  navigate("/");
+  // dispatch({ type: CLEAR_STORE });
+  // localStorage.clear();
+  // navigate("/");
+  dispatch({ type: USER_LOGOUT_REQUEST });
+  try {
+    const res = await axios.post(`${logoutURL}`, null);
+    console.log(res, "logout res");
+    dispatch({ type: USER_LOGOUT_SUCCESS });
+    localStorage.clear();
+    Swal.fire({
+      icon: "success",
+      title: res?.data?.message,
+      showConfirmButton: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate("/");
+      }
+    });
+    // navigate("/");
+  } catch (error) {
+    dispatch({ type: USER_LOGOUT_FAIL });
+    console.log("error occurred");
+  }
 };

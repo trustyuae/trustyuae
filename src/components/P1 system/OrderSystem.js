@@ -49,7 +49,7 @@ function OrderSystem() {
             console.error('Error fetching data:', error);
         }
     };
-    useEffect(() => {
+    useEffect((page,pageSize) => {
         fetchOrders();
     }, [page, pageSize]);
 
