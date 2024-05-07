@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { isValidElement, useEffect, useState } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
@@ -17,10 +17,7 @@ function FactoryForm() {
     contact_email: "",
     bank_account_details: "",
   });
-
-  useEffect(() => {
-    handleSubmit();
-  }, []);
+  const [validated, setValidated] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,7 +27,13 @@ function FactoryForm() {
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    const form = event?.currentTarget;
+    if (form?.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setValidated(true);
     const factData = {
       factory_name: factory.factory_name,
       address: factory.address,
@@ -40,15 +43,17 @@ function FactoryForm() {
       bank_account_details: factory.bank_account_details,
     };
     try {
-      dispatch(FactoryAdd(factData));
-      setFactory({
-        factory_name: "",
-        address: "",
-        contact_person: "",
-        contact_number: "",
-        contact_email: "",
-        bank_account_details: "",
-      });
+      if (form?.checkValidity()) {
+        dispatch(FactoryAdd(factData));
+        setFactory({
+          factory_name: "",
+          address: "",
+          contact_person: "",
+          contact_number: "",
+          contact_email: "",
+          bank_account_details: "",
+        });
+      }
     } catch (error) {
       console.error("Error adding factory:", error);
     }
@@ -84,15 +89,15 @@ function FactoryForm() {
                 `}
       </style>
       <Row className="justify-content-center mt-5">
-        <Col md={6}>
-          <Card className="factory-card">
-            <Card.Header as="h5" className="factory-card-header">
+        <Col md={8}>
+          <Card className="factory-card border-0 shadow-lg">
+            <Card.Header as="h4" className="factory-card-header px-4 py-3 border-0 fw-bold">
               Add New Factory
             </Card.Header>
-            <Card.Body>
-              <Form onSubmit={handleSubmit}>
+            <Card.Body className="p-4 pt-3">
+              <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formFactoryName">
-                  <Form.Label>Factory Name</Form.Label>
+                  <Form.Label className="fw-semibold">Factory Name</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter factory name"
@@ -100,10 +105,12 @@ function FactoryForm() {
                     value={factory.factory_name}
                     onChange={handleChange}
                     className="form-control"
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Please enter factory name.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formFactoryAddress">
-                  <Form.Label>Address</Form.Label>
+                  <Form.Label className="fw-semibold">Address</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter factory address"
@@ -111,13 +118,15 @@ function FactoryForm() {
                     value={factory.address}
                     onChange={handleChange}
                     className="form-control"
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Please enter factory address.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryContactPerson"
                 >
-                  <Form.Label>Contact Person</Form.Label>
+                  <Form.Label className="fw-semibold">Contact Person</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter contact person"
@@ -125,13 +134,15 @@ function FactoryForm() {
                     value={factory.contact_person}
                     onChange={handleChange}
                     className="form-control"
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Please enter cntact person.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryContactNumber"
                 >
-                  <Form.Label>Contact Number</Form.Label>
+                  <Form.Label className="fw-semibold">Contact Number</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter contact number"
@@ -139,13 +150,15 @@ function FactoryForm() {
                     value={factory.contact_number}
                     onChange={handleChange}
                     className="form-control"
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Please enter cpntact number.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryContactEmail"
                 >
-                  <Form.Label>Contact Email</Form.Label>
+                  <Form.Label className="fw-semibold">Contact Email</Form.Label>
                   <Form.Control
                     type="email"
                     placeholder="Enter contact email"
@@ -153,13 +166,15 @@ function FactoryForm() {
                     value={factory.contact_email}
                     onChange={handleChange}
                     className="form-control"
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Please entercontact email.</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryBankAccountDetails"
                 >
-                  <Form.Label>Bank Account Details</Form.Label>
+                  <Form.Label className="fw-semibold">Bank Account Details</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter bank account details"
@@ -167,13 +182,15 @@ function FactoryForm() {
                     value={factory.bank_account_details}
                     onChange={handleChange}
                     className="form-control"
+                    required
                   />
+                  <Form.Control.Feedback type="invalid">Please enter bank account details.</Form.Control.Feedback>
                 </Form.Group>
-                <div className="text-center">
+                <div className="text-end mb-2">
                   <Button
                     variant="primary"
                     type="submit"
-                    className="btn-submit"
+                    className="btn-submit py-2 fw-bold"
                   >
                     Add Factory
                   </Button>
