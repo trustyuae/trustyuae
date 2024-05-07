@@ -4,74 +4,103 @@ import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
 import axios from "axios";
-import Pagination from "react-bootstrap/Pagination";
 import { useParams } from "react-router-dom";
 import { Card } from "react-bootstrap";
 import PrintModal from "./PrintModal";
 
 function OrderDetails() {
-    const { id } = useParams();
-    const [orderData, setOrderData] = useState(null);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [imageURL, setImageURL] = useState("");
-    const [showModal, setShowModal] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState(null);
-  
-    const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders/${id}`;
-    const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-    const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
-    useEffect(() => {
-      const fetchOrder = async () => {
-        try {
-          const response = await axios.get(apiUrl, {
-            auth: {
-              username: username,
-              password: password,
-            },
-          });
-          console.log([response.data], "response");
-          setOrderData([response.data]);
-        } catch (error) {
-          console.error("Error fetching order data:", error);
-        }
-      };
-  
-      fetchOrder();
-    }, [apiUrl]);
-  
-    const handleCloseEditModal = () => {
-      setShowEditModal(false);
+  const { id } = useParams();
+  const [orderData, setOrderData] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [imageURL, setImageURL] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders/${id}`;
+  const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
+  const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
+
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const response = await axios.get(apiUrl, {
+          auth: {
+            username: username,
+            password: password,
+          },
+        });
+        setOrderData([response.data]);
+      } catch (error) {
+        console.error("Error fetching order data:", error);
+      }
     };
-  
-    const ImageModule = (url) => {
-      console.log(url, "url");
-      setImageURL(url);
-      setShowEditModal(true);
-    };
-  
-    const handlePrint = (orderId) => {
-      const order = orderData.find((o) => o.id === orderId);
-      setSelectedOrder(order);
-      setShowModal(true);
-    };
-  
-    const handleClosePrintModal = () => {
-      setShowModal(false);
-    };
-  
+
+    fetchOrder();
+  }, [apiUrl]);
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+  };
+
+  const ImageModule = (url) => {
+    setImageURL(url);
+    setShowEditModal(true);
+  };
+
+  const handlePrint = (orderId) => {
+    const order = orderData.find((o) => o.id === orderId);
+    setSelectedOrder(order);
+    setShowModal(true);
+  };
+
+  const handleClosePrintModal = () => {
+    setShowModal(false);
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+  };
+
+  const handleAttachButtonClick = () => {
+    const fileInput = document.getElementById("imageFile");
+    if (fileInput) {
+      fileInput.click();
+    } else {
+      console.error("File input element not found.");
+    }
+  };
 
   return (
     <>
       <Container fluid className="px-5" style={{ height: "98vh" }}>
         <h3 className="fw-bold text-center py-3 ">Order ID -{id}</h3>
 
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            style={{ display: "none" }}
+            id="imageFile"
+          />
+          <Button
+            variant="primary"
+            className="me-3"
+            onClick={handleAttachButtonClick}
+          >
+            Attach
+          </Button>
+          <Button variant="danger">Finish</Button>
+        </div>
+
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             <button
               type="button"
-              class="btn btn-primary me-3"
+              className="btn btn-primary me-3"
               data-bs-toggle="modal"
               data-bs-target="#staticBackdrop"
               onClick={handlePrint}
@@ -127,11 +156,6 @@ function OrderDetails() {
               </tr>
             </thead>
             <tbody>
-              {/* <tr>
-                            <td className="text-center">123 Main st</td>
-                            <td className="text-center">CityVille</td>
-                            <td className="text-center">Countryland</td>
-                        </tr> */}
               {orderData?.map((order, index) => (
                 <tr key={index}>
                   <td className="text-center">{order.billing?.address_1}</td>
@@ -226,7 +250,7 @@ function OrderDetails() {
                       </td>
                       <td className="text-center">
                         {item.image.src && (
-                          <span onClick={(e) => ImageModule(item.image.src)}>
+                          <span onClick={() => ImageModule(item.image.src)}>
                             <img
                               src={item.image.src}
                               alt={item.name}
@@ -247,7 +271,7 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex ">
             {/* <label>Customer Note:-</label>
-                    <p>Customer Note</p> */}
+                      <p>Customer Note</p> */}
             <div className="alert alert-primary z-0" role="alert">
               <label>Customer Note:-</label>
               "There is a customer note!"
@@ -256,7 +280,11 @@ function OrderDetails() {
         </MDBRow>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
-            <Button variant="primary" className="  me-3">
+            <Button
+              variant="primary"
+              className="  me-3"
+              onClick={handleAttachButtonClick}
+            >
               Attach
             </Button>
             <Button variant="danger">Finish</Button>
@@ -273,18 +301,18 @@ function OrderDetails() {
           </Modal.Header>
           <Modal.Body>
             <Card className="factory-card">
-              <img src={imageURL} />
+              <img src={imageURL} alt="Product" />
             </Card>
           </Modal.Body>
         </Modal>
         <PrintModal
-        show={showModal}
-        handleClosePrintModal={handleClosePrintModal}
-        showModal={showModal}
-        selectedOrder={selectedOrder}
-        orderData={orderData}
-        backdrop="static"
-      />
+          show={showModal}
+          handleClosePrintModal={handleClosePrintModal}
+          showModal={showModal}
+          selectedOrder={selectedOrder}
+          orderData={orderData}
+          backdrop="static"
+        />
       </Container>
     </>
   );
