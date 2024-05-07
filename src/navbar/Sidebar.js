@@ -76,28 +76,22 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <a href="forms-elements.html">
+                <Link to="/On_Hold_Manegement_System">
                   <i class="bi bi-circle"></i>
-                  <span>Form Elements</span>
-                </a>
+                  <span>On Hold Management system</span>
+                </Link>
               </li>
               <li>
-                <a href="forms-layouts.html">
+                <Link to="/GRN_Management">
                   <i class="bi bi-circle"></i>
-                  <span>Form Layouts</span>
-                </a>
+                  <span>GRN Management</span>
+                </Link>
               </li>
               <li>
-                <a href="forms-editors.html">
+                <Link to="/On_Hold_Management">
                   <i class="bi bi-circle"></i>
-                  <span>Form Editors</span>
-                </a>
-              </li>
-              <li>
-                <a href="forms-validation.html">
-                  <i class="bi bi-circle"></i>
-                  <span>Form Validation</span>
-                </a>
+                  <span>On Hold Management</span>
+                </Link>
               </li>
             </ul>
           </li>
