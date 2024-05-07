@@ -77,25 +77,6 @@ function OrderDetails() {
     <>
       <Container fluid className="px-5" style={{ height: "98vh" }}>
         <h3 className="fw-bold text-center py-3 ">Order ID -{id}</h3>
-
-        <div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            style={{ display: "none" }}
-            id="imageFile"
-          />
-          <Button
-            variant="primary"
-            className="me-3"
-            onClick={handleAttachButtonClick}
-          >
-            Attach
-          </Button>
-          <Button variant="danger">Finish</Button>
-        </div>
-
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             <button
@@ -270,8 +251,6 @@ function OrderDetails() {
         </MDBRow>
         <MDBRow>
           <MDBCol md="12" className="d-flex ">
-            {/* <label>Customer Note:-</label>
-                      <p>Customer Note</p> */}
             <div className="alert alert-primary z-0" role="alert">
               <label>Customer Note:-</label>
               "There is a customer note!"
@@ -280,6 +259,13 @@ function OrderDetails() {
         </MDBRow>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              style={{ display: "none" }}
+              id="imageFile"
+            />
             <Button
               variant="primary"
               className="  me-3"

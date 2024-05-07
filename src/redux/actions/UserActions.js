@@ -17,7 +17,7 @@ export const loginUser = (data, navigate) => async (dispatch) => {
     const res = await axios.post(`${loginURL}`, data, {
       headers: { "content-type": "application/json" },
     });
-    dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data.token });
+    dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
     await localStorage.setItem("token", JSON.stringify(res?.data?.token));
     if (res.data.token) {
       Swal.fire({
