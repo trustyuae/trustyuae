@@ -8,6 +8,8 @@ import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import countries from 'iso-3166-1-alpha-2';
+
 function OrderSystem() {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
@@ -16,7 +18,7 @@ function OrderSystem() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10); // Default page size
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' }); // Sort configuration
-    const pageSizeOptions = [5, 10, 20, 50]; // Options for page size
+    const pageSizeOptions = [5, 10, 20, 50,900]; // Options for page size
 
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -35,15 +37,16 @@ function OrderSystem() {
 
     const fetchOrders = async () => {
         try {
-            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders?page=${page}&per_page=${pageSize}`, {
+            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}`, {
                 auth: {
                     username: username,
                     password: password
                 }
             });
-            setOrders(response.data);
-            console.log(dispatchType,'dispatchType===>>>>');
-            const totalPagesHeader = response.headers.get('X-WP-TotalPages');
+            setOrders(response.data.orders);
+            console.log(response.data.orders,'dispatchType===>>>>');
+            const totalPagesHeader = response.data.total_count;
+            console.log(totalPagesHeader,'totalPagesHeader');
             setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -62,26 +65,27 @@ function OrderSystem() {
         return date.toLocaleDateString();
     };
     const handleSearch = async () => {
-        let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders`;
+        let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`;
 
         if (searchOrderID) {
-            apiUrl += `?include=${searchOrderID}`;
+            apiUrl += `?orderid=${searchOrderID}`;
         }
 
         if (startDate) {
-            apiUrl += `?after=${startDate}T00:00:00&before=${startDate}T23:59:59`;
+            // apiUrl += `?after=${startDate}T00:00:00&before=${startDate}T23:59:59`;
+            apiUrl += `?date=${startDate}`;
         }
 
         try {
-            const response = await axios.get(`${apiUrl}&page=${page}&per_page=10`, {
+            const response = await axios.get(`${apiUrl}?page=${page}&per_page=10`, {
                 auth: {
                     username: username,
                     password: password
                 }
             });
             // setFilteredOrders(response.data);
-            setOrders(response.data);
-            const totalPagesHeader = response.headers.get('X-WP-TotalPages');
+            setOrders(response.data.orders);
+            const totalPagesHeader = response.data.total_count;
             setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
             setCurrentPage(1); // Reset current page to 1 after filtering
         } catch (error) {
@@ -168,6 +172,11 @@ function OrderSystem() {
     //     // Assuming the API returns the dispatch status as a property named 'dispatchStatus'
     //     // return dispatchType.dispatchStatus || 'Not available'; // You can change the fallback text as needed
     // };
+
+    const getCountryName = code => {
+        const country = countries.getCountry(code);
+        return country ? country : 'Unknown';
+      };
 
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
@@ -294,18 +303,22 @@ function OrderSystem() {
                     </thead>
                     <tbody>
                         {orders.map((order,index) => {
-                            const subItem = dispatchType.find(sub=>sub.order_id==order.id)
-                            const backgroundColor=subItem && subItem.dispatch_type==="Dispatch"?'#8ceb8c':'#ffff00'
+                            // const subItem = dispatchType.find(sub=>sub.order_id==order.id)
+                            const backgroundColor=order.order_status==="Reserve"?'#ffff00':'#8ceb8c'
+                            // const backgroundColor=''
                             // console.log(subItem,'subItem');
                             return (
                                 <tr key={order.id} style={{backgroundColor}}>
-                                    <td className='text-center ' style={{backgroundColor}}>{formatDate(order.date_created)}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{order.id}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{order.billing.first_name} {order.billing.last_name}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{order.shipping.country}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{subItem ? subItem.dispatch_type:''}</td>
+                                    {/* <td className='text-center ' style={{backgroundColor}}>{formatDate(order.date)}</td> */}
+                                    <td className='text-center ' style={{backgroundColor}}>{order.date}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{order.order_id}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{order.customer_name}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{getCountryName(order.shipping_country)}</td>
+                                    {/* <td className='text-center ' style={{backgroundColor}}>{order.billing.first_name} {order.billing.last_name}</td> */}
+                                    {/* <td className='text-center ' style={{backgroundColor}}>{order.shipping_country}</td> */}
+                                    <td className='text-center ' style={{backgroundColor}}>{order.order_status}</td>
                                     <td className='text-center ' style={{backgroundColor}}>
-                                        <Link to={`/order_details/${order.id}`}>
+                                        <Link to={`/order_details/${order.order_id}`}>
                                             <Button type="button" className='w-auto'>View</Button>
                                         </Link>
                                     </td>

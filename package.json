@@ -19,6 +19,7 @@
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "html2canvas": "^1.4.1",
+    "iso-3166-1-alpha-2": "^1.0.2",
     "jspdf": "^2.5.1",
     "mdb-react-ui-kit": "^8.0.0",
     "react": "^18.3.1",
