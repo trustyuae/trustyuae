@@ -7,21 +7,33 @@ import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { Card } from "react-bootstrap";
+import { Link } from 'react-router-dom';
+
 function OrderManagementSystem() {
     const [orders, setOrders] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
-    const [pageSize, setPageSize] = useState(5); // Number of orders per page
-    const [selectAll, setSelectAll] = useState(false); // Track whether all checkboxes are selected
-    const pageSizes = [5, 10, 15, 20]; // Available page sizes
+    const [selectedOrderIds, setSelectedOrderIds] = useState([]);
     const username = 'ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a';
     const password = 'cs_8dcdba11377e29282bd2b898d4a517cddd6726fe';
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const pageSizes = [5, 10, 15, 20];
+    const [startDate, setStartDate] = useState('');
+
     useEffect(() => {
-        fetchOrders(currentPage, pageSize);
-    }, [currentPage, pageSize]);
-    const fetchOrders = async (page, size) => {
+        fetchOrders(page, pageSize);
+    }, [page, pageSize, startDate]);
+
+    const fetchOrders = async (page, pageSize) => {
         try {
-            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders?status=processing&page=${page}&per_page=${size}`, {
+            let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders?status=processing&page=${page}&per_page=${pageSize}`;
+
+            if (startDate) {
+                apiUrl += `&after=${startDate}T00:00:00&before=${startDate}T23:59:59`;
+            }
+
+            const response = await axios.get(apiUrl, {
                 auth: {
                     username: username,
                     password: password
@@ -31,21 +43,46 @@ function OrderManagementSystem() {
             let a = response.data.map(order => order.line_items)
             console.log([].concat(...a), '[].concat(...a)');
             setOrders([].concat(...a));
-            setTotalPages(response.headers['x-wp-totalpages']);
+            const totalPagesHeader = response.headers.get('X-WP-TotalPages');
+            setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
+
+    const goToPage = (newPage) => {
+        setPage(newPage);
     };
+
     const handlePageSizeChange = (e) => {
         setPageSize(parseInt(e.target.value));
-        setCurrentPage(1); // Reset to first page when page size changes
     };
+
     const handleSelectAll = () => {
-        setSelectAll(!selectAll); // Toggle select all state
+        const allOrderIds = orders.map(order => order.id);
+        setSelectedOrderIds(selectedOrderIds.length === allOrderIds.length ? [] : allOrderIds);
     };
+
+    const handleOrderSelection = (orderId) => {
+        const selectedIndex = selectedOrderIds.indexOf(orderId);
+        let newSelected = [];
+
+        if (selectedIndex === -1) {
+            newSelected = [...selectedOrderIds, orderId];
+        } else if (selectedIndex === 0) {
+            newSelected = selectedOrderIds.slice(1);
+        } else if (selectedIndex === selectedOrderIds.length - 1) {
+            newSelected = selectedOrderIds.slice(0, -1);
+        } else if (selectedIndex > 0) {
+            newSelected = [
+                ...selectedOrderIds.slice(0, selectedIndex),
+                ...selectedOrderIds.slice(selectedIndex + 1),
+            ];
+        }
+
+        setSelectedOrderIds(newSelected);
+    };
+
     return (
         <Container fluid className='p-5' style={{ maxHeight: "100%", minHeight: "100vh" }}>
             <div className="mb-9">
@@ -64,6 +101,8 @@ function OrderManagementSystem() {
                                 <Form.Control
                                     type="date"
                                     className="mr-sm-2"
+                                    value={startDate}
+                                    onChange={e => setStartDate(e.target.value)}
                                 />
                             </Form.Group>
                         </Col>
@@ -98,7 +137,7 @@ function OrderManagementSystem() {
                                 <Form.Check
                                     type="checkbox"
                                     onChange={handleSelectAll}
-                                    checked={selectAll}
+                                    checked={selectedOrderIds.length === orders.length}
                                 />
                             </th>
                             <th>Product Name</th>
@@ -114,8 +153,8 @@ function OrderManagementSystem() {
                                 <td>
                                     <Form.Check
                                         type="checkbox"
-                                        checked={selectAll}
-                                        onChange={() => {/* handle individual checkbox change if needed */}}
+                                        checked={selectedOrderIds.includes(order.id)}
+                                        onChange={() => handleOrderSelection(order.id)}
                                     />
                                 </td>
                                 <td className='text-center'>{order.name}</td>
@@ -133,23 +172,27 @@ function OrderManagementSystem() {
             <Row className='mb-4 mt-4'>
                 <Form inline>
                     <Row className='mt-4'>
-                        <Col xs="auto" lg="3" className=' d-flex  align-items-end'>
-                            <Button type="button" className='mr-2 mx-3 w-50' onClick={handleSelectAll}>Select All Orders</Button>
-                            <Button type="button" className='mr-2 mx-3 w-50' >Create PO</Button>
+                        <Col xs="auto" lg="6" className=' d-flex  align-items-end'>
+                            <Button type="button" className='mr-2 mx-3 ' onClick={handleSelectAll}>Select All Orders</Button>
+                            <Link to={`/PO_ManagementSystem`}>
+                                <Button type="button" className='mr-2 mx-3 ' >Create PO</Button>
+                            </Link>
+                        </Col>
+                        <Col xs="auto" lg="6" className=' d-flex  align-items-end justify-content-end m-0'>
+                            <Pagination className="mt-3 m-0 justify-content-center">
+                                <Pagination.Prev onClick={() => goToPage(page - 1)} disabled={page === 1} />
+                                <Pagination.Item >
+                                    <span>{page} of {totalPages}</span>
+                                </Pagination.Item>
+                                <Pagination.Next onClick={() => goToPage(page + 1)} disabled={page === totalPages} />
+                            </Pagination>
                         </Col>
                     </Row>
                 </Form>
             </Row>
-            <Pagination className="mt-3 justify-content-center">
-                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                {[...Array(totalPages).keys()].map(number => (
-                    <Pagination.Item key={number + 1} active={number + 1 === currentPage} onClick={() => handlePageChange(number + 1)}>
-                        {number + 1}
-                    </Pagination.Item>
-                ))}
-                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-            </Pagination>
+
         </Container>
     );
 }
+
 export default OrderManagementSystem;
