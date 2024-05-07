@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AllFactoryActions,
   FactoryEdit,
-} from "../redux/actions/AllFactoryActions";
+} from "../../redux/actions/AllFactoryActions";
 import EditFactoryModal from "./EditFactoryModal";
 
 function AllFactory() {

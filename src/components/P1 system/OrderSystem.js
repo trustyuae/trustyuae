@@ -7,7 +7,7 @@ import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Pagination from 'react-bootstrap/Pagination';
 import axios from 'axios';
-import { Link } from 'react-router-dom'; // Import Link
+import { Link } from 'react-router-dom';
 function OrderSystem() {
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
@@ -50,7 +50,7 @@ function OrderSystem() {
     };
     useEffect(() => {
         fetchOrders();
-    }, [page,pageSize]);
+    }, [page, pageSize]);
 
     useEffect(() => {
         setFilteredOrders(orders);
@@ -153,10 +153,10 @@ function OrderSystem() {
 
     const goToPage = (newPage) => {
         setPage(newPage);
-      };
+    };
 
-      const getDispatchStatus = (order) => {
-        console.log(order,'order');
+    const getDispatchStatus = (order) => {
+        console.log(order, 'order');
         // dispatchType.map(type=>{
         //     if(type.order_id==order){
         //         return type?.dispatch_status
@@ -165,7 +165,7 @@ function OrderSystem() {
         // Assuming the API returns the dispatch status as a property named 'dispatchStatus'
         // return dispatchType.dispatchStatus || 'Not available'; // You can change the fallback text as needed
     };
-    
+
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
             <div className="mb-9">
@@ -307,14 +307,14 @@ function OrderSystem() {
                     </tbody>
                 </Table>
                 <div>
-        <Row>
-        <Col className='d-flex justify-content-end align-items-center' >
-        <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
-        <span>{page} of {totalPages}</span>
-        <Button type="button" className='mr-2 mx-3 '  onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
-        </Col>
-        </Row>
-      </div>
+                    <Row>
+                        <Col className='d-flex justify-content-end align-items-center' >
+                            <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
+                            <span>{page} of {totalPages}</span>
+                            <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
+                        </Col>
+                    </Row>
+                </div>
             </div>
         </Container>
     )
