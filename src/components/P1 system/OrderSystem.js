@@ -11,54 +11,39 @@ import { Link } from 'react-router-dom';
 import countries from 'iso-3166-1-alpha-2';
 
 function OrderSystem() {
+    const [dispatchType, setDispatchType] = useState('all');
     const [orders, setOrders] = useState([]);
-    const [filteredOrders, setFilteredOrders] = useState([]);
     const [searchOrderID, setSearchOrderID] = useState('');
     const [startDate, setStartDate] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10); // Default page size
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' }); // Sort configuration
-    const pageSizeOptions = [5, 10, 20, 50,900]; // Options for page size
-
+    const pageSizeOptions = [5, 10, 20, 50, 100]; // Options for page size
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-
     const username = 'ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a';
     const password = 'cs_8dcdba11377e29282bd2b898d4a517cddd6726fe';
 
-    const [dispatchType, setdispatchType] = useState([]);
-
-    useEffect(() => {
-        fetch('https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-api/dispatch-status/')
-            .then(response => response.json())
-            .then(data => setdispatchType(data))
-            .catch(error => console.error('Error fetching orders:', error));
-    }, []);
-
     const fetchOrders = async () => {
         try {
-            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}`, {
+            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}&status=${dispatchType}`, {
                 auth: {
                     username: username,
                     password: password
                 }
             });
             setOrders(response.data.orders);
-            console.log(response.data.orders,'dispatchType===>>>>');
-            const totalPagesHeader = response.data.total_count;
-            console.log(totalPagesHeader,'totalPagesHeader');
-            setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
+            console.log(response.data.orders, 'dispatchType===>>>>');
+            const totalPagesHeader = response.data.total_pages;
+            console.log(totalPagesHeader, 'totalPagesHeader');
+            setTotalPages(response.data.total_pages);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-    useEffect((page,pageSize) => {
+    useEffect((page, pageSize) => {
         fetchOrders();
-    }, [page, pageSize]);
+    }, [page, pageSize, dispatchType]);
 
-    useEffect(() => {
-        setFilteredOrders(orders);
-    }, [orders]);
+    
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -85,9 +70,7 @@ function OrderSystem() {
             });
             // setFilteredOrders(response.data);
             setOrders(response.data.orders);
-            const totalPagesHeader = response.data.total_count;
-            setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
-            setCurrentPage(1); // Reset current page to 1 after filtering
+            setTotalPages(response.data.total_pages);
         } catch (error) {
             console.error('Error fetching filtered data:', error);
         }
@@ -96,87 +79,27 @@ function OrderSystem() {
     const handleReset = () => {
         setSearchOrderID('');
         setStartDate('');
-        setFilteredOrders(orders);
-        setCurrentPage(1); // Reset current page to 1 after resetting filters
         fetchOrders()
     };
 
     const handlePageSizeChange = (e) => {
         setPageSize(parseInt(e.target.value));
-        setCurrentPage(1); // Reset current page to 1 after changing page size
     };
-
-    const requestSort = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const sortedOrders = () => {
-        const sorted = [...filteredOrders];
-        if (sortConfig.key) {
-            sorted.sort((a, b) => {
-                let aValue = a[sortConfig.key];
-                let bValue = b[sortConfig.key];
-
-                // For 'billing_full_name' key, concatenate first and last name
-                if (sortConfig.key === 'billing.first_name') {
-                    aValue = `${a.billing.first_name} ${a.billing.last_name}`;
-                    bValue = `${b.billing.first_name} ${b.billing.last_name}`;
-                }
-
-                // For 'shipping_country' key, access country under shipping object
-                if (sortConfig.key === 'shipping.country') {
-                    aValue = a.shipping.country;
-                    bValue = b.shipping.country;
-                }
-
-                if (aValue < bValue) {
-                    return sortConfig.direction === 'ascending' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortConfig.direction === 'ascending' ? 1 : -1;
-                }
-                return 0;
-            });
-        }
-        return sorted;
-    };
-    const getClassNamesFor = (name) => {
-        if (!sortConfig) {
-            return;
-        }
-        return sortConfig.key === name ? sortConfig.direction : undefined;
-    };
-
-    // Logic to get current orders for pagination
-    const indexOfLastOrder = currentPage * pageSize;
-    const indexOfFirstOrder = indexOfLastOrder - pageSize;
-    const currentOrders = sortedOrders().slice(indexOfFirstOrder, indexOfLastOrder);
 
     const goToPage = (newPage) => {
         setPage(newPage);
     };
 
-    // const getDispatchStatus = (order) => {
-    //     console.log(order, 'order');
-    //     console.log(dispatchType,'dispatchType');
-    //     console.log(dispatchType.find(type=>type.order_id===order));
-    //     // dispatchType.map(type=>{
-    //     //     if(type.order_id==order){
-    //     //         return type?.dispatch_status
-    //     //     }
-    //     // })
-    //     // Assuming the API returns the dispatch status as a property named 'dispatchStatus'
-    //     // return dispatchType.dispatchStatus || 'Not available'; // You can change the fallback text as needed
-    // };
-
     const getCountryName = code => {
         const country = countries.getCountry(code);
         return country ? country : 'Unknown';
-      };
+    };
+
+    const handleDispatchTypeChange = (event) => {
+        const type = event.target.value;
+        setDispatchType(type);
+        fetchOrders();
+    };
 
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
@@ -216,20 +139,20 @@ function OrderSystem() {
                         <Col xs="auto" lg="4">
                             <Form.Group>
                                 <Form.Label>Dispatch type:</Form.Label>
-                                <Form.Select className="mr-sm-2">
-                                    <option value="All">All</option>
-                                    <option value="Dispatch">Dispatch</option>
-                                    <option value="Reserve">Reserve</option>
+                                <Form.Select className="mr-sm-2" value={dispatchType} onChange={handleDispatchTypeChange}>
+                                    <option value="all">All</option>
+                                    <option value="dispatch">Dispatch</option>
+                                    <option value="reserve">Reserve</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
                     </Row>
                     <Row>
-                        <Col xs="auto" lg="3" className=' d-flex  align-items-end'>
-                            <Button type="button" className='mr-2 mx-3 w-50' onClick={handleSearch}>Search</Button>
-                            <Button type="button" className='mr-2 mx-3 w-50' onClick={handleReset}>Reset filter</Button>
+                        <Col xs="auto" className=' d-flex  align-items-end'>
+                            <Button type="button" className='mr-2 mx-3 ' onClick={handleSearch}>Search</Button>
+                            <Button type="button" className='mr-2 mx-3 ' onClick={handleReset}>Reset filter</Button>
                         </Col>
-                        <Col xs="auto" lg="1">
+                        <Col xs="auto" >
                             <Form.Group>
                                 <Form.Label>Page Size:</Form.Label>
                                 <Form.Control as="select" value={pageSize} onChange={handlePageSizeChange}>
@@ -251,28 +174,18 @@ function OrderSystem() {
                                     backgroundColor: "#DEE2E6",
                                     padding: "8px",
                                     textAlign: "center",
-                                }} onClick={() => requestSort('date_created')}>
-                                Date{' '}
-                                <span className={getClassNamesFor('date_created')}></span>
+                                }}>
+                                Date
+
                             </th>
                             <th className='text-center'
                                 style={{
                                     backgroundColor: "#DEE2E6",
                                     padding: "8px",
                                     textAlign: "center",
-                                }} onClick={() => requestSort('id')}>
-                                Order ID{' '}
-                                <span className={getClassNamesFor('id')}></span>
-                            </th>
-                            <th className='text-center'
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}
-                                onClick={() => requestSort('billing.first_name')}>
-                                Customer Name{' '}
-                                <span className={getClassNamesFor('billing.first_name')}></span>
+                                }}>
+                                Order ID
+
                             </th>
                             <th className='text-center'
                                 style={{
@@ -280,18 +193,25 @@ function OrderSystem() {
                                     padding: "8px",
                                     textAlign: "center",
                                 }}
-                                onClick={() => requestSort('shipping.country')}>
-                                Shipping Country{' '}
-                                <span className={getClassNamesFor('shipping.country')}></span>
+                            >
+                                Customer Name
                             </th>
                             <th className='text-center'
                                 style={{
                                     backgroundColor: "#DEE2E6",
                                     padding: "8px",
                                     textAlign: "center",
-                                }} onClick={() => requestSort('dispatch_type')}>
-                                Dispatch Type{' '}
-                                <span className={getClassNamesFor('dispatch_type')}></span>
+                                }}
+                            >
+                                Shipping Country
+                            </th>
+                            <th className='text-center'
+                                style={{
+                                    backgroundColor: "#DEE2E6",
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }} >
+                                Dispatch Type
                             </th>
                             <th className='text-center'
                                 style={{
@@ -302,22 +222,18 @@ function OrderSystem() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order,index) => {
-                            // const subItem = dispatchType.find(sub=>sub.order_id==order.id)
-                            const backgroundColor=order.order_status==="Reserve"?'#ffff00':'#8ceb8c'
-                            // const backgroundColor=''
-                            // console.log(subItem,'subItem');
+                        {orders.map((order, index) => {
+
+                            const backgroundColor = order.order_status === "Reserve" ? '#ffff00' : '#8ceb8c'
+
                             return (
-                                <tr key={order.id} style={{backgroundColor}}>
-                                    {/* <td className='text-center ' style={{backgroundColor}}>{formatDate(order.date)}</td> */}
-                                    <td className='text-center ' style={{backgroundColor}}>{order.date}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{order.order_id}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{order.customer_name}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{getCountryName(order.shipping_country)}</td>
-                                    {/* <td className='text-center ' style={{backgroundColor}}>{order.billing.first_name} {order.billing.last_name}</td> */}
-                                    {/* <td className='text-center ' style={{backgroundColor}}>{order.shipping_country}</td> */}
-                                    <td className='text-center ' style={{backgroundColor}}>{order.order_status}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>
+                                <tr key={index} style={{ backgroundColor }}>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.date}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.order_id}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.customer_name}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{getCountryName(order.shipping_country)}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.order_status}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>
                                         <Link to={`/order_details/${order.order_id}`}>
                                             <Button type="button" className='w-auto'>View</Button>
                                         </Link>
