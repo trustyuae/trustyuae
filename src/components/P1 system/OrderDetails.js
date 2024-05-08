@@ -55,7 +55,7 @@ function OrderDetails() {
   };
 
   const handlePrint = (orderId) => {
-    const order = orderData.find((o) => o.id === orderId);
+    const order = orderData?.find((o) => o.id === orderId);
     setSelectedOrder(order);
     setShowModal(true);
   };
@@ -87,8 +87,6 @@ function OrderDetails() {
             <button
               type="button"
               className="btn btn-primary me-3"
-              data-bs-toggle="modal"
-              data-bs-target="#staticBackdrop"
               onClick={handlePrint}
             >
               Print
@@ -218,11 +216,11 @@ function OrderDetails() {
             <tbody>
               {orderData?.map((order, index) =>
                 order.line_items?.map((item, subIndex) => {
-                  const sizeObject = item.meta_data.find(
+                  const sizeObject = item.meta_data?.find(
                     (meta) => meta.key === "pa_size"
                   );
                   const size = sizeObject ? sizeObject.value : "N/A";
-                  const reducedStockObject = item.meta_data.find(
+                  const reducedStockObject = item.meta_data?.find(
                     (meta) => meta.key === "_reduced_stock"
                   );
                   const reducedStock = reducedStockObject
@@ -302,7 +300,6 @@ function OrderDetails() {
           showModal={showModal}
           selectedOrder={selectedOrder}
           orderData={orderData}
-          backdrop="static"
         />
       </Container>
     </>
