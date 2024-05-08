@@ -15,9 +15,8 @@ const Header = () => {
     }
   };
 
-  const userData = useSelector(
-    (state) => state?.loginUser?.data?.user_data
-  );
+  const userData =JSON.parse(localStorage.getItem('user_data')) 
+
   return (
     <header id="header" className="header fixed-top d-flex align-items-center">
       <div className="d-flex align-items-center justify-content-between">
