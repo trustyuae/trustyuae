@@ -5,7 +5,6 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-import Pagination from 'react-bootstrap/Pagination';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import countries from 'iso-3166-1-alpha-2';
@@ -21,9 +20,6 @@ function OrderSystem() {
     const [totalPages, setTotalPages] = useState(1);
     const username = 'ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a';
     const password = 'cs_8dcdba11377e29282bd2b898d4a517cddd6726fe';
-
-
-
 
     const fetchOrders = async () => {
         try {
@@ -44,9 +40,7 @@ function OrderSystem() {
     };
     useEffect((page, pageSize) => {
         fetchOrders();
-    }, [page, pageSize, dispatchType]);
-
-    
+    }, []);
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -101,7 +95,6 @@ function OrderSystem() {
     const handleDispatchTypeChange = (event) => {
         const type = event.target.value;
         setDispatchType(type);
-        fetchOrders();
     };
 
     return (
