@@ -1,64 +1,49 @@
 import React, { useRef } from "react";
 import { Button, Modal } from "react-bootstrap";
 import jsPDF from "jspdf";
-import countries from "iso-3166-1-alpha-2";
 import { Box, Typography } from "@mui/material";
+import { getCountryName } from "../../utils/GetCountryName";
 
 const PrintModal = ({ show, handleClosePrintModal, orderData, backdrop }) => {
-  const customerData = orderData && orderData[0]?.billing;
-  const orderId = orderData && orderData[0].id;
-  console.log(orderId, "OrderId");
+  const customerData = orderData && orderData[0]
+  console.log(orderData, "orderDataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa////////////");
   const modalRef = useRef(null);
-
-  const getCountryName = (code) => {
-    const country = countries.getCountry(code);
-    return country ? country : "Unknown";
-  };
 
   const downloadPDF = () => {
     const doc = new jsPDF();
-
-    // Calculate center of the page
     const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageHeight = doc.internal.pageSize.getHeight(); 
+    const cardWidth = 140; 
+    const cardHeight = 60; 
+    const cardX = (pageWidth - cardWidth) / 2; 
+    const cardY = (pageHeight - cardHeight) / 2; 
+    doc.setFillColor(200, 200, 200); 
+    doc.rect(cardX, cardY, cardWidth, cardHeight, "F"); 
+    const cardContentX = cardX + 5; 
+    const cardContentY = cardY + 10; 
 
-    // Start card content
-    const cardWidth = 120; // Width of the card
-    const cardHeight = 60; // Height of the card
-    const cardX = (pageWidth - cardWidth) / 2; // Centering horizontally
-    const cardY = (pageHeight - cardHeight) / 2; // Centering vertically
-    doc.setFillColor(200, 200, 200); // Card background color
-    doc.rect(cardX, cardY, cardWidth, cardHeight, "F"); // Draw card background
-    const cardContentX = cardX + 5; // Padding for card content
-    const cardContentY = cardY + 10; // Padding for card content
-
-    // Set font color
-    doc.setTextColor(0, 0, 0); // Black color
-
-    // Print the modal content in the card
-    doc.text(`Order Id: ${orderId}`, cardContentX, cardContentY);
+    doc.setTextColor(0, 0, 0); 
+    doc.text(`Order Id: ${customerData.order_id}`, cardContentX, cardContentY);
     doc.text(
-      `Customer Name: ${customerData?.first_name} ${customerData?.last_name}`,
+      `Customer Name: ${customerData.customer_name} ${customerData?.last_name}`,
       cardContentX,
       cardContentY + 10
     );
     doc.text(
-      `Contact Number: ${customerData?.phone}`,
+      `Contact Number: ${customerData.contact_no}`,
       cardContentX,
       cardContentY + 20
-    ); // Adjusting y position for the next line
+    ); 
     doc.text(
-      `Country: ${getCountryName(customerData.country)}`,
+      `Country: ${getCountryName(customerData.shipping_country)}`,
       cardContentX,
       cardContentY + 30
     );
     doc.text(
-      `Address: ${customerData?.address_1} ${customerData?.city}`,
+      `Address: ${customerData.customer_shipping_address}`,
       cardContentX,
       cardContentY + 40
-    ); // Adjusting y position for the next line
-
-    // Save the PDF
+    );
     doc.save("invoice.pdf");
   };
 
@@ -78,42 +63,42 @@ const PrintModal = ({ show, handleClosePrintModal, orderData, backdrop }) => {
       </Modal.Header>
       <Modal.Body>
         <div>
-          {customerData && orderId && (
+          {customerData && (
             <>
               <Box>
                 <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
                   Order Id:{" "}
                 </Typography>
                 <Typography variant="label" className="fw-semibold fs-5">
-                  {orderId}
+                  {customerData.order_id}
                 </Typography>
               </Box><Box>
                 <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
                   Customer Name:{" "}
                 </Typography>
                 <Typography variant="label" className="fw-semibold fs-5">
-                  {customerData.first_name} {customerData.last_name}
+                  {customerData.customer_name}
                 </Typography>
               </Box><Box>
                 <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
                   Contact Number:{" "}
                 </Typography>
                 <Typography variant="label" className="fw-semibold fs-5">
-                  {customerData.phone}
+                  {customerData.contact_no}
                 </Typography>
               </Box><Box>
                 <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
                   Country:{" "}
                 </Typography>
                 <Typography variant="label" className="fw-semibold fs-5">
-                  {getCountryName(customerData.country)}
+                  {getCountryName(customerData.shipping_country)}
                 </Typography>
               </Box><Box>
                 <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
                   Address:{" "}
                 </Typography>
                 <Typography variant="label" className="fw-semibold fs-5">
-                  {customerData.address_1} {customerData.city}
+                  {customerData.customer_shipping_address}
                 </Typography>
               </Box>
             </>
