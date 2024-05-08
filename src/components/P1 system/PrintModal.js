@@ -1,15 +1,15 @@
 import React, { useRef } from "react";
 import { Button, Modal } from "react-bootstrap";
 import jsPDF from "jspdf";
-import styled from "styled-components";
 import countries from "iso-3166-1-alpha-2";
+import { Box, Typography } from "@mui/material";
 
 const PrintModal = ({ show, handleClosePrintModal, orderData, backdrop }) => {
   const customerData = orderData && orderData[0]?.billing;
   const orderId = orderData && orderData[0].id;
   console.log(orderId, "OrderId");
   const modalRef = useRef(null);
-  
+
   const getCountryName = (code) => {
     const country = countries.getCountry(code);
     return country ? country : "Unknown";
@@ -72,43 +72,50 @@ const PrintModal = ({ show, handleClosePrintModal, orderData, backdrop }) => {
       onHide={handleClosePrintModal}
       centered
       ref={modalRef}
-      backdrop
     >
       <Modal.Header closeButton>
-        <Modal.Title className="text-center">Invoice</Modal.Title>
+        <Modal.Title>Invoice</Modal.Title>
       </Modal.Header>
-      <Modal.Body className="text-center">
-        <div className="justify-content-center">
+      <Modal.Body>
+        <div>
           {customerData && orderId && (
             <>
-              <Order>
-                Order Id:
-                <span style={{ color: "black" }}> {orderId}</span>
-              </Order>
-              <Name>
-                Customer Name:
-                <span style={{ color: "black" }}>
-                  {" "}
-                  {customerData.first_name} {customerData.last_name}{" "}
-                </span>
-              </Name>
-              <PhoneNu>
-                Contact Number:
-                <span style={{ color: "black" }}> {customerData.phone} </span>
-              </PhoneNu>
-              <Country>
-                Country:
-                <span style={{ color: "black" }}>
-                  {getCountryName(customerData.country)}{" "}
-                </span>
-              </Country>
-              <Address>
-                Address:
-                <span style={{ color: "black" }}>
-                  {" "}
+              <Box>
+                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
+                  Order Id:{" "}
+                </Typography>
+                <Typography variant="label" className="fw-semibold fs-5">
+                  {orderId}
+                </Typography>
+              </Box><Box>
+                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
+                  Customer Name:{" "}
+                </Typography>
+                <Typography variant="label" className="fw-semibold fs-5">
+                  {customerData.first_name} {customerData.last_name}
+                </Typography>
+              </Box><Box>
+                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
+                  Contact Number:{" "}
+                </Typography>
+                <Typography variant="label" className="fw-semibold fs-5">
+                  {customerData.phone}
+                </Typography>
+              </Box><Box>
+                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
+                  Country:{" "}
+                </Typography>
+                <Typography variant="label" className="fw-semibold fs-5">
+                  {getCountryName(customerData.country)}
+                </Typography>
+              </Box><Box>
+                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
+                  Address:{" "}
+                </Typography>
+                <Typography variant="label" className="fw-semibold fs-5">
                   {customerData.address_1} {customerData.city}
-                </span>{" "}
-              </Address>
+                </Typography>
+              </Box>
             </>
           )}
         </div>
@@ -129,33 +136,3 @@ const PrintModal = ({ show, handleClosePrintModal, orderData, backdrop }) => {
 };
 
 export default PrintModal;
-
-const Order = styled.h1`
-  font-size: 1.5em;
-  text-align: center;
-  color: #bf4f74;
-`;
-
-const Name = styled.h1`
-  font-size: 1.5em;
-  text-align: center;
-  color: #bf4f74;
-`;
-
-const PhoneNu = styled.h2`
-  font-size: 1.5em;
-  text-align: center;
-  color: #bf4f74;
-`;
-
-const Country = styled.h2`
-  font-size: 1.5em;
-  text-align: center;
-  color: #bf4f74;
-`;
-
-const Address = styled.h3`
-  font-size: 1.5em;
-  text-align: center;
-  color: #bf4f74;
-`;
