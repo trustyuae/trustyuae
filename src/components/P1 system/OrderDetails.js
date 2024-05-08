@@ -19,7 +19,7 @@ function OrderDetails() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders/${id}`;
+  const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders/?orderid=${id}`;
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
   const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
 
@@ -36,7 +36,9 @@ function OrderDetails() {
             password: password,
           },
         });
-        setOrderData([response.data]);
+        console.log(response.data.orders, 'response');
+
+        setOrderData(response.data.orders);
       } catch (error) {
         console.error("Error fetching order data:", error);
       }
@@ -69,13 +71,72 @@ function OrderDetails() {
     setSelectedFile(file);
   };
 
-  const handleAttachButtonClick = () => {
-    const fileInput = document.getElementById("imageFile");
-    if (fileInput) {
-      fileInput.click();
-    } else {
-      console.error("File input element not found.");
+  useEffect(() => {
+    if (selectedFile !== null) {
+      handleAttachButtonClick();
     }
+  }, [selectedFile])
+
+  const handleAttachButtonClick = async () => {
+    try {
+      // Get user data from local storage
+      const fileInput = document.getElementById("imageFile");
+      if (fileInput) {
+        fileInput.click();
+      } else {
+        console.error("File input element not found.");
+      }
+      const { user_id } = userData;
+
+
+      // Ensure a file is selected
+      if (!selectedFile) {
+        console.error("No file selected.");
+        return;
+      }
+      // Prepare request data
+      const requestData = new FormData();
+      requestData.append("dispatch_image", selectedFile);
+      const response = await axios.post(
+        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`, requestData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response.data, "Attachment API response");
+    } catch (error) {
+      console.error("Error while attaching file:", error);
+    }
+  };
+
+  const userData = JSON.parse(localStorage.getItem('user_data'));
+  const handleClick = async () => {
+
+    const currentDate = new Date();
+    const currentDateTimeString = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+    const { user_id } = userData;
+    const orderId = parseInt(id, 10);
+
+    const requestData = {
+      order_id: orderId,
+      user_id: user_id,
+      start_time: currentDateTimeString,
+      end_time: ''
+    };
+
+
+    axios.post('https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-pick/v1/insert-order-pickup/', requestData)
+      .then(response => {
+
+        console.log(response, 'response');
+        console.log('API request successful');
+      })
+      .catch(error => {
+
+        console.error('There was a problem with the API request:', error);
+      });
   };
 
   return (
@@ -91,7 +152,7 @@ function OrderDetails() {
             >
               Print
             </button>
-            <Button variant="success">Start</Button>
+            <Button variant="success" onClick={handleClick}>Start</Button>
           </MDBCol>
         </MDBRow>
         <MDBRow>
@@ -117,7 +178,7 @@ function OrderDetails() {
                     textAlign: "center",
                   }}
                 >
-                  Address
+                  Customer name
                 </th>
                 <th
                   style={{
@@ -126,8 +187,9 @@ function OrderDetails() {
                     textAlign: "center",
                   }}
                 >
-                  City
+                  Address
                 </th>
+
                 <th
                   style={{
                     backgroundColor: "#DEE2E6",
@@ -142,9 +204,9 @@ function OrderDetails() {
             <tbody>
               {orderData?.map((order, index) => (
                 <tr key={index}>
-                  <td className="text-center">{order.billing?.address_1}</td>
-                  <td className="text-center">{order.billing?.city}</td>
-                  <td className="text-center">{getCountryName(order.billing?.country)}</td>
+                  <td className="text-center">{order.customer_name}</td>
+                  <td className="text-center">{order.customer_shipping_address}</td>
+                  <td className="text-center">{getCountryName(order.shipping_country)}</td>
                 </tr>
               ))}
             </tbody>
@@ -214,43 +276,41 @@ function OrderDetails() {
               </tr>
             </thead>
             <tbody>
-              {orderData?.map((order, index) =>
-                order.line_items?.map((item, subIndex) => {
-                  const sizeObject = item.meta_data?.find(
-                    (meta) => meta.key === "pa_size"
-                  );
-                  const size = sizeObject ? sizeObject.value : "N/A";
-                  const reducedStockObject = item.meta_data?.find(
-                    (meta) => meta.key === "_reduced_stock"
-                  );
-                  const reducedStock = reducedStockObject
-                    ? reducedStockObject.value
-                    : "N/A";
-                  return (
-                    <tr key={`${index}-${subIndex}`}>
-                      <td className="text-center">{item.name}</td>
-                      <td className="text-center">
-                        Size:{size} , Reduced Stock:{reducedStock}{" "}
-                      </td>
-                      <td className="text-center">
-                        {item.image.src && (
-                          <span onClick={() => ImageModule(item.image.src)}>
-                            <img
-                              src={item.image.src}
-                              alt={item.name}
-                              style={{ maxWidth: "100px", cursor: "pointer" }}
-                            />
-                          </span>
-                        )}
-                      </td>
-                      <td className="text-center">{item.quantity}</td>
-                      <td className="text-center"></td>
-                    </tr>
-                  );
-                })
-              )}
+              {orderData?.map((order, index) => (
+                order?.items.map((product, index1) => (
+                  <tr key={`${index}-${index1}`}>
+                    <td className="text-center">{product.product_name}</td>
+                    {/* <td className="text-center">{product.variation_value.display_key}:{product.variation_value.value}</td> */}
+                    <td className="text-center">
+                      {typeof product.variation_value === 'object' ? (
+                        // If variation_value is an object
+                        <>
+                          {product.variation_value?.display_key}:{product.variation_value?.value}
+                        </>
+                      ) : (
+                        // If variation_value is a string
+                        <>
+                          {product.variation_value}
+                        </>
+                      )}
+                    </td>
+                    <td className="text-center">
+                      <span onClick={() => ImageModule(product.product_image)}>
+                        <img
+                          src={product.product_image}
+                          alt={product.product_name}
+                          style={{ maxWidth: "100px", cursor: "pointer" }}
+                        />
+                      </span>
+                    </td>
+                    <td className="text-center">{product.quantity}</td>
+                    <td className="text-center">{product.dispatch_type}</td>
+                  </tr>
+                ))
+              ))}
             </tbody>
           </Table>
+
         </MDBRow>
         <MDBRow>
           <MDBCol md="12" className="d-flex ">
