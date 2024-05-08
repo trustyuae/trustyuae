@@ -9,6 +9,8 @@ import Pagination from 'react-bootstrap/Pagination';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import countries from 'iso-3166-1-alpha-2';
+import { Box, Typography } from '@mui/material';
+import DataTable from '../DataTable';
 
 function OrderSystem() {
     const [orders, setOrders] = useState([]);
@@ -18,7 +20,7 @@ function OrderSystem() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10); // Default page size
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' }); // Sort configuration
-    const pageSizeOptions = [5, 10, 20, 50,900]; // Options for page size
+    const pageSizeOptions = [5, 10, 20, 50, 900]; // Options for page size
 
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -43,16 +45,18 @@ function OrderSystem() {
                     password: password
                 }
             });
-            setOrders(response.data.orders);
-            console.log(response.data.orders,'dispatchType===>>>>');
+            let data = response.data.orders.map((v, i) => ({ ...v, id: i }))
+            console.log(data, '<===== data')
+            setOrders(data);
+            console.log(response.data.orders, 'dispatchType===>>>>');
             const totalPagesHeader = response.data.total_count;
-            console.log(totalPagesHeader,'totalPagesHeader');
+            console.log(totalPagesHeader, 'totalPagesHeader');
             setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-    useEffect((page,pageSize) => {
+    useEffect((page, pageSize) => {
         fetchOrders();
     }, [page, pageSize]);
 
@@ -84,7 +88,7 @@ function OrderSystem() {
                 }
             });
             // setFilteredOrders(response.data);
-            setOrders(response.data.orders);
+            setOrders(response);
             const totalPagesHeader = response.data.total_count;
             setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
             setCurrentPage(1); // Reset current page to 1 after filtering
@@ -123,14 +127,14 @@ function OrderSystem() {
 
                 // For 'billing_full_name' key, concatenate first and last name
                 if (sortConfig.key === 'billing.first_name') {
-                    aValue = `${a.billing.first_name} ${a.billing.last_name}`;
-                    bValue = `${b.billing.first_name} ${b.billing.last_name}`;
+                    aValue = `${a.billing?.first_name} ${a.billing?.last_name}`;
+                    bValue = `${b.billing?.first_name} ${b.billing?.last_name}`;
                 }
 
                 // For 'shipping_country' key, access country under shipping object
                 if (sortConfig.key === 'shipping.country') {
-                    aValue = a.shipping.country;
-                    bValue = b.shipping.country;
+                    aValue = a.shipping?.country;
+                    bValue = b.shipping?.country;
                 }
 
                 if (aValue < bValue) {
@@ -176,47 +180,82 @@ function OrderSystem() {
     const getCountryName = code => {
         const country = countries.getCountry(code);
         return country ? country : 'Unknown';
-      };
+    };
+
+    const getRowClassName = (params) => {
+        console.log(params, 'params')
+        return params.row.order_status === 'Dispatch' ? 'test-class' : '';
+    };
+
+    const columns = [
+        { field: 'date', headerName: 'Date', width: 200 },
+        { field: 'order_id', headerName: 'Order ID', width: 130 },
+        { field: 'customer_name', headerName: 'Customer Name', width: 250 },
+        {
+            field: 'shipping_country',
+            headerName: 'Shipping Country',
+            type: 'string',
+            width: 250,
+            valueGetter: (value, row) => getCountryName(row.shipping_country)
+            ,
+        },
+        {
+            field: 'order_status',
+            headerName: 'Order Status',
+            width: 160,
+            type: 'string',
+        },
+        {
+            field: 'view_item',
+            headerName: 'View Item',
+            width: 125,
+            type: 'html',
+            renderCell: (value, row) => {
+                console.log(row)
+                return <Link to={`/order_details/${row?.order_id}`}>
+                    <Button type="button" className='w-auto'>View</Button>
+                </Link>
+            },
+        },
+    ];
 
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
-            <div className="mb-9">
-                <div className="row g-3 mb-4">
-                    <div className="col-auto">
-                        <h2 className="mb-0">Order Fulfillment System</h2>
-                    </div>
-                </div>
-            </div>
+            <Box className="mb-4">
+                <Typography variant='h4' className='fw-semibold'>
+                    Order Fulfillment System
+                </Typography>
+            </Box>
             <Row className='mb-4 mt-4'>
                 <Form inline>
-                    <Row >
+                    <Row className='mb-4'>
                         <Col xs="auto" lg="4">
                             <Form.Group>
-                                <Form.Label>Order Id:</Form.Label>
+                                <Form.Label className='fw-semibold'>Order Id:</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter Order ID"
                                     value={searchOrderID}
                                     onChange={e => setSearchOrderID(e.target.value)}
-                                    className="mr-sm-2"
+                                    className="mr-sm-2 py-2"
                                 />
                             </Form.Group>
                         </Col>
                         <Col xs="auto" lg="4">
                             <Form.Group>
-                                <Form.Label>Date filter:</Form.Label>
+                                <Form.Label className='fw-semibold'>Date filter:</Form.Label>
                                 <Form.Control
                                     type="date"
                                     value={startDate}
                                     onChange={e => setStartDate(e.target.value)}
-                                    className="mr-sm-2"
+                                    className="mr-sm-2 py-2"
                                 />
                             </Form.Group>
                         </Col>
                         <Col xs="auto" lg="4">
                             <Form.Group>
-                                <Form.Label>Dispatch type:</Form.Label>
-                                <Form.Select className="mr-sm-2">
+                                <Form.Label className='fw-semibold'>Dispatch type:</Form.Label>
+                                <Form.Select className="mr-sm-2 py-2">
                                     <option value="All">All</option>
                                     <option value="Dispatch">Dispatch</option>
                                     <option value="Reserve">Reserve</option>
@@ -224,26 +263,23 @@ function OrderSystem() {
                             </Form.Group>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col xs="auto" lg="3" className=' d-flex  align-items-end'>
-                            <Button type="button" className='mr-2 mx-3 w-50' onClick={handleSearch}>Search</Button>
-                            <Button type="button" className='mr-2 mx-3 w-50' onClick={handleReset}>Reset filter</Button>
-                        </Col>
-                        <Col xs="auto" lg="1">
-                            <Form.Group>
-                                <Form.Label>Page Size:</Form.Label>
-                                <Form.Control as="select" value={pageSize} onChange={handlePageSizeChange}>
-                                    {pageSizeOptions.map(size => (
-                                        <option key={size} value={size}>{size}</option>
-                                    ))}
-                                </Form.Control>
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                    <Box className='d-flex justify-content-end'>
+                        <Form.Group className='d-flex mx-1 align-items-center'>
+                            <Form.Label className='fw-semibold mb-0 me-2'>Page Size:</Form.Label>
+                            <Form.Control as="select" className='w-auto' value={pageSize} onChange={handlePageSizeChange}>
+                                {pageSizeOptions.map(size => (
+                                    <option key={size} value={size}>{size}</option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                        <Button type="button" className='mr-2 mx-1 w-auto' onClick={handleSearch}>Search</Button>
+                        <Button type="button" className='mr-2 mx-1 w-auto' onClick={handleReset}>Reset filter</Button>
+                    </Box>
                 </Form>
             </Row>
-            <div className='mt-2'>
-                <Table striped bordered hover>
+            <Box className='mt-2'>
+                <DataTable columns={columns} rows={orders} getRowClassName={'test-class'} />
+                {/* <Table striped bordered hover>
                     <thead>
                         <tr>
                             <th className='text-center'
@@ -302,22 +338,22 @@ function OrderSystem() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order,index) => {
+                        {orders.map((order, index) => {
                             // const subItem = dispatchType.find(sub=>sub.order_id==order.id)
-                            const backgroundColor=order.order_status==="Reserve"?'#ffff00':'#8ceb8c'
+                            const backgroundColor = order.order_status === "Reserve" ? '#ffff00' : '#8ceb8c'
                             // const backgroundColor=''
                             // console.log(subItem,'subItem');
                             return (
-                                <tr key={order.id} style={{backgroundColor}}>
-                                    {/* <td className='text-center ' style={{backgroundColor}}>{formatDate(order.date)}</td> */}
-                                    <td className='text-center ' style={{backgroundColor}}>{order.date}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{order.order_id}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{order.customer_name}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>{getCountryName(order.shipping_country)}</td>
-                                    {/* <td className='text-center ' style={{backgroundColor}}>{order.billing.first_name} {order.billing.last_name}</td> */}
-                                    {/* <td className='text-center ' style={{backgroundColor}}>{order.shipping_country}</td> */}
-                                    <td className='text-center ' style={{backgroundColor}}>{order.order_status}</td>
-                                    <td className='text-center ' style={{backgroundColor}}>
+                                <tr key={order.id} style={{ backgroundColor }}>
+                                    <td className='text-center ' style={{backgroundColor}}>{formatDate(order.date)}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.date}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.order_id}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.customer_name}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{getCountryName(order.shipping_country)}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{order.billing.first_name} {order.billing.last_name}</td>
+                                    <td className='text-center ' style={{backgroundColor}}>{order.shipping_country}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>{order.order_status}</td>
+                                    <td className='text-center ' style={{ backgroundColor }}>
                                         <Link to={`/order_details/${order.order_id}`}>
                                             <Button type="button" className='w-auto'>View</Button>
                                         </Link>
@@ -326,8 +362,8 @@ function OrderSystem() {
                             )
                         })}
                     </tbody>
-                </Table>
-                <div>
+                </Table> */}
+                {/* <div>
                     <Row>
                         <Col className='d-flex justify-content-end align-items-center' >
                             <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
@@ -335,8 +371,8 @@ function OrderSystem() {
                             <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
                         </Col>
                     </Row>
-                </div>
-            </div>
+                </div> */}
+            </Box>
         </Container>
     )
 }
