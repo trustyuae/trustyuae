@@ -18,7 +18,8 @@ export const loginUser = (data, navigate) => async (dispatch) => {
       headers: { "content-type": "application/json" },
     });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
-    await localStorage.setItem("token", JSON.stringify(res?.data?.token));
+    localStorage.setItem("token", JSON.stringify(res?.data?.token));
+   localStorage.setItem("user_data", JSON.stringify(res?.data?.user_data));
     if (res.data.token) {
       Swal.fire({
         icon: "success",
