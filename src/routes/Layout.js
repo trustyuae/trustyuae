@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Card } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
 import Dashboard from "../components/Dashboardd";
@@ -26,14 +26,13 @@ const InnerContainer = styled(Box)(({ theme }) => ({
 }));
 
 const StyledMain = styled("main")(({ theme }) => ({
-  //backgroundColor: theme.palette.primary.light,
-  //   height: "calc(100vh - 64px)",
   height: "100%",
   flex: 1,
   overflow: "auto",
   width: "100%",
   paddingTop: "65px",
   paddingBottom: "6rem",
+  backgroundColor: 'rgb(241, 239, 241)'
 }));
 
 export const Layout = () => {
@@ -41,10 +40,12 @@ export const Layout = () => {
     <OuterContainer>
       <InnerContainer>
         {/* <Dashboard /> */}
-        <Header/>
-        <SideBar/>
+        <Header />
+        <SideBar />
         <StyledMain id="main">
-          <Outlet/>
+          <Card className="border-0 p-2">
+            <Outlet />
+          </Card>
         </StyledMain>
       </InnerContainer>
     </OuterContainer>

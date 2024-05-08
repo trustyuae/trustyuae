@@ -212,7 +212,7 @@ function OrderSystem() {
                                 style={{
                                     backgroundColor: "#DEE2E6",
                                     padding: "8px",
-                                    textAlign: "center",
+                                    textAlign: "center", 
                                 }} >
                                 Dispatch Type
                             </th>
