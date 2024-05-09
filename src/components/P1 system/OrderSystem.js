@@ -9,7 +9,17 @@ import { Link } from 'react-router-dom';
 import countries from 'iso-3166-1-alpha-2';
 import { Box, Typography } from '@mui/material';
 import DataTable from '../DataTable';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 
+// const WrappedSingleInputDateRangeField = React.forwardRef((props, ref) => {
+//     return <SingleInputDateRangeField size="small" {...props} ref={ref} />;
+// });
+
+// WrappedSingleInputDateRangeField.fieldType = 'single-input';
 function OrderSystem() {
     const [dispatchType, setDispatchType] = useState('all');
     const [orders, setOrders] = useState([]);
@@ -29,6 +39,7 @@ function OrderSystem() {
         if (startDate) apiUrl += `?date=${startDate}`;
 
         try {
+            console.log(startDate,'startDate');
             // const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}&status=${dispatchType}`);
             const response = await axios.get(`${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`);
             let data = response.data.orders.map((v, i) => ({ ...v, id: i }))
@@ -71,27 +82,27 @@ function OrderSystem() {
     };
 
     const columns = [
-        { field: 'date', headerName: 'Date', flex: 1  },
-        { field: 'order_id', headerName: 'Order ID', flex: 1  },
-        { field: 'customer_name', headerName: 'Customer Name', flex: 1  },
+        { field: 'date', headerName: 'Date', flex: 1 },
+        { field: 'order_id', headerName: 'Order ID', flex: 1 },
+        { field: 'customer_name', headerName: 'Customer Name', flex: 1 },
         {
             field: 'shipping_country',
             headerName: 'Shipping Country',
             type: 'string',
-            flex: 1 ,
+            flex: 1,
             valueGetter: (value, row) => getCountryName(row.shipping_country)
             ,
         },
         {
             field: 'order_status',
             headerName: 'Order Status',
-            flex: 1 ,
+            flex: 1,
             type: 'string',
         },
         {
             field: 'view_item',
             headerName: 'View Item',
-            flex: 1 ,
+            flex: 1,
             type: 'html',
             renderCell: (value, row) => {
                 return <Link to={`/order_details/${value?.row?.order_id}`}>
@@ -103,6 +114,15 @@ function OrderSystem() {
 
     const handleChange = (event, value) => {
         setPage(value);
+    };
+
+    const handleDateChange = (newDateRange) => {
+        const formattedDateRange = [
+            newDateRange[0] ? newDateRange[0].toLocaleDateString('en-GB') : null,
+            newDateRange[1] ? newDateRange[1].toLocaleDateString('en-GB') : null
+        ];
+        console.log(formattedDateRange,'formattedDateRange');
+        // setStartDate(formattedDateRange); // Update state with the new date range
     };
 
     return (
@@ -136,6 +156,14 @@ function OrderSystem() {
                                     onChange={e => setStartDate(e.target.value)}
                                     className="mr-sm-2 py-2"
                                 />
+                                {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['SingleInputDateRangeField']}>
+                                        <DateRangePicker 
+                                        value={startDate}
+                                        onChange={handleDateChange}
+                                        slots={{ field: SingleInputDateRangeField }} />
+                                    </DemoContainer>
+                                </LocalizationProvider> */}
                             </Form.Group>
                         </Col>
                         <Col xs="auto" lg="4">

@@ -183,12 +183,19 @@ function OrderDetails() {
     }
   }
 
+  const handalBackButton=()=>{
+    navigate("/ordersystem")
+  }
+
   return (
     <>
       <Container fluid className="px-5" style={{ height: "98vh" }}>
         <h3 className="fw-bold text-center py-3 ">Order ID -{id}</h3>
         <MDBRow>
-          <MDBCol md="12" className="d-flex justify-content-end">
+          <MDBCol md="6" className="d-flex justify-content-start">
+              <Button variant="success" onClick={handalBackButton}>Back</Button>
+          </MDBCol>
+          <MDBCol md="6" className="d-flex justify-content-end">
             <button
               type="button"
               className="btn btn-primary me-3"
