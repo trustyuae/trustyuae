@@ -29,7 +29,19 @@ export default function DataTable({ columns, rows, page, totalPages, handleChang
           },
           '& .MuiDataGrid-footerContainer ': {
             display: 'none',
-          }
+          },
+          '& .MuiDataGrid-cell': {
+            borderLeft: '1px solid rgba(224, 224, 224, 1)',
+            borderRight: '1px solid rgba(224, 224, 224, 1)'
+          },
+          '& .MuiDataGrid-columnHeader': {
+            borderLeft: '1px solid rgba(224, 224, 224, 1)',
+            borderRight: '1px solid rgba(224, 224, 224, 1)'
+          },
+          '& .MuiDataGrid-columnHeaderTitle': {
+            fontWeight: 700,
+            fontSize: 16
+          },
         }}
         getCellClassName={(params) => {
           if (!params.row.order_status) {
