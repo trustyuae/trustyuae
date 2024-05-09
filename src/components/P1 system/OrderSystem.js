@@ -19,7 +19,6 @@ function OrderSystem() {
     const pageSizeOptions = [5, 10, 20, 50, 100];
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [totalCount, setTotalCount] = useState(0);
     const [isReset, setIsReset] = useState(false);
 
     const fetchOrders = async () => {
@@ -37,7 +36,6 @@ function OrderSystem() {
 
             const totalPagesHeader = response.data.total_pages;
             setTotalPages(response.data.total_pages);
-            setTotalCount(response.data.total_count);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -166,93 +164,7 @@ function OrderSystem() {
                 </Form>
             </Row>
             <div className='mt-2'>
-                <DataTable columns={columns} rows={orders} page={page} totalPages={totalPages} handleChange={handleChange} />
-                {/* <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th className='text-center'
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}>
-                                Date
-
-                            </th>
-                            <th className='text-center'
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}>
-                                Order ID
-
-                            </th>
-                            <th className='text-center'
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}
-                            >
-                                Customer Name
-                            </th>
-                            <th className='text-center'
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}
-                            >
-                                Shipping Country
-                            </th>
-                            <th className='text-center'
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }} >
-                                Dispatch Type
-                            </th>
-                            <th className='text-center'
-                                style={{
-                                    backgroundColor: "#DEE2E6",
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}>View Items</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map((order, index) => {
-
-                            const backgroundColor = order.order_status === "Reserve" ? '#ffff00' : '#8ceb8c'
-
-                            return (
-                                <tr key={index} style={{ backgroundColor }}>
-                                    <td className='text-center ' style={{ backgroundColor }}>{order.date}</td>
-                                    <td className='text-center ' style={{ backgroundColor }}>{order.order_id}</td>
-                                    <td className='text-center ' style={{ backgroundColor }}>{order.customer_name}</td>
-                                    <td className='text-center ' style={{ backgroundColor }}>{getCountryName(order.shipping_country)}</td>
-                                    <td className='text-center ' style={{ backgroundColor }}>{order.order_status}</td>
-                                    <td className='text-center ' style={{ backgroundColor }}>
-                                        <Link to={`/order_details/${order.order_id}`}>
-                                            <Button type="button" className='w-auto'>View</Button>
-                                        </Link>
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </Table> */}
-                {/* <div>
-                    <Row>
-                        <Col className='d-flex justify-content-end align-items-center' >
-                            <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
-                            <span>{page} of {totalPages}</span>
-                            <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
-                        </Col>
-                    </Row>
-                </div> */}
+                <DataTable columns={columns} rows={orders} page={page} pageSize={pageSize} totalPages={totalPages} handleChange={handleChange} />
             </div>
         </Container>
     )
