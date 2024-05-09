@@ -19,6 +19,7 @@ function OrderSystem() {
     const pageSizeOptions = [5, 10, 20, 50, 100];
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalCount, setTotalCount] = useState(0);
     const [isReset, setIsReset] = useState(false);
 
     const fetchOrders = async () => {
@@ -32,13 +33,11 @@ function OrderSystem() {
             // const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}&status=${dispatchType}`);
             const response = await axios.get(`${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`);
             let data = response.data.orders.map((v, i) => ({ ...v, id: i }))
-            console.log(data, '<===== data')
             setOrders(data);
-            console.log(response.data.orders, 'dispatchType===>>>>');
-            
+
             const totalPagesHeader = response.data.total_pages;
-            console.log(totalPagesHeader, 'totalPagesHeader');
             setTotalPages(response.data.total_pages);
+            setTotalCount(response.data.total_count);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -46,18 +45,17 @@ function OrderSystem() {
 
     useEffect(() => {
         fetchOrders();
-    }, [pageSize, page, dispatchType,isReset]);
+    }, [pageSize, page, dispatchType, isReset]);
 
     const handleReset = () => {
         setSearchOrderID('');
         setStartDate('');
         setTotalPages(1)
-        if(isReset){
+        if (isReset) {
             setIsReset(false)
-        }else{
+        } else {
             setIsReset(true)
         }
-        // fetchOrders()
     };
 
     const handlePageSizeChange = (e) => {
@@ -97,13 +95,16 @@ function OrderSystem() {
             width: 125,
             type: 'html',
             renderCell: (value, row) => {
-                console.log(value,'----',value.row.order_id,'-------',row)
                 return <Link to={`/order_details/${value?.row?.order_id}`}>
                     <Button type="button" className='w-auto'>View</Button>
                 </Link>
             },
         },
     ];
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
 
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
@@ -164,7 +165,7 @@ function OrderSystem() {
                 </Form>
             </Row>
             <div className='mt-2'>
-                <DataTable columns={columns} rows={orders} pageNo={page} pageSize={pageSize} totalCount={totalPages} />
+                <DataTable columns={columns} rows={orders} page={page} totalPages={totalPages} handleChange={handleChange} />
                 {/* <Table striped bordered hover>
                     <thead>
                         <tr>
@@ -242,7 +243,7 @@ function OrderSystem() {
                         })}
                     </tbody>
                 </Table> */}
-                <div>
+                {/* <div>
                     <Row>
                         <Col className='d-flex justify-content-end align-items-center' >
                             <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page - 1)} disabled={page === 1}>Previous</Button>
@@ -250,7 +251,7 @@ function OrderSystem() {
                             <Button type="button" className='mr-2 mx-3 ' onClick={() => goToPage(page + 1)} disabled={page === totalPages}>Next</Button>
                         </Col>
                     </Row>
-                </div>
+                </div> */}
             </div>
         </Container>
     )

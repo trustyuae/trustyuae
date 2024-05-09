@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
+import { Box, Pagination } from '@mui/material';
 
-export default function DataTable({ columns, rows, pageNo, pageSize, totalCount }) {
+export default function DataTable({ columns, rows, page, totalPages, handleChange }) {
 
   return (
     <Box style={{
@@ -15,18 +15,17 @@ export default function DataTable({ columns, rows, pageNo, pageSize, totalCount 
       <DataGrid
         rows={rows}
         columns={columns}
-        rowLength={totalCount}
-        initialState={{
-          pagination: {
-            paginationModel: { page: pageNo, pageSize: pageSize },
-          },
-        }}
+        rowLength={totalPages}
         sx={{
+          marginBottom: 3,
           '& .MuiTablePagination-selectLabel': {
             marginBottom: '0px',
           },
           '& .MuiTablePagination-displayedRows ': {
             marginBottom: '0px',
+          },
+          '& .MuiDataGrid-footerContainer ': {
+            display: 'none',
           }
         }}
         getCellClassName={(params) => {
@@ -35,9 +34,14 @@ export default function DataTable({ columns, rows, pageNo, pageSize, totalCount 
           }
           return params.row.order_status == 'Dispatch' ? 'bg-green' : params.row.order_status == 'Reserve' ? 'bg-yellow' : '';
         }}
-        pageSizeOptions={[5, 10, 20, 50, 90]}
         checkboxSelection={false}
       />
+      <Pagination sx={{
+        marginBottom: 3,
+        '& .MuiPagination-ul ': {
+          justifyContent: 'end'
+        }
+      }} count={totalPages} page={page} variant="outlined" onChange={handleChange} />
     </Box>
   );
 }
