@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "react-bootstrap";
 import PrintModal from "./PrintModal";
 import { getCountryName } from "../../utils/GetCountryName";
@@ -23,10 +23,12 @@ function OrderDetails() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
+  const navigate = useNavigate();
+
   const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders/?orderid=${id}`;
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
   const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
-  
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -72,7 +74,7 @@ function OrderDetails() {
     if (selectedFile !== null) {
       handleAttachButtonClick();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFile])
 
   const handleAttachButtonClick = async () => {
@@ -106,7 +108,7 @@ function OrderDetails() {
     }
   };
   const userData = JSON.parse(localStorage.getItem('user_data')) ?? {}; // Set default value to an empty object if userData is null
-  
+
   const handleClick = async () => {
     const currentDate = new Date();
     const currentDateTimeString = currentDate.toISOString().slice(0, 19).replace('T', ' ');
@@ -130,29 +132,33 @@ function OrderDetails() {
       });
   };
 
-  const handleFinishButtonClick = async () =>{
+  const handleFinishButtonClick = async () => {
     try {
       // Swal.fire({
       //   text: "error",
       // });
       const { user_id } = userData ?? {};
       const response = await axios.post(
-        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}` );
+        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`);
       console.log(response.data, "finish API response");
-      if(response.data.status=="Completed"){
+      if (response.data.status == "Completed") {
         Swal.fire({
-        text: response.data?.message
-      });
+          text: response.data?.message
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/ordersystem");
+          }
+        });
       }
-      if(response.data.status=="Dispatch Image"){
+      if (response.data.status == "Dispatch Image") {
         Swal.fire({
-        text: response.data?.message
-      });
+          text: response.data?.message
+        });
       }
-      if(response.data.status=="P2"){
+      if (response.data.status == "P2") {
         Swal.fire({
-        text: response.data?.message
-      });
+          text: response.data?.message
+        });
       }
     } catch (error) {
       console.error("Error while attaching file:", error);
@@ -172,9 +178,9 @@ function OrderDetails() {
             >
               Print
             </button>
-            {orderProcess==="started" ? ( 
+            {orderProcess === "started" ? (
               <Button variant="success" disabled>Start</Button>
-            ):( 
+            ) : (
               <Button variant="success" onClick={handleClick}>Start</Button>
             )}
           </MDBCol>
