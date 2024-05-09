@@ -4,32 +4,35 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Table from 'react-bootstrap/Table';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import countries from 'iso-3166-1-alpha-2';
+import { Box, Typography } from '@mui/material';
+import DataTable from '../DataTable';
 
 function OrderSystem() {
     const [dispatchType, setDispatchType] = useState('all');
     const [orders, setOrders] = useState([]);
     const [searchOrderID, setSearchOrderID] = useState('');
     const [startDate, setStartDate] = useState('');
-    const [pageSize, setPageSize] = useState(10); // Default page size
-    const pageSizeOptions = [5, 10, 20, 50, 100]; // Options for page size
+    const [pageSize, setPageSize] = useState(10);
+    const pageSizeOptions = [5, 10, 20, 50, 100];
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const username = 'ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a';
-    const password = 'cs_8dcdba11377e29282bd2b898d4a517cddd6726fe';
 
     const fetchOrders = async () => {
+
+        let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`
+
+        if (searchOrderID) apiUrl += `?orderid=${searchOrderID}`;
+        if (startDate) apiUrl += `?date=${startDate}`;
+
         try {
-            const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}&status=${dispatchType}`, {
-                auth: {
-                    username: username,
-                    password: password
-                }
-            });
-            setOrders(response.data.orders);
+            // const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}&status=${dispatchType}`);
+            const response = await axios.get(`${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`);
+            let data = response.data.orders.map((v, i) => ({ ...v, id: i }))
+            console.log(data, '<===== data')
+            setOrders(data);
             console.log(response.data.orders, 'dispatchType===>>>>');
             const totalPagesHeader = response.data.total_pages;
             console.log(totalPagesHeader, 'totalPagesHeader');
@@ -38,44 +41,15 @@ function OrderSystem() {
             console.error('Error fetching data:', error);
         }
     };
-    useEffect((page, pageSize) => {
+
+    useEffect(() => {
         fetchOrders();
-    }, []);
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString();
-    };
-    const handleSearch = async () => {
-        let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`;
-
-        if (searchOrderID) {
-            apiUrl += `?orderid=${searchOrderID}`;
-        }
-
-        if (startDate) {
-            // apiUrl += `?after=${startDate}T00:00:00&before=${startDate}T23:59:59`;
-            apiUrl += `?date=${startDate}`;
-        }
-
-        try {
-            const response = await axios.get(`${apiUrl}?page=${page}&per_page=10`, {
-                auth: {
-                    username: username,
-                    password: password
-                }
-            });
-            // setFilteredOrders(response.data);
-            setOrders(response.data.orders);
-            setTotalPages(response.data.total_pages);
-        } catch (error) {
-            console.error('Error fetching filtered data:', error);
-        }
-    };
+    }, [pageSize, page, dispatchType]);
 
     const handleReset = () => {
         setSearchOrderID('');
         setStartDate('');
+        setTotalPages(1)
         fetchOrders()
     };
 
@@ -92,50 +66,75 @@ function OrderSystem() {
         return country ? country : 'Unknown';
     };
 
-    const handleDispatchTypeChange = (event) => {
-        const type = event.target.value;
-        setDispatchType(type);
-    };
+    const columns = [
+        { field: 'date', headerName: 'Date', width: 200 },
+        { field: 'order_id', headerName: 'Order ID', width: 130 },
+        { field: 'customer_name', headerName: 'Customer Name', width: 250 },
+        {
+            field: 'shipping_country',
+            headerName: 'Shipping Country',
+            type: 'string',
+            width: 250,
+            valueGetter: (value, row) => getCountryName(row.shipping_country)
+            ,
+        },
+        {
+            field: 'order_status',
+            headerName: 'Order Status',
+            width: 160,
+            type: 'string',
+        },
+        {
+            field: 'view_item',
+            headerName: 'View Item',
+            width: 125,
+            type: 'html',
+            renderCell: (value, row) => {
+                console.log(row)
+                return <Link to={`/order_details/${row?.order_id}`}>
+                    <Button type="button" className='w-auto'>View</Button>
+                </Link>
+            },
+        },
+    ];
 
     return (
         <Container fluid className='py-3' style={{ maxHeight: "100%", minHeight: "100vh" }}>
-            <div className="mb-9">
-                <div className="row g-3 mb-4">
-                    <div className="col-auto">
-                        <h2 className="mb-0">Order Fulfillment System</h2>
-                    </div>
-                </div>
-            </div>
+            <Box className="mb-4">
+                <Typography variant='h4' className='fw-semibold'>
+                    Order Fulfillment System
+                </Typography>
+            </Box>
             <Row className='mb-4 mt-4'>
                 <Form inline>
-                    <Row >
+                    <Row className='mb-4'>
                         <Col xs="auto" lg="4">
                             <Form.Group>
-                                <Form.Label>Order Id:</Form.Label>
+                                <Form.Label className='fw-semibold'>Order Id:</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter Order ID"
                                     value={searchOrderID}
                                     onChange={e => setSearchOrderID(e.target.value)}
-                                    className="mr-sm-2"
+                                    className="mr-sm-2 py-2"
                                 />
                             </Form.Group>
                         </Col>
                         <Col xs="auto" lg="4">
                             <Form.Group>
-                                <Form.Label>Date filter:</Form.Label>
+                                <Form.Label className='fw-semibold'>Date filter:</Form.Label>
                                 <Form.Control
                                     type="date"
                                     value={startDate}
                                     onChange={e => setStartDate(e.target.value)}
-                                    className="mr-sm-2"
+                                    className="mr-sm-2 py-2"
                                 />
                             </Form.Group>
                         </Col>
                         <Col xs="auto" lg="4">
                             <Form.Group>
-                                <Form.Label>Dispatch type:</Form.Label>
-                                <Form.Select className="mr-sm-2" value={dispatchType} onChange={handleDispatchTypeChange}>
+                                <Form.Label className='fw-semibold'>Dispatch type:</Form.Label>
+                                <Form.Select className="mr-sm-2 py-2" onChange={e => setDispatchType(e.target.value)}>
                                     <option value="all">All</option>
                                     <option value="dispatch">Dispatch</option>
                                     <option value="reserve">Reserve</option>
@@ -143,26 +142,23 @@ function OrderSystem() {
                             </Form.Group>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col xs="auto" className=' d-flex  align-items-end'>
-                            <Button type="button" className='mr-2 mx-3 ' onClick={handleSearch}>Search</Button>
-                            <Button type="button" className='mr-2 mx-3 ' onClick={handleReset}>Reset filter</Button>
-                        </Col>
-                        <Col xs="auto" >
-                            <Form.Group>
-                                <Form.Label>Page Size:</Form.Label>
-                                <Form.Control as="select" value={pageSize} onChange={handlePageSizeChange}>
-                                    {pageSizeOptions.map(size => (
-                                        <option key={size} value={size}>{size}</option>
-                                    ))}
-                                </Form.Control>
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                    <Box className='d-flex justify-content-end'>
+                        <Form.Group className='d-flex mx-1 align-items-center'>
+                            <Form.Label className='fw-semibold mb-0 me-2'>Page Size:</Form.Label>
+                            <Form.Control as="select" className='w-auto' value={pageSize} onChange={handlePageSizeChange}>
+                                {pageSizeOptions.map(size => (
+                                    <option key={size} value={size}>{size}</option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                        <Button type="button" className='mr-2 mx-1 w-auto' onClick={fetchOrders}>Search</Button>
+                        <Button type="button" className='mr-2 mx-1 w-auto' onClick={handleReset}>Reset filter</Button>
+                    </Box>
                 </Form>
             </Row>
             <div className='mt-2'>
-                <Table striped bordered hover>
+                <DataTable columns={columns} rows={orders} pageNo={page} pageSize={pageSize} totalCount={totalPages} />
+                {/* <Table striped bordered hover>
                     <thead>
                         <tr>
                             <th className='text-center'
@@ -205,7 +201,7 @@ function OrderSystem() {
                                 style={{
                                     backgroundColor: "#DEE2E6",
                                     padding: "8px",
-                                    textAlign: "center", 
+                                    textAlign: "center",
                                 }} >
                                 Dispatch Type
                             </th>
@@ -238,7 +234,7 @@ function OrderSystem() {
                             )
                         })}
                     </tbody>
-                </Table>
+                </Table> */}
                 <div>
                     <Row>
                         <Col className='d-flex justify-content-end align-items-center' >
