@@ -19,6 +19,7 @@ function OrderSystem() {
     const pageSizeOptions = [5, 10, 20, 50, 100];
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [isReset, setIsReset] = useState(false);
 
     const fetchOrders = async () => {
 
@@ -34,6 +35,7 @@ function OrderSystem() {
             console.log(data, '<===== data')
             setOrders(data);
             console.log(response.data.orders, 'dispatchType===>>>>');
+            
             const totalPagesHeader = response.data.total_pages;
             console.log(totalPagesHeader, 'totalPagesHeader');
             setTotalPages(response.data.total_pages);
@@ -44,13 +46,18 @@ function OrderSystem() {
 
     useEffect(() => {
         fetchOrders();
-    }, [pageSize, page, dispatchType]);
+    }, [pageSize, page, dispatchType,isReset]);
 
     const handleReset = () => {
         setSearchOrderID('');
         setStartDate('');
         setTotalPages(1)
-        fetchOrders()
+        if(isReset){
+            setIsReset(false)
+        }else{
+            setIsReset(true)
+        }
+        // fetchOrders()
     };
 
     const handlePageSizeChange = (e) => {
@@ -90,8 +97,8 @@ function OrderSystem() {
             width: 125,
             type: 'html',
             renderCell: (value, row) => {
-                console.log(row)
-                return <Link to={`/order_details/${row?.order_id}`}>
+                console.log(value,'----',value.row.order_id,'-------',row)
+                return <Link to={`/order_details/${value?.row?.order_id}`}>
                     <Button type="button" className='w-auto'>View</Button>
                 </Link>
             },
