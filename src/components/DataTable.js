@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 import { Box, Pagination } from '@mui/material';
 
-export default function DataTable({ columns, rows, page, totalPages, handleChange }) {
+export default function DataTable({ columns, rows, page, totalPages, handleChange, pageSize }) {
 
   return (
     <Box style={{
@@ -16,6 +16,9 @@ export default function DataTable({ columns, rows, page, totalPages, handleChang
         rows={rows}
         columns={columns}
         rowLength={totalPages}
+        initialState={{
+          pagination: { paginationModel: { pageSize: pageSize } },
+        }}
         sx={{
           marginBottom: 3,
           '& .MuiTablePagination-selectLabel': {
