@@ -71,27 +71,27 @@ function OrderSystem() {
     };
 
     const columns = [
-        { field: 'date', headerName: 'Date', width: 200 },
-        { field: 'order_id', headerName: 'Order ID', width: 130 },
-        { field: 'customer_name', headerName: 'Customer Name', width: 250 },
+        { field: 'date', headerName: 'Date', flex: 1  },
+        { field: 'order_id', headerName: 'Order ID', flex: 1  },
+        { field: 'customer_name', headerName: 'Customer Name', flex: 1  },
         {
             field: 'shipping_country',
             headerName: 'Shipping Country',
             type: 'string',
-            width: 250,
+            flex: 1 ,
             valueGetter: (value, row) => getCountryName(row.shipping_country)
             ,
         },
         {
             field: 'order_status',
             headerName: 'Order Status',
-            width: 160,
+            flex: 1 ,
             type: 'string',
         },
         {
             field: 'view_item',
             headerName: 'View Item',
-            width: 125,
+            flex: 1 ,
             type: 'html',
             renderCell: (value, row) => {
                 return <Link to={`/order_details/${value?.row?.order_id}`}>
