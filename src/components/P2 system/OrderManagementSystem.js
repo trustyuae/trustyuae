@@ -9,6 +9,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { Card } from "react-bootstrap";
 import { Link } from 'react-router-dom';
+import DataTable from '../DataTable';
 
 function OrderManagementSystem() {
     const [orders, setOrders] = useState([]);
@@ -21,6 +22,15 @@ function OrderManagementSystem() {
     const pageSizes = [5, 10, 15, 20];
     const [startDate, setStartDate] = useState('');
 
+    const columns = [
+        { field: "product_names", headerName: "product names", flex: 1 },
+        { field: "variation_values", headerName: "variation values", flex: 1 },
+        // { field: "product_images", headerName: "product images", flex: 1 },
+        { field: "total_quantity", headerName: "total quantity", flex: 1 },
+        { field: "factory_id", headerName: "factory id", flex: 1 },
+        { field: "po_number", headerName: "po number", flex: 1 },
+      ];
+
     useEffect(() => {
         fetchOrders(page, pageSize);
     }, [page, pageSize, startDate]);
@@ -28,6 +38,8 @@ function OrderManagementSystem() {
     const fetchOrders = async (page, pageSize) => {
         try {
             let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/orders?status=processing&page=${page}&per_page=${pageSize}`;
+            // let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-preorder-products/v1/pre-order/?start_date=2024-05-08&end_date=2024-05-09&factory_id=3`;
+            // let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-preorder-products/v1/pre-order`;
 
             if (startDate) {
                 apiUrl += `&after=${startDate}T00:00:00&before=${startDate}T23:59:59`;
@@ -190,7 +202,14 @@ function OrderManagementSystem() {
                     </Row>
                 </Form>
             </Row>
-
+            <div className="mt-2">
+        {/* <DataTable
+          columns={columns}
+          rows={orders}
+          
+          
+        /> */}
+      </div>
         </Container>
     );
 }
