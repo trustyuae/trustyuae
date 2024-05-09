@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
@@ -10,6 +10,9 @@ import { Card } from "react-bootstrap";
 import PrintModal from "./PrintModal";
 import { getCountryName } from "../../utils/GetCountryName";
 import Swal from "sweetalert2";
+import { Box, Typography } from "@mui/material";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 function OrderDetails() {
   const { id } = useParams();
@@ -18,10 +21,12 @@ function OrderDetails() {
   // console.log(orderProcess,'orderD')
   const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -50,24 +55,28 @@ function OrderDetails() {
     };
     fetchOrder();
   }, [apiUrl]);
+  
   const handleCloseEditModal = () => {
     setShowEditModal(false);
   };
+
+  const handleCloseAttachModal = () => {
+    setShowAttachModal(false);
+  };
+
   const ImageModule = (url) => {
     setImageURL(url);
     setShowEditModal(true);
   };
+
   const handlePrint = (orderId) => {
     const order = orderData?.find((o) => o.id === orderId);
     setSelectedOrder(order);
     setShowModal(true);
   };
+
   const handleClosePrintModal = () => {
     setShowModal(false);
-  };
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
   };
 
   useEffect(() => {
@@ -77,22 +86,18 @@ function OrderDetails() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFile])
 
-  const handleAttachButtonClick = async () => {
+  const handleFileUpload = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileInputChange = async (e) => {
+    const file = e.target.files[0];
+    console.log('Selected file:', file);
+    setSelectedFile(file)
     try {
-      const fileInput = document.getElementById("imageFile");
-      if (fileInput) {
-        fileInput.click();
-      } else {
-        console.error("File input element not found.");
-      }
       const { user_id } = userData ?? {};
-      if (!selectedFile) {
-        console.error("No file selected.");
-        return;
-      }
-      // Prepare request data
       const requestData = new FormData();
-      requestData.append("dispatch_image", selectedFile);
+      requestData.append("dispatch_image", file);
       const response = await axios.post(
         `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`, requestData,
         {
@@ -106,6 +111,11 @@ function OrderDetails() {
     } catch (error) {
       console.error("Error while attaching file:", error);
     }
+
+  };
+
+  const handleAttachButtonClick = async () => {
+    setShowAttachModal(true)
   };
   const userData = JSON.parse(localStorage.getItem('user_data')) ?? {}; // Set default value to an empty object if userData is null
 
@@ -134,9 +144,6 @@ function OrderDetails() {
 
   const handleFinishButtonClick = async () => {
     try {
-      // Swal.fire({
-      //   text: "error",
-      // });
       const { user_id } = userData ?? {};
       const response = await axios.post(
         `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`);
@@ -174,7 +181,7 @@ function OrderDetails() {
     } else {
       return "Variant data not available";
     }
-  } 
+  }
 
   return (
     <>
@@ -319,7 +326,7 @@ function OrderDetails() {
                   <tr key={`${index}-${index1}`}>
                     <td className="text-center">{product.product_name}</td>
                     <td className="text-center">{variant(product.variation_value)}</td>
-                    
+
                     <td className="text-center">
                       <span onClick={() => ImageModule(product.product_image)}>
                         <img
@@ -347,17 +354,9 @@ function OrderDetails() {
         </MDBRow>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              capture
-              style={{ display: "none" }}
-              id="imageFile"
-            />
             <Button
               variant="primary"
-              className="  me-3"
+              className="me-3"
               onClick={handleAttachButtonClick}
             >
               Attach
@@ -365,6 +364,49 @@ function OrderDetails() {
             <Button variant="danger" onClick={handleFinishButtonClick}>Finish</Button>
           </MDBCol>
         </MDBRow>
+
+        <Modal
+          show={showAttachModal}
+          onHide={handleCloseAttachModal}
+          style={{ marginTop: "130px" }}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Select Attachment From</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="p-3">
+            <Box className="d-flex justify-content-center my-4">
+              <Card className="factory-card p-3 mx-2 shadow-sm">
+                <Button className="bg-transparent border-0 p-3 text-black"
+                  onClick={handleFileUpload}>
+                  <CloudUploadIcon />
+                  <Typography>
+                    Device
+                  </Typography>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileInputChange}
+                  />
+                </Button>
+              </Card>
+              <Card className="factory-card p-3 mx-2 shadow-sm">
+                <Button className="bg-transparent border-0 p-3 text-black">
+                  <CameraAltIcon />
+                  <Typography>
+                    Camera
+                  </Typography>
+                </Button>
+              </Card>
+            </Box>
+          </Modal.Body>
+          {/* <Modal.Footer>
+            <Button className="py-2">
+              Submit
+            </Button>
+          </Modal.Footer> */}
+        </Modal>
+
         <Modal
           show={showEditModal}
           onHide={handleCloseEditModal}
