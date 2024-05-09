@@ -159,6 +159,17 @@ function OrderDetails() {
     }
   }
 
+  const variant = (e) => {
+    const matches = e.match(/"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/);
+    if (matches) {
+      const key = matches[1];
+      const value = matches[2].replace(/<[^>]*>/g, ''); // Remove HTML tags
+      return `${key}: ${value}`;
+    } else {
+      return "Variant data not available";
+    }
+  } 
+
   return (
     <>
       <Container fluid className="px-5" style={{ height: "98vh" }}>
@@ -301,20 +312,8 @@ function OrderDetails() {
                 order?.items.map((product, index1) => (
                   <tr key={`${index}-${index1}`}>
                     <td className="text-center">{product.product_name}</td>
-                    {/* <td className="text-center">{product.variation_value.display_key}:{product.variation_value.value}</td> */}
-                    <td className="text-center">
-                      {typeof product.variation_value === 'object' ? (
-                        // If variation_value is an object
-                        <>
-                          {product.variation_value?.display_key}:{product.variation_value?.value}
-                        </>
-                      ) : (
-                        // If variation_value is a string
-                        <>
-                          {product.variation_value}
-                        </>
-                      )}
-                    </td>
+                    <td className="text-center">{variant(product.variation_value)}</td>
+                    
                     <td className="text-center">
                       <span onClick={() => ImageModule(product.product_image)}>
                         <img

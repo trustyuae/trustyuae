@@ -60,6 +60,7 @@ function OrderSystem() {
 
     const handlePageSizeChange = (e) => {
         setPageSize(parseInt(e.target.value));
+        setPage(1)
     };
 
     const goToPage = (newPage) => {
