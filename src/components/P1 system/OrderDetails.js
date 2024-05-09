@@ -9,6 +9,8 @@ import { useParams } from "react-router-dom";
 import { Card } from "react-bootstrap";
 import PrintModal from "./PrintModal";
 import { getCountryName } from "../../utils/GetCountryName";
+import Swal from "sweetalert2";
+
 function OrderDetails() {
   const { id } = useParams();
   const [orderData, setOrderData] = useState(null);
@@ -20,6 +22,7 @@ function OrderDetails() {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+
   const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders/?orderid=${id}`;
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
   const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
@@ -103,6 +106,7 @@ function OrderDetails() {
     }
   };
   const userData = JSON.parse(localStorage.getItem('user_data')) ?? {}; // Set default value to an empty object if userData is null
+  
   const handleClick = async () => {
     const currentDate = new Date();
     const currentDateTimeString = currentDate.toISOString().slice(0, 19).replace('T', ' ');
@@ -125,6 +129,36 @@ function OrderDetails() {
         console.error('There was a problem with the API request:', error);
       });
   };
+
+  const handleFinishButtonClick = async () =>{
+    try {
+      // Swal.fire({
+      //   text: "error",
+      // });
+      const { user_id } = userData ?? {};
+      const response = await axios.post(
+        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}` );
+      console.log(response.data, "finish API response");
+      if(response.data.status=="Completed"){
+        Swal.fire({
+        text: response.data?.message
+      });
+      }
+      if(response.data.status=="Dispatch Image"){
+        Swal.fire({
+        text: response.data?.message
+      });
+      }
+      if(response.data.status=="P2"){
+        Swal.fire({
+        text: response.data?.message
+      });
+      }
+    } catch (error) {
+      console.error("Error while attaching file:", error);
+    }
+  }
+
   return (
     <>
       <Container fluid className="px-5" style={{ height: "98vh" }}>
@@ -323,7 +357,7 @@ function OrderDetails() {
             >
               Attach
             </Button>
-            <Button variant="danger">Finish</Button>
+            <Button variant="danger" onClick={handleFinishButtonClick}>Finish</Button>
           </MDBCol>
         </MDBRow>
         <Modal
