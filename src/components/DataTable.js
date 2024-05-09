@@ -2,11 +2,8 @@ import * as React from 'react';
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
 
-export default function DataTable({ columns, rows }) {
-  const getRowClassName = (params) => {
-    console.log(params, 'params')
-    return params.row.order_status === 'Shipped' ? 'specialRow' : '';
-  };
+export default function DataTable({ columns, rows, pageNo, pageSize, totalCount }) {
+
   return (
     <Box style={{
       height: 400, width: '100%',
@@ -18,25 +15,21 @@ export default function DataTable({ columns, rows }) {
       <DataGrid
         rows={rows}
         columns={columns}
+        rowLength={totalCount}
         initialState={{
           pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
+            paginationModel: { page: pageNo, pageSize: pageSize },
           },
         }}
-        // sx={{
-        //   '& .MuiDataGrid-row': {
-        //     backgroundColor: 'rgb(140, 235, 140)',
-        //     '&:hover': {
-        //       backgroundColor: 'rgb(140, 235, 140)',
-        //     },
-        //     '& .specialRow': {
-        //       backgroundColor: 'lightblue',
-        //     }
-        //   }
-        // }}
+        sx={{
+          '& .MuiTablePagination-selectLabel': {
+            marginBottom: '0px',
+          },
+          '& .MuiTablePagination-displayedRows ': {
+            marginBottom: '0px',
+          }
+        }}
         getCellClassName={(params) => {
-          console.log(params, 'params')
-          console.log(!params.row.order_status, 'params.row.order_status')
           if (!params.row.order_status) {
             return '';
           }
