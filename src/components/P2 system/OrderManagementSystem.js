@@ -325,6 +325,7 @@ function OrderManagementSystem() {
                                     checked={selectedOrderIds.length === orders.length}
                                 />
                             </th>
+                            <th>order Id</th>
                             <th>Product Name</th>
                             <th>Variant</th>
                             <th>Image</th>
@@ -343,6 +344,7 @@ function OrderManagementSystem() {
                                         onChange={() => handleOrderSelection(order.order_id)}
                                     />
                                 </td>
+                                <td className="text-center">{order.order_id}</td>
                                 <td className="text-center">{order.product_names}</td>
                                 <td className="text-center">{variant(order.variation_values)}</td>
                                 <td className="text-center">
