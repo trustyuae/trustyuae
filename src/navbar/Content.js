@@ -1,7 +1,7 @@
 import React from "react";
 
 const Content = () => {
-  return <main id="main" class="main">
+  return <main id="main" className="main">
     
   </main>;
 };

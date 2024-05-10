@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 import { Box, Pagination } from '@mui/material';
 
-export default function DataTable({ columns, rows, page, totalPages, handleChange, pageSize }) {
+export default function DataTable({ columns, rows, page = 1, totalPages = 1, handleChange = () => {}, pageSize = 10 ,checkboxSelection=false}) {
 
   return (
     <Box style={{
@@ -49,7 +49,7 @@ export default function DataTable({ columns, rows, page, totalPages, handleChang
           }
           return params.row.order_status == 'Dispatch' ? 'bg-green' : params.row.order_status == 'Reserve' ? 'bg-yellow' : '';
         }}
-        checkboxSelection={false}
+        checkboxSelection={checkboxSelection}
       />
       <Pagination sx={{
         marginBottom: 3,
