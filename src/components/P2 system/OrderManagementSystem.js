@@ -35,20 +35,21 @@ function OrderManagementSystem() {
     const columns = [
         { field: "product_names", headerName: "product names", flex: 1 },
         { field: "variation_values", headerName: "variation values", flex: 1 },
-        { field: "product_images", headerName: "product images", flex: 1 ,
-        type: "html",
-        renderCell: (value, row) => {
-          return (
-            // <Link to={`/order_details/${value?.row?.order_id}`}>
-            //   <Button type="button" className="w-auto">
-            //     View
-            //   </Button>
-            // </Link>
-            <>
-                <img src={value.row.product_images} alt={value.row.product_names} className="img-fluid" width={90} />
-            </>
-          );
-        },
+        {
+            field: "product_images", headerName: "product images", flex: 1,
+            type: "html",
+            renderCell: (value, row) => {
+                return (
+                    // <Link to={`/order_details/${value?.row?.order_id}`}>
+                    //   <Button type="button" className="w-auto">
+                    //     View
+                    //   </Button>
+                    // </Link>
+                    <>
+                        <img src={value.row.product_images} alt={value.row.product_names} className="img-fluid" width={90} />
+                    </>
+                );
+            },
         },
         { field: "total_quantity", headerName: "total quantity", flex: 1 },
         { field: "factory_id", headerName: "factory id", flex: 1 },
@@ -244,9 +245,34 @@ function OrderManagementSystem() {
             <Row className="mb-4 mt-4">
                 <Form inline>
                     <Row>
-                        <Col xs="auto" lg="5">
+                        {/* <Col xs="auto" lg="5">
                             <Form.Group>
                                 <Form.Label>Date filter:</Form.Label>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={["SingleInputDateRangeField"]}>
+                                        <DateRangePicker
+                                            sx={{
+                                                '& .MuiInputBase-root': {
+                                                    paddingRight: 0
+                                                },
+                                                '& .MuiInputBase-input': {
+                                                    padding: '.5rem .75rem .5rem .75rem',
+                                                    '&:hover': {
+                                                        borderColor: '#dee2e6'
+                                                    }
+                                                },
+                                            }}
+                                            value={selectedDateRange}
+                                            onChange={handleDateChange}
+                                            slots={{ field: SingleInputDateRangeField }}
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                            </Form.Group>
+                        </Col> */}
+                        <Col xs="auto" lg="4">
+                            <Form.Group>
+                                <Form.Label className="fw-semibold mb-0">Date filter:</Form.Label>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DemoContainer components={["SingleInputDateRangeField"]}>
                                         <DateRangePicker
