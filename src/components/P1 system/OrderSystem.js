@@ -189,7 +189,7 @@ function OrderSystem() {
     <Container
       fluid
       className="py-3"
-      style={{ maxHeight: "100%", minHeight: "100vh" }}
+      style={{ maxHeight: "100%" }}
     >
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">

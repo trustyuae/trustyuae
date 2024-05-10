@@ -246,7 +246,7 @@ function OrderDetails() {
 
   return (
     <>
-      <Container fluid className="px-5" style={{ height: "98vh" }}>
+      <Container fluid className="px-5" >
         <MDBRow className="my-3">
           <MDBCol
             md="5"

@@ -6,7 +6,7 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
 
   return (
     <Box style={{
-      height: 400, width: '100%',
+       width: '100%',
       [`.${gridClasses.cell}.hot`]: {
         backgroundColor: '#ff943975',
         color: '#1a3e72',

@@ -42,8 +42,8 @@ export const Layout = () => {
         {/* <Dashboard /> */}
         <Header />
         <SideBar />
-        <StyledMain id="main">
-          <Card className="border-0 p-2">
+        <StyledMain id="main" className="overflow-visible">
+          <Card className="border-0 p-2 overflow-visible">
             <Outlet />
           </Card>
         </StyledMain>
