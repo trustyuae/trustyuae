@@ -46,6 +46,7 @@ function OrderSystem() {
         `${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`
       );
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      setPage(1);
       setOrders(data);
       const totalPagesHeader = response.data.total_pages;
       setTotalPages(response.data.total_pages);
@@ -177,7 +178,7 @@ function OrderSystem() {
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>
-          <Row className="mb-4">
+          <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
                 <Form.Label className="fw-semibold">Order Id:</Form.Label>
@@ -192,7 +193,7 @@ function OrderSystem() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">Date filter:</Form.Label>
+                <Form.Label className="fw-semibold mb-0">Date filter:</Form.Label>
                 {/* <Form.Control
                                     type="date"
                                     value={startDate}
@@ -202,6 +203,17 @@ function OrderSystem() {
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
                     <DateRangePicker
+                      sx={{
+                        '& .MuiInputBase-root': {
+                          paddingRight: 0
+                        },
+                        '& .MuiInputBase-input': {
+                          padding: '.5rem .75rem .5rem .75rem',
+                          '&:hover': {
+                            borderColor: '#dee2e6'
+                          }
+                        },
+                      }}
                       value={selectedDateRange}
                       onChange={handleDateChange}
                       slots={{ field: SingleInputDateRangeField }}
