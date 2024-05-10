@@ -78,7 +78,7 @@ function OnHoldManegementSystem() {
                     </div>
                     <div className="col-lg-3">
                         <h6 className=''>Attach the Delivery Bill:</h6>
-                        <input type="file" class="form-control" name="bill" id="bill" placeholder="" />
+                        <input type="file" className="form-control" name="bill" id="bill" placeholder="" />
                     </div>
                 </div>
             </div>
