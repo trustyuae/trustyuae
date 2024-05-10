@@ -62,6 +62,7 @@ function OrderDetails() {
       const response = await axios.get(apiUrl);
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
+      console.log(response.data.orders[0].user_id,'response.data.orders[0]');
       setOrderDetails(response.data.orders[0]);
       const order = response.data.orders[0];
       if (order) {
@@ -270,7 +271,7 @@ function OrderDetails() {
               <Typography className="fw-bold">Order# {id}</Typography>
             </Box>
           </MDBCol>
-          {orderDetails?.user_id !== userData?.user_id && (
+          {orderDetails?.user_id != userData?.user_id && orderDetails?.order_process === "started" && (
             <MDBCol md="7" className="d-flex justify-content-end">
               <Alert variant={"danger"}>
                 This order has already been taken by another user!
@@ -409,7 +410,7 @@ function OrderDetails() {
           <Col sm={12} md={6}>
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-                Customer & Order
+              Attachment
               </Typography>
               <Row
                 className={`${
