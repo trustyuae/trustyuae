@@ -11,10 +11,10 @@ import PrintModal from "./PrintModal";
 import { getCountryName } from "../../utils/GetCountryName";
 import Swal from "sweetalert2";
 import { Box, Typography } from "@mui/material";
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CancelIcon from '@mui/icons-material/Cancel';
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CancelIcon from "@mui/icons-material/Cancel";
 import Webcam from "react-webcam";
 
 function OrderDetails() {
@@ -39,22 +39,22 @@ function OrderDetails() {
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
-    setSelectedFileUrl(imageSrc)
-    setShowAttachModal(false)
+    setSelectedFileUrl(imageSrc);
+    setShowAttachModal(false);
 
     fetch(imageSrc)
-      .then(res => res.blob())
-      .then(blob => {
-        const file = new File([blob], 'screenshot.jpg', { type: 'image/jpeg' });
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], "screenshot.jpg", { type: "image/jpeg" });
         setSelectedFile(file);
       })
-      .catch(error => {
-        console.error('Error converting data URL to file:', error);
+      .catch((error) => {
+        console.error("Error converting data URL to file:", error);
       });
   }, [webcamRef]);
 
   const retake = () => {
-    setSelectedFileUrl(null)
+    setSelectedFileUrl(null);
   };
 
   const fetchOrder = async () => {
@@ -62,7 +62,7 @@ function OrderDetails() {
       const response = await axios.get(apiUrl);
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
-      setOrderDetails(response.data.orders[0])
+      setOrderDetails(response.data.orders[0]);
       const order = response.data.orders[0];
       if (order) {
         setOrderProcess(order.order_process);
@@ -84,10 +84,10 @@ function OrderDetails() {
     setShowAttachModal(false);
   };
 
-  // const ImageModule = (url) => {
-  //   setImageURL(url);
-  //   setShowEditModal(true);
-  // };
+  const ImageModule = (url) => {
+    setImageURL(url);
+    setShowEditModal(true);
+  };
 
   const handlePrint = (orderId) => {
     const order = orderData?.find((o) => o.id === orderId);
@@ -104,7 +104,7 @@ function OrderDetails() {
     // handleAttachButtonClick();
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFile])
+  }, [selectedFile]);
 
   const handleFileUpload = () => {
     fileInputRef.current.click();
@@ -114,10 +114,10 @@ function OrderDetails() {
     const file = e.target.files[0];
     var fr = new FileReader();
     fr.onload = function () {
-      setSelectedFileUrl(fr.result)
-    }
-    fr.readAsDataURL(file)
-    setSelectedFile(file)
+      setSelectedFileUrl(fr.result);
+    };
+    fr.readAsDataURL(file);
+    setSelectedFile(file);
   };
 
   const handleCameraUpload = () => {
@@ -125,9 +125,9 @@ function OrderDetails() {
   };
 
   const handleCancel = () => {
-    setSelectedFileUrl(null)
-    setSelectedFile(null)
-  }
+    setSelectedFileUrl(null);
+    setSelectedFile(null);
+  };
 
   const handleSubmitAttachment = async () => {
     try {
@@ -135,7 +135,8 @@ function OrderDetails() {
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
-        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`, requestData,
+        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`,
+        requestData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -153,38 +154,45 @@ function OrderDetails() {
           }
         });
       }
-      setSelectedFile(null)
+      setSelectedFile(null);
     } catch (error) {
       console.error("Error while attaching file:", error);
     }
-  }
+  };
 
   // const handleAttachButtonClick = async () => {
   //   setShowAttachModal(true)
   // };
-  const userData = JSON.parse(localStorage.getItem('user_data')) ?? {}; // Set default value to an empty object if userData is null
+  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {}; // Set default value to an empty object if userData is null
 
   const handleClick = async () => {
     const currentDate = new Date();
-    const currentDateTimeString = currentDate.toISOString().slice(0, 19).replace('T', ' ');
+    const currentDateTimeString = currentDate
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
     const { user_id } = userData;
     const orderId = parseInt(id, 10);
-    const started = "started"
+    const started = "started";
     const requestData = {
       order_id: orderId,
       user_id: user_id,
       start_time: currentDateTimeString,
-      end_time: '',
-      order_status: started
+      end_time: "",
+      order_status: started,
     };
-    axios.post('https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-pick/v1/insert-order-pickup/', requestData)
-      .then(response => {
+    axios
+      .post(
+        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-pick/v1/insert-order-pickup/",
+        requestData
+      )
+      .then((response) => {
         if (response.status == 200) {
           fetchOrder();
         }
       })
-      .catch(error => {
-        console.error('There was a problem with the API request:', error);
+      .catch((error) => {
+        console.error("There was a problem with the API request:", error);
       });
   };
 
@@ -192,10 +200,11 @@ function OrderDetails() {
     try {
       const { user_id } = userData ?? {};
       const response = await axios.post(
-        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`);
+        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
+      );
       if (response.data.status == "Completed") {
         Swal.fire({
-          text: response.data?.message
+          text: response.data?.message,
         }).then((result) => {
           if (result.isConfirmed) {
             navigate("/ordersystem");
@@ -204,58 +213,70 @@ function OrderDetails() {
       }
       if (response.data.status == "Dispatch Image") {
         Swal.fire({
-          text: response.data?.message
+          text: response.data?.message,
         });
       }
       if (response.data.status == "P2") {
         Swal.fire({
-          text: response.data?.message
+          text: response.data?.message,
         });
       }
     } catch (error) {
       console.error("Error while attaching file:", error);
     }
-  }
+  };
 
   const variant = (e) => {
-    const matches = e.match(/"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/);
+    const matches = e.match(
+      /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
+    );
     if (matches) {
       const key = matches[1];
-      const value = matches[2].replace(/<[^>]*>/g, ''); // Remove HTML tags
+      const value = matches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
       return `${key}: ${value}`;
     } else {
       return "Variant data not available";
     }
-  }
+  };
 
   const handalBackButton = () => {
-    navigate("/ordersystem")
-  }
+    navigate("/ordersystem");
+  };
 
   return (
     <>
       <Container fluid className="px-5" style={{ height: "98vh" }}>
         <MDBRow className="my-3">
-          <MDBCol md="5" className="d-flex justify-content-start align-items-center">
-            <Button variant="outline-secondary" className="p-1 me-2 bg-transparent text-secondary" onClick={handalBackButton}>
+          <MDBCol
+            md="5"
+            className="d-flex justify-content-start align-items-center"
+          >
+            <Button
+              variant="outline-secondary"
+              className="p-1 me-2 bg-transparent text-secondary"
+              onClick={handalBackButton}
+            >
               <ArrowBackIcon className="me-1" />
             </Button>
             <Box>
-              <Typography className="text-secondary" sx={{
-                fontSize: 14
-              }}>Order Details</Typography>
-              <Typography className="fw-bold">
-                Order# {id}
+              <Typography
+                className="text-secondary"
+                sx={{
+                  fontSize: 14,
+                }}
+              >
+                Order Details
               </Typography>
+              <Typography className="fw-bold">Order# {id}</Typography>
             </Box>
           </MDBCol>
-          {orderDetails?.user_id === userData?.user_id &&
+          {orderDetails?.user_id !== userData?.user_id && (
             <MDBCol md="7" className="d-flex justify-content-end">
-              <Alert variant={'danger'}>
+              <Alert variant={"danger"}>
                 This order has already been taken by another user!
               </Alert>
             </MDBCol>
-          }
+          )}
           {/* <MDBCol md="6" className="d-flex justify-content-end">
             <Button
               type="button"
@@ -268,16 +289,18 @@ function OrderDetails() {
           </MDBCol> */}
         </MDBRow>
 
-
         <Card className="p-3 mb-3">
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold">
                 Order# {id}
               </Typography>
-              <Typography className="" sx={{
-                fontSize: 14
-              }}>
+              <Typography
+                className=""
+                sx={{
+                  fontSize: 14,
+                }}
+              >
                 <Badge bg="success">{orderDetails?.order_status}</Badge>
               </Typography>
             </Box>
@@ -285,12 +308,15 @@ function OrderDetails() {
               <Button
                 type="button"
                 className="btn btn-primary me-3"
-                onClick={handlePrint}>
+                onClick={handlePrint}
+              >
                 Print
               </Button>
-              <Button variant="success"
-                disabled={orderProcess === 'started'}
-                onClick={handleClick}>
+              <Button
+                variant="success"
+                disabled={orderProcess === "started"}
+                onClick={handleClick}
+              >
                 Start
               </Button>
             </Box>
@@ -304,50 +330,77 @@ function OrderDetails() {
               </Typography>
               <Row className="mb-2">
                 <Col md={5}>
-                  <Typography variant="label" className="fw-semibold" sx={{
-                    fontSize: 14
-                  }}>
+                  <Typography
+                    variant="label"
+                    className="fw-semibold"
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
                     Name
                   </Typography>
                 </Col>
                 <Col md={7}>
-                  <Typography variant="label" className="fw-semibold text-secondary" sx={{
-                    fontSize: 14
-                  }}>
-                    : {"  "}{orderDetails?.customer_name}
+                  <Typography
+                    variant="label"
+                    className="fw-semibold text-secondary"
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
+                    : {"  "}
+                    {orderDetails?.customer_name}
                   </Typography>
                 </Col>
               </Row>
               <Row className="mb-2">
                 <Col md={5}>
-                  <Typography variant="label" className="fw-semibold" sx={{
-                    fontSize: 14
-                  }}>
+                  <Typography
+                    variant="label"
+                    className="fw-semibold"
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
                     Phone
                   </Typography>
                 </Col>
                 <Col md={7}>
-                  <Typography variant="label" className="fw-semibold text-secondary" sx={{
-                    fontSize: 14
-                  }}>
-                    : {"  "}{orderDetails?.contact_no}
+                  <Typography
+                    variant="label"
+                    className="fw-semibold text-secondary"
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
+                    : {"  "}
+                    {orderDetails?.contact_no}
                   </Typography>
                 </Col>
               </Row>
               <Row className="mb-2">
                 <Col md={5}>
-                  <Typography variant="label" className="fw-semibold" sx={{
-                    fontSize: 14
-                  }}>
+                  <Typography
+                    variant="label"
+                    className="fw-semibold"
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
                     Order Process
                   </Typography>
                 </Col>
                 <Col md={7}>
-                  <Typography variant="label" className="fw-semibold text-secondary" sx={{
-                    fontSize: 14,
-                    textTransform: 'capitalize'
-                  }}>
-                    : {"  "}<Badge bg="success">{orderDetails?.order_process}</Badge>
+                  <Typography
+                    variant="label"
+                    className="fw-semibold text-secondary"
+                    sx={{
+                      fontSize: 14,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    : {"  "}
+                    <Badge bg="success">{orderDetails?.order_process}</Badge>
                   </Typography>
                 </Col>
               </Row>
@@ -358,55 +411,83 @@ function OrderDetails() {
               <Typography variant="h6" className="fw-bold mb-3">
                 Customer & Order
               </Typography>
-              <Row className={`${selectedFileUrl ? "justify-content-start" : "justify-content-center"} my-1`}>
-                <Col md={selectedFileUrl ? 7 : 12} className={`d-flex ${selectedFileUrl ? "justify-content-start" : "justify-content-center"} my-1`}>
+              <Row
+                className={`${
+                  selectedFileUrl
+                    ? "justify-content-start"
+                    : "justify-content-center"
+                } my-1`}
+              >
+                <Col
+                  md={selectedFileUrl ? 7 : 12}
+                  className={`d-flex ${
+                    selectedFileUrl
+                      ? "justify-content-start"
+                      : "justify-content-center"
+                  } my-1`}
+                >
                   <Card className="factory-card p-3 mx-2 shadow-sm">
-                    <Button className="bg-transparent border-0 p-3 text-black"
-                      onClick={handleFileUpload}>
+                    <Button
+                      className="bg-transparent border-0 p-3 text-black"
+                      onClick={handleFileUpload}
+                    >
                       <CloudUploadIcon />
-                      <Typography>
-                        Device
-                      </Typography>
+                      <Typography>Device</Typography>
                       <input
                         type="file"
                         ref={fileInputRef}
-                        style={{ display: 'none' }}
+                        style={{ display: "none" }}
                         onChange={handleFileInputChange}
                       />
                     </Button>
                   </Card>
                   <Card className="factory-card p-3 mx-2 shadow-sm">
-                    <Button className="bg-transparent border-0 p-3 text-black"
-                      onClick={handleCameraUpload}>
+                    <Button
+                      className="bg-transparent border-0 p-3 text-black"
+                      onClick={handleCameraUpload}
+                    >
                       <CameraAltIcon />
-                      <Typography>
-                        Camera
-                      </Typography>
+                      <Typography>Camera</Typography>
                     </Button>
                   </Card>
                 </Col>
-                {selectedFileUrl &&
+                {selectedFileUrl && (
                   <Col md={5}>
                     <Box className="text-center">
-                      <Box className="mx-auto mb-2" sx={{
-                        height: '80px',
-                        width: '100%',
-                        position: 'relative'
-                      }}>
-                        <CancelIcon sx={{
-                          position: 'absolute',
-                          top: '-15px',
-                          right: '-15px',
-                          cursor: 'pointer'
-                        }} onClick={handleCancel} />
-                        <img style={{ objectFit: 'cover' }} className="h-100 w-100" alt="" src={selectedFileUrl} />
+                      <Box
+                        className="mx-auto mb-2"
+                        sx={{
+                          height: "80px",
+                          width: "100%",
+                          position: "relative",
+                        }}
+                      >
+                        <CancelIcon
+                          sx={{
+                            position: "absolute",
+                            top: "-15px",
+                            right: "-15px",
+                            cursor: "pointer",
+                          }}
+                          onClick={handleCancel}
+                        />
+                        <img
+                          style={{ objectFit: "cover" }}
+                          className="h-100 w-100"
+                          alt=""
+                          src={selectedFileUrl}
+                        />
                       </Box>
-                      <Button variant="primary" className="me-3" onClick={handleSubmitAttachment}>
+                      <Button
+                        variant="primary"
+                        className="me-3"
+                        onClick={handleSubmitAttachment}
+                      >
                         Submit
                       </Button>
                     </Box>
                   </Col>
-                }
+                )}
               </Row>
             </Card>
           </Col>
@@ -415,7 +496,7 @@ function OrderDetails() {
         <Card className="p-3 mb-3">
           <Table striped bordered hover>
             <thead>
-              <tr style={{ textAlign: 'center' }}>
+              <tr style={{ textAlign: "center" }}>
                 <th>Item Id</th>
                 <th>Name</th>
                 <th>Variant Details</th>
@@ -425,32 +506,45 @@ function OrderDetails() {
               </tr>
             </thead>
             <tbody>
-              {orderData?.map((order, index) => (
+              {orderData?.map((order, index) =>
                 order?.items?.map((product, index1) => (
-                  <tr style={{ verticalAlign: 'middle', textAlign: 'center' }}>
+                  <tr style={{ verticalAlign: "middle", textAlign: "center" }}>
                     <td style={{ fontSize: 14 }}>{product.item_id}</td>
                     <td style={{ fontSize: 14 }}>{product.product_name}</td>
-                    <td style={{ fontSize: 14 }}>{variant(product.variation_value)}</td>
                     <td style={{ fontSize: 14 }}>
-                      <Box className="mx-auto" sx={{
-                        height: '75px',
-                        width: '75px'
-                      }}>
-                        <img src={product.product_image || `${require('../../assets/default.png')}`}
-                          className="h-100 w-100" style={{ objectFit: 'contain' }} />
+                      {variant(product.variation_value)}
+                    </td>
+                    <td style={{ fontSize: 14 }}>
+                      <Box
+                        className="mx-auto"
+                        sx={{
+                          height: "75px",
+                          width: "75px",
+                        }}
+                      >
+                        <img
+                          onClick={() => ImageModule(product.product_image)}
+                          src={
+                            product.product_image ||
+                            `${require("../../assets/default.png")}`
+                          }
+                          className="h-100 w-100"
+                          style={{ objectFit: "contain", cursor: "pointer" }}
+                        />
                       </Box>
                     </td>
                     <td style={{ fontSize: 14 }}>{product.quantity}</td>
-                    <td style={{ fontSize: 14 }}><Badge bg="success">{product.dispatch_type}</Badge></td>
+                    <td style={{ fontSize: 14 }}>
+                      <Badge bg="success">{product.dispatch_type}</Badge>
+                    </td>
                   </tr>
                 ))
-              ))}
+              )}
             </tbody>
           </Table>
         </Card>
-        <Alert variant={'info'}>
-          <label>Customer Note{" "}:-</label>{" "}
-          "There is a customer note!"
+        <Alert variant={"info"}>
+          <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
 
         {/* <Box className="py-3">
@@ -622,7 +716,9 @@ function OrderDetails() {
             >
               Attach
             </Button> */}
-            <Button variant="danger" onClick={handleFinishButtonClick}>Finish</Button>
+            <Button variant="danger" onClick={handleFinishButtonClick}>
+              Finish
+            </Button>
           </MDBCol>
         </MDBRow>
 
@@ -655,7 +751,10 @@ function OrderDetails() {
                 {selectedFileUrl ? (
                   <img src={selectedFileUrl} alt="webcam" />
                 ) : (
-                  <Webcam style={{ width: '100%', height: '100%' }} ref={webcamRef} />
+                  <Webcam
+                    style={{ width: "100%", height: "100%" }}
+                    ref={webcamRef}
+                  />
                 )}
                 <Box className="btn-container">
                   {selectedFileUrl ? (
@@ -682,7 +781,7 @@ function OrderDetails() {
           show={showEditModal}
           // onHide={handleCloseEditModal}
           onHide={() => setShowEditModal(false)}
-          style={{ marginTop: "130px" }}
+          centered
         >
           <Modal.Header closeButton>
             <Modal.Title>Product Image</Modal.Title>
@@ -700,7 +799,7 @@ function OrderDetails() {
           selectedOrder={selectedOrder}
           orderData={orderData}
         />
-      </Container >
+      </Container>
     </>
   );
 }
