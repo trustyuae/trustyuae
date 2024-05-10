@@ -77,10 +77,6 @@ function OrderSystem() {
     setPage(1);
   };
 
-  const goToPage = (newPage) => {
-    setPage(newPage);
-  };
-
   const getCountryName = (code) => {
     const country = countries.getCountry(code);
     return country ? country : "Unknown";
