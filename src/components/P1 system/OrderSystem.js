@@ -15,6 +15,8 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { format } from "date-fns";
+import { Badge } from "react-bootstrap";
+import { FaEye } from "react-icons/fa";
 // const WrappedSingleInputDateRangeField = React.forwardRef((props, ref) => {
 //   return <SingleInputDateRangeField size="small" {...props} ref={ref} />;
 // });
@@ -46,7 +48,7 @@ function OrderSystem() {
         `${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`
       );
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setPage(1);
+      // setPage(1);
       setOrders(data);
       const totalPagesHeader = response.data.total_pages;
       setTotalPages(response.data.total_pages);
@@ -57,7 +59,7 @@ function OrderSystem() {
 
   useEffect(() => {
     fetchOrders();
-  }, [pageSize, page, dispatchType, isReset]);
+  }, [pageSize, page,dispatchType, isReset]);
 
   const handleReset = () => {
     setSearchOrderID("");
@@ -105,11 +107,23 @@ function OrderSystem() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
+        console.log(value,'value');
         return (
           <Link to={`/order_details/${value?.row?.order_id}`}>
             <Button type="button" className="w-auto">
-              View
+              <FaEye />
             </Button>
+            <Typography
+                    variant="label"
+                    className="fw-semibold text-secondary"
+                    sx={{
+                      fontSize: 14,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                     {/* {"  "} */}
+                    <Badge bg="success" className="m-2">{value?.row?.order_process}</Badge>
+                  </Typography>
           </Link>
         );
       },
@@ -160,6 +174,16 @@ function OrderSystem() {
       .toString()
       .padStart(2, "0")}/${date.getFullYear()}`;
   };
+
+  const handleSearchFilter=()=>{
+    setPage(1);
+    fetchOrders();
+  }
+
+  const searchDispatchTypeFilter=(e)=>{
+    setDispatchType(e)
+    setPage(1);
+  }
 
   return (
     <Container
@@ -223,7 +247,7 @@ function OrderSystem() {
                 <Form.Label className="fw-semibold">Dispatch type:</Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
-                  onChange={(e) => setDispatchType(e.target.value)}
+                  onChange={(e) => searchDispatchTypeFilter(e.target.value)}
                 >
                   <option value="all">All</option>
                   <option value="dispatch">Dispatch</option>
@@ -253,7 +277,7 @@ function OrderSystem() {
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
-              onClick={fetchOrders}
+              onClick={handleSearchFilter}
             >
               Search
             </Button>

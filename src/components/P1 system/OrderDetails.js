@@ -62,7 +62,7 @@ function OrderDetails() {
       const response = await axios.get(apiUrl);
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
-      console.log(response.data.orders[0].user_id,'response.data.orders[0]');
+      console.log(response.data.orders[0].user_id, "response.data.orders[0]");
       setOrderDetails(response.data.orders[0]);
       const order = response.data.orders[0];
       if (order) {
@@ -271,13 +271,14 @@ function OrderDetails() {
               <Typography className="fw-bold">Order# {id}</Typography>
             </Box>
           </MDBCol>
-          {orderDetails?.user_id != userData?.user_id && orderDetails?.order_process === "started" && (
-            <MDBCol md="7" className="d-flex justify-content-end">
-              <Alert variant={"danger"}>
-                This order has already been taken by another user!
-              </Alert>
-            </MDBCol>
-          )}
+          {orderDetails?.user_id != userData?.user_id &&
+            orderDetails?.order_process === "started" && (
+              <MDBCol md="7" className="d-flex justify-content-end">
+                <Alert variant={"danger"}>
+                  This order has already been taken by another user!
+                </Alert>
+              </MDBCol>
+            )}
           {/* <MDBCol md="6" className="d-flex justify-content-end">
             <Button
               type="button"
@@ -410,7 +411,7 @@ function OrderDetails() {
           <Col sm={12} md={6}>
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-              Attachment
+                Attachment
               </Typography>
               <Row
                 className={`${
@@ -495,6 +496,9 @@ function OrderDetails() {
         </Row>
 
         <Card className="p-3 mb-3">
+          <Typography variant="h6" className="fw-bold mb-3">
+            Order Details
+          </Typography>
           <Table striped bordered hover>
             <thead>
               <tr style={{ textAlign: "center" }}>
