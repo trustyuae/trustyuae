@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
@@ -6,19 +6,22 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card } from "react-bootstrap";
+import { Alert, Badge, Card, Col, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
 import { getCountryName } from "../../utils/GetCountryName";
 import Swal from "sweetalert2";
 import { Box, Typography } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CancelIcon from '@mui/icons-material/Cancel';
+import Webcam from "react-webcam";
 
 function OrderDetails() {
   const { id } = useParams();
   const [orderData, setOrderData] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
   // const orderProcess = orderData && orderData.length > 0 ? orderData[0]?.order_process : null;
-  // console.log(orderProcess,'orderD')
   const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAttachModal, setShowAttachModal] = useState(false);
@@ -26,48 +29,65 @@ function OrderDetails() {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const fileInputRef = useRef(null);
+  const webcamRef = useRef(null);
 
   const navigate = useNavigate();
 
   const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders/?orderid=${id}`;
-  const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-  const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
+
+  const capture = useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setSelectedFileUrl(imageSrc)
+    setShowAttachModal(false)
+
+    fetch(imageSrc)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], 'screenshot.jpg', { type: 'image/jpeg' });
+        setSelectedFile(file);
+      })
+      .catch(error => {
+        console.error('Error converting data URL to file:', error);
+      });
+  }, [webcamRef]);
+
+  const retake = () => {
+    setSelectedFileUrl(null)
+  };
+
+  const fetchOrder = async () => {
+    try {
+      const response = await axios.get(apiUrl);
+      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      setOrderData(data);
+      setOrderDetails(response.data.orders[0])
+      const order = response.data.orders[0];
+      if (order) {
+        setOrderProcess(order.order_process);
+      }
+    } catch (error) {
+      console.error("Error fetching order data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const response = await axios.get(apiUrl, {
-          auth: {
-            username: username,
-            password: password,
-          },
-        });
-        console.log(response.data.orders, 'response');
-        setOrderData(response.data.orders);
-        const order = response.data.orders[0];
-        if (order) {
-          setOrderProcess(order.order_process); // Update order process state
-        }
-      } catch (error) {
-        console.error("Error fetching order data:", error);
-      }
-    };
     fetchOrder();
-  }, [apiUrl]);
-  
-  const handleCloseEditModal = () => {
-    setShowEditModal(false);
-  };
+  }, [orderProcess]);
+
+  // const handleCloseEditModal = () => {
+  //   setShowEditModal(false);
+  // };
 
   const handleCloseAttachModal = () => {
     setShowAttachModal(false);
   };
 
-  const ImageModule = (url) => {
-    setImageURL(url);
-    setShowEditModal(true);
-  };
+  // const ImageModule = (url) => {
+  //   setImageURL(url);
+  //   setShowEditModal(true);
+  // };
 
   const handlePrint = (orderId) => {
     const order = orderData?.find((o) => o.id === orderId);
@@ -80,9 +100,9 @@ function OrderDetails() {
   };
 
   useEffect(() => {
-    if (selectedFile !== null) {
-      handleAttachButtonClick();
-    }
+    // if (selectedFile !== null) {
+    // handleAttachButtonClick();
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFile])
 
@@ -92,12 +112,28 @@ function OrderDetails() {
 
   const handleFileInputChange = async (e) => {
     const file = e.target.files[0];
-    console.log('Selected file:', file);
+    var fr = new FileReader();
+    fr.onload = function () {
+      setSelectedFileUrl(fr.result)
+    }
+    fr.readAsDataURL(file)
     setSelectedFile(file)
+  };
+
+  const handleCameraUpload = () => {
+    setShowAttachModal(true);
+  };
+
+  const handleCancel = () => {
+    setSelectedFileUrl(null)
+    setSelectedFile(null)
+  }
+
+  const handleSubmitAttachment = async () => {
     try {
       const { user_id } = userData ?? {};
       const requestData = new FormData();
-      requestData.append("dispatch_image", file);
+      requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
         `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`, requestData,
         {
@@ -106,17 +142,26 @@ function OrderDetails() {
           },
         }
       );
-      console.log(response.data, "Attachment API response");
+      if (response.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Uploaded Successfully!",
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleCancel();
+          }
+        });
+      }
       setSelectedFile(null)
     } catch (error) {
       console.error("Error while attaching file:", error);
     }
+  }
 
-  };
-
-  const handleAttachButtonClick = async () => {
-    setShowAttachModal(true)
-  };
+  // const handleAttachButtonClick = async () => {
+  //   setShowAttachModal(true)
+  // };
   const userData = JSON.parse(localStorage.getItem('user_data')) ?? {}; // Set default value to an empty object if userData is null
 
   const handleClick = async () => {
@@ -134,8 +179,9 @@ function OrderDetails() {
     };
     axios.post('https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-pick/v1/insert-order-pickup/', requestData)
       .then(response => {
-        console.log(response, 'response');
-        console.log('API request successful');
+        if (response.status == 200) {
+          fetchOrder();
+        }
       })
       .catch(error => {
         console.error('There was a problem with the API request:', error);
@@ -147,7 +193,6 @@ function OrderDetails() {
       const { user_id } = userData ?? {};
       const response = await axios.post(
         `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`);
-      console.log(response.data, "finish API response");
       if (response.data.status == "Completed") {
         Swal.fire({
           text: response.data?.message
@@ -183,174 +228,383 @@ function OrderDetails() {
     }
   }
 
-  const handalBackButton=()=>{
+  const handalBackButton = () => {
     navigate("/ordersystem")
   }
 
   return (
     <>
       <Container fluid className="px-5" style={{ height: "98vh" }}>
-        <h3 className="fw-bold text-center py-3 ">Order ID -{id}</h3>
-        <MDBRow>
-          <MDBCol md="6" className="d-flex justify-content-start">
-              <Button variant="success" onClick={handalBackButton}>Back</Button>
+        <MDBRow className="my-3">
+          <MDBCol md="5" className="d-flex justify-content-start align-items-center">
+            <Button variant="outline-secondary" className="p-1 me-2 bg-transparent text-secondary" onClick={handalBackButton}>
+              <ArrowBackIcon className="me-1" />
+            </Button>
+            <Box>
+              <Typography className="text-secondary" sx={{
+                fontSize: 14
+              }}>Order Details</Typography>
+              <Typography className="fw-bold">
+                Order# {id}
+              </Typography>
+            </Box>
           </MDBCol>
-          <MDBCol md="6" className="d-flex justify-content-end">
-            <button
+          {orderDetails?.user_id === userData?.user_id &&
+            <MDBCol md="7" className="d-flex justify-content-end">
+              <Alert variant={'danger'}>
+                This order has already been taken by another user!
+              </Alert>
+            </MDBCol>
+          }
+          {/* <MDBCol md="6" className="d-flex justify-content-end">
+            <Button
               type="button"
               className="btn btn-primary me-3"
               onClick={handlePrint}
             >
               Print
-            </button>
-            {orderProcess === "started" ? (
-              <Button variant="success" disabled>Start</Button>
-            ) : (
-              <Button variant="success" onClick={handleClick}>Start</Button>
-            )}
-          </MDBCol>
+            </Button>
+            <Button variant="success" disabled={orderProcess === 'started'} onClick={handleClick}>Start</Button>
+          </MDBCol> */}
         </MDBRow>
-        <MDBRow>
-          <MDBCol md="12" className="d-flex justify-content-start">
-            <h3 className="fw-bold text-center py-3 ">Shipping Address</h3>
-          </MDBCol>
-        </MDBRow>
-        <MDBRow className="d-flex justify-content-center align-items-center">
-          <MDBCol col="10" md="12" sm="12"></MDBCol>
-          <Table
-            striped
-            bordered
-            hover
-            style={{ boxShadow: "4px 4px 11px 0rem rgb(0 0 0 / 25%)" }}
-          >
-            <thead>
-              <tr className="table-headers">
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Customer name
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Address
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Country
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {orderData?.map((order, index) => (
-                <tr key={index}>
-                  <td className="text-center">{order.customer_name}</td>
-                  <td className="text-center">{order.customer_shipping_address}</td>
-                  <td className="text-center">{getCountryName(order.shipping_country)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </MDBRow>
-        <MDBRow>
-          <MDBCol md="4">
-            <h3 className="fw-bold text-center py-3 ">Order Details</h3>
-          </MDBCol>
-        </MDBRow>
-        <MDBRow className="d-flex justify-content-center align-items-center">
-          <MDBCol col="10" md="12" sm="12"></MDBCol>
-          <Table
-            striped
-            bordered
-            hover
-            style={{ boxShadow: "4px 4px 11px 0rem rgb(0 0 0 / 25%)" }}
-          >
-            <thead>
-              <tr className="table-headers">
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Name
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Variant Details
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Image
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Qty
-                </th>
-                <th
-                  style={{
-                    backgroundColor: "#DEE2E6",
-                    padding: "8px",
-                    textAlign: "center",
-                  }}
-                >
-                  Dispatch type
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {orderData?.map((order, index) => (
-                order?.items.map((product, index1) => (
-                  <tr key={`${index}-${index1}`}>
-                    <td className="text-center">{product.product_name}</td>
-                    <td className="text-center">{variant(product.variation_value)}</td>
 
-                    <td className="text-center">
-                      <span onClick={() => ImageModule(product.product_image)}>
-                        <img
-                          src={product.product_image}
-                          alt={product.product_name}
-                          style={{ maxWidth: "100px", cursor: "pointer" }}
-                        />
-                      </span>
+
+        <Card className="p-3 mb-3">
+          <Box className="d-flex align-items-center justify-content-between">
+            <Box>
+              <Typography variant="h6" className="fw-bold">
+                Order# {id}
+              </Typography>
+              <Typography className="" sx={{
+                fontSize: 14
+              }}>
+                <Badge bg="success">{orderDetails?.order_status}</Badge>
+              </Typography>
+            </Box>
+            <Box>
+              <Button
+                type="button"
+                className="btn btn-primary me-3"
+                onClick={handlePrint}>
+                Print
+              </Button>
+              <Button variant="success"
+                disabled={orderProcess === 'started'}
+                onClick={handleClick}>
+                Start
+              </Button>
+            </Box>
+          </Box>
+        </Card>
+        <Row className="mb-3">
+          <Col sm={12} md={6}>
+            <Card className="p-3 h-100">
+              <Typography variant="h6" className="fw-bold mb-3">
+                Customer & Order
+              </Typography>
+              <Row className="mb-2">
+                <Col md={5}>
+                  <Typography variant="label" className="fw-semibold" sx={{
+                    fontSize: 14
+                  }}>
+                    Name
+                  </Typography>
+                </Col>
+                <Col md={7}>
+                  <Typography variant="label" className="fw-semibold text-secondary" sx={{
+                    fontSize: 14
+                  }}>
+                    : {"  "}{orderDetails?.customer_name}
+                  </Typography>
+                </Col>
+              </Row>
+              <Row className="mb-2">
+                <Col md={5}>
+                  <Typography variant="label" className="fw-semibold" sx={{
+                    fontSize: 14
+                  }}>
+                    Phone
+                  </Typography>
+                </Col>
+                <Col md={7}>
+                  <Typography variant="label" className="fw-semibold text-secondary" sx={{
+                    fontSize: 14
+                  }}>
+                    : {"  "}{orderDetails?.contact_no}
+                  </Typography>
+                </Col>
+              </Row>
+              <Row className="mb-2">
+                <Col md={5}>
+                  <Typography variant="label" className="fw-semibold" sx={{
+                    fontSize: 14
+                  }}>
+                    Order Process
+                  </Typography>
+                </Col>
+                <Col md={7}>
+                  <Typography variant="label" className="fw-semibold text-secondary" sx={{
+                    fontSize: 14,
+                    textTransform: 'capitalize'
+                  }}>
+                    : {"  "}<Badge bg="success">{orderDetails?.order_process}</Badge>
+                  </Typography>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+          <Col sm={12} md={6}>
+            <Card className="p-3 h-100">
+              <Typography variant="h6" className="fw-bold mb-3">
+                Customer & Order
+              </Typography>
+              <Row className={`${selectedFileUrl ? "justify-content-start" : "justify-content-center"} my-1`}>
+                <Col md={selectedFileUrl ? 7 : 12} className={`d-flex ${selectedFileUrl ? "justify-content-start" : "justify-content-center"} my-1`}>
+                  <Card className="factory-card p-3 mx-2 shadow-sm">
+                    <Button className="bg-transparent border-0 p-3 text-black"
+                      onClick={handleFileUpload}>
+                      <CloudUploadIcon />
+                      <Typography>
+                        Device
+                      </Typography>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleFileInputChange}
+                      />
+                    </Button>
+                  </Card>
+                  <Card className="factory-card p-3 mx-2 shadow-sm">
+                    <Button className="bg-transparent border-0 p-3 text-black"
+                      onClick={handleCameraUpload}>
+                      <CameraAltIcon />
+                      <Typography>
+                        Camera
+                      </Typography>
+                    </Button>
+                  </Card>
+                </Col>
+                {selectedFileUrl &&
+                  <Col md={5}>
+                    <Box className="text-center">
+                      <Box className="mx-auto mb-2" sx={{
+                        height: '80px',
+                        width: '100%',
+                        position: 'relative'
+                      }}>
+                        <CancelIcon sx={{
+                          position: 'absolute',
+                          top: '-15px',
+                          right: '-15px',
+                          cursor: 'pointer'
+                        }} onClick={handleCancel} />
+                        <img style={{ objectFit: 'cover' }} className="h-100 w-100" alt="" src={selectedFileUrl} />
+                      </Box>
+                      <Button variant="primary" className="me-3" onClick={handleSubmitAttachment}>
+                        Submit
+                      </Button>
+                    </Box>
+                  </Col>
+                }
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+
+        <Card className="p-3 mb-3">
+          <Table striped bordered hover>
+            <thead>
+              <tr style={{ textAlign: 'center' }}>
+                <th>Item Id</th>
+                <th>Name</th>
+                <th>Variant Details</th>
+                <th>Image</th>
+                <th>Qty</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orderData?.map((order, index) => (
+                order?.items?.map((product, index1) => (
+                  <tr style={{ verticalAlign: 'middle', textAlign: 'center' }}>
+                    <td style={{ fontSize: 14 }}>{product.item_id}</td>
+                    <td style={{ fontSize: 14 }}>{product.product_name}</td>
+                    <td style={{ fontSize: 14 }}>{variant(product.variation_value)}</td>
+                    <td style={{ fontSize: 14 }}>
+                      <Box className="mx-auto" sx={{
+                        height: '75px',
+                        width: '75px'
+                      }}>
+                        <img src={product.product_image || `${require('../../assets/default.png')}`}
+                          className="h-100 w-100" style={{ objectFit: 'contain' }} />
+                      </Box>
                     </td>
-                    <td className="text-center">{product.quantity}</td>
-                    <td className="text-center">{product.dispatch_type}</td>
+                    <td style={{ fontSize: 14 }}>{product.quantity}</td>
+                    <td style={{ fontSize: 14 }}><Badge bg="success">{product.dispatch_type}</Badge></td>
                   </tr>
                 ))
               ))}
             </tbody>
           </Table>
-        </MDBRow>
+        </Card>
+        <Alert variant={'info'}>
+          <label>Customer Note{" "}:-</label>{" "}
+          "There is a customer note!"
+        </Alert>
+
+        {/* <Box className="py-3">
+          <Typography variant="h4" className="fw-bold text-center">
+            Order ID -{id}
+          </Typography>
+        </Box> 
+        <Box className="mb-3">
+           <Typography variant="h5" className="fw-bold mb-3">
+            Shipping Address
+          </Typography> 
+          <MDBRow className="">
+            <MDBCol col="10" md="12" sm="12"></MDBCol>
+
+             <DataTable
+              columns={shippingColumns}
+              rows={orderData}
+            /> 
+            <Table
+              striped
+              bordered
+              hover
+              style={{ boxShadow: "4px 4px 11px 0rem rgb(0 0 0 / 25%)" }}
+            >
+              <thead>
+                <tr className="table-headers">
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Customer name
+                  </th>
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Address
+                  </th>
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Country
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {orderData?.map((order, index) => (
+                  <tr key={index}>
+                    <td className="text-center">{order.customer_name}</td>
+                    <td className="text-center">{order.customer_shipping_address}</td>
+                    <td className="text-center">{getCountryName(order.shipping_country)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </MDBRow>
+        </Box>
+
+        <Box>
+          <Typography variant="h5" className="fw-bold mb-3">
+            Order Details
+          </Typography>
+          <MDBRow className="d-flex justify-content-center align-items-center">
+            <MDBCol col="10" md="12" sm="12"></MDBCol>
+            <Table
+              striped
+              bordered
+              hover
+              style={{ boxShadow: "4px 4px 11px 0rem rgb(0 0 0 / 25%)" }}
+            >
+              <thead>
+                <tr className="table-headers">
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Name
+                  </th>
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Variant Details
+                  </th>
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Image
+                  </th>
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Qty
+                  </th>
+                  <th
+                    style={{
+                      backgroundColor: "#DEE2E6",
+                      padding: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Dispatch type
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {orderData?.map((order, index) => (
+                  order?.items.map((product, index1) => (
+                    <tr key={`${index}-${index1}`}>
+                      <td className="text-center">{product.product_name}</td>
+                      <td className="text-center">{variant(product.variation_value)}</td>
+
+                      <td className="text-center">
+                        <span onClick={() => ImageModule(product.product_image)}>
+                          <img
+                            src={product.product_image}
+                            alt={product.product_name}
+                            style={{ maxWidth: "100px", cursor: "pointer" }}
+                          />
+                        </span>
+                      </td>
+                      <td className="text-center">{product.quantity}</td>
+                      <td className="text-center">{product.dispatch_type}</td>
+                    </tr>
+                  ))
+                ))}
+              </tbody>
+            </Table>
+          </MDBRow>
+        </Box>
         <MDBRow>
           <MDBCol md="12" className="d-flex ">
             <div className="alert alert-primary z-0" role="alert">
@@ -358,16 +612,16 @@ function OrderDetails() {
               "There is a customer note!"
             </div>
           </MDBCol>
-        </MDBRow>
+        </MDBRow>*/}
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
-            <Button
+            {/* <Button
               variant="primary"
               className="me-3"
               onClick={handleAttachButtonClick}
             >
               Attach
-            </Button>
+            </Button> */}
             <Button variant="danger" onClick={handleFinishButtonClick}>Finish</Button>
           </MDBCol>
         </MDBRow>
@@ -375,15 +629,16 @@ function OrderDetails() {
         <Modal
           show={showAttachModal}
           onHide={handleCloseAttachModal}
-          style={{ marginTop: "130px" }}
+          // style={{ marginTop: "130px" }}
+          centered
         >
           <Modal.Header closeButton>
             <Modal.Title>Select Attachment From</Modal.Title>
           </Modal.Header>
           <Modal.Body className="p-3">
-            <Box className="d-flex justify-content-center my-4">
-              <Card className="factory-card p-3 mx-2 shadow-sm">
-                <Button className="bg-transparent border-0 p-3 text-black"
+            <Box className="d-flex justify-content-center my-5">
+              {/* <Card className="factory-card p-3 mx-2 shadow-sm"> */}
+              {/* <Button className="bg-transparent border-0 p-3 text-black"
                   onClick={handleFileUpload}>
                   <CloudUploadIcon />
                   <Typography>
@@ -395,28 +650,38 @@ function OrderDetails() {
                     style={{ display: 'none' }}
                     onChange={handleFileInputChange}
                   />
-                </Button>
-              </Card>
-              <Card className="factory-card p-3 mx-2 shadow-sm">
+                </Button> */}
+              <Box className="">
+                {selectedFileUrl ? (
+                  <img src={selectedFileUrl} alt="webcam" />
+                ) : (
+                  <Webcam style={{ width: '100%', height: '100%' }} ref={webcamRef} />
+                )}
+                <Box className="btn-container">
+                  {selectedFileUrl ? (
+                    <Button onClick={retake}>Retake photo</Button>
+                  ) : (
+                    <Button onClick={capture}>Capture photo</Button>
+                  )}
+                </Box>
+              </Box>
+              {/* </Card> */}
+              {/* <Card className="factory-card p-3 mx-2 shadow-sm">
                 <Button className="bg-transparent border-0 p-3 text-black">
                   <CameraAltIcon />
                   <Typography>
                     Camera
                   </Typography>
                 </Button>
-              </Card>
+              </Card> */}
             </Box>
           </Modal.Body>
-          {/* <Modal.Footer>
-            <Button className="py-2">
-              Submit
-            </Button>
-          </Modal.Footer> */}
         </Modal>
 
         <Modal
           show={showEditModal}
-          onHide={handleCloseEditModal}
+          // onHide={handleCloseEditModal}
+          onHide={() => setShowEditModal(false)}
           style={{ marginTop: "130px" }}
         >
           <Modal.Header closeButton>
@@ -435,7 +700,7 @@ function OrderDetails() {
           selectedOrder={selectedOrder}
           orderData={orderData}
         />
-      </Container>
+      </Container >
     </>
   );
 }
