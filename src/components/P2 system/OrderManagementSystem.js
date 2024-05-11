@@ -382,14 +382,14 @@ function OrderManagementSystem() {
                   />
                 </td>
                 <td className="text-center">{order.order_id}</td>
-                <td className="text-center">{order.product_names}</td>
+                <td className="text-center">{order.product_name}</td>
                 <td className="text-center">
-                  {variant(order.variation_values)}
+                  {variant(order.variation_value)}
                 </td>
                 <td className="text-center">
                   <img
-                    src={order.product_images}
-                    alt={order.product_names}
+                    src={order.product_image}
+                    alt={order.product_name}
                     className="img-fluid"
                     width={90}
                   />
