@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_URL } from '../redux/constants/Constants';
 
 const ImageUpload = () => {
   const [image, setImage] = useState(null);
@@ -12,7 +13,7 @@ const ImageUpload = () => {
     formData.append('image', image);
 
     try {
-      const response = await fetch('https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-image-upload/v1/upload-image', {
+      const response = await fetch(`${API_URL}wp-json/custom-image-upload/v1/upload-image`, {
         method: 'POST',
         body: formData,
       });

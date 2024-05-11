@@ -17,6 +17,7 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { format } from "date-fns";
 import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
+import { API_URL } from "../../redux/constants/Constants";
 // const WrappedSingleInputDateRangeField = React.forwardRef((props, ref) => {
 //   return <SingleInputDateRangeField size="small" {...props} ref={ref} />;
 // });
@@ -36,14 +37,13 @@ function OrderSystem() {
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
 
   const fetchOrders = async () => {
-    let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`;
-
+    // let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`;
+    let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders`
     if (searchOrderID) apiUrl += `?orderid=${searchOrderID}`;
     if (endDate) apiUrl += `?start_date=${startDate}&end_date=${endDate}`;
 
     try {
       console.log(startDate, "startDate");
-      // const response = await axios.get(`https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders?page=${page}&per_page=${pageSize}&status=${dispatchType}`);
       const response = await axios.get(
         `${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`
       );
@@ -59,7 +59,7 @@ function OrderSystem() {
 
   useEffect(() => {
     fetchOrders();
-  }, [pageSize, page,dispatchType, isReset]);
+  }, [pageSize, page, dispatchType, isReset]);
 
   const handleReset = () => {
     setSearchOrderID("");
@@ -107,23 +107,23 @@ function OrderSystem() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
-        console.log(value,'value');
+        console.log(value, 'value');
         return (
           <Link to={`/order_details/${value?.row?.order_id}`}>
             <Button type="button" className="w-auto">
               <FaEye />
             </Button>
             <Typography
-                    variant="label"
-                    className="fw-semibold text-secondary"
-                    sx={{
-                      fontSize: 14,
-                      textTransform: "capitalize",
-                    }}
-                  >
-                     {/* {"  "} */}
-                    <Badge bg="success" className="m-2">{value?.row?.order_process}</Badge>
-                  </Typography>
+              variant="label"
+              className="fw-semibold text-secondary"
+              sx={{
+                fontSize: 14,
+                textTransform: "capitalize",
+              }}
+            >
+              {/* {"  "} */}
+              <Badge bg="success" className="m-2">{value?.row?.order_process}</Badge>
+            </Typography>
           </Link>
         );
       },
@@ -135,7 +135,6 @@ function OrderSystem() {
   };
 
   const handleDateChange = async (newDateRange) => {
-    // Check if both start and end dates are present and not null
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
       setSelectedDateRange(newDateRange);
       const startDateString = newDateRange[0].$d.toDateString();
@@ -143,10 +142,7 @@ function OrderSystem() {
 
       const formattedStartDate = formatDate(startDateString);
       const formattedEndDate = formatDate(endDateString);
-
-      console.log("====================================");
       console.log(formattedStartDate, formattedEndDate);
-      console.log("====================================");
 
       const isoStartDate = new Date(formattedStartDate)
         ?.toISOString()
@@ -155,11 +151,8 @@ function OrderSystem() {
         ?.toISOString()
         .split("T")[0];
 
-      console.log("====================================");
-      console.log(isoStartDate, isoEndDate);
       setStartDate(isoStartDate);
       setEndDate(isoEndDate);
-      console.log("====================================");
     } else {
       console.error("Invalid date range");
     }
@@ -167,7 +160,6 @@ function OrderSystem() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    // Increment the date by 1 to correct the off-by-one error
     date.setDate(date.getDate() + 1);
     return `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date
       .getDate()
@@ -175,12 +167,12 @@ function OrderSystem() {
       .padStart(2, "0")}/${date.getFullYear()}`;
   };
 
-  const handleSearchFilter=()=>{
+  const handleSearchFilter = () => {
     setPage(1);
     fetchOrders();
   }
 
-  const searchDispatchTypeFilter=(e)=>{
+  const searchDispatchTypeFilter = (e) => {
     setDispatchType(e)
     setPage(1);
   }

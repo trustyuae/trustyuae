@@ -16,6 +16,7 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import Swal from "sweetalert2";
 import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";
+import { API_URL } from "../../redux/constants/Constants";
 
 function OrderManagementSystem() {
   const [orders, setOrders] = useState([]);
@@ -93,7 +94,7 @@ function OrderManagementSystem() {
 
   const fetchOrders = async () => {
     try {
-      let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-preorder-products/v1/pre-order/?`;
+      let apiUrl = `${API_URL}wp-json/custom-preorder-products/v1/pre-order/?`;
       if (endDate) apiUrl += `start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       const response = await axios.get(apiUrl);
@@ -110,7 +111,7 @@ function OrderManagementSystem() {
   const fetchFactories = async () => {
     try {
       const response = await axios.get(
-        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/fetch-factories"
+        `${API_URL}wp-json/custom-factory/v1/fetch-factories`
       );
       setFactories(response.data);
     } catch (error) {
@@ -208,7 +209,7 @@ function OrderManagementSystem() {
       setAlertMessage("");
       try {
         const response = await axios.post(
-          "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-po-number/v1/po-id-generate/",
+          `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
           {
             product_ids: selectedProductIds,
             order_ids: selectedOrderIdsStr,
