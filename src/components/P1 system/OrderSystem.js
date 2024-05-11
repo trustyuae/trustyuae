@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import countries from "iso-3166-1-alpha-2";
 import { Box, Typography } from "@mui/material";
@@ -14,17 +13,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { format } from "date-fns";
 import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch } from "react-redux";
 import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
-// const WrappedSingleInputDateRangeField = React.forwardRef((props, ref) => {
-//   return <SingleInputDateRangeField size="small" {...props} ref={ref} />;
-// });
 
-// WrappedSingleInputDateRangeField.fieldType = "single-input";
 function OrderSystem() {
   const [dispatchType, setDispatchType] = useState("all");
   const [orders, setOrders] = useState([]);
@@ -40,53 +34,24 @@ function OrderSystem() {
 
   const dispatch = useDispatch();
 
-  // const fetchOrders = async () => {
-  //   // let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`;
-  //   let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders`
-  //   if (searchOrderID) apiUrl += `?orderid=${searchOrderID}`;
-  //   if (endDate) apiUrl += `?start_date=${startDate}&end_date=${endDate}`;
-
-  //   try {
-  //     console.log(startDate, "startDate");
-  //     const response = await axios.get(
-  //       `${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`
-  //     );
-  //     let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-  //     // setPage(1);
-  //     setOrders(data);
-  //     setTotalPages(response.data.total_pages);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-
   async function fetchOrders() {
     let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders/?`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
-    try {
-      await dispatch(
-        OrderSystemGet({
-          apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
-        })
-      )
-        .then((response) => {
-          console.log(response, "response");
-          let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-          setOrders(data);
-          setTotalPages(response.data.total_pages);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+    await dispatch(
+      OrderSystemGet({
+        apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
+      })
+    )
+      .then((response) => {
+        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+        setOrders(data);
+        setTotalPages(response.data.total_pages);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
-
-  useEffect(() => {
-    fetchOrders();
-  }, [pageSize, page, dispatchType, isReset]);
 
   const handleReset = () => {
     setSearchOrderID("");
@@ -170,7 +135,6 @@ function OrderSystem() {
 
       const formattedStartDate = formatDate(startDateString);
       const formattedEndDate = formatDate(endDateString);
-      console.log(formattedStartDate, formattedEndDate);
 
       const isoStartDate = new Date(formattedStartDate)
         ?.toISOString()
@@ -204,6 +168,10 @@ function OrderSystem() {
     setDispatchType(e);
     setPage(1);
   };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [pageSize, page, dispatchType, isReset]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
