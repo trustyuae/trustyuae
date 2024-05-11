@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
 import Pagination from "react-bootstrap/Pagination";
+import { API_URL } from "../../redux/constants/Constants";
 
 function AllProductList() {
   const [products, setProducts] = useState([]);
@@ -37,7 +38,7 @@ function AllProductList() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-products-api/v1/fetch-products",
+        `${API_URL}wp-json/custom-products-api/v1/fetch-products`,
         {
           auth: {
             username: username,
@@ -58,7 +59,7 @@ function AllProductList() {
   const fetchFactories = async () => {
     try {
       const response = await axios.get(
-        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-factory/v1/fetch-factories"
+        `${API_URL}wp-json/custom-factory/v1/fetch-factories`
       );
       setFactories(response.data);
     } catch (error) {
@@ -71,7 +72,7 @@ function AllProductList() {
 
   const handleEdit = (productId) => {
     const product = products.find((p) => p.id === productId);
-    console.log(product,'product');
+    console.log(product, 'product');
     setSelectedProduct(product);
     setShowEditModal(true);
   };
@@ -80,68 +81,68 @@ function AllProductList() {
     setShowEditModal(false);
   };
 
-  const handleSaveEdit = async  () => {
+  const handleSaveEdit = async () => {
     try {
-    console.log("Product saved:", selectedProduct);
-    const data = {
-      ...selectedProduct,
-      factory_image: selectFile
-    }
-    console.log("Product selectFile:", selectFile);
-    console.log("Product data 2222:", data);
+      console.log("Product saved:", selectedProduct);
+      const data = {
+        ...selectedProduct,
+        factory_image: selectFile
+      }
+      console.log("Product selectFile:", selectFile);
+      console.log("Product data 2222:", data);
 
 
-    const formData = new FormData();
-    const formData2 = new FormData();
+      const formData = new FormData();
+      const formData2 = new FormData();
 
-    formData.append("factory_id", selectedProduct.factory_id);
-    formData.append("id", selectedProduct.id);
-    formData.append("product_id", selectedProduct.product_id);
-    formData.append("product_image", selectedProduct.product_image);
-    formData.append("product_name", selectedProduct.product_name);
-    formData.append("stock_quantity", selectedProduct.stock_quantity);
-    formData.append("stock_status", selectedProduct.stock_status);
-    formData2.append("name", selectedProduct?.product_name);
+      formData.append("factory_id", selectedProduct.factory_id);
+      formData.append("id", selectedProduct.id);
+      formData.append("product_id", selectedProduct.product_id);
+      formData.append("product_image", selectedProduct.product_image);
+      formData.append("product_name", selectedProduct.product_name);
+      formData.append("stock_quantity", selectedProduct.stock_quantity);
+      formData.append("stock_status", selectedProduct.stock_status);
+      formData2.append("name", selectedProduct?.product_name);
 
-    if(selectFile){
-      formData.append("factory_image", selectFile);
-    }else{
-      console.log(selectedProduct.factory_image,'selectedProduct.factory_image');
-      formData.append("factory_image", selectedProduct.factory_image);
-    }
+      if (selectFile) {
+        formData.append("factory_image", selectFile);
+      } else {
+        console.log(selectedProduct.factory_image, 'selectedProduct.factory_image');
+        formData.append("factory_image", selectedProduct.factory_image);
+      }
 
-    
-    const response1 = await axios.post(
-      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/wc/v3/products/${selectedProduct?.product_id}`,
-      formData2, {
+
+      const response1 = await axios.post(
+        `${API_URL}wp-json/wc/v3/products/${selectedProduct?.product_id}`,
+        formData2, {
         auth: {
-            username: username,
-            password: password
+          username: username,
+          password: password
         },
         headers: {
           'Content-Type': 'multipart/form-data'
         }
-    });
+      });
 
-    const response = await axios.post(
-      `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-proimage-update/v1/update-product/${selectedProduct.product_id}`,
-      formData, {
+      const response = await axios.post(
+        `${API_URL}wp-json/custom-proimage-update/v1/update-product/${selectedProduct.product_id}`,
+        formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }
-    );
+      );
 
-    setShowEditModal(false);
-    fetchProducts();
-    fetchFactories()
+      setShowEditModal(false);
+      fetchProducts();
+      fetchFactories()
     } catch (error) {
       console.error('Error saving product:', error);
     }
-    
+
   };
 
-  const handleFileChange =   (e) => {
+  const handleFileChange = (e) => {
     console.log(e.target.files[0]);
     setFile(e.target.files[0]);
     // setFile({ ...selectFile, factoryImage: e.target.files[0] });
@@ -385,7 +386,7 @@ function AllProductList() {
                 className="me-2"
               /> */}
               {/* <Form.Control type="text" value={selectedProduct?.factoryImage} onChange={(e) => setSelectedProduct({ ...selectedProduct, factoryImage: e.target.value })} /> */}
-              <Form.Control type="file"  onChange={handleFileChange} />
+              <Form.Control type="file" onChange={handleFileChange} />
             </Form.Group>
             <Form.Group className="mb-3" controlId="factory_id">
               <Form.Label>Factory</Form.Label>
@@ -393,9 +394,9 @@ function AllProductList() {
                 as="select"
                 defaultValue={selectedProduct?.factory_id}
                 onChange={(e) => setSelectedProduct({
-                
-                ...selectedProduct,
-                factory_id:e.target.value
+
+                  ...selectedProduct,
+                  factory_id: e.target.value
                 })}
               >
                 <option value="">Select Factory</option>

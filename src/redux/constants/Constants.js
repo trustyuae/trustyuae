@@ -1,4 +1,5 @@
-export const url ="https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/"
+export const url = "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/"
+export const API_URL = "https://ghostwhite-guanaco-836757.hostingersite.com/"
 
 export const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
 export const password = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";

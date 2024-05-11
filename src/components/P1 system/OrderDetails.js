@@ -16,6 +16,7 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Webcam from "react-webcam";
+import { API_URL } from "../../redux/constants/Constants";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -32,10 +33,9 @@ function OrderDetails() {
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const fileInputRef = useRef(null);
   const webcamRef = useRef(null);
+  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
 
   const navigate = useNavigate();
-
-  const apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders/?orderid=${id}`;
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -59,7 +59,7 @@ function OrderDetails() {
 
   const fetchOrder = async () => {
     try {
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(`${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`);
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       console.log(response.data.orders[0].user_id, "response.data.orders[0]");
@@ -77,14 +77,6 @@ function OrderDetails() {
     fetchOrder();
   }, [orderProcess]);
 
-  // const handleCloseEditModal = () => {
-  //   setShowEditModal(false);
-  // };
-
-  const handleCloseAttachModal = () => {
-    setShowAttachModal(false);
-  };
-
   const ImageModule = (url) => {
     setImageURL(url);
     setShowEditModal(true);
@@ -96,20 +88,12 @@ function OrderDetails() {
     setShowModal(true);
   };
 
-  const handleClosePrintModal = () => {
-    setShowModal(false);
-  };
-
   useEffect(() => {
     // if (selectedFile !== null) {
     // handleAttachButtonClick();
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFile]);
-
-  const handleFileUpload = () => {
-    fileInputRef.current.click();
-  };
 
   const handleFileInputChange = async (e) => {
     const file = e.target.files[0];
@@ -119,10 +103,6 @@ function OrderDetails() {
     };
     fr.readAsDataURL(file);
     setSelectedFile(file);
-  };
-
-  const handleCameraUpload = () => {
-    setShowAttachModal(true);
   };
 
   const handleCancel = () => {
@@ -136,7 +116,7 @@ function OrderDetails() {
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
-        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`,
+        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`,
         requestData,
         {
           headers: {
@@ -161,11 +141,6 @@ function OrderDetails() {
     }
   };
 
-  // const handleAttachButtonClick = async () => {
-  //   setShowAttachModal(true)
-  // };
-  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {}; // Set default value to an empty object if userData is null
-
   const handleClick = async () => {
     const currentDate = new Date();
     const currentDateTimeString = currentDate
@@ -184,7 +159,7 @@ function OrderDetails() {
     };
     axios
       .post(
-        "https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-pick/v1/insert-order-pickup/",
+        `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
         requestData
       )
       .then((response) => {
@@ -201,7 +176,7 @@ function OrderDetails() {
     try {
       const { user_id } = userData ?? {};
       const response = await axios.post(
-        `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
+        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
       );
       if (response.data.status == "Completed") {
         Swal.fire({
@@ -414,24 +389,22 @@ function OrderDetails() {
                 Attachment
               </Typography>
               <Row
-                className={`${
-                  selectedFileUrl
-                    ? "justify-content-start"
-                    : "justify-content-center"
-                } my-1`}
+                className={`${selectedFileUrl
+                  ? "justify-content-start"
+                  : "justify-content-center"
+                  } my-1`}
               >
                 <Col
                   md={selectedFileUrl ? 7 : 12}
-                  className={`d-flex ${
-                    selectedFileUrl
-                      ? "justify-content-start"
-                      : "justify-content-center"
-                  } my-1`}
+                  className={`d-flex ${selectedFileUrl
+                    ? "justify-content-start"
+                    : "justify-content-center"
+                    } my-1`}
                 >
                   <Card className="factory-card p-3 mx-2 shadow-sm">
                     <Button
                       className="bg-transparent border-0 p-3 text-black"
-                      onClick={handleFileUpload}
+                      onClick={() => fileInputRef.current.click()}
                     >
                       <CloudUploadIcon />
                       <Typography>Device</Typography>
@@ -446,7 +419,7 @@ function OrderDetails() {
                   <Card className="factory-card p-3 mx-2 shadow-sm">
                     <Button
                       className="bg-transparent border-0 p-3 text-black"
-                      onClick={handleCameraUpload}
+                      onClick={() => setShowAttachModal(true)}
                     >
                       <CameraAltIcon />
                       <Typography>Camera</Typography>
@@ -729,7 +702,7 @@ function OrderDetails() {
 
         <Modal
           show={showAttachModal}
-          onHide={handleCloseAttachModal}
+          onHide={() => setShowAttachModal(false)}
           // style={{ marginTop: "130px" }}
           centered
         >
@@ -799,7 +772,7 @@ function OrderDetails() {
         </Modal>
         <PrintModal
           show={showModal}
-          handleClosePrintModal={handleClosePrintModal}
+          handleClosePrintModal={() => setShowModal(false)}
           showModal={showModal}
           selectedOrder={selectedOrder}
           orderData={orderData}
