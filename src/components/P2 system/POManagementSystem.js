@@ -127,7 +127,7 @@ function POManagementSystem() {
 
             <Box className="mb-4">
                 <Typography variant="h4" className="fw-semibold">
-                    Order Management System
+                   PO Order Management System
                 </Typography>
             </Box>
             <Row className="mb-4 mt-4">

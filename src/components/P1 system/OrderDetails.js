@@ -878,6 +878,7 @@ function OrderDetails() {
         </Modal.Header>
         <Modal.Body>
           <Form.Control as="textarea" placeholder="Enter your message here..." rows={3} />
+          <Button className="mt-2">Add Message</Button>
         </Modal.Body>
       </Modal>
       </Container>
