@@ -18,6 +18,8 @@ import { format } from "date-fns";
 import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
+import { useDispatch } from "react-redux";
+import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
 // const WrappedSingleInputDateRangeField = React.forwardRef((props, ref) => {
 //   return <SingleInputDateRangeField size="small" {...props} ref={ref} />;
 // });
@@ -36,26 +38,51 @@ function OrderSystem() {
   const [isReset, setIsReset] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
 
-  const fetchOrders = async () => {
-    // let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`;
-    let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders`
+  const dispatch = useDispatch();
+
+  // const fetchOrders = async () => {
+  //   // let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/custom-orders-new/v1/orders`;
+  //   let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders`
+  //   if (searchOrderID) apiUrl += `?orderid=${searchOrderID}`;
+  //   if (endDate) apiUrl += `?start_date=${startDate}&end_date=${endDate}`;
+
+  //   try {
+  //     console.log(startDate, "startDate");
+  //     const response = await axios.get(
+  //       `${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`
+  //     );
+  //     let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+  //     // setPage(1);
+  //     setOrders(data);
+  //     setTotalPages(response.data.total_pages);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  async function fetchOrders() {
+    let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders/?`;
     if (searchOrderID) apiUrl += `?orderid=${searchOrderID}`;
     if (endDate) apiUrl += `?start_date=${startDate}&end_date=${endDate}`;
-
     try {
-      console.log(startDate, "startDate");
-      const response = await axios.get(
-        `${apiUrl}?page=${page}&per_page=${pageSize}&status=${dispatchType}`
-      );
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      // setPage(1);
-      setOrders(data);
-      const totalPagesHeader = response.data.total_pages;
-      setTotalPages(response.data.total_pages);
+      await dispatch(
+        OrderSystemGet({
+          apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
+        })
+      )
+        .then((response) => {
+          console.log(response, "response");
+          let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+          setOrders(data);
+          setTotalPages(response.data.total_pages);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }
 
   useEffect(() => {
     fetchOrders();
@@ -107,7 +134,6 @@ function OrderSystem() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
-        console.log(value, 'value');
         return (
           <Link to={`/order_details/${value?.row?.order_id}`}>
             <Button type="button" className="w-auto">
@@ -122,7 +148,9 @@ function OrderSystem() {
               }}
             >
               {/* {"  "} */}
-              <Badge bg="success" className="m-2">{value?.row?.order_process}</Badge>
+              <Badge bg="success" className="m-2">
+                {value?.row?.order_process}
+              </Badge>
             </Typography>
           </Link>
         );
@@ -170,19 +198,15 @@ function OrderSystem() {
   const handleSearchFilter = () => {
     setPage(1);
     fetchOrders();
-  }
+  };
 
   const searchDispatchTypeFilter = (e) => {
-    setDispatchType(e)
+    setDispatchType(e);
     setPage(1);
-  }
+  };
 
   return (
-    <Container
-      fluid
-      className="py-3"
-      style={{ maxHeight: "100%" }}
-    >
+    <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
           Order Fulfillment System
@@ -205,7 +229,9 @@ function OrderSystem() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold mb-0">Date filter:</Form.Label>
+                <Form.Label className="fw-semibold mb-0">
+                  Date filter:
+                </Form.Label>
                 {/* <Form.Control
                                     type="date"
                                     value={startDate}
@@ -216,14 +242,14 @@ function OrderSystem() {
                   <DemoContainer components={["SingleInputDateRangeField"]}>
                     <DateRangePicker
                       sx={{
-                        '& .MuiInputBase-root': {
-                          paddingRight: 0
+                        "& .MuiInputBase-root": {
+                          paddingRight: 0,
                         },
-                        '& .MuiInputBase-input': {
-                          padding: '.5rem .75rem .5rem .75rem',
-                          '&:hover': {
-                            borderColor: '#dee2e6'
-                          }
+                        "& .MuiInputBase-input": {
+                          padding: ".5rem .75rem .5rem .75rem",
+                          "&:hover": {
+                            borderColor: "#dee2e6",
+                          },
                         },
                       }}
                       value={selectedDateRange}
