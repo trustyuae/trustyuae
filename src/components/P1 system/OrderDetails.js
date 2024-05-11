@@ -8,7 +8,6 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { Alert, Badge, Card, Col, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
-import { getCountryName } from "../../utils/GetCountryName";
 import Swal from "sweetalert2";
 import { Box, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -17,6 +16,13 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Webcam from "react-webcam";
 import { API_URL } from "../../redux/constants/Constants";
+import { useDispatch } from "react-redux";
+import {
+  AttachmentFileUpload,
+  CustomOrderFinish,
+  InsertOrderPickup,
+  OrderDetailsGet,
+} from "../../redux/actions/OrderSystemActions";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -36,6 +42,7 @@ function OrderDetails() {
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -57,25 +64,29 @@ function OrderDetails() {
     setSelectedFileUrl(null);
   };
 
-  const fetchOrder = async () => {
-    try {
-      const response = await axios.get(`${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`);
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      console.log(response.data.orders[0].user_id, "response.data.orders[0]");
-      setOrderDetails(response.data.orders[0]);
-      const order = response.data.orders[0];
-      if (order) {
-        setOrderProcess(order.order_process);
-      }
-    } catch (error) {
-      console.error("Error fetching order data:", error);
-    }
-  };
+  async function fetchOrder() {
+    await dispatch(
+      OrderDetailsGet({
+        id: id,
+      })
+    )
+      .then((response) => {
+        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+        setOrderData(data);
+        setOrderDetails(response.data.orders[0]);
+        const order = response.data.orders[0];
+        if (order) {
+          setOrderProcess(order.order_process);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   useEffect(() => {
     fetchOrder();
-  }, [orderProcess]);
+  }, []);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -87,13 +98,6 @@ function OrderDetails() {
     setSelectedOrder(order);
     setShowModal(true);
   };
-
-  useEffect(() => {
-    // if (selectedFile !== null) {
-    // handleAttachButtonClick();
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFile]);
 
   const handleFileInputChange = async (e) => {
     const file = e.target.files[0];
@@ -111,92 +115,113 @@ function OrderDetails() {
   };
 
   const handleSubmitAttachment = async () => {
-    try {
-      const { user_id } = userData ?? {};
-      const requestData = new FormData();
-      requestData.append("dispatch_image", selectedFile);
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`,
-        requestData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+    const { user_id } = userData ?? {};
+    await dispatch(
+      AttachmentFileUpload({
+        user_id: user_id,
+        id: id,
+        selectedFile: selectedFile,
+      })
+    )
+      .then((response) => {
+        console.log(response, "response upload");
+        if (response.data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Uploaded Successfully!",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              handleCancel();
+            }
+          });
         }
-      );
-      if (response.data.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Uploaded Successfully!",
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            handleCancel();
-          }
-        });
-      }
-      setSelectedFile(null);
-    } catch (error) {
-      console.error("Error while attaching file:", error);
-    }
+        setSelectedFile(null);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
-  const handleClick = async () => {
+  const handleStartOrderProcess = async () => {
     const currentDate = new Date();
-    const currentDateTimeString = currentDate
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
-    const { user_id } = userData;
     const orderId = parseInt(id, 10);
     const started = "started";
     const requestData = {
       order_id: orderId,
-      user_id: user_id,
-      start_time: currentDateTimeString,
+      user_id: userData.user_id,
+      start_time: currentDate.toISOString().slice(0, 19).replace("T", " "),
       end_time: "",
       order_status: started,
     };
-    axios
-      .post(
-        `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
-        requestData
-      )
+    await dispatch(InsertOrderPickup(requestData))
       .then((response) => {
-        if (response.status == 200) {
-          fetchOrder();
-        }
+        fetchOrder();
       })
       .catch((error) => {
-        console.error("There was a problem with the API request:", error);
+        console.error(error);
       });
   };
+
+  // const handleFinishButtonClick = async () => {
+  //   try {
+  //     const { user_id } = userData ?? {};
+  //     const response = await axios.post(
+  //       `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
+  //     );
+  //     if (response.data.status == "Completed") {
+  //       Swal.fire({
+  //         text: response.data?.message,
+  //       }).then((result) => {
+  //         if (result.isConfirmed) {
+  //           navigate("/ordersystem");
+  //         }
+  //       });
+  //     }
+  //     if (response.data.status == "Dispatch Image") {
+  //       Swal.fire({
+  //         text: response.data?.message,
+  //       });
+  //     }
+  //     if (response.data.status == "P2") {
+  //       Swal.fire({
+  //         text: response.data?.message,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error while attaching file:", error);
+  //   }
+  // };
 
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
-      );
-      if (response.data.status == "Completed") {
-        Swal.fire({
-          text: response.data?.message,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/ordersystem");
+
+      await dispatch(CustomOrderFinish({ user_id, id }))
+        .then((response) => {
+          if (response.data.status == "Completed") {
+            Swal.fire({
+              text: response.data?.message,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/ordersystem");
+              }
+            });
           }
+          if (response.data.status == "Dispatch Image") {
+            Swal.fire({
+              text: response.data?.message,
+            });
+          }
+          if (response.data.status == "P2") {
+            Swal.fire({
+              text: response.data?.message,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
         });
-      }
-      if (response.data.status == "Dispatch Image") {
-        Swal.fire({
-          text: response.data?.message,
-        });
-      }
-      if (response.data.status == "P2") {
-        Swal.fire({
-          text: response.data?.message,
-        });
-      }
     } catch (error) {
       console.error("Error while attaching file:", error);
     }
@@ -221,7 +246,7 @@ function OrderDetails() {
 
   return (
     <>
-      <Container fluid className="px-5" >
+      <Container fluid className="px-5">
         <MDBRow className="my-3">
           <MDBCol
             md="5"
@@ -262,7 +287,7 @@ function OrderDetails() {
             >
               Print
             </Button>
-            <Button variant="success" disabled={orderProcess === 'started'} onClick={handleClick}>Start</Button>
+            <Button variant="success" disabled={orderProcess === 'started'} onClick={handleStartOrderProcess}>Start</Button>
           </MDBCol> */}
         </MDBRow>
 
@@ -292,7 +317,7 @@ function OrderDetails() {
               <Button
                 variant="success"
                 disabled={orderProcess === "started"}
-                onClick={handleClick}
+                onClick={handleStartOrderProcess}
               >
                 Start
               </Button>
@@ -389,17 +414,19 @@ function OrderDetails() {
                 Attachment
               </Typography>
               <Row
-                className={`${selectedFileUrl
-                  ? "justify-content-start"
-                  : "justify-content-center"
-                  } my-1`}
+                className={`${
+                  selectedFileUrl
+                    ? "justify-content-start"
+                    : "justify-content-center"
+                } my-1`}
               >
                 <Col
                   md={selectedFileUrl ? 7 : 12}
-                  className={`d-flex ${selectedFileUrl
-                    ? "justify-content-start"
-                    : "justify-content-center"
-                    } my-1`}
+                  className={`d-flex ${
+                    selectedFileUrl
+                      ? "justify-content-start"
+                      : "justify-content-center"
+                  } my-1`}
                 >
                   <Card className="factory-card p-3 mx-2 shadow-sm">
                     <Button
