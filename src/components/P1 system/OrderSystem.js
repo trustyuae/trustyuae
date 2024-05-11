@@ -62,8 +62,8 @@ function OrderSystem() {
 
   async function fetchOrders() {
     let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders/?`;
-    if (searchOrderID) apiUrl += `?orderid=${searchOrderID}`;
-    if (endDate) apiUrl += `?start_date=${startDate}&end_date=${endDate}`;
+    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
+    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     try {
       await dispatch(
         OrderSystemGet({
