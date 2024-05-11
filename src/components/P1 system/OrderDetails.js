@@ -14,6 +14,8 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CancelIcon from "@mui/icons-material/Cancel";
+import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
+import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
 import Webcam from "react-webcam";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch } from "react-redux";
@@ -23,6 +25,7 @@ import {
   InsertOrderPickup,
   OrderDetailsGet,
 } from "../../redux/actions/OrderSystemActions";
+import Form from 'react-bootstrap/Form';
 
 function OrderDetails() {
   const { id } = useParams();
@@ -40,7 +43,7 @@ function OrderDetails() {
   const fileInputRef = useRef(null);
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
-
+  const [showMessageModal, setshowMessageModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -244,6 +247,14 @@ function OrderDetails() {
     navigate("/ordersystem");
   };
 
+  const handleMessageButtonClick = () => {
+    setshowMessageModal(true);
+  };
+
+  const handleMessageCloseModal = () => {
+    setshowMessageModal(false);
+  };
+
   return (
     <>
       <Container fluid className="px-5">
@@ -260,15 +271,15 @@ function OrderDetails() {
               <ArrowBackIcon className="me-1" />
             </Button>
             <Box>
-              <Typography
+              {/* <Typography
                 className="text-secondary"
                 sx={{
                   fontSize: 14,
                 }}
               >
                 Order Details
-              </Typography>
-              <Typography className="fw-bold">Order# {id}</Typography>
+              </Typography> */}
+              {/* <Typography className="fw-bold">Order# {id}</Typography> */}
             </Box>
           </MDBCol>
           {orderDetails?.user_id != userData?.user_id &&
@@ -294,9 +305,12 @@ function OrderDetails() {
         <Card className="p-3 mb-3">
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
-              <Typography variant="h6" className="fw-bold">
-                Order# {id}
+              <Typography variant="h6" className="fw-bold mb-3">
+                Order Details
               </Typography>
+              <Box>
+                <Typography className="fw-bold">Order# {id}</Typography>
+              </Box>
               <Typography
                 className=""
                 sx={{
@@ -308,19 +322,50 @@ function OrderDetails() {
             </Box>
             <Box>
               <Button
-                type="button"
-                className="btn btn-primary me-3"
-                onClick={handlePrint}
+                variant="outline-secondary"
+                className="p-1 me-3 bg-transparent text-secondary"
+                onClick={handleMessageButtonClick}
               >
-                Print
+                <AddCommentOutlinedIcon className="me-1" />
+
               </Button>
               <Button
+                variant="outline-primary"
+                className="p-1 me-3 bg-transparent text-primary"
+                onClick={handlePrint}
+              >
+                <LocalPrintshopOutlinedIcon className="me-1" />
+
+              </Button>
+              {/* <Button
                 variant="success"
                 disabled={orderProcess === "started"}
                 onClick={handleStartOrderProcess}
               >
                 Start
-              </Button>
+              </Button> */}
+              {
+                orderProcess === 'started' ? (
+                  <Button
+                    variant="outline-danger"
+                    className="p-1 me-2 bg-transparent text-danger"
+                  // disabled={orderProcess === "started"}
+                  // onClick={handleStartOrderProcess}
+                  >
+                    <CancelIcon className="me-1" />
+
+                  </Button>
+                ) : (
+                  <Button
+                    variant="success"
+                    // disabled={orderProcess === "started"}
+                    onClick={handleStartOrderProcess}
+                  >
+                    Start
+                  </Button>
+                )
+              }
+
             </Box>
           </Box>
         </Card>
@@ -389,6 +434,31 @@ function OrderDetails() {
                       fontSize: 14,
                     }}
                   >
+                    Customer shipping address
+                  </Typography>
+                </Col>
+                <Col md={7}>
+                  <Typography
+                    variant="label"
+                    className="fw-semibold text-secondary"
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
+                    : {"  "}
+                    {orderDetails?.customer_shipping_address}
+                  </Typography>
+                </Col>
+              </Row>
+              <Row className="mb-2">
+                <Col md={5}>
+                  <Typography
+                    variant="label"
+                    className="fw-semibold"
+                    sx={{
+                      fontSize: 14,
+                    }}
+                  >
                     Order Process
                   </Typography>
                 </Col>
@@ -414,19 +484,17 @@ function OrderDetails() {
                 Attachment
               </Typography>
               <Row
-                className={`${
-                  selectedFileUrl
-                    ? "justify-content-start"
-                    : "justify-content-center"
-                } my-1`}
+                className={`${selectedFileUrl
+                  ? "justify-content-start"
+                  : "justify-content-center"
+                  } my-1`}
               >
                 <Col
                   md={selectedFileUrl ? 7 : 12}
-                  className={`d-flex ${
-                    selectedFileUrl
-                      ? "justify-content-start"
-                      : "justify-content-center"
-                  } my-1`}
+                  className={`d-flex ${selectedFileUrl
+                    ? "justify-content-start"
+                    : "justify-content-center"
+                    } my-1`}
                 >
                   <Card className="factory-card p-3 mx-2 shadow-sm">
                     <Button
@@ -804,6 +872,14 @@ function OrderDetails() {
           selectedOrder={selectedOrder}
           orderData={orderData}
         />
+        <Modal show={showMessageModal} onHide={handleMessageCloseModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Message</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Control as="textarea" placeholder="Enter your message here..." rows={3} />
+        </Modal.Body>
+      </Modal>
       </Container>
     </>
   );
