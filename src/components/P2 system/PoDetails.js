@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     MDBCol,
     MDBRow
@@ -10,7 +10,27 @@ import Row from 'react-bootstrap/Row';
 // import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
+import { useParams } from 'react-router-dom';
+import { API_URL } from '../../redux/constants/Constants';
+import axios from 'axios';
+
+
+
 const PoDetails = () => {
+    const { id } = useParams();
+    const [PO_OrderList,setPO_OrderList]=useState([])
+
+const fetchOrder = async()=>{
+    let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`
+    const response = await axios.get(apiUrl);
+    console.log(response.data,'response');
+    setPO_OrderList(response.data)
+}
+
+useEffect(()=>{
+    console.log(id,'id===>>>>>');
+    fetchOrder()
+},[])
     const tableHeaders = [
         "Product Name",
         "Image",
@@ -84,7 +104,7 @@ const PoDetails = () => {
         <Container fluid className='px-5'style={{ height:'100vh'}}>
             <h3 className='fw-bold text-center my-3'>PO Details</h3>
             <h6 className='fw-bold text-center'>XYZ Guangzhon</h6>
-            <p className='text-center my-3'>PO Number: {PONumber}</p>
+            <p className='text-center my-3'>PO Number: {PO_OrderList.po_id}</p>
             <div className="d-flex justify-content-start align-items-center my-3">
                 <h6 className=''>Payment Status:</h6>
                 <select className="form-select w-25 ms-3" name="" id="">
@@ -96,7 +116,8 @@ const PoDetails = () => {
             </div>
             <MDBRow className='d-flex justify-content-center align-items-center'>
                 <MDBCol col='10' md='12' sm='12'></MDBCol>
-                <Table striped bordered hover style={{boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)'}}>
+               <div style={{overflow:'auto',height:'350px'}}>
+               <Table striped bordered hover style={{boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)'}}>
                     <thead>
                         <tr className='table-headers'>
                             {tableHeaders.map((header, index) => (
@@ -105,13 +126,13 @@ const PoDetails = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {PODetails.map((rowData, rowIndex) => (
+                        {PO_OrderList?.line_items?.map((rowData, rowIndex) => (
                             <tr key={rowIndex}>
-                                <td className='text-center'>{rowData.productName}</td>
-                                <td className='text-center'><img src={rowData.image} alt={rowData.productName} /></td>
-                                <td className='text-center'>{rowData.qtyOrdered}</td>
-                                <td className='text-center'>{rowData.estimatedCostRMB}</td>
-                                <td className='text-center'>{rowData.estimatedCostAED}</td>
+                                <td className='text-center'>{rowData.product_name}</td>
+                                <td className='text-center'><img src={rowData.image} style={{width:'100px',height:'100px'}} alt={rowData.product_name} /></td>
+                                <td className='text-center'>{rowData.quantity}</td>
+                                <td className='text-center'>--</td>
+                                <td className='text-center'>--</td>
                                 <td>
                             <Form.Group>
                                 {/* <Form.Label>Page Size:</Form.Label> */}
@@ -135,6 +156,7 @@ const PoDetails = () => {
                         </tr>
                     </tfoot>
                 </Table>
+               </div>
                 <Row>
                 <Button type="button" className='w-auto'>Upload</Button>
                 </Row>
