@@ -15,6 +15,7 @@ import { DateRangePicker, LocalizationProvider, SingleInputDateRangeField } from
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { API_URL } from '../../redux/constants/Constants';
+import { Link } from 'react-router-dom';
 
 const tableHeaders = [
     "PO Number",
@@ -68,6 +69,8 @@ function POManagementSystem() {
     const [factories, setFactories] = useState([]);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [orderList, setOrderList] = useState([]);
+    const [PoStatus, setPoStatus] = useState("");
 
     const fetchFactories = async () => {
         try {
@@ -80,9 +83,28 @@ function POManagementSystem() {
         }
     };
 
+    const POM_system_products = async () => {
+        try {
+            let apiUrl = `${API_URL}wp-json/custom-po-management/v1/po-generated-order/?`
+            if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+            if (selectedFactory) apiUrl += `?&factory_id=${selectedFactory}`;
+            if (PoStatus) apiUrl += `?&status=${PoStatus}`;
+            const response = await axios.get(apiUrl);
+
+            console.log(response.data, 'res===>>>>');
+            setOrderList(response.data)
+        } catch (error) {
+            console.error("Error Products:", error);
+        }
+    }
+
     useEffect(() => {
         fetchFactories();
     }, [])
+
+    useEffect(() => {
+        POM_system_products();
+    }, [endDate, selectedFactory, PoStatus])
 
     const handleDateChange = async (newDateRange) => {
         if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
@@ -122,12 +144,16 @@ function POManagementSystem() {
         setSelectedFactory(e.target.value);
     };
 
+    const handlePOStatus = (e) => {
+        setPoStatus(e.target.value)
+    }
+
     return (
         <Container fluid className='p-5' style={{ height: '98vh', maxHeight: "100%", minHeight: "100vh" }}>
 
             <Box className="mb-4">
                 <Typography variant="h4" className="fw-semibold">
-                   PO Order Management System
+                    PO Order Management System
                 </Typography>
             </Box>
             <Row className="mb-4 mt-4">
@@ -184,8 +210,8 @@ function POManagementSystem() {
                                 <Form.Control
                                     as="select"
                                     className="mr-sm-2"
-                                // value={selectedFactory}
-                                // onChange={handleFactoryChange}
+                                    // value={selectedFactory}
+                                    onChange={handlePOStatus}
                                 >
                                     <option value="">All </option>
                                     {POStatusFilter.map((po) => (
@@ -235,16 +261,17 @@ function POManagementSystem() {
                 </Form>
             </Row> */}
             <Row className='mb-4 mt-4 '>
-                <Table responsive striped bordered hover style={{ boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
-                    <thead>
-                        <tr className='table-headers'>
-                            {tableHeaders.map((header, index) => (
-                                <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map(order => (
+                <div style={{ overflow: 'auto', height: '320px' }}>
+                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
+                        <thead>
+                            <tr className='table-headers'>
+                                {tableHeaders.map((header, index) => (
+                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* {orders.map(order => (
                             <tr key={order.id}>
                                 <td className='text-center'>
                                     {order.PONumber}
@@ -271,9 +298,41 @@ function POManagementSystem() {
                                 </td>
 
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                        ))} */}
+                            {
+                                // console.log(orderList,'orderrrr')
+                                orderList?.map((order) => (
+                                    <tr >
+                                        <td>{order.po_id}</td>
+                                        <td>{order.po_date}</td>
+                                        <td>{order.total_quantity}</td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>{order.po_status}</td>
+                                        <td>{order.payment_status}</td>
+                                        <td>{
+                                            factories.find((factory) => factory.id === order.factory_id)
+                                                ?.factory_name
+                                        }</td>
+                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
+                                            <Link to={`/PO_details/${order.po_id}`}>
+                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                    <FaEye />
+                                                </Button>
+                                            </Link>
+                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                <MdEdit />
+                                            </Button>
+                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                <MdDelete />
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </Table>
+                </div>
             </Row>
         </Container>
     )
