@@ -33,14 +33,14 @@ const AllFactoryReducer = (state=initialState, action) => {
           case EDIT_FACTORY_REQUEST:
           return { ...state, isEditFactory: true };
         case EDIT_FACTORY_SUCCESS:
-          return { ...state, isEditFactory: false, factory: action.payload };
+          return { ...state, isEditFactory: false, editFactory: action.payload };
         case EDIT_FACTORY_FAIL:
           return { ...state, isEditFactory: false, error: action.payload };
 
           case ADD_FACTORY_REQUEST:
             return { ...state, isAddFactory: true };
           case ADD_FACTORY_SUCCESS:
-            return { ...state, isAddFactory: false, factory: action.payload };
+            return { ...state, isAddFactory: false, addFactory: action.payload };
           case ADD_FACTORY_FAIL:
             return { ...state, isAddFactory: false, error: action.payload };
     
