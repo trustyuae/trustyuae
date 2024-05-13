@@ -14,8 +14,8 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CancelIcon from "@mui/icons-material/Cancel";
-import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
-import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
+import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
+import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch } from "react-redux";
@@ -25,7 +25,7 @@ import {
   InsertOrderPickup,
   OrderDetailsGet,
 } from "../../redux/actions/OrderSystemActions";
-import Form from 'react-bootstrap/Form';
+import Form from "react-bootstrap/Form";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -43,6 +43,7 @@ function OrderDetails() {
   const fileInputRef = useRef(null);
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
+  console.log(userData, "userData date-13-05-2024");
   const [showMessageModal, setshowMessageModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -165,7 +166,6 @@ function OrderDetails() {
         console.error(error);
       });
   };
-
   // const handleFinishButtonClick = async () => {
   //   try {
   //     const { user_id } = userData ?? {};
@@ -255,6 +255,8 @@ function OrderDetails() {
     setshowMessageModal(false);
   };
 
+  // const userData =JSON.parse(localStorage.getItem('user_data'))
+
   return (
     <>
       <Container fluid className="px-5">
@@ -282,7 +284,7 @@ function OrderDetails() {
               {/* <Typography className="fw-bold">Order# {id}</Typography> */}
             </Box>
           </MDBCol>
-          {orderDetails?.user_id != userData?.user_id &&
+          {orderDetails?.operation_user_id != userData?.user_id &&
             orderDetails?.order_process === "started" && (
               <MDBCol md="7" className="d-flex justify-content-end">
                 <Alert variant={"danger"}>
@@ -327,7 +329,6 @@ function OrderDetails() {
                 onClick={handleMessageButtonClick}
               >
                 <AddCommentOutlinedIcon className="me-1" />
-
               </Button>
               <Button
                 variant="outline-primary"
@@ -335,7 +336,6 @@ function OrderDetails() {
                 onClick={handlePrint}
               >
                 <LocalPrintshopOutlinedIcon className="me-1" />
-
               </Button>
               {/* <Button
                 variant="success"
@@ -344,28 +344,33 @@ function OrderDetails() {
               >
                 Start
               </Button> */}
-              {
-                orderProcess === 'started' ? (
-                  <Button
-                    variant="outline-danger"
-                    className="p-1 me-2 bg-transparent text-danger"
-                  // disabled={orderProcess === "started"}
+              {userData?.user_id == orderDetails?.operation_user_id &&
+              orderProcess == "started" ? (
+                <Button
+                  variant="outline-danger"
+                  className="p-1 me-2 bg-transparent text-danger"
+                  // Add your onClick handler here if needed
+                >
+                  <CancelIcon className="me-1" />
+                </Button>
+              ) : orderProcess == "started" &&
+                userData?.user_id != orderDetails?.operation_user_id ? (
+                <Button
+                  variant="success"
+                  disabled
                   // onClick={handleStartOrderProcess}
-                  >
-                    <CancelIcon className="me-1" />
-
-                  </Button>
-                ) : (
-                  <Button
-                    variant="success"
-                    // disabled={orderProcess === "started"}
-                    onClick={handleStartOrderProcess}
-                  >
-                    Start
-                  </Button>
-                )
-              }
-
+                >
+                  Start
+                </Button>
+              ) : (
+                <Button
+                  variant="success"
+                  // disabled
+                  onClick={handleStartOrderProcess}
+                >
+                  Start
+                </Button>
+              )}
             </Box>
           </Box>
         </Card>
@@ -484,17 +489,19 @@ function OrderDetails() {
                 Attachment
               </Typography>
               <Row
-                className={`${selectedFileUrl
-                  ? "justify-content-start"
-                  : "justify-content-center"
-                  } my-1`}
+                className={`${
+                  selectedFileUrl
+                    ? "justify-content-start"
+                    : "justify-content-center"
+                } my-1`}
               >
                 <Col
                   md={selectedFileUrl ? 7 : 12}
-                  className={`d-flex ${selectedFileUrl
-                    ? "justify-content-start"
-                    : "justify-content-center"
-                    } my-1`}
+                  className={`d-flex ${
+                    selectedFileUrl
+                      ? "justify-content-start"
+                      : "justify-content-center"
+                  } my-1`}
                 >
                   <Card className="factory-card p-3 mx-2 shadow-sm">
                     <Button
@@ -872,15 +879,23 @@ function OrderDetails() {
           selectedOrder={selectedOrder}
           orderData={orderData}
         />
-        <Modal show={showMessageModal} onHide={handleMessageCloseModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Message</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form.Control as="textarea" placeholder="Enter your message here..." rows={3} />
-          <Button className="mt-2">Add Message</Button>
-        </Modal.Body>
-      </Modal>
+        <Modal
+          show={showMessageModal}
+          onHide={handleMessageCloseModal}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Message</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Control
+              as="textarea"
+              placeholder="Enter your message here..."
+              rows={3}
+            />
+            <Button className="mt-2">Add Message</Button>
+          </Modal.Body>
+        </Modal>
       </Container>
     </>
   );

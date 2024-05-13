@@ -4,9 +4,8 @@ import jsPDF from "jspdf";
 import { Box, Typography } from "@mui/material";
 import { getCountryName } from "../../utils/GetCountryName";
 
-const PrintModal = ({ show, handleClosePrintModal, orderData, backdrop }) => {
+const PrintModal = ({ show, handleClosePrintModal, orderData}) => {
   const customerData = orderData && orderData[0]
-  console.log(orderData, "orderDataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa////////////");
   const modalRef = useRef(null);
 
   const downloadPDF = () => {

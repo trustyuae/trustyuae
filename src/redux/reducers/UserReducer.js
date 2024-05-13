@@ -36,7 +36,7 @@ export const UserLogoutReducer = (
     case USER_LOGOUT_REQUEST:
       return { ...state, loading: true };
     case USER_LOGOUT_SUCCESS:
-      return { ...state, loading: false };
+      return { ...state, loading: false, data: payload};
     case USER_LOGOUT_FAIL:
       return { ...state, loading: false };
 
