@@ -190,30 +190,82 @@ function OrderManagementSystem() {
     //     }
     // };
 
+    // const handleGeneratePO = async () => {
+    //     const selectedOrders = orders.filter((order) =>
+    //         selectedOrderIds.includes(order.order_id)
+    //     );
+    //     const factoryIds = new Set(selectedOrders.map((order) => order.factory_id));
+    //     if (factoryIds.size === 1) {
+    //         const selectedProductIds = selectedOrders
+    //             .map((order) => order.item_ids)
+    //             .join(",");
+    //         const selectedOrderIdsStr = selectedOrderIds.join(",");
+    //         setSelectedProductIds(
+    //             JSON.stringify({
+    //                 product_ids: selectedProductIds,
+    //                 order_ids: selectedOrderIdsStr,
+    //             })
+    //         );
+    //         setAlertMessage("");
+    //         try {
+    //             const response = await axios.post(
+    //                 `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
+    //                 {
+    //                     product_ids: selectedProductIds,
+    //                     order_ids: selectedOrderIdsStr,
+    //                 }
+    //             );
+    //             console.log(response.data);
+    //             if (response.data) {
+    //                 Swal.fire({
+    //                     text: response.data,
+    //                 }).then((result) => {
+    //                     if (result.isConfirmed) {
+    //                         navigate("/PO_ManagementSystem");
+    //                     }
+    //                 });
+    //             }
+    //         } catch (error) {
+    //             console.error("Error generating PO IDs:", error);
+    //         }
+    //     } else {
+    //         setAlertMessage(
+    //             "Selected orders belong to different factories. Please select orders from the same factory."
+    //         );
+    //         Swal.fire({
+    //             text: "Selected orders belong to different factories. Please select orders from the same factory.",
+    //         });
+    //     }
+    // };
+
     const handleGeneratePO = async () => {
         const selectedOrders = orders.filter((order) =>
             selectedOrderIds.includes(order.order_id)
         );
-        const factoryIds = new Set(selectedOrders.map((order) => order.factory_id));
-        if (factoryIds.size === 1) {
-            const selectedProductIds = selectedOrders
-                .map((order) => order.item_ids)
-                .join(",");
+    
+        // Extract unique factory IDs from selected orders
+        const factoryIds = [...new Set(selectedOrders.map((order) => order.factory_id))];
+    
+        if (factoryIds.length === 1) {
+            // Concatenate selected product IDs and order IDs
+            const selectedProductIds = selectedOrders.map((order) => order.item_ids).join(",");
             const selectedOrderIdsStr = selectedOrderIds.join(",");
-            setSelectedProductIds(
-                JSON.stringify({
-                    product_ids: selectedProductIds,
-                    order_ids: selectedOrderIdsStr,
-                })
-            );
+    
+            // Construct the payload object
+            const payload = {
+                product_ids: selectedProductIds,
+                factory_ids: factoryIds.join(","), // Convert array to comma-separated string
+                order_ids: selectedOrderIdsStr,
+            };
+    
+            console.log(payload,'payload');
+            setSelectedProductIds(JSON.stringify(payload));
             setAlertMessage("");
+    
             try {
                 const response = await axios.post(
                     `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
-                    {
-                        product_ids: selectedProductIds,
-                        order_ids: selectedOrderIdsStr,
-                    }
+                    payload // Send the payload object
                 );
                 console.log(response.data);
                 if (response.data) {
@@ -237,6 +289,7 @@ function OrderManagementSystem() {
             });
         }
     };
+    
 
     // const handleGenerateJson = () => {
     //     const selectedOrders = orders.filter((order) => selectedOrderIds.includes(order.order_id));
