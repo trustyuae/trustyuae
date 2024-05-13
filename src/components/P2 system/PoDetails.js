@@ -124,7 +124,7 @@ useEffect(()=>{
                                 <th style={{ backgroundColor: '#DEE2E6', padding: '8px', textAlign:'center'}} key={index}>{header}</th>
                             ))}
                         </tr>
-                    </thead>
+                    </thead> 
                     <tbody>
                         {PO_OrderList?.line_items?.map((rowData, rowIndex) => (
                             <tr key={rowIndex}>
