@@ -43,6 +43,7 @@ export const OrderDetailsGet =
       const response = await axios.get(
         `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`
       );
+      console.log(response,'response of OrderDetailsGet Api')
       dispatch({ type: GET_ORDER_DETAILS_SUCCESS, payload: response?.data });
       return response;
     } catch (error) {
@@ -75,7 +76,7 @@ export const AttachmentFileUpload =
   };
 
 export const InsertOrderPickup = (requestData) => async (dispatch) => {
-  console.log(requestData, "requestData");
+  // console.log(requestData, "requestData");
   try {
     dispatch({ type: INSERT_ORDER_PICKUP_REQUEST });
 
@@ -83,6 +84,7 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
       `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
       requestData
     );
+    console.log(response,'InsertOrderPickup')
     dispatch({ type: INSERT_ORDER_PICKUP_SUCCESS, payload: response?.data });
     return response;
   } catch (error) {
