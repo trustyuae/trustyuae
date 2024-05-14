@@ -419,8 +419,8 @@ function OrderManagementSystem() {
       </TabContext>
     </Box> */}
 
-            <div class="card">
-                <div class="card-body">
+            <div className="card">
+                <div className="card-body">
                     {/* <Box className="mb-4">
                 <Typography variant="h4" className="fw-semibold">
                     Order Management System
@@ -428,20 +428,20 @@ function OrderManagementSystem() {
             </Box> */}
 
 
-                    <ul class="nav nav-tabs nav-tabs-bordered d-flex" id="borderedTabJustified" role="tablist">
-                        <li class="nav-item flex-fill" role="presentation">
-                            <button class="nav-link w-100 active" id="home-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-home" type="button" role="tab" aria-controls="home" aria-selected="true" fdprocessedid="x9r6tp">Order against PO</button>
+                    <ul className="nav nav-tabs nav-tabs-bordered d-flex" id="borderedTabJustified" role="tablist">
+                        <li className="nav-item flex-fill" role="presentation">
+                            <button className="nav-link w-100 active" id="home-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-home" type="button" role="tab" aria-controls="home" aria-selected="true" fdprocessedid="x9r6tp">Order against PO</button>
                         </li>
-                        <li class="nav-item flex-fill" role="presentation">
-                            <button class="nav-link w-100" id="profile-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Manual PO</button>
+                        <li className="nav-item flex-fill" role="presentation">
+                            <button className="nav-link w-100" id="profile-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Manual PO</button>
                         </li>
-                        <li class="nav-item flex-fill" role="presentation">
-                            <button class="nav-link w-100" id="contact-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Scheduled PO</button>
+                        <li className="nav-item flex-fill" role="presentation">
+                            <button className="nav-link w-100" id="contact-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Scheduled PO</button>
                         </li>
                     </ul>
-                    <div class="tab-content pt-2" id="borderedTabJustifiedContent">
+                    <div className="tab-content pt-2" id="borderedTabJustifiedContent">
                         {/* order against PO */}
-                        <div class="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
+                        <div className="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
                             <Row className="mb-4 mt-4">
                                 <Form inline>
                                     <Row>
@@ -490,7 +490,7 @@ function OrderManagementSystem() {
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
-                                        <Col className=" d-flex justify-content-end align-items-center ">
+                                        {/* <Col className=" d-flex justify-content-end align-items-center ">
                                             <Button
                                                 variant="primary"
                                                 className="p-1 me-3 bg-primary"
@@ -505,7 +505,7 @@ function OrderManagementSystem() {
                                             >
                                                 PO against Orders
                                             </Button>
-                                        </Col>
+                                        </Col> */}
                                     </Row>
                                 </Form>
                             </Row>
@@ -589,8 +589,8 @@ function OrderManagementSystem() {
                             </Row>
                         </div>
                         {/* manual PO */}
-                        <div class="tab-pane fade" id="bordered-justified-profile" role="tabpanel" aria-labelledby="profile-tab">
-                            <div class="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
+                        <div className="tab-pane fade" id="bordered-justified-profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div className="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
                                 <Row className="mb-4 mt-4">
                                     <Form inline>
                                         <Row>
@@ -628,7 +628,7 @@ function OrderManagementSystem() {
                                                         as="select"
                                                         className="mr-sm-2"
                                                         value={selectedManualFactory}
-                                                        onChange={(e)=>setSelectedManualFactory(e.target.value)}
+                                                        onChange={(e) => setSelectedManualFactory(e.target.value)}
                                                     >
                                                         <option value="">All Factory</option>
                                                         {factories.map((factory) => (
@@ -637,6 +637,12 @@ function OrderManagementSystem() {
                                                             </option>
                                                         ))}
                                                     </Form.Control>
+                                                </Form.Group>
+                                            </Col>
+                                            <Col xs="auto" lg="4">
+                                                <Form.Group className="fw-semibold mb-0">
+                                                    <Form.Label>Product Filter:</Form.Label>
+                                                    <Form.Control type="text" placeholder="Enter Product" />
                                                 </Form.Group>
                                             </Col>
                                         </Row>
@@ -655,12 +661,12 @@ function OrderManagementSystem() {
                                                 </th>
                                                 {/* <th>order Id</th> */}
                                                 <th>Factory Name</th>
-                                                <th>Date</th>
+                                                {/* <th>Date</th> */}
                                                 <th>Product Name</th>
                                                 <th>Product Image</th>
                                                 <th>Product Variant</th>
                                                 <th>Quantity</th>
-                                                <th>Note</th>
+                                                {/* <th>Note</th> */}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -679,12 +685,11 @@ function OrderManagementSystem() {
                                                                 ?.factory_name
                                                         }
                                                     </td>
-                                                    <td className="text-center">
-                                                        {/* {order.Date} */}
+                                                    {/* <td className="text-center">
                                                         <Form.Group controlId="duedate">
                                                             <Form.Control type="date" name="duedate" placeholder="Due date" />
                                                         </Form.Group>
-                                                    </td>
+                                                    </td> */}
                                                     <td className="text-center">{order.product_name}</td>
                                                     <td className="text-center">
                                                         <img
@@ -705,17 +710,17 @@ function OrderManagementSystem() {
                                                             <Form.Control type="text" placeholder="Enter Quantity" />
                                                         </Form.Group>
                                                     </td>
-                                                    <td className="text-center">
-                                                        {/* {order.Note} */}
-                                                        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                                            {/* <Form.Label>Example textarea</Form.Label> */}
-                                                            <Form.Control as="textarea" rows={2} />
-                                                        </Form.Group>
-                                                    </td>
+
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </Table>
+                                </Row>
+                                <Row>
+                                    <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                        <Form.Label>Add Note</Form.Label>
+                                        <Form.Control as="textarea" rows={2} />
+                                    </Form.Group>
                                 </Row>
                                 <Row className="mb-4 mt-4">
                                     <Form inline>
@@ -724,14 +729,14 @@ function OrderManagementSystem() {
                                                 <Button
                                                     type="button"
                                                     className="mr-2 mx-3 "
-                                                    // onClick={handleSelectAll}
+                                                // onClick={handleSelectAll}
                                                 >
                                                     Select All Orders
                                                 </Button>
                                                 <Button
                                                     type="button"
                                                     className="mr-2 mx-3 "
-                                                    // onClick={handleGeneratePO}
+                                                // onClick={handleGeneratePO}
                                                 >
                                                     Create Manual PO
                                                 </Button>
@@ -742,8 +747,171 @@ function OrderManagementSystem() {
                             </div>
                         </div>
                         {/* scheduled PO */}
-                        <div class="tab-pane fade" id="bordered-justified-contact" role="tabpanel" aria-labelledby="contact-tab">
-                            Saepe animi et soluta ad odit soluta sunt. Nihil quos omnis animi debitis cumque. Accusantium quibusdam perspiciatis qui qui omnis magnam. Officiis accusamus impedit molestias nostrum veniam. Qui amet ipsum iure. Dignissimos fuga tempore dolor.
+                        <div className="tab-pane fade" id="bordered-justified-contact" role="tabpanel" aria-labelledby="contact-tab">
+                            <div className="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
+                                <Row className="mb-4 mt-4">
+                                    <Form inline>
+                                        <Row>
+                                            {/* <Col xs="auto" lg="4">
+                                            <Form.Group>
+                                                <Form.Label className="fw-semibold mb-0">
+                                                    Date filter:
+                                                </Form.Label>
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DemoContainer components={["SingleInputDateRangeField"]}>
+                                                        <DateRangePicker
+                                                            sx={{
+                                                                "& .MuiInputBase-root": {
+                                                                    paddingRight: 0,
+                                                                },
+                                                                "& .MuiInputBase-input": {
+                                                                    padding: ".5rem .75rem .5rem .75rem",
+                                                                    "&:hover": {
+                                                                        borderColor: "#dee2e6",
+                                                                    },
+                                                                },
+                                                            }}
+                                                            value={selectedDateRange}
+                                                            onChange={handleDateChange}
+                                                            slots={{ field: SingleInputDateRangeField }}
+                                                        />
+                                                    </DemoContainer>
+                                                </LocalizationProvider>
+                                            </Form.Group>
+                                        </Col> */}
+                                            <Col xs="auto" lg="4">
+                                                <Form.Group className="fw-semibold mb-0">
+                                                    <Form.Label>Factory Filter:</Form.Label>
+                                                    <Form.Control
+                                                        as="select"
+                                                        className="mr-sm-2"
+                                                        value={selectedManualFactory}
+                                                        onChange={(e) => setSelectedManualFactory(e.target.value)}
+                                                    >
+                                                        <option value="">All Factory</option>
+                                                        {factories.map((factory) => (
+                                                            <option key={factory.id} value={factory.id}>
+                                                                {factory.factory_name}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            </Col>
+                                            <Col xs="auto" lg="4">
+                                                <Form.Group className="fw-semibold mb-0">
+                                                    <Form.Label>Product Filter:</Form.Label>
+                                                    <Form.Control type="text" placeholder="Enter Product" />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                </Row>
+                                <Row className="mb-4 mt-4 ">
+                                    <Table striped bordered hover>
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        onChange={handleSelectAll}
+                                                        checked={selectedOrderIds.length === orders.length}
+                                                    />
+                                                </th>
+                                                {/* <th>order Id</th> */}
+                                                <th>Factory Name</th>
+                                                {/* <th>Date</th> */}
+                                                <th>Product Name</th>
+                                                <th>Product Image</th>
+                                                <th>Product Variant</th>
+                                                <th>Quantity</th>
+                                                {/* <th>Note</th> */}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {manualPOorders?.products?.map((order) => (
+                                                <tr key={order.order_id}>
+                                                    <td>
+                                                        <Form.Check
+                                                            type="checkbox"
+                                                            checked={selectedOrderIds.includes(order.order_id)}
+                                                            onChange={() => handleOrderSelection(order.order_id)}
+                                                        />
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {
+                                                            factories.find((factory) => factory.id === order.factory_id)
+                                                                ?.factory_name
+                                                        }
+                                                    </td>
+                                                    {/* <td className="text-center">
+                                                        <Form.Group controlId="duedate">
+                                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
+                                                        </Form.Group>
+                                                    </td> */}
+                                                    <td className="text-center">{order.product_name}</td>
+                                                    <td className="text-center">
+                                                        <img
+                                                            src={order.product_image}
+                                                            alt={order.product_name}
+                                                            className="img-fluid"
+                                                            width={90}
+                                                        />
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {/* {variant(order.variation_value)} */}
+                                                        {order.variation_id}
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {/* {order.Quantity} */}
+                                                        <Form.Group className="mb-3" controlId="quantity">
+                                                            {/* <Form.Label>Email address</Form.Label> */}
+                                                            <Form.Control type="text" placeholder="Enter Quantity" />
+                                                        </Form.Group>
+                                                    </td>
+
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                </Row>
+                                <Row>
+                                    <Col xs="auto" lg="4">
+                                        <Form.Group controlId="duedate">
+                                            <Form.Label>Estimated time</Form.Label>
+                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col xs="auto" lg="4">
+                                        <Form.Group controlId="duedate">
+                                            <Form.Label>Remainder date</Form.Label>
+                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
+                                        </Form.Group>
+                                    </Col>
+
+                                </Row>
+                                <Row className="mb-4 mt-4">
+                                    <Form inline>
+                                        <Row className="mt-4">
+                                            <Col xs="auto" lg="6" className="d-flex  align-items-end">
+                                                <Button
+                                                    type="button"
+                                                    className="mr-2 mx-3 "
+                                                // onClick={handleSelectAll}
+                                                >
+                                                    Select All Orders
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    className="mr-2 mx-3 "
+                                                // onClick={handleGeneratePO}
+                                                >
+                                                    Create Scheduled PO
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                </Row>
+                            </div>
                         </div>
                     </div>
                 </div>
