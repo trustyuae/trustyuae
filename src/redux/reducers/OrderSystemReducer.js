@@ -9,6 +9,9 @@ import {
   INSERT_ORDER_PICKUP_REQUEST,
   INSERT_ORDER_PICKUP_SUCCESS,
   INSERT_ORDER_PICKUP_FAIL,
+  INSERT_ORDER_PICKUP_CANCEL_REQUEST,
+  INSERT_ORDER_PICKUP_CANCEL_SUCCESS,
+  INSERT_ORDER_PICKUP_CANCEL_FAIL,
   CUSTOM_ORDER_FINISH_REQUEST,
   CUSTOM_ORDER_FINISH_SUCCESS,
   CUSTOM_ORDER_FINISH_FAIL,
@@ -21,6 +24,8 @@ const initialState = {
   isOrderDetails: false,
   orderPickUp: [],
   isOrderPickUp: false,
+  orderPickUpCancel: [],
+  isOrderPickUpCancel:false,
   customOrderData:[],
   isCustomOrder:false,
   error: null,
@@ -48,6 +53,13 @@ const OrderSystemReducer = (state = initialState, action) => {
       return { ...state, isOrderPickUp: false, orderPickUp: action.payload };
     case INSERT_ORDER_PICKUP_FAIL:
       return { ...state, isOrderPickUp: false, error: action.payload };
+
+      case INSERT_ORDER_PICKUP_CANCEL_REQUEST:
+        return { ...state, isOrderPickUpCancel: true };
+      case INSERT_ORDER_PICKUP_CANCEL_SUCCESS:
+        return { ...state, isOrderPickUpCancel: false, orderPickUpCancel: action.payload };
+      case INSERT_ORDER_PICKUP_CANCEL_FAIL:
+        return { ...state, isOrderPickUpCancel: false, error: action.payload };
 
     case CUSTOM_ORDER_FINISH_REQUEST:
       return { ...state, isCustomOrder: true };

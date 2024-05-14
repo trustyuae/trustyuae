@@ -12,6 +12,9 @@ import {
   INSERT_ORDER_PICKUP_REQUEST,
   INSERT_ORDER_PICKUP_SUCCESS,
   INSERT_ORDER_PICKUP_FAIL,
+  INSERT_ORDER_PICKUP_CANCEL_REQUEST,
+  INSERT_ORDER_PICKUP_CANCEL_SUCCESS,
+  INSERT_ORDER_PICKUP_CANCEL_FAIL,
   CUSTOM_ORDER_FINISH_REQUEST,
   CUSTOM_ORDER_FINISH_SUCCESS,
   CUSTOM_ORDER_FINISH_FAIL,
@@ -88,6 +91,24 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
     return response;
   } catch (error) {
     dispatch({ type: INSERT_ORDER_PICKUP_FAIL, error: error.message });
+  }
+};
+
+
+export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
+  // console.log(requestData, "requestData");
+  try {
+    dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_REQUEST });
+
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/`,
+      requestData
+    );
+    console.log(response,'InsertOrderPickup')
+    dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_SUCCESS, payload: response?.data });
+    return response;
+  } catch (error) {
+    dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_FAIL, error: error.message });
   }
 };
 
