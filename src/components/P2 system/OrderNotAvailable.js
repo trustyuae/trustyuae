@@ -54,7 +54,8 @@ function OrderNotAvailable() {
     }, [dispatch]);
 
     const OrderNotAvailabledata = useSelector(
-        (state) => state?.orderNotAvailable?.ordersNotAvailable
+        (state) => state?.orderNotAvailable?.ordersNotAvailable?.orders
+        
     );
 
     useEffect(() => {
