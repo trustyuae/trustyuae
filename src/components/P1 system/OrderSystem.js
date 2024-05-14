@@ -5,7 +5,6 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import countries from "iso-3166-1-alpha-2";
 import { Box, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -18,6 +17,7 @@ import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch } from "react-redux";
 import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
+import { getCountryName } from "../../utils/GetCountryName";
 
 function OrderSystem() {
   const [dispatchType, setDispatchType] = useState("all");
@@ -69,11 +69,6 @@ function OrderSystem() {
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
     setPage(1);
-  };
-
-  const getCountryName = (code) => {
-    const country = countries.getCountry(code);
-    return country ? country : "Unknown";
   };
 
   const columns = [

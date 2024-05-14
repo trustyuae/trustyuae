@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MDBCol, MDBRow } from 'mdb-react-ui-kit';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -6,8 +6,11 @@ import Row from 'react-bootstrap/Row';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { OrderNotAvailableData } from '../../redux/actions/P2SystemActions';
 
 function OrderNotAvailable() {
+    const dispatch = useDispatch();
     const tableHeaders = [
         "Order ID",
         "Item Name",
@@ -26,33 +29,10 @@ function OrderNotAvailable() {
         "Refund"
     ];
 
-    const OrderNotA = [
-        {
-            orderID: 1,
-            itemName: 'demo',
-            image: "product_a.jpg",
-            qtyOrdered: 10,
-            contactNo: 111111111,
-            estimatedProductionTime: '1 week',
-            customerStatus: "Not Confirmed"
-        },
-        {
-            orderID: 2,
-            itemName: 'demo',
-            image: "product_a.jpg",
-            qtyOrdered: 10,
-            contactNo: 1222222221,
-            estimatedProductionTime: '2 week',
-            customerStatus: "Not Confirmed"
-        },
-        // Add more product details as needed
-    ];
-
     const [checkedItems, setCheckedItems] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState("");
-    const [selectProduct, setDetails] = useState(OrderNotA); // PODetailsInitial is the initial array of details
-    const [selectedDetails, setselectedDetails] = useState([]); // PODetailsInitial is the initial array of details
+    const [selectedStatus, setSelectedStatus] = useState(null);
+    const [orderStatusMap, setOrderStatusMap] = useState({}); // Map to store status of each order
 
     const handleCheckboxChange = (orderID) => {
         const newCheckedItems = checkedItems.includes(orderID)
@@ -69,19 +49,31 @@ function OrderNotAvailable() {
         setShowModal(false);
     };
 
-    const handleStatusChange = (orderID, status) => {
-        const updatedPODetails = OrderNotA.map(item => {
-            if (item.orderID === orderID) {
-                return { ...item, customerStatus: status }; // Update the customer status for the specific item
-            }
-            return item;
-        });
-        setDetails(updatedPODetails); // Update the state with the updated details
-        setselectedDetails(updatedPODetails)
-        setSelectedStatus(status);
-    }
+    useEffect(() => {
+        dispatch(OrderNotAvailableData());
+    }, [dispatch]);
 
-    // const selectedDetails = selectProduct
+    const OrderNotAvailabledata = useSelector(
+        (state) => state?.orderNotAvailable?.ordersNotAvailable
+    );
+
+    useEffect(() => {
+        // Initialize orderStatusMap when OrderNotAvailabledata changes
+        const statusMap = {};
+        OrderNotAvailabledata.forEach(item => {
+            statusMap[item.order_id] = item.customerStatus;
+        });
+        setOrderStatusMap(statusMap);
+        console.log()
+    }, [OrderNotAvailabledata]);
+
+    const handleStatusChange = (order_id, status) => {
+        // Update the status map with the new status
+        setOrderStatusMap(prevMap => ({
+            ...prevMap,
+            [order_id]: status
+        }));
+    }
 
     return (
         <Container fluid className='px-5' style={{ height: '98vh' }}>
@@ -102,17 +94,17 @@ function OrderNotAvailable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {OrderNotA.map((rowData, rowIndex) => (
-                            <tr key={rowIndex}>
-                                <td className='text-center'>{rowData.orderID}</td>
-                                <td className='text-center'>{rowData.itemName}</td>
-                                <td className='text-center'><img src={rowData.image} alt={rowData.itemName} /></td>
-                                <td className='text-center'>{rowData.qtyOrdered}</td>
-                                <td className='text-center'>{rowData.contactNo}</td>
-                                <td className='text-center'>{rowData.estimatedProductionTime}</td>
+                        {OrderNotAvailabledata?.map((order) => (
+                            <tr key={order.order_id}>
+                                <td className='text-center'>{order.order_id}</td>
+                                <td className='text-center'>{order.product_name}</td>
+                                <td className='text-center'><img src={order.product_image} alt={order.product_name} className="img-fluid" width={90} /></td>
+                                <td className='text-center'>{order.quantity}</td>
+                                <td className='text-center'>{order.custom_number}</td>
+                                <td className='text-center'>{order.estimated_production_time}</td>
                                 <td className='text-center'>
                                     <Form.Group>
-                                        <Form.Select style={{ height: '32px', padding: '0 10px' }}  onChange={(e) => handleStatusChange(rowData.orderID, e.target.value)}>
+                                        <Form.Select style={{ height: '32px', padding: '0 10px' }} value={orderStatusMap[order.order_id]} onChange={(e) => handleStatusChange(order.order_id, e.target.value)}>
                                             {customerStatus.map((status, index) => (
                                                 <option key={index} value={status}>{status}</option>
                                             ))}
@@ -120,7 +112,7 @@ function OrderNotAvailable() {
                                     </Form.Group>
                                 </td>
                                 <td className='text-center'>
-                                    <Form.Check type="checkbox" onChange={() => handleCheckboxChange(rowData.orderID)} />
+                                    <Form.Check type="checkbox" onChange={() => handleCheckboxChange(order.orderID)} />
                                 </td>
                             </tr>
                         ))}
@@ -147,12 +139,12 @@ function OrderNotAvailable() {
                             </tr>
                         </thead>
                         <tbody>
-                            {selectedDetails.map((item, index) => (
+                            {OrderNotAvailabledata.filter(order => checkedItems.includes(order.order_id)).map((item, index) => (
                                 <tr key={index}>
-                                    <td>{item.orderID}</td>
-                                    <td>{item.itemName}</td>
-                                    <td>{item.qtyOrdered}</td>
-                                    <td>{item.customerStatus}</td>
+                                    <td>{item.order_id}</td>
+                                    <td>{item.product_name}</td>
+                                    <td>{item.quantity}</td>
+                                    <td>{orderStatusMap[item.order_id]}</td>
                                 </tr>
                             ))}
                         </tbody>
