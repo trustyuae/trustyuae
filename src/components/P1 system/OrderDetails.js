@@ -23,6 +23,7 @@ import {
   AttachmentFileUpload,
   CustomOrderFinish,
   InsertOrderPickup,
+  InsertOrderPickupCancel,
   OrderDetailsGet,
 } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
@@ -166,6 +167,24 @@ function OrderDetails() {
         console.error(error);
       });
   };
+
+  const handleCancelOrderProcess = async () => {
+    const orderId = parseInt(id, 10);
+    const Cancel = "Cancelled";
+    const requestData = {
+      order_id: orderId,
+      operation_id: orderDetails?.operation_user_id,
+      order_status: Cancel,
+    };
+    await dispatch(InsertOrderPickupCancel(requestData))
+      .then((response) => {
+        fetchOrder();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  
   // const handleFinishButtonClick = async () => {
   //   try {
   //     const { user_id } = userData ?? {};
@@ -350,6 +369,7 @@ function OrderDetails() {
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
                   // Add your onClick handler here if needed
+                  onClick={handleCancelOrderProcess}
                 >
                   <CancelIcon className="me-1" />
                 </Button>

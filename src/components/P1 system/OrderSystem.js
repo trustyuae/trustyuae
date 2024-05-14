@@ -109,7 +109,7 @@ function OrderSystem() {
             >
               {/* {"  "} */}
               <Badge bg="success" className="m-2">
-                {value?.row?.order_process}
+                {value?.row?.order_process=='started' ? (value?.row?.order_process) : null}
               </Badge>
             </Typography>
           </Link>
