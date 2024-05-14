@@ -15,11 +15,18 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import Swal from "sweetalert2";
 import DataTable from "../DataTable";
-import { Box, Typography } from "@mui/material";
+import { Box, Tab, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
+
+// import Box from '@mui/material/Box';
+// import Tab from '@mui/material/Tab';
+// import TabContext from '@mui/lab/TabContext';
+// import TabList from '@mui/lab/TabList';
+// import TabPanel from '@mui/lab/TabPanel';
 
 function OrderManagementSystem() {
     const [orders, setOrders] = useState([]);
+    const [manualPOorders, setManualPoOrders] = useState([]);
     const [orders2, setOrders2] = useState([]);
     const [selectedOrderIds, setSelectedOrderIds] = useState([]);
     const [page, setPage] = useState(1);
@@ -29,7 +36,10 @@ function OrderManagementSystem() {
     const [endDate, setEndDate] = useState("");
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
     const [factories, setFactories] = useState([]);
+
     const [selectedFactory, setSelectedFactory] = useState("");
+    const [selectedManualFactory, setSelectedManualFactory] = useState("");
+
     const [selectedProductIds, setSelectedProductIds] = useState("");
     const [alertMessage, setAlertMessage] = useState("");
     const navigate = useNavigate();
@@ -107,6 +117,22 @@ function OrderManagementSystem() {
             console.error("Error fetching data:", error);
         }
     };
+
+    const manualPO = async () => {
+        try {
+            let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
+            if (selectedManualFactory) apiUrl += `&factory_id=${selectedManualFactory}`;
+            const response = await axios.get(apiUrl);
+            console.log(response.data, 'response.data===manual PO');
+            setManualPoOrders(response.data)
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
+    useEffect(() => {
+        manualPO()
+    }, [selectedManualFactory])
 
     const fetchFactories = async () => {
         try {
@@ -242,26 +268,26 @@ function OrderManagementSystem() {
         const selectedOrders = orders.filter((order) =>
             selectedOrderIds.includes(order.order_id)
         );
-    
+
         // Extract unique factory IDs from selected orders
         const factoryIds = [...new Set(selectedOrders.map((order) => order.factory_id))];
-    
+
         if (factoryIds.length === 1) {
             // Concatenate selected product IDs and order IDs
             const selectedProductIds = selectedOrders.map((order) => order.item_ids).join(",");
             const selectedOrderIdsStr = selectedOrderIds.join(",");
-    
+
             // Construct the payload object
             const payload = {
                 product_ids: selectedProductIds,
                 factory_ids: factoryIds.join(","), // Convert array to comma-separated string
                 order_ids: selectedOrderIdsStr,
             };
-    
-            console.log(payload,'payload');
+
+            console.log(payload, 'payload');
             setSelectedProductIds(JSON.stringify(payload));
             setAlertMessage("");
-    
+
             try {
                 const response = await axios.post(
                     `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
@@ -289,7 +315,7 @@ function OrderManagementSystem() {
             });
         }
     };
-    
+
 
     // const handleGenerateJson = () => {
     //     const selectedOrders = orders.filter((order) => selectedOrderIds.includes(order.order_id));
@@ -333,6 +359,8 @@ function OrderManagementSystem() {
         }
     };
 
+
+
     return (
         <Container
             fluid
@@ -353,151 +381,7 @@ function OrderManagementSystem() {
                     </Col>
                 </Row>
             )} */}
-            <Row className="mb-4 mt-4">
-                <Form inline>
-                    <Row>
-                        <Col xs="auto" lg="4">
-                            <Form.Group>
-                                <Form.Label className="fw-semibold mb-0">
-                                    Date filter:
-                                </Form.Label>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DemoContainer components={["SingleInputDateRangeField"]}>
-                                        <DateRangePicker
-                                            sx={{
-                                                "& .MuiInputBase-root": {
-                                                    paddingRight: 0,
-                                                },
-                                                "& .MuiInputBase-input": {
-                                                    padding: ".5rem .75rem .5rem .75rem",
-                                                    "&:hover": {
-                                                        borderColor: "#dee2e6",
-                                                    },
-                                                },
-                                            }}
-                                            value={selectedDateRange}
-                                            onChange={handleDateChange}
-                                            slots={{ field: SingleInputDateRangeField }}
-                                        />
-                                    </DemoContainer>
-                                </LocalizationProvider>
-                            </Form.Group>
-                        </Col>
-                        <Col xs="auto" lg="4">
-                            <Form.Group className="fw-semibold mb-0">
-                                <Form.Label>Factory Filter:</Form.Label>
-                                <Form.Control
-                                    as="select"
-                                    className="mr-sm-2"
-                                    value={selectedFactory}
-                                    onChange={handleFactoryChange}
-                                >
-                                    <option value="">All Factory</option>
-                                    {factories.map((factory) => (
-                                        <option key={factory.id} value={factory.id}>
-                                            {factory.factory_name}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                            </Form.Group>
-                        </Col>
-                        <Col className=" d-flex justify-content-end align-items-center ">
-                            <Button
-                                variant="primary"
-                                className="p-1 me-3 bg-primary"
-                            // onClick={handlePrint}
-                            >
-                                Manual PO
-                            </Button>
-                            <Button
-                                variant="primary"
-                                className="p-1 me-3 bg-primary"
-                            // onClick={handlePrint}
-                            >
-                                PO against Orders
-                            </Button>
-                        </Col>
-                    </Row>
-                </Form>
-            </Row>
-            <Row className="mb-4 mt-4 ">
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th>
-                                <Form.Check
-                                    type="checkbox"
-                                    onChange={handleSelectAll}
-                                    checked={selectedOrderIds.length === orders.length}
-                                />
-                            </th>
-                            {/* <th>order Id</th> */}
-                            <th>Product Name</th>
-                            <th>Variant</th>
-                            <th>Image</th>
-                            <th>Quantity</th>
-                            {/* <th>PO Number</th> */}
-                            <th>Factory Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map((order) => (
-                            <tr key={order.order_id}>
-                                <td>
-                                    <Form.Check
-                                        type="checkbox"
-                                        checked={selectedOrderIds.includes(order.order_id)}
-                                        onChange={() => handleOrderSelection(order.order_id)}
-                                    />
-                                </td>
-                                {/* <td className="text-center">{order.order_id}</td> */}
-                                <td className="text-center">{order.product_name}</td>
-                                <td className="text-center">
-                                    {variant(order.variation_value)}
-                                </td>
-                                <td className="text-center">
-                                    <img
-                                        src={order.product_image}
-                                        alt={order.product_name}
-                                        className="img-fluid"
-                                        width={90}
-                                    />
-                                </td>
-                                <td className="text-center">{order.total_quantity}</td>
-                                {/* <td className="text-center">{order.po_number}</td> */}
-                                <td className="text-center">
-                                    {
-                                        factories.find((factory) => factory.id === order.factory_id)
-                                            ?.factory_name
-                                    }
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            </Row>
-            <Row className="mb-4 mt-4">
-                <Form inline>
-                    <Row className="mt-4">
-                        <Col xs="auto" lg="6" className="d-flex  align-items-end">
-                            <Button
-                                type="button"
-                                className="mr-2 mx-3 "
-                                onClick={handleSelectAll}
-                            >
-                                Select All Orders
-                            </Button>
-                            <Button
-                                type="button"
-                                className="mr-2 mx-3 "
-                                onClick={handleGeneratePO}
-                            >
-                                Create PO
-                            </Button>
-                        </Col>
-                    </Row>
-                </Form>
-            </Row>
+
             {/* <div className="mt-2">
                 {selectedProductIds && (
                     <Card>
@@ -519,6 +403,352 @@ function OrderManagementSystem() {
                     // handleChange={handleChange}
                 />
             </div> */}
+
+            {/* <Box sx={{ width: '100%', typography: 'body1' }}>
+      <TabContext value={value}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList onChange={handleChange} aria-label="lab API tabs example">
+            <Tab label="Item One" value="1" />
+            <Tab label="Item Two" value="2" />
+            <Tab label="Item Three" value="3" />
+          </TabList>
+        </Box>
+        <TabPanel value="1">Item One</TabPanel>
+        <TabPanel value="2">Item Two</TabPanel>
+        <TabPanel value="3">Item Three</TabPanel>
+      </TabContext>
+    </Box> */}
+
+            <div class="card">
+                <div class="card-body">
+                    {/* <Box className="mb-4">
+                <Typography variant="h4" className="fw-semibold">
+                    Order Management System
+                </Typography>
+            </Box> */}
+
+
+                    <ul class="nav nav-tabs nav-tabs-bordered d-flex" id="borderedTabJustified" role="tablist">
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link w-100 active" id="home-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-home" type="button" role="tab" aria-controls="home" aria-selected="true" fdprocessedid="x9r6tp">Order against PO</button>
+                        </li>
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link w-100" id="profile-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Manual PO</button>
+                        </li>
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link w-100" id="contact-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Scheduled PO</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content pt-2" id="borderedTabJustifiedContent">
+                        {/* order against PO */}
+                        <div class="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
+                            <Row className="mb-4 mt-4">
+                                <Form inline>
+                                    <Row>
+                                        <Col xs="auto" lg="4">
+                                            <Form.Group>
+                                                <Form.Label className="fw-semibold mb-0">
+                                                    Date filter:
+                                                </Form.Label>
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DemoContainer components={["SingleInputDateRangeField"]}>
+                                                        <DateRangePicker
+                                                            sx={{
+                                                                "& .MuiInputBase-root": {
+                                                                    paddingRight: 0,
+                                                                },
+                                                                "& .MuiInputBase-input": {
+                                                                    padding: ".5rem .75rem .5rem .75rem",
+                                                                    "&:hover": {
+                                                                        borderColor: "#dee2e6",
+                                                                    },
+                                                                },
+                                                            }}
+                                                            value={selectedDateRange}
+                                                            onChange={handleDateChange}
+                                                            slots={{ field: SingleInputDateRangeField }}
+                                                        />
+                                                    </DemoContainer>
+                                                </LocalizationProvider>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col xs="auto" lg="4">
+                                            <Form.Group className="fw-semibold mb-0">
+                                                <Form.Label>Factory Filter:</Form.Label>
+                                                <Form.Control
+                                                    as="select"
+                                                    className="mr-sm-2"
+                                                    value={selectedFactory}
+                                                    onChange={handleFactoryChange}
+                                                >
+                                                    <option value="">All Factory</option>
+                                                    {factories.map((factory) => (
+                                                        <option key={factory.id} value={factory.id}>
+                                                            {factory.factory_name}
+                                                        </option>
+                                                    ))}
+                                                </Form.Control>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col className=" d-flex justify-content-end align-items-center ">
+                                            <Button
+                                                variant="primary"
+                                                className="p-1 me-3 bg-primary"
+                                            // onClick={handlePrint}
+                                            >
+                                                Manual PO
+                                            </Button>
+                                            <Button
+                                                variant="primary"
+                                                className="p-1 me-3 bg-primary"
+                                            // onClick={handlePrint}
+                                            >
+                                                PO against Orders
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </Row>
+                            <Row className="mb-4 mt-4 ">
+                                <Table striped bordered hover>
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    onChange={handleSelectAll}
+                                                    checked={selectedOrderIds.length === orders.length}
+                                                />
+                                            </th>
+                                            {/* <th>order Id</th> */}
+                                            <th>Product Name</th>
+                                            <th>Variant</th>
+                                            <th>Image</th>
+                                            <th>Quantity</th>
+                                            {/* <th>PO Number</th> */}
+                                            <th>Factory Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {orders.map((order) => (
+                                            <tr key={order.order_id}>
+                                                <td>
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        checked={selectedOrderIds.includes(order.order_id)}
+                                                        onChange={() => handleOrderSelection(order.order_id)}
+                                                    />
+                                                </td>
+                                                {/* <td className="text-center">{order.order_id}</td> */}
+                                                <td className="text-center">{order.product_name}</td>
+                                                <td className="text-center">
+                                                    {variant(order.variation_value)}
+                                                </td>
+                                                <td className="text-center">
+                                                    <img
+                                                        src={order.product_image}
+                                                        alt={order.product_name}
+                                                        className="img-fluid"
+                                                        width={90}
+                                                    />
+                                                </td>
+                                                <td className="text-center">{order.total_quantity}</td>
+                                                {/* <td className="text-center">{order.po_number}</td> */}
+                                                <td className="text-center">
+                                                    {
+                                                        factories.find((factory) => factory.id === order.factory_id)
+                                                            ?.factory_name
+                                                    }
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            </Row>
+                            <Row className="mb-4 mt-4">
+                                <Form inline>
+                                    <Row className="mt-4">
+                                        <Col xs="auto" lg="6" className="d-flex  align-items-end">
+                                            <Button
+                                                type="button"
+                                                className="mr-2 mx-3 "
+                                                onClick={handleSelectAll}
+                                            >
+                                                Select All Orders
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                className="mr-2 mx-3 "
+                                                onClick={handleGeneratePO}
+                                            >
+                                                Create PO
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </Row>
+                        </div>
+                        {/* manual PO */}
+                        <div class="tab-pane fade" id="bordered-justified-profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
+                                <Row className="mb-4 mt-4">
+                                    <Form inline>
+                                        <Row>
+                                            {/* <Col xs="auto" lg="4">
+                                            <Form.Group>
+                                                <Form.Label className="fw-semibold mb-0">
+                                                    Date filter:
+                                                </Form.Label>
+                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                                    <DemoContainer components={["SingleInputDateRangeField"]}>
+                                                        <DateRangePicker
+                                                            sx={{
+                                                                "& .MuiInputBase-root": {
+                                                                    paddingRight: 0,
+                                                                },
+                                                                "& .MuiInputBase-input": {
+                                                                    padding: ".5rem .75rem .5rem .75rem",
+                                                                    "&:hover": {
+                                                                        borderColor: "#dee2e6",
+                                                                    },
+                                                                },
+                                                            }}
+                                                            value={selectedDateRange}
+                                                            onChange={handleDateChange}
+                                                            slots={{ field: SingleInputDateRangeField }}
+                                                        />
+                                                    </DemoContainer>
+                                                </LocalizationProvider>
+                                            </Form.Group>
+                                        </Col> */}
+                                            <Col xs="auto" lg="4">
+                                                <Form.Group className="fw-semibold mb-0">
+                                                    <Form.Label>Factory Filter:</Form.Label>
+                                                    <Form.Control
+                                                        as="select"
+                                                        className="mr-sm-2"
+                                                        value={selectedManualFactory}
+                                                        onChange={(e)=>setSelectedManualFactory(e.target.value)}
+                                                    >
+                                                        <option value="">All Factory</option>
+                                                        {factories.map((factory) => (
+                                                            <option key={factory.id} value={factory.id}>
+                                                                {factory.factory_name}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Control>
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                </Row>
+                                <Row className="mb-4 mt-4 ">
+                                    <Table striped bordered hover>
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        onChange={handleSelectAll}
+                                                        checked={selectedOrderIds.length === orders.length}
+                                                    />
+                                                </th>
+                                                {/* <th>order Id</th> */}
+                                                <th>Factory Name</th>
+                                                <th>Date</th>
+                                                <th>Product Name</th>
+                                                <th>Product Image</th>
+                                                <th>Product Variant</th>
+                                                <th>Quantity</th>
+                                                <th>Note</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {manualPOorders?.products?.map((order) => (
+                                                <tr key={order.order_id}>
+                                                    <td>
+                                                        <Form.Check
+                                                            type="checkbox"
+                                                            checked={selectedOrderIds.includes(order.order_id)}
+                                                            onChange={() => handleOrderSelection(order.order_id)}
+                                                        />
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {
+                                                            factories.find((factory) => factory.id === order.factory_id)
+                                                                ?.factory_name
+                                                        }
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {/* {order.Date} */}
+                                                        <Form.Group controlId="duedate">
+                                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
+                                                        </Form.Group>
+                                                    </td>
+                                                    <td className="text-center">{order.product_name}</td>
+                                                    <td className="text-center">
+                                                        <img
+                                                            src={order.product_image}
+                                                            alt={order.product_name}
+                                                            className="img-fluid"
+                                                            width={90}
+                                                        />
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {/* {variant(order.variation_value)} */}
+                                                        {order.variation_id}
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {/* {order.Quantity} */}
+                                                        <Form.Group className="mb-3" controlId="quantity">
+                                                            {/* <Form.Label>Email address</Form.Label> */}
+                                                            <Form.Control type="text" placeholder="Enter Quantity" />
+                                                        </Form.Group>
+                                                    </td>
+                                                    <td className="text-center">
+                                                        {/* {order.Note} */}
+                                                        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                                            {/* <Form.Label>Example textarea</Form.Label> */}
+                                                            <Form.Control as="textarea" rows={2} />
+                                                        </Form.Group>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                </Row>
+                                <Row className="mb-4 mt-4">
+                                    <Form inline>
+                                        <Row className="mt-4">
+                                            <Col xs="auto" lg="6" className="d-flex  align-items-end">
+                                                <Button
+                                                    type="button"
+                                                    className="mr-2 mx-3 "
+                                                    // onClick={handleSelectAll}
+                                                >
+                                                    Select All Orders
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    className="mr-2 mx-3 "
+                                                    // onClick={handleGeneratePO}
+                                                >
+                                                    Create Manual PO
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                </Row>
+                            </div>
+                        </div>
+                        {/* scheduled PO */}
+                        <div class="tab-pane fade" id="bordered-justified-contact" role="tabpanel" aria-labelledby="contact-tab">
+                            Saepe animi et soluta ad odit soluta sunt. Nihil quos omnis animi debitis cumque. Accusantium quibusdam perspiciatis qui qui omnis magnam. Officiis accusamus impedit molestias nostrum veniam. Qui amet ipsum iure. Dignissimos fuga tempore dolor.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </Container>
     );
 }
