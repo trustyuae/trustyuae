@@ -40,7 +40,9 @@ const PoDetails = () => {
         "Qty Ordered",
         "Estimated Cost(RMB)",
         "Estimated Cost(AED)",
-        "Availability Status"
+        "Available Qty",
+        "Availability Status",
+        "Dispatch Status"
     ];
     const PODetails = [{
         productName: "Product A",
@@ -192,6 +194,7 @@ const PoDetails = () => {
                                     <td className='text-center'>{rowData.quantity}</td>
                                     <td className='text-center'>--</td>
                                     <td className='text-center'>--</td>
+                                    <td className='text-center'>--</td>
                                     <td>
                                         <Form.Group>
                                             <Form.Select style={{ height: '32px', padding: '0 10px' }}
@@ -203,18 +206,8 @@ const PoDetails = () => {
                                                 ))}
                                             </Form.Select>
                                         </Form.Group>
-                                        {/* <Form.Group>
-                                            <Form.Select
-                                                style={{ height: '32px', padding: '0 10px' }}
-                                                // onChange={(event) => handleStatusChange(rowIndex, event)} // Pass the index of the product and the event object
-                                                value={PO_OrderList.availability_status[rowIndex]} // Set the value of the select dropdown to the current availability status
-                                            >
-                                                {availabilityStatus.map(status => (
-                                                    <option key={status} value={status}>{status}</option>
-                                                ))}
-                                            </Form.Select>
-                                        </Form.Group> */}
                                     </td>
+                                    <td className='text-center'>--</td>
                                 </tr>
                             ))}
                         </tbody>
