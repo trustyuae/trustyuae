@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
 import { useDispatch, useSelector } from "react-redux";
 import { OrderNotAvailableData } from "../../redux/actions/P2SystemActions";
 import DataTable from "../DataTable";

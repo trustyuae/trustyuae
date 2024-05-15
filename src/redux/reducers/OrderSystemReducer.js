@@ -6,6 +6,9 @@ import {
   GET_ORDER_DETAILS_REQUEST,
   GET_ORDER_DETAILS_SUCCESS,
   GET_ORDER_DETAILS_FAIL,
+  UPLOAD_ATTACH_FILE_REQUEST,
+  UPLOAD_ATTACH_FILE_SUCCESS,
+  UPLOAD_ATTACH_FILE_FAIL,
   INSERT_ORDER_PICKUP_REQUEST,
   INSERT_ORDER_PICKUP_SUCCESS,
   INSERT_ORDER_PICKUP_FAIL,
@@ -22,6 +25,8 @@ const initialState = {
   isOrders: false,
   orderDetails: [],
   isOrderDetails: false,
+  uploadAttachFile:[],
+  isUploadAttachFile:false,
   orderPickUp: [],
   isOrderPickUp: false,
   orderPickUpCancel: [],
@@ -46,6 +51,13 @@ const OrderSystemReducer = (state = initialState, action) => {
       return { ...state, isOrderDetails: false, orderDetails: action.payload };
     case GET_ORDER_DETAILS_FAIL:
       return { ...state, isOrderDetails: false, error: action.payload };
+
+      case UPLOAD_ATTACH_FILE_REQUEST:
+      return { ...state, isOrderPickUp: true };
+    case  UPLOAD_ATTACH_FILE_SUCCESS:
+      return { ...state, isOrderPickUp: false, uploadAttachFile: action.payload };
+    case UPLOAD_ATTACH_FILE_FAIL:
+      return { ...state, isOrderPickUp: false, error: action.payload };
 
     case INSERT_ORDER_PICKUP_REQUEST:
       return { ...state, isOrderPickUp: true };
