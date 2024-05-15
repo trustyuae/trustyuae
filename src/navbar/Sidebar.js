@@ -42,12 +42,6 @@ const Sidebar = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/PO_details">
-                  <i className="bi bi-circle"></i>
-                  <span>PO details</span>
-                </Link>
-              </li>
-              <li>
                 <Link to="/order_not_available">
                   <i className="bi bi-circle"></i>
                   <span>Order Not Available</span>
