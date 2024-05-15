@@ -53,7 +53,7 @@ function OrderDetails() {
   );
 
   const capture = useCallback(
-    (itemId) => {
+    () => {
       const imageSrc = webcamRef.current.getScreenshot();
       setSelectedFileUrl(imageSrc);
       setShowAttachModal(false);
@@ -69,7 +69,7 @@ function OrderDetails() {
           console.error("Error converting data URL to file:", error);
         });
       setShowAttachmentModal(true);
-      handleSubmitAttachment(itemId);
+      // handleSubmitAttachment(itemId);
     },
     [webcamRef]
   );
@@ -131,9 +131,9 @@ function OrderDetails() {
     setShowAttachmentModal(false);
   };
 
-  const handleSubmitAttachment = async (itemId) => {
+  const handleSubmitAttachment = async () => {
     const { user_id } = userData ?? {};
-    console.log(itemId, "itemId from handleSubmittattachment");
+    console.log(selectedItemId,'selectedItemIddd in handle attachment function')
     dispatch(
       AttachmentFileUpload({
         user_id: user_id,
