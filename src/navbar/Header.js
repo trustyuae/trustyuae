@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser} from "../redux/actions/UserActions";
+import { logoutUser } from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
 
 const Header = () => {
@@ -15,20 +15,20 @@ const Header = () => {
     }
   };
 
-  const userData =JSON.parse(localStorage.getItem('user_data')) 
+  const userData = JSON.parse(localStorage.getItem("user_data"));
 
   return (
     <header id="header" className="header fixed-top d-flex align-items-center">
       <div className="d-flex align-items-center justify-content-between">
-        <a href="index.html" className="logo d-flex align-items-center">
+        <Link className="logo d-flex align-items-center" to="/ordersystem">
           <Box>
-              <img
-                src={require("../assets/logo-large-main.webp")}
-                alt="Logo"
-                style={{ height: "50px"}}
-              />
-            </Box>
-        </a>
+            <img
+              src={require("../assets/logo-large-main.webp")}
+              alt="Logo"
+              style={{ height: "50px" }}
+            />
+          </Box>
+        </Link>
         {/* <i className="bi bi-list toggle-sidebar-btn"></i> */}
       </div>
       {/* <div className="search-bar">
@@ -215,12 +215,15 @@ const Header = () => {
                 className="rounded-circle"
               />
               <span className="d-none d-md-block dropdown-toggle ps-2">
-              {userData?.first_name} {userData?.last_name}
+                {userData?.first_name} {userData?.last_name}
               </span>
             </a>
             <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
               <li className="dropdown-header">
-                <h6> {userData?.first_name} {userData?.last_name}</h6>
+                <h6>
+                  {" "}
+                  {userData?.first_name} {userData?.last_name}
+                </h6>
                 <span>Web Designer</span>
               </li>
               <li>
