@@ -44,33 +44,35 @@ function OrderDetails() {
   console.log(userData, "userData date-13-05-2024");
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const orderDetailsDataItemId = useSelector(
-    (state) => state?.orderSystemData?.orderDetails?.orders?.[0]?.items?.[0]
-  );
 
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
-  const capture = useCallback(() => {
-    
-    const imageSrc = webcamRef.current.getScreenshot();
-    setSelectedFileUrl(imageSrc);
-    setShowAttachModal(false)
-    fetch(imageSrc)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const file = new File([blob], "screenshot.jpg", { type: "image/jpeg" });
-        setSelectedFile(file);
-      })
-      .catch((error) => {
-        console.error("Error converting data URL to file:", error);
-      });
+  const capture = useCallback(
+    (itemId) => {
+      const imageSrc = webcamRef.current.getScreenshot();
+      setSelectedFileUrl(imageSrc);
+      setShowAttachModal(false);
+      fetch(imageSrc)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], "screenshot.jpg", {
+            type: "image/jpeg",
+          });
+          setSelectedFile(file);
+        })
+        .catch((error) => {
+          console.error("Error converting data URL to file:", error);
+        });
       setShowAttachmentModal(true);
-  }, [webcamRef]);
+      handleSubmitAttachment(itemId);
+    },
+    [webcamRef]
+  );
 
   const retake = () => {
     setSelectedFileUrl(null);
@@ -111,7 +113,7 @@ function OrderDetails() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e) => {
+  const handleFileInputChange = async (e, itemId) => {
     const file = e.target.files[0];
     var fr = new FileReader();
     fr.onload = function () {
@@ -120,6 +122,7 @@ function OrderDetails() {
     fr.readAsDataURL(file);
     setSelectedFile(file);
     setShowAttachmentModal(true);
+    setSelectedItemId(itemId)
   };
 
   const handleCancel = () => {
@@ -128,13 +131,14 @@ function OrderDetails() {
     setShowAttachmentModal(false);
   };
 
-  const handleSubmitAttachment = async () => {
+  const handleSubmitAttachment = async (itemId) => {
     const { user_id } = userData ?? {};
+    console.log(itemId, "itemId from handleSubmittattachment");
     dispatch(
       AttachmentFileUpload({
         user_id: user_id,
-        order_id:orderDetailsDataOrderId?.order_id,
-        item_id:orderDetailsDataItemId?.item_id,
+        order_id: orderDetailsDataOrderId?.order_id,
+        item_id: selectedItemId,
         selectedFile: selectedFile,
       })
     )
@@ -513,9 +517,7 @@ function OrderDetails() {
                         textAlign: "center",
                       }}
                     >
-                      <Row
-                        className={`${"justify-content-center"}`}
-                      >
+                      <Row className={`${"justify-content-center"}`}>
                         <Col
                           md={12}
                           className={`d-flex align-items-center justify-content-center my-1`}
@@ -533,14 +535,19 @@ function OrderDetails() {
                                 type="file"
                                 ref={fileInputRef}
                                 style={{ display: "none" }}
-                                onChange={handleFileInputChange}
+                                onChange={(e) =>
+                                  handleFileInputChange(e, product.item_id)
+                                }
                               />
                             </Button>
                           </Card>
                           <Card className="factory-card ms-1 shadow-sm">
                             <Button
                               className="bg-transparent border-0 text-black"
-                              onClick={() => setShowAttachModal(true)}
+                              onClick={() => {
+                                setShowAttachModal(true);
+                                setSelectedItemId(product.item_id);
+                              }}
                             >
                               <CameraAltIcon />
                               <Typography style={{ fontSize: "14px" }}>
