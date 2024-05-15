@@ -53,16 +53,14 @@ export const OrderDetailsGet =
     }
   };
 
-export const AttachmentFileUpload =
-  ({ user_id, id, selectedFile }) =>
-  async (dispatch) => {
+  export const AttachmentFileUpload = ({ user_id, order_id, item_id, selectedFile }) => async (dispatch) => {
     try {
       dispatch({ type: UPLOAD_ATTACH_FILE_REQUEST });
-
+  
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
-        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${id}`,
+        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}`,
         requestData,
         {
           headers: {
@@ -76,6 +74,7 @@ export const AttachmentFileUpload =
       dispatch({ type: UPLOAD_ATTACH_FILE_FAIL, error: error.message });
     }
   };
+  
 
 export const InsertOrderPickup = (requestData) => async (dispatch) => {
   // console.log(requestData, "requestData");
