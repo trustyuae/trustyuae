@@ -52,27 +52,24 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
-  const capture = useCallback(
-    () => {
-      const imageSrc = webcamRef.current.getScreenshot();
-      setSelectedFileUrl(imageSrc);
-      setShowAttachModal(false);
-      fetch(imageSrc)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const file = new File([blob], "screenshot.jpg", {
-            type: "image/jpeg",
-          });
-          setSelectedFile(file);
-        })
-        .catch((error) => {
-          console.error("Error converting data URL to file:", error);
+  const capture = useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setSelectedFileUrl(imageSrc);
+    setShowAttachModal(false);
+    fetch(imageSrc)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], "screenshot.jpg", {
+          type: "image/jpeg",
         });
-      setShowAttachmentModal(true);
-      // handleSubmitAttachment(itemId);
-    },
-    [webcamRef]
-  );
+        setSelectedFile(file);
+      })
+      .catch((error) => {
+        console.error("Error converting data URL to file:", error);
+      });
+    setShowAttachmentModal(true);
+    // handleSubmitAttachment(itemId);
+  }, [webcamRef]);
 
   const retake = () => {
     setSelectedFileUrl(null);
@@ -122,7 +119,7 @@ function OrderDetails() {
     fr.readAsDataURL(file);
     setSelectedFile(file);
     setShowAttachmentModal(true);
-    setSelectedItemId(itemId)
+    setSelectedItemId(itemId);
   };
 
   const handleCancel = () => {
@@ -133,7 +130,6 @@ function OrderDetails() {
 
   const handleSubmitAttachment = async () => {
     const { user_id } = userData ?? {};
-    console.log(selectedItemId,'selectedItemIddd in handle attachment function')
     dispatch(
       AttachmentFileUpload({
         user_id: user_id,
@@ -523,37 +519,82 @@ function OrderDetails() {
                           className={`d-flex align-items-center justify-content-center my-1`}
                         >
                           <Card className="factory-card me-1 shadow-sm">
-                            <Button
-                              className="bg-transparent border-0  text-black"
-                              onClick={() => fileInputRef.current.click()}
-                            >
-                              <CloudUploadIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Device
-                              </Typography>
-                              <input
-                                type="file"
-                                ref={fileInputRef}
-                                style={{ display: "none" }}
-                                onChange={(e) =>
-                                  handleFileInputChange(e, product.item_id)
-                                }
-                              />
-                            </Button>
+                            {userData?.user_id ==
+                              orderDetails?.operation_user_id &&
+                            orderProcess == "started" ? (
+                              <Button
+                                className="bg-transparent border-0  text-black"
+                                onClick={() => fileInputRef.current.click()}
+                              >
+                                <CloudUploadIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Device
+                                </Typography>
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  style={{ display: "none" }}
+                                  onChange={(e) =>
+                                    handleFileInputChange(e, product.item_id)
+                                  }
+                                />
+                              </Button>
+                            ) : orderProcess == "started" &&
+                              userData?.user_id !=
+                                orderDetails?.operation_user_id ? (
+                              <Button
+                                className="bg-transparent border-0  text-black"
+                                disabled
+                                onClick={() => fileInputRef.current.click()}
+                              >
+                                <CloudUploadIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Device
+                                </Typography>
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  style={{ display: "none" }}
+                                  onChange={(e) =>
+                                    handleFileInputChange(e, product.item_id)
+                                  }
+                                />
+                              </Button>
+                            ) : null}
                           </Card>
                           <Card className="factory-card ms-1 shadow-sm">
-                            <Button
-                              className="bg-transparent border-0 text-black"
-                              onClick={() => {
-                                setShowAttachModal(true);
-                                setSelectedItemId(product.item_id);
-                              }}
-                            >
-                              <CameraAltIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Camera
-                              </Typography>
-                            </Button>
+                            {userData?.user_id ==
+                              orderDetails?.operation_user_id &&
+                            orderProcess == "started" ? (
+                              <Button
+                                className="bg-transparent border-0 text-black"
+                                onClick={() => {
+                                  setShowAttachModal(true);
+                                  setSelectedItemId(product.item_id);
+                                }}
+                              >
+                                <CameraAltIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Camera
+                                </Typography>
+                              </Button>
+                            ) : orderProcess == "started" &&
+                              userData?.user_id !=
+                                orderDetails?.operation_user_id ? (
+                              <Button
+                                className="bg-transparent border-0 text-black"
+                                disabled
+                                onClick={() => {
+                                  setShowAttachModal(true);
+                                  setSelectedItemId(product.item_id);
+                                }}
+                              >
+                                <CameraAltIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Camera
+                                </Typography>
+                              </Button>
+                            ) : null}
                           </Card>
                         </Col>
                       </Row>
@@ -569,9 +610,21 @@ function OrderDetails() {
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
-            <Button variant="danger" onClick={handleFinishButtonClick}>
-              Finish
-            </Button>
+            {userData?.user_id == orderDetails?.operation_user_id &&
+            orderProcess == "started" ? (
+              <Button variant="danger" onClick={handleFinishButtonClick}>
+                Finish
+              </Button>
+            ) : orderProcess == "started" &&
+              userData?.user_id != orderDetails?.operation_user_id ? (
+              <Button
+                variant="danger"
+                disabled
+                onClick={handleFinishButtonClick}
+              >
+                Finish
+              </Button>
+            ) : null}
           </MDBCol>
         </MDBRow>
 
