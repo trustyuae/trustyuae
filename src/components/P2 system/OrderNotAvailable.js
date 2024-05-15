@@ -6,24 +6,50 @@ import { OrderNotAvailableData } from "../../redux/actions/P2SystemActions";
 import DataTable from "../DataTable";
 import ReleaseSchedulePoModal from "./ReleaseSchedulePoModal";
 import { Avatar } from "@mui/material";
+import { API_URL } from "../../redux/constants/Constants";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
   const [checkedItems, setCheckedItems] = useState([]);
+  const [ordersNotAvailableData, setOrdersNotAvailableData] = useState([])
   const [showModal, setShowModal] = useState(false);
   const [orderStatusMap, setOrderStatusMap] = useState({});
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [ordersNotAvailable, setOrdersNotAvailable] = useState([]);
   const [OrderNotAvailable, setOrderNotAvailable]=useState(null)
 
+  console.log()
 //   const handleCheckboxChange = (orderID) => {
 //     const newCheckedItems = checkedItems.includes(orderID)
 //       ? checkedItems.filter((item) => item !== orderID)
 //       : [...checkedItems, orderID];
 //     setCheckedItems(newCheckedItems);
 //   };
+
+async function fetchOrdersNotAvailableData() {
+  let apiUrl = `${API_URL}wp-json/custom-order-not/v1/order-not-available/?`;
+
+  await dispatch(
+    OrderNotAvailableData({
+      apiUrl: `${apiUrl}&per_page=${pageSize}&page=${page}`,
+    })
+  )
+    .then((response) => {
+      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      setOrdersNotAvailableData(data);
+      setTotalPages(response.data.total_pages);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+// const handlePageSizeChange = (e) => {
+//   setPageSize(parseInt(e.target.value));
+//   setPage(1);
+// };
+
 
   const columns = [
     { field: "id", headerName: "ID", flex: 1 }, // Added ID column
@@ -60,53 +86,18 @@ function OrderNotAvailable() {
   ];
 
   const handleShowModal = (OrderNotAvaId) => {
-    const OrderNotAvailable = ordersNotAvailable?.find((o) => o.id === OrderNotAvaId);
+    const OrderNotAvailable = ordersNotAvailableData?.find((o) => o.id === OrderNotAvaId);
     setOrderNotAvailable(OrderNotAvailable)
     setShowModal(true);
   };
-
-
-  const handlePageSizeChange = (e) => {
-    setPageSize(parseInt(e.target.value));
-    setPage(1);
-  };
-
-  useEffect(() => {
-    dispatch(OrderNotAvailableData());
-  }, [dispatch]);
 
   const handleChange = (event, value) => {
     setPage(value);
   };
 
-  const OrderNotAvailabledata = useSelector(
-    (state) => state?.orderNotAvailable?.ordersNotAvailable?.orders
-  );
-
-  const TotalPages = useSelector(
-    (state) => state?.orderNotAvailable?.ordersNotAvailable?.total_pages
-  );
-
   useEffect(() => {
-    // Initialize orderStatusMap when OrderNotAvailabledata changes
-    const statusMap = {};
-    OrderNotAvailabledata?.forEach((item) => {
-      statusMap[item.order_id] = item.customerStatus;
-    });
-    setOrderStatusMap(statusMap);
-  }, [OrderNotAvailabledata]);
-
-  useEffect(() => {
-    if (OrderNotAvailabledata) {
-      // Add ID field to each item
-      const ordersWithIds = OrderNotAvailabledata.map((item, index) => ({
-        ...item,
-        id: index + 1, // Assuming index + 1 as ID
-      }));
-      setOrdersNotAvailable(ordersWithIds);
-      setTotalPages(TotalPages);
-    }
-  }, [OrderNotAvailabledata, TotalPages]);
+    fetchOrdersNotAvailableData();
+  }, [pageSize, page]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -119,7 +110,7 @@ function OrderNotAvailable() {
       <div className="mt-2">
         <DataTable
           columns={columns}
-          rows={ordersNotAvailable}
+          rows={ordersNotAvailableData}
           page={page}
           pageSize={pageSize}
           totalPages={totalPages}
@@ -131,7 +122,7 @@ function OrderNotAvailable() {
           handleCloseReleaseSchedulePoModal={() => setShowModal(false)}
           showModal={showModal}
           OrderNotAvailable={OrderNotAvailable}
-          ordersNotAvailable={ordersNotAvailable}
+          ordersNotAvailable={ordersNotAvailableData}
           checkedItems={checkedItems}
           orderStatusMap={orderStatusMap}
         />
