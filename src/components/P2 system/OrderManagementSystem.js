@@ -23,12 +23,21 @@ import { API_URL } from "../../redux/constants/Constants";
 // import TabContext from '@mui/lab/TabContext';
 // import TabList from '@mui/lab/TabList';
 // import TabPanel from '@mui/lab/TabPanel';
+const EstimatedTime = [
+    '1 week', '2 week', '3 week', '1 month', 'Out of stock'
+]
 
 function OrderManagementSystem() {
     const [orders, setOrders] = useState([]);
     const [manualPOorders, setManualPoOrders] = useState([]);
+    const [scheduledPOorders, setScheduleOrders] = useState([]);
+
     const [orders2, setOrders2] = useState([]);
+
     const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+    const [selectedManualOrderIds, setSelectedManualOrderIds] = useState([]);
+    const [selectedScheduleOrderIds, setSelectedScheduleOrderIds] = useState([]);
+
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -37,11 +46,24 @@ function OrderManagementSystem() {
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
     const [factories, setFactories] = useState([]);
 
+    //selected  factory filter
     const [selectedFactory, setSelectedFactory] = useState("");
     const [selectedManualFactory, setSelectedManualFactory] = useState("");
+    const [selectedShedulFactory, setSelectedSheduleFactory] = useState("");
 
     const [selectedProductIds, setSelectedProductIds] = useState("");
     const [alertMessage, setAlertMessage] = useState("");
+
+    //selected Product filter
+    const [manualProductF, setManualProductF] = useState('')
+    const [scheduledProductF, setScheduledProductF] = useState('')
+
+    const [manualNote, setManualNote] = useState('')
+
+    const [scheduledNote, setScheduledNote] = useState('')
+    const [estimatedTime, setEstimatedTime] = useState('')
+    const [remainderDate, setRemainderDate] = useState('')
+
     const navigate = useNavigate();
 
     const columns = [
@@ -108,8 +130,9 @@ function OrderManagementSystem() {
             if (endDate) apiUrl += `start_date=${startDate}&end_date=${endDate}`;
             if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
             const response = await axios.get(apiUrl);
+            console.log(response, 'response.data');
+            setOrders(response.data.pre_orders);
             let data = response.data.map((v, i) => ({ ...v, id: i }));
-            setOrders(response.data);
             setOrders2(data);
             const totalPagesHeader = response.headers.get("X-WP-TotalPages");
             setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
@@ -117,23 +140,40 @@ function OrderManagementSystem() {
             console.error("Error fetching data:", error);
         }
     };
-
     const manualPO = async () => {
         try {
             let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
             if (selectedManualFactory) apiUrl += `&factory_id=${selectedManualFactory}`;
+            if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
+
             const response = await axios.get(apiUrl);
             console.log(response.data, 'response.data===manual PO');
-            setManualPoOrders(response.data)
+            if (response.data.products) {
+                setManualPoOrders(response.data?.products)
+            } else {
+                setManualPoOrders([])
+            }
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     }
+    const scheduledPO = async () => {
+        try {
+            let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
+            if (selectedShedulFactory) apiUrl += `&factory_id=${selectedShedulFactory}`;
+            if (scheduledProductF) apiUrl += `&product_name=${scheduledProductF}`;
 
-    useEffect(() => {
-        manualPO()
-    }, [selectedManualFactory])
-
+            const response = await axios.get(apiUrl);
+            console.log(response.data, 'response.data===manual PO');
+            if (response.data.products) {
+                setScheduleOrders(response.data.products)
+            } else {
+                setScheduleOrders([])
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
     const fetchFactories = async () => {
         try {
             const response = await axios.get(
@@ -145,6 +185,16 @@ function OrderManagementSystem() {
         }
     };
 
+    useEffect(() => {
+        manualPO()
+    }, [selectedManualFactory, manualProductF])
+
+    useEffect(() => {
+        scheduledPO()
+    }, [selectedShedulFactory, scheduledProductF])
+
+    
+    // single select
     const handleOrderSelection = (orderId) => {
         const selectedIndex = selectedOrderIds.indexOf(orderId);
         let newSelected = [];
@@ -157,14 +207,54 @@ function OrderManagementSystem() {
 
         setSelectedOrderIds(newSelected);
     };
+    const handleOrderManualSelection = (orderId) => {
+        const selectedIndex = selectedManualOrderIds.indexOf(orderId);
+        let newSelected = [];
 
+        if (selectedIndex === -1) {
+            newSelected = [...selectedManualOrderIds, orderId];
+        } else {
+            newSelected = selectedManualOrderIds.filter((id) => id !== orderId);
+        }
+
+        setSelectedManualOrderIds(newSelected);
+    };
+    const handleOrderScheduleSelection = (orderId) => {
+        const selectedIndex = selectedScheduleOrderIds.indexOf(orderId);
+        let newSelected = [];
+
+        if (selectedIndex === -1) {
+            newSelected = [...selectedScheduleOrderIds, orderId];
+        } else {
+            newSelected = selectedScheduleOrderIds.filter((id) => id !== orderId);
+        }
+
+        setSelectedScheduleOrderIds(newSelected);
+    };
+
+    // select all
     const handleSelectAll = () => {
         const allOrderIds = orders.map((order) => order.order_id);
         setSelectedOrderIds(
             selectedOrderIds.length === allOrderIds.length ? [] : allOrderIds
         );
     };
+    const handleSelectAllManual = () => {
+        const allOrderIds = manualPOorders.map((order) => order.product_id);
+        console.log(allOrderIds);
+        setSelectedManualOrderIds(
+            selectedManualOrderIds.length === allOrderIds.length ? [] : allOrderIds
+        );
+    };
+    const handleSelectAllSchedule = () => {
+        const allOrderIds = scheduledPOorders.map((order) => order.product_id);
+        console.log(allOrderIds);
+        setSelectedScheduleOrderIds(
+            selectedScheduleOrderIds.length === allOrderIds.length ? [] : allOrderIds
+        );
+    };
 
+    // filters
     const handleDateChange = async (newDateRange) => {
         if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
             setSelectedDateRange(newDateRange);
@@ -189,7 +279,6 @@ function OrderManagementSystem() {
             setEndDate("");
         }
     };
-
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         date.setDate(date.getDate() + 1);
@@ -198,72 +287,12 @@ function OrderManagementSystem() {
             .toString()
             .padStart(2, "0")}/${date.getFullYear()}`;
     };
-
     const handleFactoryChange = (e) => {
         setSelectedFactory(e.target.value);
     };
+    
 
-    // const handleGenerateJson = () => {
-    //     const selectedOrders = orders.filter((order) => selectedOrderIds.includes(order.order_id));
-    //     const factoryIds = new Set(selectedOrders.map((order) => order.factory_id));
-    //     if (factoryIds.size === 1) {
-    //         const selectedProductIds = selectedOrders.map((order) => order.item_ids).join(',');
-    //         const selectedOrderIdsStr = selectedOrderIds.join(',');
-    //         setSelectedProductIds(JSON.stringify({ product_ids: selectedProductIds, order_ids: selectedOrderIdsStr }));
-    //         setAlertMessage('');
-    //     } else {
-    //         setAlertMessage('Selected orders belong to different factories. Please select orders from the same factory.');
-    //     }
-    // };
-
-    // const handleGeneratePO = async () => {
-    //     const selectedOrders = orders.filter((order) =>
-    //         selectedOrderIds.includes(order.order_id)
-    //     );
-    //     const factoryIds = new Set(selectedOrders.map((order) => order.factory_id));
-    //     if (factoryIds.size === 1) {
-    //         const selectedProductIds = selectedOrders
-    //             .map((order) => order.item_ids)
-    //             .join(",");
-    //         const selectedOrderIdsStr = selectedOrderIds.join(",");
-    //         setSelectedProductIds(
-    //             JSON.stringify({
-    //                 product_ids: selectedProductIds,
-    //                 order_ids: selectedOrderIdsStr,
-    //             })
-    //         );
-    //         setAlertMessage("");
-    //         try {
-    //             const response = await axios.post(
-    //                 `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
-    //                 {
-    //                     product_ids: selectedProductIds,
-    //                     order_ids: selectedOrderIdsStr,
-    //                 }
-    //             );
-    //             console.log(response.data);
-    //             if (response.data) {
-    //                 Swal.fire({
-    //                     text: response.data,
-    //                 }).then((result) => {
-    //                     if (result.isConfirmed) {
-    //                         navigate("/PO_ManagementSystem");
-    //                     }
-    //                 });
-    //             }
-    //         } catch (error) {
-    //             console.error("Error generating PO IDs:", error);
-    //         }
-    //     } else {
-    //         setAlertMessage(
-    //             "Selected orders belong to different factories. Please select orders from the same factory."
-    //         );
-    //         Swal.fire({
-    //             text: "Selected orders belong to different factories. Please select orders from the same factory.",
-    //         });
-    //     }
-    // };
-
+    // PO Generate
     const handleGeneratePO = async () => {
         const selectedOrders = orders.filter((order) =>
             selectedOrderIds.includes(order.order_id)
@@ -315,51 +344,156 @@ function OrderManagementSystem() {
             });
         }
     };
-
-
-    // const handleGenerateJson = () => {
-    //     const selectedOrders = orders.filter((order) => selectedOrderIds.includes(order.order_id));
-    //     const factoryIds = new Set(selectedOrders.map((order) => order.factory_id));
-
-    //     if (factoryIds.size === 1) {
-    //         const selectedProductIds = selectedOrders.map((order) => order.item_ids).join(',');
-    //         const selectedOrderIdsStr = selectedOrderIds.join(',');
-    //         setSelectedProductIds(JSON.stringify({ product_ids: selectedProductIds, order_ids: selectedOrderIdsStr }));
-    //         setAlertMessage('');
-    //     } else {
-    //         const productsByFactory = {};
-    //         selectedOrders.forEach((order) => {
-    //             const factoryName = factories.find((factory) => factory.id === order.factory_id)?.factory_name;
-    //             if (factoryName in productsByFactory) {
-    //                 productsByFactory[factoryName].push(order.product_names);
-    //             } else {
-    //                 productsByFactory[factoryName] = [order.product_names];
-    //             }
-    //         });
-
-    //         let errorMessage = 'Selected orders belong to different factories. Please select orders from the same factory.\n';
-    //         for (const factoryName in productsByFactory) {
-    //             errorMessage += `Factory: ${factoryName}, Products: ${productsByFactory[factoryName].join(', ')}\n`;
-    //         }
-
-    //         setAlertMessage(errorMessage);
-    //     }
-    // };
-
-    const variant = (e) => {
-        const matches = e.match(
-            /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
+    const handleGenerateManualPO = async () => {
+        const selectedOrders = manualPOorders.filter((order) =>
+            selectedManualOrderIds.includes(order.product_id)
         );
+        console.log(selectedOrders, 'selectedOrders');
+        // Extract unique factory IDs from selected orders
+        const factoryIds = [...new Set(selectedOrders.map((order) => order.factory_id))];
+
+        if (factoryIds.length === 1) {
+            // Concatenate selected product IDs and order IDs
+            // const selectedProductIds = selectedOrders.map((order) => order.product_id).join(",");
+            const selectedquantities = selectedOrders.map((order) => order.Quantity);
+            const selectedOrderIdsStr = selectedManualOrderIds;
+
+            // Construct the payload object
+            const payload = {
+                quantities: selectedquantities,
+                // factory_ids: factoryIds.join(","), // Convert array to comma-separated string
+                product_ids: selectedOrderIdsStr,
+                note: manualNote
+            };
+            console.log(payload, 'payload');
+            // setSelectedProductIds(JSON.stringify(payload));
+            // setAlertMessage("");
+
+            try {
+                const response = await axios.post(
+                    `${API_URL}wp-json/custom-manual-order/v1/post-order-manual/`,
+                    payload // Send the payload object
+                );
+                console.log(response.data);
+                if (response.data) {
+                    Swal.fire({
+                        text: response.data,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate("/PO_ManagementSystem");
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error generating PO IDs:", error);
+            }
+        } else {
+            setAlertMessage(
+                "Selected orders belong to different factories. Please select orders from the same factory."
+            );
+            Swal.fire({
+                text: "Selected orders belong to different factories. Please select orders from the same factory.",
+            });
+        }
+    };
+    const handleGenerateScheduledPO = async () => {
+        const selectedOrders = scheduledPOorders.filter((order) =>
+            selectedScheduleOrderIds.includes(order.product_id)
+        );
+
+        // Extract unique factory IDs from selected orders
+        const factoryIds = [...new Set(selectedOrders.map((order) => order.factory_id))];
+        if (factoryIds.length === 1) {
+            // Concatenate selected product IDs and order IDs
+            // const selectedProductIds = selectedOrders.map((order) => order.product_id).join(",");
+            const selectedquantities = selectedOrders.map((order) => order.Quantity);
+            const selectedOrderIdsStr = selectedScheduleOrderIds;
+
+            // Construct the payload object
+            const payload = {
+                quantities: selectedquantities,
+                // factory_ids: factoryIds.join(","), // Convert array to comma-separated string
+                product_ids: selectedOrderIdsStr,
+                note: scheduledNote,
+                estimated_time: estimatedTime,
+                reminder_date: remainderDate
+            };
+            // setSelectedProductIds(JSON.stringify(payload));
+            // setAlertMessage("");
+
+            try {
+                const response = await axios.post(
+                    `${API_URL}wp-json/custom-schedule-order/v1/post-order-schedule/`,
+                    payload // Send the payload object
+                );
+                console.log(response.data);
+                if (response.data) {
+                    Swal.fire({
+                        text: response.data,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate("/PO_ManagementSystem");
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error generating PO IDs:", error);
+            }
+        } else {
+            setAlertMessage(
+                "Selected orders belong to different factories. Please select orders from the same factory."
+            );
+            Swal.fire({
+                text: "Selected orders belong to different factories. Please select orders from the same factory.",
+            });
+        }
+    };
+
+
+   
+    // variant
+    const variant = (e) => {
+        const matches = e.match(/"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/g);
+        let size = null;
+        let color = null;
+
         if (matches) {
-            const key = matches[1];
-            const value = matches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
-            return `${key}: ${value}`;
+            matches.forEach(match => {
+                const keyValueMatches = match.match(/"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/);
+                if (keyValueMatches) {
+                    const key = keyValueMatches[1];
+                    const value = keyValueMatches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
+                    if (key === "size") {
+                        size = value;
+                    } else if (key === "color") {
+                        color = value;
+                    }
+                }
+            });
+        }
+
+        if (size && color) {
+            return `Size: ${size}, Color: ${color}`;
+        } if (size) {
+            return `Size:${size}`
+        } if (color) {
+            return `Color:${color}`
         } else {
             return "Variant data not available";
         }
     };
 
-
+    // onchange quantity
+    const handleQuantityMO = (index, event) => {
+        console.log(index, event);
+        manualPOorders[index].Quantity = event.target.value;
+        console.log(manualPOorders, 'manualPOorders');
+    }
+    const handleQuantitySO = (index, event) => {
+        console.log(index, event);
+        scheduledPOorders[index].Quantity = event.target.value;
+        console.log(scheduledPOorders, 'manualPOorders');
+    }
 
     return (
         <Container
@@ -372,62 +506,8 @@ function OrderManagementSystem() {
                     Order Management System
                 </Typography>
             </Box>
-            {/* {alertMessage && (
-                <Row className="mb-4 mt-4">
-                    <Col>
-                        <div className="alert alert-danger" role="alert">
-                            {alertMessage}
-                        </div>
-                    </Col>
-                </Row>
-            )} */}
-
-            {/* <div className="mt-2">
-                {selectedProductIds && (
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>Generated JSON</Card.Title>
-                            <Card.Text>{selectedProductIds}</Card.Text>
-                        </Card.Body>
-                    </Card>
-                )}
-            </div> */}
-            {/* <div className="mt-2">
-                <DataTable
-                    columns={columns}
-                    rows={orders2}
-                    checkboxSelection={true}
-                    // page={page}
-                    // pageSize={pageSize}
-                    // totalPages={totalPages}
-                    // handleChange={handleChange}
-                />
-            </div> */}
-
-            {/* <Box sx={{ width: '100%', typography: 'body1' }}>
-      <TabContext value={value}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
-            <Tab label="Item One" value="1" />
-            <Tab label="Item Two" value="2" />
-            <Tab label="Item Three" value="3" />
-          </TabList>
-        </Box>
-        <TabPanel value="1">Item One</TabPanel>
-        <TabPanel value="2">Item Two</TabPanel>
-        <TabPanel value="3">Item Three</TabPanel>
-      </TabContext>
-    </Box> */}
-
             <div className="card">
                 <div className="card-body">
-                    {/* <Box className="mb-4">
-                <Typography variant="h4" className="fw-semibold">
-                    Order Management System
-                </Typography>
-            </Box> */}
-
-
                     <ul className="nav nav-tabs nav-tabs-bordered d-flex" id="borderedTabJustified" role="tablist">
                         <li className="nav-item flex-fill" role="presentation">
                             <button className="nav-link w-100 active" id="home-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-home" type="button" role="tab" aria-controls="home" aria-selected="true" fdprocessedid="x9r6tp">Order against PO</button>
@@ -440,7 +520,7 @@ function OrderManagementSystem() {
                         </li>
                     </ul>
                     <div className="tab-content pt-2" id="borderedTabJustifiedContent">
-                        {/* order against PO */}
+                        {/* order against PO Table */}
                         <div className="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
                             <Row className="mb-4 mt-4">
                                 <Form inline>
@@ -490,22 +570,6 @@ function OrderManagementSystem() {
                                                 </Form.Control>
                                             </Form.Group>
                                         </Col>
-                                        {/* <Col className=" d-flex justify-content-end align-items-center ">
-                                            <Button
-                                                variant="primary"
-                                                className="p-1 me-3 bg-primary"
-                                            // onClick={handlePrint}
-                                            >
-                                                Manual PO
-                                            </Button>
-                                            <Button
-                                                variant="primary"
-                                                className="p-1 me-3 bg-primary"
-                                            // onClick={handlePrint}
-                                            >
-                                                PO against Orders
-                                            </Button>
-                                        </Col> */}
                                     </Row>
                                 </Form>
                             </Row>
@@ -520,12 +584,10 @@ function OrderManagementSystem() {
                                                     checked={selectedOrderIds.length === orders.length}
                                                 />
                                             </th>
-                                            {/* <th>order Id</th> */}
                                             <th>Product Name</th>
                                             <th>Variant</th>
                                             <th>Image</th>
                                             <th>Quantity</th>
-                                            {/* <th>PO Number</th> */}
                                             <th>Factory Name</th>
                                         </tr>
                                     </thead>
@@ -539,7 +601,6 @@ function OrderManagementSystem() {
                                                         onChange={() => handleOrderSelection(order.order_id)}
                                                     />
                                                 </td>
-                                                {/* <td className="text-center">{order.order_id}</td> */}
                                                 <td className="text-center">{order.product_name}</td>
                                                 <td className="text-center">
                                                     {variant(order.variation_value)}
@@ -553,7 +614,6 @@ function OrderManagementSystem() {
                                                     />
                                                 </td>
                                                 <td className="text-center">{order.total_quantity}</td>
-                                                {/* <td className="text-center">{order.po_number}</td> */}
                                                 <td className="text-center">
                                                     {
                                                         factories.find((factory) => factory.id === order.factory_id)
@@ -588,253 +648,181 @@ function OrderManagementSystem() {
                                 </Form>
                             </Row>
                         </div>
-                        {/* manual PO */}
+                        {/* manual PO Table */}
                         <div className="tab-pane fade" id="bordered-justified-profile" role="tabpanel" aria-labelledby="profile-tab">
-                            <div className="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
-                                <Row className="mb-4 mt-4">
-                                    <Form inline>
-                                        <Row>
-                                            {/* <Col xs="auto" lg="4">
-                                            <Form.Group>
-                                                <Form.Label className="fw-semibold mb-0">
-                                                    Date filter:
-                                                </Form.Label>
-                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                    <DemoContainer components={["SingleInputDateRangeField"]}>
-                                                        <DateRangePicker
-                                                            sx={{
-                                                                "& .MuiInputBase-root": {
-                                                                    paddingRight: 0,
-                                                                },
-                                                                "& .MuiInputBase-input": {
-                                                                    padding: ".5rem .75rem .5rem .75rem",
-                                                                    "&:hover": {
-                                                                        borderColor: "#dee2e6",
-                                                                    },
-                                                                },
-                                                            }}
-                                                            value={selectedDateRange}
-                                                            onChange={handleDateChange}
-                                                            slots={{ field: SingleInputDateRangeField }}
-                                                        />
-                                                    </DemoContainer>
-                                                </LocalizationProvider>
+                            <Row className="mb-4 mt-4">
+                                <Form inline>
+                                    <Row>
+                                        <Col xs="auto" lg="4">
+                                            <Form.Group className="fw-semibold mb-0">
+                                                <Form.Label>Factory Filter:</Form.Label>
+                                                <Form.Control
+                                                    as="select"
+                                                    className="mr-sm-2"
+                                                    value={selectedManualFactory}
+                                                    onChange={(e) => setSelectedManualFactory(e.target.value)}
+                                                >
+                                                    <option value="">All Factory</option>
+                                                    {factories.map((factory) => (
+                                                        <option key={factory.id} value={factory.id}>
+                                                            {factory.factory_name}
+                                                        </option>
+                                                    ))}
+                                                </Form.Control>
                                             </Form.Group>
-                                        </Col> */}
-                                            <Col xs="auto" lg="4">
-                                                <Form.Group className="fw-semibold mb-0">
-                                                    <Form.Label>Factory Filter:</Form.Label>
-                                                    <Form.Control
-                                                        as="select"
-                                                        className="mr-sm-2"
-                                                        value={selectedManualFactory}
-                                                        onChange={(e) => setSelectedManualFactory(e.target.value)}
-                                                    >
-                                                        <option value="">All Factory</option>
-                                                        {factories.map((factory) => (
-                                                            <option key={factory.id} value={factory.id}>
-                                                                {factory.factory_name}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Control>
-                                                </Form.Group>
-                                            </Col>
-                                            <Col xs="auto" lg="4">
-                                                <Form.Group className="fw-semibold mb-0">
-                                                    <Form.Label>Product Filter:</Form.Label>
-                                                    <Form.Control type="text" placeholder="Enter Product" />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                </Row>
-                                <Row className="mb-4 mt-4 ">
-                                    <Table striped bordered hover>
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <Form.Check
-                                                        type="checkbox"
-                                                        onChange={handleSelectAll}
-                                                        checked={selectedOrderIds.length === orders.length}
-                                                    />
-                                                </th>
-                                                {/* <th>order Id</th> */}
-                                                <th>Factory Name</th>
-                                                {/* <th>Date</th> */}
-                                                <th>Product Name</th>
-                                                <th>Product Image</th>
-                                                <th>Product Variant</th>
-                                                <th>Quantity</th>
-                                                {/* <th>Note</th> */}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {manualPOorders?.products?.map((order) => (
-                                                <tr key={order.order_id}>
+                                        </Col>
+                                        <Col xs="auto" lg="4">
+                                            <Form.Group className="fw-semibold mb-0">
+                                                <Form.Label>Product Filter:</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Product" value={manualProductF} onChange={(e) => setManualProductF(e.target.value)} />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </Row>
+                            <Row className="mb-4 mt-4 ">
+                                <Table striped bordered hover>
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    onChange={handleSelectAllManual}
+                                                    checked={selectedManualOrderIds.length === manualPOorders.length}
+                                                />
+                                            </th>
+                                            <th>Factory Name</th>
+                                            <th>Product Name</th>
+                                            <th>Product Image</th>
+                                            <th>Product Variant</th>
+                                            <th>Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {manualPOorders && manualPOorders?.length > 0 ? (
+                                            manualPOorders.map((order, rowIndex) => (
+                                                <tr key={order.product_id}>
                                                     <td>
                                                         <Form.Check
                                                             type="checkbox"
-                                                            checked={selectedOrderIds.includes(order.order_id)}
-                                                            onChange={() => handleOrderSelection(order.order_id)}
+                                                            checked={selectedManualOrderIds.includes(order.product_id)}
+                                                            onChange={() => handleOrderManualSelection(order.product_id)}
                                                         />
                                                     </td>
                                                     <td className="text-center">
-                                                        {
-                                                            factories.find((factory) => factory.id === order.factory_id)
-                                                                ?.factory_name
-                                                        }
+                                                        {factories.find((factory) => factory.id === order.factory_id)?.factory_name}
                                                     </td>
-                                                    {/* <td className="text-center">
-                                                        <Form.Group controlId="duedate">
-                                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
-                                                        </Form.Group>
-                                                    </td> */}
                                                     <td className="text-center">{order.product_name}</td>
                                                     <td className="text-center">
-                                                        <img
-                                                            src={order.product_image}
-                                                            alt={order.product_name}
-                                                            className="img-fluid"
-                                                            width={90}
-                                                        />
+                                                        <img src={order.product_image} alt={order.product_name} className="img-fluid" width={90} />
                                                     </td>
                                                     <td className="text-center">
-                                                        {/* {variant(order.variation_value)} */}
-                                                        {order.variation_id}
+                                                        {order.variation_values}
                                                     </td>
                                                     <td className="text-center">
-                                                        {/* {order.Quantity} */}
                                                         <Form.Group className="mb-3" controlId="quantity">
-                                                            {/* <Form.Label>Email address</Form.Label> */}
-                                                            <Form.Control type="text" placeholder="Enter Quantity" />
+                                                            <Form.Control type="text" placeholder="Enter Quantity" onChange={(event) => handleQuantityMO(rowIndex, event)} />
                                                         </Form.Group>
                                                     </td>
-
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </Row>
-                                <Row>
-                                    <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                        <Form.Label>Add Note</Form.Label>
-                                        <Form.Control as="textarea" rows={2} />
-                                    </Form.Group>
-                                </Row>
-                                <Row className="mb-4 mt-4">
-                                    <Form inline>
-                                        <Row className="mt-4">
-                                            <Col xs="auto" lg="6" className="d-flex  align-items-end">
-                                                <Button
-                                                    type="button"
-                                                    className="mr-2 mx-3 "
-                                                // onClick={handleSelectAll}
-                                                >
-                                                    Select All Orders
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    className="mr-2 mx-3 "
-                                                // onClick={handleGeneratePO}
-                                                >
-                                                    Create Manual PO
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                </Row>
-                            </div>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="6" className="text-center">No products found</td>
+                                            </tr>
+                                        )}
+
+                                    </tbody>
+                                </Table>
+                            </Row>
+                            <Row>
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Label>Add Note</Form.Label>
+                                    <Form.Control as="textarea" rows={2} onChange={(e) => setManualNote(e.target.value)} />
+                                </Form.Group>
+                            </Row>
+                            <Row className="mb-4 mt-4">
+                                <Form inline>
+                                    <Row className="mt-4">
+                                        <Col xs="auto" lg="6" className="d-flex  align-items-end">
+                                            <Button
+                                                type="button"
+                                                className="mr-2 mx-3 "
+                                                onClick={handleSelectAllManual}
+                                            >
+                                                Select All Orders
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                className="mr-2 mx-3 "
+                                                onClick={handleGenerateManualPO}
+                                            >
+                                                Create Manual PO
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </Row>
                         </div>
-                        {/* scheduled PO */}
+                        {/* scheduled PO Table */}
                         <div className="tab-pane fade" id="bordered-justified-contact" role="tabpanel" aria-labelledby="contact-tab">
-                            <div className="tab-pane fade active show" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
-                                <Row className="mb-4 mt-4">
-                                    <Form inline>
-                                        <Row>
-                                            {/* <Col xs="auto" lg="4">
-                                            <Form.Group>
-                                                <Form.Label className="fw-semibold mb-0">
-                                                    Date filter:
-                                                </Form.Label>
-                                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                                    <DemoContainer components={["SingleInputDateRangeField"]}>
-                                                        <DateRangePicker
-                                                            sx={{
-                                                                "& .MuiInputBase-root": {
-                                                                    paddingRight: 0,
-                                                                },
-                                                                "& .MuiInputBase-input": {
-                                                                    padding: ".5rem .75rem .5rem .75rem",
-                                                                    "&:hover": {
-                                                                        borderColor: "#dee2e6",
-                                                                    },
-                                                                },
-                                                            }}
-                                                            value={selectedDateRange}
-                                                            onChange={handleDateChange}
-                                                            slots={{ field: SingleInputDateRangeField }}
-                                                        />
-                                                    </DemoContainer>
-                                                </LocalizationProvider>
+                            <Row className="mb-4 mt-4">
+                                <Form inline>
+                                    <Row>
+                                        <Col xs="auto" lg="4">
+                                            <Form.Group className="fw-semibold mb-0">
+                                                <Form.Label>Factory Filter:</Form.Label>
+                                                <Form.Control
+                                                    as="select"
+                                                    className="mr-sm-2"
+                                                    value={selectedShedulFactory}
+                                                    onChange={(e) => setSelectedSheduleFactory(e.target.value)}
+                                                >
+                                                    <option value="">All Factory</option>
+                                                    {factories.map((factory) => (
+                                                        <option key={factory.id} value={factory.id}>
+                                                            {factory.factory_name}
+                                                        </option>
+                                                    ))}
+                                                </Form.Control>
                                             </Form.Group>
-                                        </Col> */}
-                                            <Col xs="auto" lg="4">
-                                                <Form.Group className="fw-semibold mb-0">
-                                                    <Form.Label>Factory Filter:</Form.Label>
-                                                    <Form.Control
-                                                        as="select"
-                                                        className="mr-sm-2"
-                                                        value={selectedManualFactory}
-                                                        onChange={(e) => setSelectedManualFactory(e.target.value)}
-                                                    >
-                                                        <option value="">All Factory</option>
-                                                        {factories.map((factory) => (
-                                                            <option key={factory.id} value={factory.id}>
-                                                                {factory.factory_name}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Control>
-                                                </Form.Group>
-                                            </Col>
-                                            <Col xs="auto" lg="4">
-                                                <Form.Group className="fw-semibold mb-0">
-                                                    <Form.Label>Product Filter:</Form.Label>
-                                                    <Form.Control type="text" placeholder="Enter Product" />
-                                                </Form.Group>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                </Row>
-                                <Row className="mb-4 mt-4 ">
-                                    <Table striped bordered hover>
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <Form.Check
-                                                        type="checkbox"
-                                                        onChange={handleSelectAll}
-                                                        checked={selectedOrderIds.length === orders.length}
-                                                    />
-                                                </th>
-                                                {/* <th>order Id</th> */}
-                                                <th>Factory Name</th>
-                                                {/* <th>Date</th> */}
-                                                <th>Product Name</th>
-                                                <th>Product Image</th>
-                                                <th>Product Variant</th>
-                                                <th>Quantity</th>
-                                                {/* <th>Note</th> */}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {manualPOorders?.products?.map((order) => (
-                                                <tr key={order.order_id}>
+                                        </Col>
+                                        <Col xs="auto" lg="4">
+                                            <Form.Group className="fw-semibold mb-0">
+                                                <Form.Label>Product Filter:</Form.Label>
+                                                <Form.Control type="text" placeholder="Enter Product" value={scheduledProductF} onChange={(e) => setScheduledProductF(e.target.value)} />
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </Row>
+                            <Row className="mb-4 mt-4 ">
+                                <Table striped bordered hover>
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    onChange={handleSelectAllSchedule}
+                                                    checked={selectedScheduleOrderIds.length === scheduledPOorders.length}
+                                                />
+                                            </th>
+                                            <th>Factory Name</th>
+                                            <th>Product Name</th>
+                                            <th>Product Image</th>
+                                            <th>Product Variant</th>
+                                            <th>Quantity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {scheduledPOorders && scheduledPOorders?.length > 0 ? (
+                                            scheduledPOorders?.map((order, rowIndex) => (
+                                                <tr key={order.product_id}>
                                                     <td>
                                                         <Form.Check
                                                             type="checkbox"
-                                                            checked={selectedOrderIds.includes(order.order_id)}
-                                                            onChange={() => handleOrderSelection(order.order_id)}
+                                                            checked={selectedScheduleOrderIds.includes(order.product_id)}
+                                                            onChange={() => handleOrderScheduleSelection(order.product_id)}
                                                         />
                                                     </td>
                                                     <td className="text-center">
@@ -843,11 +831,6 @@ function OrderManagementSystem() {
                                                                 ?.factory_name
                                                         }
                                                     </td>
-                                                    {/* <td className="text-center">
-                                                        <Form.Group controlId="duedate">
-                                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
-                                                        </Form.Group>
-                                                    </td> */}
                                                     <td className="text-center">{order.product_name}</td>
                                                     <td className="text-center">
                                                         <img
@@ -858,65 +841,86 @@ function OrderManagementSystem() {
                                                         />
                                                     </td>
                                                     <td className="text-center">
-                                                        {/* {variant(order.variation_value)} */}
                                                         {order.variation_id}
                                                     </td>
                                                     <td className="text-center">
-                                                        {/* {order.Quantity} */}
                                                         <Form.Group className="mb-3" controlId="quantity">
-                                                            {/* <Form.Label>Email address</Form.Label> */}
-                                                            <Form.Control type="text" placeholder="Enter Quantity" />
+                                                            <Form.Control type="text" placeholder="Enter Quantity" onChange={(event) => handleQuantitySO(rowIndex, event)} />
                                                         </Form.Group>
                                                     </td>
 
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </Row>
-                                <Row>
-                                    <Col xs="auto" lg="4">
-                                        <Form.Group controlId="duedate">
-                                            <Form.Label>Estimated time</Form.Label>
-                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col xs="auto" lg="4">
-                                        <Form.Group controlId="duedate">
-                                            <Form.Label>Remainder date</Form.Label>
-                                            <Form.Control type="date" name="duedate" placeholder="Due date" />
-                                        </Form.Group>
-                                    </Col>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="6" className="text-center">No products found</td>
+                                            </tr>
+                                        )
 
-                                </Row>
-                                <Row className="mb-4 mt-4">
-                                    <Form inline>
-                                        <Row className="mt-4">
-                                            <Col xs="auto" lg="6" className="d-flex  align-items-end">
-                                                <Button
-                                                    type="button"
-                                                    className="mr-2 mx-3 "
-                                                // onClick={handleSelectAll}
-                                                >
-                                                    Select All Orders
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    className="mr-2 mx-3 "
-                                                // onClick={handleGeneratePO}
-                                                >
-                                                    Create Scheduled PO
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                </Row>
-                            </div>
+                                        }
+                                    </tbody>
+                                </Table>
+                            </Row>
+                            <Row>
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                    <Form.Label>Add Note</Form.Label>
+                                    <Form.Control as="textarea" rows={2} onChange={(e) => setScheduledNote(e.target.value)} />
+                                </Form.Group>
+                            </Row>
+                            <Row>
+                                <Col xs="auto" lg="4">
+                                    <Form.Group controlId="duedate">
+                                        <Form.Label>Estimated time</Form.Label>
+                                        <Form.Control
+                                            as="select"
+                                            className="mr-sm-2"
+                                            value={estimatedTime}
+                                            onChange={(e) => setEstimatedTime(e.target.value)}
+                                        >
+                                            <option value="">select time</option>
+                                            {EstimatedTime.map((time) => (
+                                                <option key={time} value={time}>
+                                                    {time}
+                                                </option>
+                                            ))}
+                                        </Form.Control>
+                                    </Form.Group>
+                                </Col>
+                                <Col xs="auto" lg="4">
+                                    <Form.Group controlId="duedate">
+                                        <Form.Label>Remainder date</Form.Label>
+                                        <Form.Control type="date" name="duedate" placeholder="Due date" onChange={(e) => setRemainderDate(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+
+                            </Row>
+                            <Row className="mb-4 mt-4">
+                                <Form inline>
+                                    <Row className="mt-4">
+                                        <Col xs="auto" lg="6" className="d-flex  align-items-end">
+                                            <Button
+                                                type="button"
+                                                className="mr-2 mx-3 "
+                                                onClick={handleSelectAllSchedule}
+                                            >
+                                                Select All Orders
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                className="mr-2 mx-3 "
+                                                onClick={handleGenerateScheduledPO}
+                                            >
+                                                Create Scheduled PO
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </Row>
+
                         </div>
                     </div>
                 </div>
             </div>
-
         </Container>
     );
 }

@@ -92,7 +92,7 @@ function POManagementSystem() {
             const response = await axios.get(apiUrl);
 
             console.log(response.data, 'res===>>>>');
-            setOrderList(response.data)
+            setOrderList(response.data.pre_orders)
         } catch (error) {
             console.error("Error Products:", error);
         }
