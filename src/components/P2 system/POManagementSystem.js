@@ -16,6 +16,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { API_URL } from '../../redux/constants/Constants';
 import { Link } from 'react-router-dom';
+import { Badge, Card, Tab, Tabs } from 'react-bootstrap';
+import DataTable from '../DataTable';
 
 const tableHeaders = [
     "PO Number",
@@ -69,7 +71,11 @@ function POManagementSystem() {
     const [factories, setFactories] = useState([]);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+
     const [orderList, setOrderList] = useState([]);
+    const [manualorderList, setManualOrderList] = useState([]);
+    const [scheduleorderList, setScheduleOrderList] = useState([]);
+
     const [PoStatus, setPoStatus] = useState("");
 
     const fetchFactories = async () => {
@@ -92,7 +98,10 @@ function POManagementSystem() {
             const response = await axios.get(apiUrl);
 
             console.log(response.data, 'res===>>>>');
-            setOrderList(response.data.pre_orders)
+        let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
+
+            // setOrderList(response.data.pre_orders)
+            setOrderList(data)
         } catch (error) {
             console.error("Error Products:", error);
         }
@@ -147,6 +156,65 @@ function POManagementSystem() {
     const handlePOStatus = (e) => {
         setPoStatus(e.target.value)
     }
+
+    const columns = [
+        { field: "po_id", headerName: "PO Number", flex: 1 },
+        { field: "po_date", headerName: "Date created", flex: 1 },
+        { field: "total_quantity", headerName: "Total Quantity", flex: 1 },
+        { field: "total_quantity", headerName: "Estimated Cost(RMB)", flex: 1 },
+        { field: "total_quantity", headerName: "Estimated Cost(AED)", flex: 1 },
+        { field: "po_status", headerName: "Status", flex: 1 },
+        { field: "payment_status", headerName: "Payment Status", flex: 1 },
+        {
+            field: "factory_id", headerName: "Factory", flex: 1,
+            type: "html",
+            renderCell: (value, row) => {
+                return factories.find((factory) => factory.id == value.row.factory_id)?.factory_name
+            }
+        },
+        // { field: "customer_name", headerName: "Action", flex: 1 },
+        // {
+        //   field: "shipping_country",
+        //   headerName: "Shipping Country",
+        //   type: "string",
+        //   flex: 1,
+        //   valueGetter: (value, row) => getCountryName(row.shipping_country),
+        // },
+        // {
+        //   field: "order_status",
+        //   headerName: "Order Status",
+        //   flex: 1,
+        //   type: "string",
+        // },
+        {
+            field: "view_item",
+            headerName: "View Item",
+            flex: 1,
+            type: "html",
+            renderCell: (value, row) => {
+                return (
+                    <Link to={`/order_details/${value?.row?.order_id}`}>
+                        <Button type="button" className="w-auto">
+                            <FaEye />
+                        </Button>
+                        <Typography
+                            variant="label"
+                            className="fw-semibold text-secondary"
+                            sx={{
+                                fontSize: 14,
+                                textTransform: "capitalize",
+                            }}
+                        >
+                            {/* {"  "} */}
+                            <Badge bg="success" className="m-2">
+                                {value?.row?.order_process == 'started' ? (value?.row?.order_process) : null}
+                            </Badge>
+                        </Typography>
+                    </Link>
+                );
+            },
+        },
+    ];
 
     return (
         <Container fluid className='p-5' style={{ height: '98vh', maxHeight: "100%", minHeight: "100vh" }}>
@@ -225,43 +293,9 @@ function POManagementSystem() {
                     </Row>
                 </Form>
             </Row>
-            {/* <Row className='mb-4 mt-4'>
-                <Form inline>
-                    <Row >
-                        <Col xs="auto" lg="2">
-                            <Form.Group>
-                                <Form.Label>Date filter:</Form.Label>
-                                <Form.Control
-                                    type="date"
-                                    className="mr-sm-2"
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col xs="auto" lg="2">
-                            <Form.Group>
-                                <Form.Label>PO Status Filter:</Form.Label>
-                                <Form.Select >
-                                    {POStatusFilter.map(status => (
-                                        <option key={status} value={status}>{status}</option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-                        <Col xs="auto" lg="2">
-                            <Form.Group>
-                                <Form.Label>Factory Filter:</Form.Label>
-                                <Form.Select >
-                                    {factoryFilter.map(status => (
-                                        <option key={status} value={status}>{status}</option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                </Form>
-            </Row> */}
+
             <Row className='mb-4 mt-4 '>
-                <div style={{ overflow: 'auto', height: '320px' }}>
+                {/* <div style={{ overflow: 'auto', height: '320px' }}>
                     <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
                         <thead>
                             <tr className='table-headers'>
@@ -271,34 +305,7 @@ function POManagementSystem() {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* {orders.map(order => (
-                            <tr key={order.id}>
-                                <td className='text-center'>
-                                    {order.PONumber}
-                                </td>
-                                <td className='text-center'>{order.DateCreated}</td>
-                                <td className='text-center'>
-                                    {order.TotalQuantity}
-                                </td>
-                                <td className='text-center'>{order.RMB}</td>
-                                <td className='text-center'>{order.AED}</td>
-                                <td className={`text-center text-${order.status === 'Open' ? 'primary' : order.status === 'Checking with factory' ? 'success' : order.status === 'Closed' ? 'info' : ''}`} >{order.status}</td>
-                                <td className={`text-center text-${order.P_status === 'Paid' ? 'success' : order.P_status === 'Not Paid' ? 'danger' : ''}`}>{order.P_status}</td>
-                                <td className='text-center'>{order.Factory}</td>
-                                <td className='text-center d-flex  align-items-center  justify-content-around '>
-                                    <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                        <FaEye />
-                                    </Button>
-                                    <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                        <MdEdit />
-                                    </Button>
-                                    <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                        <MdDelete />
-                                    </Button>
-                                </td>
 
-                            </tr>
-                        ))} */}
                             {
                                 // console.log(orderList,'orderrrr')
                                 orderList?.map((order) => (
@@ -332,7 +339,174 @@ function POManagementSystem() {
                             }
                         </tbody>
                     </Table>
-                </div>
+                </div> */}
+            </Row>
+
+            <Row>
+                <Card >
+                    <Card.Body>
+                        <Tabs
+                            defaultActiveKey="home"
+                            id="fill-tab-example"
+                            className="mb-3"
+                            fill
+                        >
+                            {/* po */}
+                            <Tab eventKey="home" title="Order against PO">
+                                <div style={{ overflow: 'auto', height: '320px' }}>
+                                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
+                                        <thead>
+                                            <tr className='table-headers'>
+                                                {tableHeaders.map((header, index) => (
+                                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            {
+                                                // console.log(orderList,'orderrrr')
+                                                orderList?.map((order) => (
+                                                    <tr >
+                                                        <td>{order.po_id}</td>
+                                                        <td>{order.po_date}</td>
+                                                        <td>{order.total_quantity}</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>{order.po_status}</td>
+                                                        <td>{order.payment_status}</td>
+                                                        <td>{
+                                                            factories.find((factory) => factory.id === order.factory_id)
+                                                                ?.factory_name
+                                                        }</td>
+                                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
+                                                            <Link to={`/PO_details/${order.po_id}`}>
+                                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                    <FaEye />
+                                                                </Button>
+                                                            </Link>
+                                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                <MdEdit />
+                                                            </Button>
+                                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                <MdDelete />
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            }
+                                        </tbody>
+                                    </Table>
+                                </div>
+
+                                {/* <DataTable
+                                    columns={columns}
+                                    rows={orderList}
+                                    // page={page}
+                                    // pageSize={pageSize}
+                                    // totalPages={totalPages}
+                                    // handleChange={handleChange}
+                                /> */}
+                            </Tab>
+                            {/* MPO */}
+                            <Tab eventKey="profile" title="Manual PO">
+                                <div style={{ overflow: 'auto', height: '320px' }}>
+                                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
+                                        <thead>
+                                            <tr className='table-headers'>
+                                                {tableHeaders.map((header, index) => (
+                                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            {
+                                                // console.log(orderList,'orderrrr')
+                                                orderList?.map((order) => (
+                                                    <tr >
+                                                        <td>{order.po_id}</td>
+                                                        <td>{order.po_date}</td>
+                                                        <td>{order.total_quantity}</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>{order.po_status}</td>
+                                                        <td>{order.payment_status}</td>
+                                                        <td>{
+                                                            factories.find((factory) => factory.id === order.factory_id)
+                                                                ?.factory_name
+                                                        }</td>
+                                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
+                                                            <Link to={`/PO_details/${order.po_id}`}>
+                                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                    <FaEye />
+                                                                </Button>
+                                                            </Link>
+                                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                <MdEdit />
+                                                            </Button>
+                                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                <MdDelete />
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            }
+                                        </tbody>
+                                    </Table>
+                                </div>
+                            </Tab>
+                            {/* SPO */}
+                            <Tab eventKey="longer-tab" title="Scheduled PO">
+                                <div style={{ overflow: 'auto', height: '320px' }}>
+                                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
+                                        <thead>
+                                            <tr className='table-headers'>
+                                                {tableHeaders.map((header, index) => (
+                                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            {
+                                                // console.log(orderList,'orderrrr')
+                                                orderList?.map((order) => (
+                                                    <tr >
+                                                        <td>{order.po_id}</td>
+                                                        <td>{order.po_date}</td>
+                                                        <td>{order.total_quantity}</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>{order.po_status}</td>
+                                                        <td>{order.payment_status}</td>
+                                                        <td>{
+                                                            factories.find((factory) => factory.id === order.factory_id)
+                                                                ?.factory_name
+                                                        }</td>
+                                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
+                                                            <Link to={`/PO_details/${order.po_id}`}>
+                                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                    <FaEye />
+                                                                </Button>
+                                                            </Link>
+                                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                <MdEdit />
+                                                            </Button>
+                                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                                                <MdDelete />
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            }
+                                        </tbody>
+                                    </Table>
+                                </div>
+                            </Tab>
+                        </Tabs>
+                    </Card.Body>
+                </Card>
             </Row>
         </Container>
     )
