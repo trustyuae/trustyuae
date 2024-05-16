@@ -98,8 +98,8 @@ function OrderSystem() {
       renderCell: (value, row) => {
         return (
           <Link to={`/order_details/${value?.row?.order_id}`}>
-            <Button type="button" className="w-auto">
-              <FaEye />
+            <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5">
+              <FaEye className="mb-1" />
             </Button>
             <Typography
               variant="label"

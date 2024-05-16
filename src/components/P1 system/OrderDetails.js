@@ -518,7 +518,7 @@ function OrderDetails() {
                           md={12}
                           className={`d-flex align-items-center justify-content-center my-1`}
                         >
-                          <Card className="factory-card me-1 shadow-sm">
+                          <Card className="factory-card me-1 shadow-sm mb-0">
                             {userData?.user_id ==
                               orderDetails?.operation_user_id &&
                             orderProcess == "started" ? (
@@ -581,7 +581,7 @@ function OrderDetails() {
                               </Button>
                             )}
                           </Card>
-                          <Card className="factory-card ms-1 shadow-sm">
+                          <Card className="factory-card ms-1 shadow-sm mb-0">
                             {userData?.user_id ==
                               orderDetails?.operation_user_id &&
                             orderProcess == "started" ? (
