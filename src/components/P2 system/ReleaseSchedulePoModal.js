@@ -4,9 +4,7 @@ import { Button, Modal, Table } from "react-bootstrap";
 const ReleaseSchedulePoModal = ({
   handleCloseReleaseSchedulePoModal,
   showModal,
-  ordersNotAvailable,
-  checkedItems,
-  orderStatusMap
+  OrderNotAvailable,
 }) => {
   return (
     <div>
@@ -25,23 +23,23 @@ const ReleaseSchedulePoModal = ({
               </tr>
             </thead>
             <tbody>
-            {console.log(ordersNotAvailable,'ordersNotAvailableeeee')}
-              {ordersNotAvailable &&
-                ordersNotAvailable
-                  .filter((order) => checkedItems.includes(order.id))
-                  .map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.order_id}</td>
-                      <td>{item.product_name}</td>
-                      <td>{item.quantity}</td>
-                      <td>{orderStatusMap[item.order_id]}</td>
-                    </tr>
-                  ))}
+              {OrderNotAvailable &&
+                OrderNotAvailable.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.order_id}</td>
+                    <td>{item.product_name || "NA"}</td>
+                    <td>{item.quantity}</td>
+                    <td>{item.customer_status}</td>
+                  </tr>
+                ))}
             </tbody>
           </Table>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseReleaseSchedulePoModal}>
+          <Button
+            variant="secondary"
+            onClick={handleCloseReleaseSchedulePoModal}
+          >
             Close
           </Button>
         </Modal.Footer>
