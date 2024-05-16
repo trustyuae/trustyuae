@@ -15,8 +15,16 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import Swal from "sweetalert2";
 import DataTable from "../DataTable";
-import { Box, Tab, Typography } from "@mui/material";
+import { Box, ButtonBase, Checkbox, FormControlLabel, FormGroup, Tab, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
+import styled from "styled-components";
+
+const Img = styled('img')({
+    margin: 'auto',
+    display: 'block',
+    maxWidth: '100%',
+    maxHeight: '100%',
+});
 
 // import Box from '@mui/material/Box';
 // import Tab from '@mui/material/Tab';
@@ -41,7 +49,16 @@ function OrderManagementSystem() {
 
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(5);
+
+    const [pageMO, setPageMO] = useState(1);
+    const [totalPagesMO, setTotalPagesMO] = useState(1);
+    const [pageSizeMO, setPageSizeMO] = useState(5);
+
+    const [pageSO, setPageSO] = useState(1);
+    const [totalPagesSO, setTotalPagesSO] = useState(1);
+    const [pageSizeSO, setPageSizeSO] = useState(5);
+
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
@@ -65,33 +82,42 @@ function OrderManagementSystem() {
     const [estimatedTime, setEstimatedTime] = useState('')
     const [remainderDate, setRemainderDate] = useState('')
 
+
+
     const navigate = useNavigate();
 
-    const columns = [
+    // po ogainst order colum
+    const columns1 = [
         {
-            field: "",
-            headerName: "",
+            field: "select",
+            headerName: "Select",
             flex: 1,
-            type: "html",
-            renderCell: (value, row) => {
+            renderCell: (params) => {
                 return (
-                    // <Link to={`/order_details/${value?.row?.order_id}`}>
-                    //   <Button type="button" className="w-auto">
-                    //     View
-                    //   </Button>
-                    // </Link>
-                    <>
-                        <Form.Check
-                            type="checkbox"
-                            onChange={handleSelectAll}
-                            checked={selectedOrderIds.length === orders.length}
+                    <FormGroup>
+                        <FormControlLabel
+                            control={<Checkbox />}
+                            style={{ justifyContent: "center" }}
+                            checked={selectedOrderIds.includes(params.row.product_name)}
+                            // onChange={(event) => handleCheckboxChange(event, params.row)}
+                            onChange={(event) => handleOrderSelection(params.row.product_name)}
                         />
-                    </>
+                    </FormGroup>
                 );
             },
         },
-        { field: "product_names", headerName: "product names", flex: 1 },
-        { field: "variation_values", headerName: "variation values", flex: 1 },
+        { field: "product_name", headerName: "product names", flex: 1 },
+        {
+            field: "variation_value", headerName: "variation values", flex: 1,
+            renderCell: (params) => {
+                // console.log(params,'params');
+                return (
+
+                    variant(params.row.variation_value)
+
+                )
+            }
+        },
         {
             field: "product_images",
             headerName: "product images",
@@ -99,26 +125,183 @@ function OrderManagementSystem() {
             type: "html",
             renderCell: (value, row) => {
                 return (
-                    // <Link to={`/order_details/${value?.row?.order_id}`}>
-                    //   <Button type="button" className="w-auto">
-                    //     View
-                    //   </Button>
-                    // </Link>
                     <>
                         <img
-                            src={value.row.product_images}
-                            alt={value.row.product_names}
+                            src={value.row.product_image}
+                            alt={value.row.product_name}
                             className="img-fluid"
-                            width={90}
+                            width={100}
                         />
                     </>
                 );
             },
         },
         { field: "total_quantity", headerName: "total quantity", flex: 1 },
-        { field: "factory_id", headerName: "factory id", flex: 1 },
-        { field: "po_number", headerName: "po number", flex: 1 },
+        {
+            field: "factory_id", headerName: "factory Name", flex: 1,
+            renderCell: (prams) => {
+                return (
+
+                    factories.find((factory) => factory.id === prams.row.factory_id)
+                        ?.factory_name
+
+                )
+            }
+        },
     ];
+    //MPO
+    const columnsMPO = [
+        {
+            field: "select",
+            headerName: "Select",
+            flex: 1,
+            renderCell: (params) => {
+                return (
+                    <FormGroup>
+                        <FormControlLabel
+                            control={<Checkbox />}
+                            style={{ justifyContent: "center" }}
+                            checked={selectedManualOrderIds.includes(params.row.product_id)}
+                            onChange={() => handleOrderManualSelection(params.row.product_id)}
+                        />
+                    </FormGroup>
+                );
+            },
+        },
+        {
+            field: "factory_id", headerName: "factory Name", flex: 1,
+            renderCell: (prams) => {
+                return (
+                    factories.find((factory) => factory.id === prams.row.factory_id)
+                        ?.factory_name
+
+                )
+            }
+        },
+        { field: "product_name", headerName: "product names", flex: 1 },
+        {
+            field: "product_image",
+            headerName: "product images",
+            flex: 1,
+            type: "html",
+            renderCell: (value, row) => {
+                return (
+                    <>
+                        <img
+                            src={value.row.product_image}
+                            alt={value.row.product_name}
+                            className="img-fluid"
+                            width={100}
+                        />
+                        {/* <ButtonBase sx={{ width: 128, height: 128 }}>
+                            <Img alt={value.row.product_name} src={value.row.product_image} />
+                        </ButtonBase> */}
+                    </>
+                );
+            },
+        },
+        {
+            field: "variation_values", headerName: "variation values", flex: 1,
+            renderCell: (params) => {
+                if (params.row.variation_value == '') {
+                    return variant(params.row.variation_value)
+                } else {
+                    return ''
+                }
+            }
+        },
+        {
+            field: "Quantity", headerName: "Quantity", flex: 1, editable: true, type: 'number',
+
+        }
+    ]
+    const columnsSPO = [
+        {
+            field: "select",
+            headerName: "Select",
+            flex: 1,
+            renderCell: (params) => {
+                return (
+                    <FormGroup>
+                        <FormControlLabel
+                            control={<Checkbox />}
+                            style={{ justifyContent: "center" }}
+                            checked={selectedScheduleOrderIds.includes(params.row.product_id)}
+                            onChange={() => handleOrderScheduleSelection(params.row.product_id)}
+                        />
+                    </FormGroup>
+                );
+            },
+        },
+        {
+            field: "factory_id", headerName: "factory Name", flex: 1,
+            renderCell: (prams) => {
+                return (
+                    factories.find((factory) => factory.id === prams.row.factory_id)
+                        ?.factory_name
+
+                )
+            }
+        },
+        { field: "product_name", headerName: "product names", flex: 1 },
+        {
+            field: "product_image",
+            headerName: "product images",
+            flex: 1,
+            type: "html",
+            renderCell: (value, row) => {
+                return (
+                    <>
+                        <img
+                            src={value.row.product_image}
+                            alt={value.row.product_name}
+                            className="img-fluid"
+                            width={100}
+                        />
+                    </>
+                );
+            },
+        },
+        {
+            field: "variation_values", headerName: "variation values", flex: 1,
+            renderCell: (params) => {
+                if (params.row.variation_value == '') {
+                    return variant(params.row.variation_value)
+                } else {
+                    return ''
+                }
+            }
+        },
+        {
+            field: "Quantity", headerName: "Quantity", flex: 1, editable: true, type: 'number',
+
+        }
+    ]
+
+    const processRowUpdate = (newRow, i) => {
+        console.log(newRow, 'newRow====');
+        console.log(i, 'i====');
+        const updatedData = manualPOorders.map(item => {
+            if (item.product_id === newRow.product_id) {
+                return { ...item, Quantity: newRow.Quantity };
+            }
+            return item;
+        });
+        console.log(updatedData, 'updatedData====');
+        setManualPoOrders(updatedData)
+    };
+    const processRowUpdateSPO = (newRow, i) => {
+        console.log(newRow, 'newRow====');
+        console.log(i, 'i====');
+        const updatedData = scheduledPOorders.map(item => {
+            if (item.product_id === newRow.product_id) {
+                return { ...item, Quantity: newRow.Quantity };
+            }
+            return item;
+        });
+        console.log(updatedData, 'updatedData====');
+        setScheduleOrders(updatedData)
+    };
 
     useEffect(() => {
         fetchOrders();
@@ -127,32 +310,36 @@ function OrderManagementSystem() {
 
     const fetchOrders = async () => {
         try {
-            let apiUrl = `${API_URL}wp-json/custom-preorder-products/v1/pre-order/?`;
+            let apiUrl = `${API_URL}wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}`;
             if (endDate) apiUrl += `start_date=${startDate}&end_date=${endDate}`;
             if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
             const response = await axios.get(apiUrl);
             console.log(response, 'response.data');
-            setOrders(response.data.pre_orders);
-            let data = response.data.map((v, i) => ({ ...v, id: i }));
+            let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
+            setOrders(data);
             setOrders2(data);
-            const totalPagesHeader = response.headers.get("X-WP-TotalPages");
-            setTotalPages(totalPagesHeader ? parseInt(totalPagesHeader) : 1);
+            setTotalPages(response.data.total_pages);
+
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
     const manualPO = async () => {
         try {
-            let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
+            let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSizeMO}&page=${pageMO}`;
             if (selectedManualFactory) apiUrl += `&factory_id=${selectedManualFactory}`;
             if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
             const response = await axios.get(apiUrl);
             console.log(response.data, 'response.data===manual PO');
+            let data = response.data.products.map((v, i) => ({ ...v, id: i }));
+            setManualPoOrders(data)
+            setTotalPagesMO(response.data.total_pages);
+
             if (response.data.products) {
-                setManualPoOrders(response.data?.products)
+
             } else {
-                setManualPoOrders([])
+                setManualPoOrders(data)
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -160,14 +347,17 @@ function OrderManagementSystem() {
     }
     const scheduledPO = async () => {
         try {
-            let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
+            let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSizeSO}&page=${pageSO}`;
             if (selectedShedulFactory) apiUrl += `&factory_id=${selectedShedulFactory}`;
             if (scheduledProductF) apiUrl += `&product_name=${scheduledProductF}`;
 
             const response = await axios.get(apiUrl);
             console.log(response.data, 'response.data===manual PO');
+            let data = response.data.products.map((v, i) => ({ ...v, id: i }));
+
             if (response.data.products) {
-                setScheduleOrders(response.data.products)
+                setScheduleOrders(data)
+                setTotalPagesSO(response.data.total_pages)
             } else {
                 setScheduleOrders([])
             }
@@ -188,11 +378,11 @@ function OrderManagementSystem() {
 
     useEffect(() => {
         manualPO()
-    }, [selectedManualFactory, manualProductF])
+    }, [selectedManualFactory, manualProductF, pageMO, pageSizeMO])
 
     useEffect(() => {
         scheduledPO()
-    }, [selectedShedulFactory, scheduledProductF])
+    }, [selectedShedulFactory, scheduledProductF, pageSO, pageSizeSO])
 
 
     // single select
@@ -409,24 +599,24 @@ function OrderManagementSystem() {
             // setSelectedProductIds(JSON.stringify(payload));
             // setAlertMessage("");
 
-            try {
-                const response = await axios.post(
-                    `${API_URL}wp-json/custom-manual-order/v1/post-order-manual/`,
-                    payload // Send the payload object
-                );
-                console.log(response.data);
-                if (response.data) {
-                    Swal.fire({
-                        text: response.data,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            navigate("/PO_ManagementSystem");
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error("Error generating PO IDs:", error);
-            }
+            // try {
+            //     const response = await axios.post(
+            //         `${API_URL}wp-json/custom-manual-order/v1/post-order-manual/`,
+            //         payload // Send the payload object
+            //     );
+            //     console.log(response.data);
+            //     if (response.data) {
+            //         Swal.fire({
+            //             text: response.data,
+            //         }).then((result) => {
+            //             if (result.isConfirmed) {
+            //                 navigate("/PO_ManagementSystem");
+            //             }
+            //         });
+            //     }
+            // } catch (error) {
+            //     console.error("Error generating PO IDs:", error);
+            // }
         } else {
             setAlertMessage(
                 "Selected orders belong to different factories. Please select orders from the same factory."
@@ -535,6 +725,16 @@ function OrderManagementSystem() {
         console.log(scheduledPOorders, 'manualPOorders');
     }
 
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
+    const handleChangeMO = (event, value) => {
+        setPageMO(value);
+    };
+    const handleChangeSO = (event, value) => {
+        setPageSO(value);
+    };
+
     return (
         <Container
             fluid
@@ -613,7 +813,7 @@ function OrderManagementSystem() {
                                     </Row>
                                 </Form>
                             </Row>
-                            <Row className="mb-4 mt-4 ">
+                            {/* <Row className="mb-4 mt-4 ">
                                 <Table striped bordered hover>
                                     <thead>
                                         <tr>
@@ -664,7 +864,18 @@ function OrderManagementSystem() {
                                         ))}
                                     </tbody>
                                 </Table>
-                            </Row>
+                            </Row> */}
+                            <div className="mt-2">
+                                <DataTable
+                                    columns={columns1}
+                                    rows={orders}
+                                    page={page}
+                                    pageSize={pageSize}
+                                    totalPages={totalPages}
+                                    rowHeight={100}
+                                    handleChange={handleChange}
+                                />
+                            </div>
                             <Row className="mb-4 mt-4">
                                 <Form inline>
                                     <Row className="mt-4">
@@ -687,7 +898,9 @@ function OrderManagementSystem() {
                                     </Row>
                                 </Form>
                             </Row>
+
                         </div>
+
                         {/* manual PO Table */}
                         <div className="tab-pane fade" id="bordered-justified-profile" role="tabpanel" aria-labelledby="profile-tab">
                             <Row className="mb-4 mt-4">
@@ -721,7 +934,7 @@ function OrderManagementSystem() {
                                 </Form>
                             </Row>
                             <Row className="mb-4 mt-4 ">
-                                <Table striped bordered hover>
+                                {/* <Table striped bordered hover>
                                     <thead>
                                         <tr>
                                             <th>
@@ -773,7 +986,20 @@ function OrderManagementSystem() {
                                         )}
 
                                     </tbody>
-                                </Table>
+                                </Table> */}
+                                <div className="mt-2">
+                                    <DataTable
+                                        columns={columnsMPO}
+                                        rows={manualPOorders}
+                                        page={pageMO}
+                                        pageSize={pageSizeMO}
+                                        totalPages={totalPagesMO}
+                                        handleChange={handleChangeMO}
+                                        rowHeight={100}
+                                        // onCellEditStart={handleCellEditStart}
+                                        processRowUpdate={processRowUpdate}
+                                    />
+                                </div>
                             </Row>
                             <Row>
                                 <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
@@ -837,7 +1063,7 @@ function OrderManagementSystem() {
                                 </Form>
                             </Row>
                             <Row className="mb-4 mt-4 ">
-                                <Table striped bordered hover>
+                                {/* <Table striped bordered hover>
                                     <thead>
                                         <tr>
                                             <th>
@@ -899,7 +1125,20 @@ function OrderManagementSystem() {
 
                                         }
                                     </tbody>
-                                </Table>
+                                </Table> */}
+                                <div className="mt-2">
+                                    <DataTable
+                                        columns={columnsSPO}
+                                        rows={scheduledPOorders}
+                                        page={pageSO}
+                                        pageSize={pageSizeSO}
+                                        totalPages={totalPagesSO}
+                                        rowHeight={100}
+                                        handleChange={handleChangeSO}
+                                        // onCellEditStart={handleCellEditStart}
+                                        processRowUpdate={processRowUpdateSPO}
+                                    />
+                                </div>
                             </Row>
                             <Row>
                                 <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
