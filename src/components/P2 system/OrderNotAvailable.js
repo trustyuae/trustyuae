@@ -7,6 +7,7 @@ import DataTable from "../DataTable";
 import ReleaseSchedulePoModal from "./ReleaseSchedulePoModal";
 import {
   Avatar,
+  Box,
   Checkbox,
   FormControlLabel,
   FormGroup,
@@ -14,6 +15,8 @@ import {
   Select,
 } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
+import getFactoryNameById from "../../utils/GetFactoryName";
+import { Image } from "@material-ui/icons";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -25,6 +28,20 @@ function OrderNotAvailable() {
   const [selectedOrderNotAvailable, setSelectedOrderNotAvailable] = useState(
     []
   );
+
+  const FactoryNameColumn = ({ factoryId }) => {
+    const [factoryName, setFactoryName] = React.useState("");
+
+    React.useEffect(() => {
+      const fetchFactoryName = async () => {
+        const name = await getFactoryNameById(factoryId);
+        setFactoryName(name);
+      };
+      fetchFactoryName();
+    }, [factoryId]);
+
+    return <>{factoryName}</>;
+  };
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
@@ -71,17 +88,37 @@ function OrderNotAvailable() {
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "order_id", headerName: "Order ID", flex: 1 },
+    {
+      field: "factory_id",
+      headerName: "Factory Name",
+      flex: 1,
+      renderCell: (params) => <FactoryNameColumn factoryId={params.value} />,
+    },
     { field: "product_name", headerName: "Item Name", flex: 1 },
     {
       field: "product_image",
       headerName: "Image",
       flex: 1,
       renderCell: (params) => (
-        <Avatar
-          src={params.value}
-          alt="Product Image"
-          style={{ width: "100px", height: "100%", borderRadius: "8px" }}
-        />
+        <Box
+          className="h-100 w-100 d-flex align-items-center"
+        >
+          <Avatar
+            src={params.value}
+            alt="Product Image"
+            sx={{
+              height: "45px",
+              width: "45px",
+              borderRadius: "2px",
+              margin: "0 auto",
+              "& .MuiAvatar-img": {
+                height: "100%",
+                width: "100%",
+                borderRadius: "2px",
+              },
+            }}
+          />
+        </Box>
       ),
     },
     {
