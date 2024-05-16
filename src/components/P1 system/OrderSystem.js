@@ -45,7 +45,9 @@ function OrderSystem() {
     )
       .then((response) => {
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+        console.log(data,'data');
         setOrders(data);
+        console.log(orders,'orders');
         setTotalPages(response.data.total_pages);
       })
       .catch((error) => {

@@ -13,6 +13,7 @@ import Container from 'react-bootstrap/Container';
 import { useParams } from 'react-router-dom';
 import { API_URL } from '../../redux/constants/Constants';
 import axios from 'axios';
+import { Col } from 'react-bootstrap';
 
 
 
@@ -20,7 +21,10 @@ const PoDetails = () => {
     const { id } = useParams();
     const [PO_OrderList, setPO_OrderList] = useState([])
     const [data, setData] = useState(null);
-    const [paymentStatus,setPaymentStatus]=useState('')
+    const [paymentStatus, setPaymentStatus] = useState('Paid')
+    const paymentS = ['Paid', 'Unpaid', 'Hold', 'Cancelled']
+    const POStatusFilter = ['Open', 'Checking with factory', 'Closed'];
+    const [PoStatus, setPoStatus] = useState("open");
 
     const fetchOrder = async () => {
         let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`
@@ -118,8 +122,8 @@ const PoDetails = () => {
 
     const handleStatusChange = (index, event) => {
         console.log(index, event);
-        console.log(PO_OrderList.line_items[index].availability_status=event.target.value,'PO_OrderList');
-        console.log(PO_OrderList,'PO_OrderList========');
+        console.log(PO_OrderList.line_items[index].availability_status = event.target.value, 'PO_OrderList');
+        console.log(PO_OrderList, 'PO_OrderList========');
         // PO_OrderList?.availability_status[index]
         // Check if PO_OrderList and availability_status are defined and is an array
         // if (PO_OrderList && Array.isArray(PO_OrderList.availability_status)) {
@@ -134,47 +138,117 @@ const PoDetails = () => {
         // }
     };
 
-    const handleUpdate = async() => {
-        console.log(PO_OrderList,'PO_OrderList======');
-        console.log(PO_OrderList.line_items.map(item => item.product_id),'PO_OrderList.line_items.map(item => item.product_id)');
+    const handleUpdate = async () => {
+        console.log(PO_OrderList, 'PO_OrderList======');
+        console.log(PO_OrderList.line_items.map(item => item.product_id), 'PO_OrderList.line_items.map(item => item.product_id)');
         const updatedData = {
-          availability_status: PO_OrderList.line_items.map(item => item.availability_status),
-          product_ids: PO_OrderList.line_items.map(item => item.product_id),
-          order_ids: PO_OrderList.line_items.map(item => item.order_id),
-          payment_status: paymentStatus
+            availability_status: PO_OrderList.line_items.map(item => item.availability_status),
+            availability_quantity: PO_OrderList.line_items.map(item => item.available_quantity),
+            product_ids: PO_OrderList.line_items.map(item => item.product_id),
+            order_ids: PO_OrderList.line_items.map(item => item.order_id),
+            payment_status: paymentStatus,
+            po_status: PoStatus
         };
 
-        let apiUrl=`${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`
-        const response = await axios.post(apiUrl,updatedData
-        //     {
-        //   availability_status: PO_OrderList.line_items.map(item => item.availability_status),
-        //   product_ids: PO_OrderList.line_items.map(item => item.product_id),
-        //   order_ids: PO_OrderList.line_items.map(item => item.order_id),
-        //   payment_status: paymentStatus
-        // }
-    );
-        console.log(response,'response');
-        console.log(updatedData,'updatedData');
+        let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`
+        const response = await axios.post(apiUrl, updatedData
+            //     {
+            //   availability_status: PO_OrderList.line_items.map(item => item.availability_status),
+            //   product_ids: PO_OrderList.line_items.map(item => item.product_id),
+            //   order_ids: PO_OrderList.line_items.map(item => item.order_id),
+            //   payment_status: paymentStatus
+            // }
+        );
+        console.log(response, 'response');
+        console.log(updatedData, 'updatedData');
     }
 
-    const handlepayMentStatus=(e)=>{
+    const handlepayMentStatus = (e) => {
         setPaymentStatus(e.target.value)
     }
-
+    const handlePOStatus = (e) => {
+        setPoStatus(e.target.value)
+    }
+    const handleAvailableQtyChange = (index, event) => {
+        console.log(index, event);
+        console.log(PO_OrderList.line_items[index].available_quantity = event.target.value, 'PO_OrderList');
+        console.log(PO_OrderList, 'PO_OrderList========');
+        // PO_OrderList?.availability_status[index]
+        // Check if PO_OrderList and availability_status are defined and is an array
+        // if (PO_OrderList && Array.isArray(PO_OrderList.availability_status)) {
+        //     const newAvailabilityStatus = [...PO_OrderList.availability_status];
+        //     newAvailabilityStatus[index] = event.target.value;
+        //     setPO_OrderList(prevState => ({
+        //         ...prevState,
+        //         availability_status: newAvailabilityStatus
+        //     }));
+        // } else {
+        //     console.error("PO_OrderList or availability_status is not defined or not an array");
+       
+    }
     return (
         <Container fluid className='px-5' style={{ height: '100vh' }}>
             <h3 className='fw-bold text-center my-3'>PO Details</h3>
             <h6 className='fw-bold text-center'>XYZ Guangzhon</h6>
             <p className='text-center my-3'>PO Number: {PO_OrderList.po_id}</p>
-            <div className="d-flex justify-content-start align-items-center my-3">
-                <h6 className=''>Payment Status:</h6>
-                <select className="form-select w-25 ms-3" name="" id="" onChange={(e)=>handlepayMentStatus(e)}>
-                    <option value='Paid'>Paid</option>
-                    <option value='Unpaid'>Unpaid</option>
-                    <option value='Hold'>Hold</option>
-                    <option value='Cancelled'>Cancelled</option>
-                </select>
-            </div>
+            {/* <div className='d-flex'>
+                <div className="d-flex justify-content-start align-items-center my-3">
+                    <h6 className=''>Payment Status:</h6>
+                    <select className="form-select  ms-3" name="" id="" onChange={(e) => handlepayMentStatus(e)}>
+                        <option value='Paid'>Paid</option>
+                        <option value='Unpaid'>Unpaid</option>
+                        <option value='Hold'>Hold</option>
+                        <option value='Cancelled'>Cancelled</option>
+                    </select>
+                </div>
+                <div className="d-flex justify-content-start align-items-center my-3">
+                    <h6 className=''>Payment Status:</h6>
+                    <select className="form-select  ms-3" name="" id="" onChange={(e) => handlepayMentStatus(e)}>
+                        <option value='Paid'>Paid</option>
+                        <option value='Unpaid'>Unpaid</option>
+                        <option value='Hold'>Hold</option>
+                        <option value='Cancelled'>Cancelled</option>
+                    </select>
+                </div>
+            </div> */}
+            <Row className='mb-3'>
+                <Col xs="auto" lg="4">
+                    <Form.Group className="fw-semibold mb-0">
+                        <Form.Label>Payment Status:</Form.Label>
+                        <Form.Control
+                            as="select"
+                            className="mr-sm-2"
+                            // value={selectedFactory}
+                            onChange={(e) => handlepayMentStatus(e)}
+                        >
+                            {/* <option value="">All </option> */}
+                            {paymentS.map((po) => (
+                                <option key={po} value={po}>
+                                    {po}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+                <Col xs="auto" lg="4">
+                    <Form.Group className="fw-semibold mb-0">
+                        <Form.Label>PO Status:</Form.Label>
+                        <Form.Control
+                            as="select"
+                            className="mr-sm-2"
+                            // value={selectedFactory}
+                            onChange={handlePOStatus}
+                        >
+                            {/* <option value="">All </option> */}
+                            {POStatusFilter.map((po) => (
+                                <option key={po} value={po}>
+                                    {po}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+            </Row>
             <MDBRow className='d-flex justify-content-center align-items-center'>
                 <MDBCol col='10' md='12' sm='12'></MDBCol>
                 <div style={{ overflow: 'auto', height: '350px' }}>
@@ -193,13 +267,18 @@ const PoDetails = () => {
                                     <td className='text-center'><img src={rowData.image} style={{ width: '100px', height: '100px' }} alt={rowData.product_name} /></td>
                                     <td className='text-center'>{rowData.quantity}</td>
                                     <td className='text-center'>--</td>
-                                    <td className='text-center'>--</td>
-                                    <td className='text-center'>--</td>
+                                    <td className='text-center'>{rowData.total_price}</td>
+                                    <td className='text-center'>
+                                        <Form.Group className="fw-semibold mb-0">
+                                            {/* <Form.Label>Product Filter:</Form.Label> */}
+                                            <Form.Control type="text" placeholder="0"  onChange={(e) => handleAvailableQtyChange(rowIndex,e)} />
+                                        </Form.Group>
+                                    </td>
                                     <td>
                                         <Form.Group>
                                             <Form.Select style={{ height: '32px', padding: '0 10px' }}
                                                 onChange={(event) => handleStatusChange(rowIndex, event)}
-                                                // value={ PO_OrderList?.availability_status[rowIndex] }
+                                            // value={ PO_OrderList?.availability_status[rowIndex] }
                                             >
                                                 {availabilityStatus.map(status => (
                                                     <option key={status} value={status}>{status}</option>
@@ -215,9 +294,9 @@ const PoDetails = () => {
                             <tr>
                                 {/* <td colSpan={1}></td> */}
                                 <td colspan="2" className=' text-end'><strong>Total:</strong></td>
-                                <td className='text-center'>{totalQty}</td>
+                                <td className='text-center'>{PO_OrderList.total_count}</td>
                                 <td className='text-center'>{totalEstdCostRMB}</td>
-                                <td colspan="2">{totalEstdCostAED}</td>
+                                <td colspan="2">{PO_OrderList.total_cost}</td>
                             </tr>
                         </tfoot>
                     </Table>

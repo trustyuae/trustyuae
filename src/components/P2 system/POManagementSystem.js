@@ -77,6 +77,12 @@ function POManagementSystem() {
     const [scheduleorderList, setScheduleOrderList] = useState([]);
 
     const [PoStatus, setPoStatus] = useState("");
+    const [poType, setPOType] = useState('po')
+
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [totalPages, setTotalPages] = useState(1);
+
 
     const fetchFactories = async () => {
         try {
@@ -90,18 +96,31 @@ function POManagementSystem() {
     };
 
     const POM_system_products = async () => {
+        console.log(poType, 'poStatus');
         try {
-            let apiUrl = `${API_URL}wp-json/custom-po-management/v1/po-generated-order/?`
+            // let apiUrl = `${API_URL}wp-json/custom-po-management/v1/po-generated-order/?`
+            let apiUrl
+            if (poType == 'po') {
+                apiUrl = `${API_URL}wp-json/custom-po-management/v1/po-generated-order/?&per_page=${pageSize}&page=${page}
+                `
+            } else if (poType == 'mpo') {
+                apiUrl = `${API_URL}wp-json/custom-mo-management/v1/generated-mo-order/?&per_page=${pageSize}&page=${page}`
+            } else if (poType == 'spo') {
+                apiUrl = `${API_URL}wp-json/custom-so-management/v1/generated-so-order/?&per_page=${pageSize}&page=${page}`
+            }
+
             if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
             if (selectedFactory) apiUrl += `?&factory_id=${selectedFactory}`;
             if (PoStatus) apiUrl += `?&status=${PoStatus}`;
             const response = await axios.get(apiUrl);
 
             console.log(response.data, 'res===>>>>');
-        let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
+            let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
 
             // setOrderList(response.data.pre_orders)
             setOrderList(data)
+            setTotalPages(response.data.total_pages);
+
         } catch (error) {
             console.error("Error Products:", error);
         }
@@ -109,11 +128,12 @@ function POManagementSystem() {
 
     useEffect(() => {
         fetchFactories();
+        handleTabChange(poType)
     }, [])
 
     useEffect(() => {
         POM_system_products();
-    }, [endDate, selectedFactory, PoStatus])
+    }, [page, endDate, selectedFactory, PoStatus, poType])
 
     const handleDateChange = async (newDateRange) => {
         if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
@@ -158,11 +178,12 @@ function POManagementSystem() {
     }
 
     const columns = [
-        { field: "po_id", headerName: "PO Number", flex: 1 },
-        { field: "po_date", headerName: "Date created", flex: 1 },
-        { field: "total_quantity", headerName: "Total Quantity", flex: 1 },
-        { field: "total_quantity", headerName: "Estimated Cost(RMB)", flex: 1 },
-        { field: "total_quantity", headerName: "Estimated Cost(AED)", flex: 1 },
+        { field: "po_id", 
+        headerName: "PO \n Number", flex: 2 },
+        { field: "po_date", headerName: "Date created", flex: 2 },
+        { field: "total_quantity", headerName: "Total Quantity", flex: 3 },
+        { field: "", headerName: "Estimated Cost(RMB)", flex: 3 },
+        { field: "estimated_cost_aed", headerName: "Estimated Cost(AED)", flex: 3 },
         { field: "po_status", headerName: "Status", flex: 1 },
         { field: "payment_status", headerName: "Payment Status", flex: 1 },
         {
@@ -189,32 +210,52 @@ function POManagementSystem() {
         {
             field: "view_item",
             headerName: "View Item",
-            flex: 1,
+            flex: 2,
             type: "html",
             renderCell: (value, row) => {
                 return (
-                    <Link to={`/order_details/${value?.row?.order_id}`}>
-                        <Button type="button" className="w-auto">
-                            <FaEye />
+                    // <Link to={`/order_details/${value?.row?.order_id}`}>
+                    //     <Button type="button" className="w-auto">
+                    //         <FaEye />
+                    //     </Button>
+                    //     <Typography
+                    //         variant="label"
+                    //         className="fw-semibold text-secondary"
+                    //         sx={{
+                    //             fontSize: 14,
+                    //             textTransform: "capitalize",
+                    //         }}
+                    //     >
+                    //         {/* {"  "} */}
+                    //         <Badge bg="success" className="m-2">
+                    //             {value?.row?.order_process == 'started' ? (value?.row?.order_process) : null}
+                    //         </Badge>
+                    //     </Typography>
+                    // </Link>
+                    < div className='d-flex  align-items-center  justify-content-around'>
+                        <Link to={`/PO_details/${value.row.po_id}`}>
+                            <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                                <FaEye />
+                            </Button>
+                        </Link>
+                        <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                            <MdDelete />
                         </Button>
-                        <Typography
-                            variant="label"
-                            className="fw-semibold text-secondary"
-                            sx={{
-                                fontSize: 14,
-                                textTransform: "capitalize",
-                            }}
-                        >
-                            {/* {"  "} */}
-                            <Badge bg="success" className="m-2">
-                                {value?.row?.order_process == 'started' ? (value?.row?.order_process) : null}
-                            </Badge>
-                        </Typography>
-                    </Link>
+                    </div>
                 );
             },
         },
     ];
+
+    const handleTabChange = (e) => {
+        console.log(e);
+        setPOType(e)
+        setPage(1);
+    }
+
+    const handleChange = (event, value) => {
+        setPage(value);
+    };
 
     return (
         <Container fluid className='p-5' style={{ height: '98vh', maxHeight: "100%", minHeight: "100vh" }}>
@@ -346,14 +387,15 @@ function POManagementSystem() {
                 <Card >
                     <Card.Body>
                         <Tabs
-                            defaultActiveKey="home"
+                            defaultActiveKey="po"
                             id="fill-tab-example"
                             className="mb-3"
                             fill
+                            onSelect={(key) => handleTabChange(key)}
                         >
                             {/* po */}
-                            <Tab eventKey="home" title="Order against PO">
-                                <div style={{ overflow: 'auto', height: '320px' }}>
+                            <Tab eventKey="po" title="Order against PO" >
+                                {/* <div style={{ overflow: 'auto', height: '320px' }}>
                                     <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
                                         <thead>
                                             <tr className='table-headers'>
@@ -397,20 +439,20 @@ function POManagementSystem() {
                                             }
                                         </tbody>
                                     </Table>
-                                </div>
+                                </div> */}
 
-                                {/* <DataTable
+                                <DataTable
                                     columns={columns}
                                     rows={orderList}
-                                    // page={page}
-                                    // pageSize={pageSize}
-                                    // totalPages={totalPages}
-                                    // handleChange={handleChange}
-                                /> */}
+                                    page={page}
+                                    pageSize={pageSize}
+                                    totalPages={totalPages}
+                                    handleChange={handleChange}
+                                />
                             </Tab>
                             {/* MPO */}
-                            <Tab eventKey="profile" title="Manual PO">
-                                <div style={{ overflow: 'auto', height: '320px' }}>
+                            <Tab eventKey="mpo" title="Manual PO" >
+                                {/* <div style={{ overflow: 'auto', height: '320px' }}>
                                     <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
                                         <thead>
                                             <tr className='table-headers'>
@@ -454,11 +496,19 @@ function POManagementSystem() {
                                             }
                                         </tbody>
                                     </Table>
-                                </div>
+                                </div> */}
+                                <DataTable
+                                    columns={columns}
+                                    rows={orderList}
+                                    page={page}
+                                    pageSize={pageSize}
+                                    totalPages={totalPages}
+                                    handleChange={handleChange}
+                                />
                             </Tab>
                             {/* SPO */}
-                            <Tab eventKey="longer-tab" title="Scheduled PO">
-                                <div style={{ overflow: 'auto', height: '320px' }}>
+                            <Tab eventKey="spo" title="Scheduled PO">
+                                {/* <div style={{ overflow: 'auto', height: '320px' }}>
                                     <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
                                         <thead>
                                             <tr className='table-headers'>
@@ -502,7 +552,15 @@ function POManagementSystem() {
                                             }
                                         </tbody>
                                     </Table>
-                                </div>
+                                </div> */}
+                                <DataTable
+                                    columns={columns}
+                                    rows={orderList}
+                                    page={page}
+                                    pageSize={pageSize}
+                                    totalPages={totalPages}
+                                    handleChange={handleChange}
+                                />
                             </Tab>
                         </Tabs>
                     </Card.Body>
