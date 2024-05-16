@@ -35,6 +35,7 @@ function OrderManagementSystem() {
     const [orders2, setOrders2] = useState([]);
 
     const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+    const [selectedOrderIdss, setSelectedOrderIdss] = useState([]);
     const [selectedManualOrderIds, setSelectedManualOrderIds] = useState([]);
     const [selectedScheduleOrderIds, setSelectedScheduleOrderIds] = useState([]);
 
@@ -193,19 +194,36 @@ function OrderManagementSystem() {
         scheduledPO()
     }, [selectedShedulFactory, scheduledProductF])
 
-    
+
     // single select
     const handleOrderSelection = (orderId) => {
+        // let id = orders.map((name)=>name.)
+        const filteredOrders = orders.filter(order => order.product_name === orderId);
+
+        // Map through the filtered orders to extract the order_ids
+        const orderIds = filteredOrders.map(order => order.order_ids);
+        console.log(orderIds);
+
         const selectedIndex = selectedOrderIds.indexOf(orderId);
+        const selectedIndexs = selectedOrderIdss.indexOf(...orderIds);
+        console.log(selectedOrderIdss, 'selectedOrderIds');
+        console.log(selectedIndexs, 'selectedIndexs');
         let newSelected = [];
+        let newSelected2 = [];
 
         if (selectedIndex === -1) {
             newSelected = [...selectedOrderIds, orderId];
+            newSelected2 = [...selectedOrderIdss, ...orderIds];
         } else {
             newSelected = selectedOrderIds.filter((id) => id !== orderId);
+            // newSelected = selectedOrderIds.filter((id) => id !== orderId);
         }
+        console.log(newSelected2, 'newSelected2');
+        const flattenedData = newSelected2.flatMap(str => str.split(','));
+        console.log(flattenedData, 'flattenedData');
 
         setSelectedOrderIds(newSelected);
+        setSelectedOrderIdss(flattenedData);
     };
     const handleOrderManualSelection = (orderId) => {
         const selectedIndex = selectedManualOrderIds.indexOf(orderId);
@@ -234,9 +252,21 @@ function OrderManagementSystem() {
 
     // select all
     const handleSelectAll = () => {
-        const allOrderIds = orders.map((order) => order.order_id);
+        const allOrderIds = orders.map((order) => order.product_name);
+        console.log(allOrderIds, 'allOrderIds');
+        const allOrderIdss = [];
+        allOrderIds.forEach(productName => {
+            const orderIds = getOrderIdsByProductName(orders, productName);
+            allOrderIdss.push(...orderIds);
+        });
+        console.log(allOrderIdss, 'allOrderIds');
+        const flattenedData = allOrderIdss.flatMap(str => str.split(','));
+        console.log(flattenedData, 'flattenedData');
         setSelectedOrderIds(
             selectedOrderIds.length === allOrderIds.length ? [] : allOrderIds
+        );
+        setSelectedOrderIdss(
+            selectedOrderIdss.length === flattenedData.length ? [] : flattenedData
         );
     };
     const handleSelectAllManual = () => {
@@ -253,6 +283,16 @@ function OrderManagementSystem() {
             selectedScheduleOrderIds.length === allOrderIds.length ? [] : allOrderIds
         );
     };
+
+    function getOrderIdsByProductName(data, productName) {
+        // Filter the data based on the product name
+        const filteredOrders = data.filter(order => order.product_name === productName);
+
+        // Map through the filtered orders to extract the order_ids
+        const orderIds = filteredOrders.map(order => order.order_ids);
+
+        return orderIds;
+    }
 
     // filters
     const handleDateChange = async (newDateRange) => {
@@ -290,21 +330,21 @@ function OrderManagementSystem() {
     const handleFactoryChange = (e) => {
         setSelectedFactory(e.target.value);
     };
-    
+
 
     // PO Generate
     const handleGeneratePO = async () => {
         const selectedOrders = orders.filter((order) =>
-            selectedOrderIds.includes(order.order_id)
+            selectedOrderIds.includes(order.product_name)
         );
-
+        console.log(selectedOrders, 'selectedOrders');
         // Extract unique factory IDs from selected orders
         const factoryIds = [...new Set(selectedOrders.map((order) => order.factory_id))];
 
         if (factoryIds.length === 1) {
             // Concatenate selected product IDs and order IDs
-            const selectedProductIds = selectedOrders.map((order) => order.item_ids).join(",");
-            const selectedOrderIdsStr = selectedOrderIds.join(",");
+            const selectedProductIds = selectedOrders.map((order) => order.item_id).join(",");
+            const selectedOrderIdsStr = selectedOrderIdss.join(",");
 
             // Construct the payload object
             const payload = {
@@ -450,7 +490,7 @@ function OrderManagementSystem() {
     };
 
 
-   
+
     // variant
     const variant = (e) => {
         const matches = e.match(/"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/g);
@@ -597,8 +637,8 @@ function OrderManagementSystem() {
                                                 <td>
                                                     <Form.Check
                                                         type="checkbox"
-                                                        checked={selectedOrderIds.includes(order.order_id)}
-                                                        onChange={() => handleOrderSelection(order.order_id)}
+                                                        checked={selectedOrderIds.includes(order.product_name)}
+                                                        onChange={() => handleOrderSelection(order.product_name)}
                                                     />
                                                 </td>
                                                 <td className="text-center">{order.product_name}</td>
