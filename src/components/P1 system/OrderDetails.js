@@ -560,7 +560,26 @@ function OrderDetails() {
                                   }
                                 />
                               </Button>
-                            ) : null}
+                            ) : (
+                              <Button
+                                className="bg-transparent border-0  text-black"
+                                disabled
+                                onClick={() => fileInputRef.current.click()}
+                              >
+                                <CloudUploadIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Device
+                                </Typography>
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  style={{ display: "none" }}
+                                  onChange={(e) =>
+                                    handleFileInputChange(e, product.item_id)
+                                  }
+                                />
+                              </Button>
+                            )}
                           </Card>
                           <Card className="factory-card ms-1 shadow-sm">
                             {userData?.user_id ==
@@ -594,7 +613,21 @@ function OrderDetails() {
                                   Camera
                                 </Typography>
                               </Button>
-                            ) : null}
+                            ) : (
+                              <Button
+                                className="bg-transparent border-0 text-black"
+                                disabled
+                                onClick={() => {
+                                  setShowAttachModal(true);
+                                  setSelectedItemId(product.item_id);
+                                }}
+                              >
+                                <CameraAltIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Camera
+                                </Typography>
+                              </Button>
+                            )}
                           </Card>
                         </Col>
                       </Row>
@@ -624,7 +657,15 @@ function OrderDetails() {
               >
                 Finish
               </Button>
-            ) : null}
+            ) : (
+              <Button
+                variant="danger"
+                disabled
+                onClick={handleFinishButtonClick}
+              >
+                Finish
+              </Button>
+            )}
           </MDBCol>
         </MDBRow>
 
