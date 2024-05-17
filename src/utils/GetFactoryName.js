@@ -1,13 +1,12 @@
 import { API_URL } from "../redux/constants/Constants";
 import axios from "axios";
 
-const getFactoryNameById = async (factoryId) => {
+const getFactoryNameById = async (factory_id) => {
   try {
     const response = await axios.get(
-      `${API_URL}wp-json/custom-factory/v1/fetch-factories`
+      `${API_URL}wp-json/custom-factory-fetch/v1/fetch-factory/${factory_id}`
     );
-    const factories = response.data;
-    const factory = factories.find((factory) => factory.id === factoryId);
+    const factory = response.data;
     return factory ? factory.factory_name : "Factory Not Found";
   } catch (error) {
     console.error("Error fetching factories:", error);

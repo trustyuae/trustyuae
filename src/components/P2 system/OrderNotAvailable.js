@@ -15,7 +15,8 @@ import {
   Select,
 } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
-import getFactoryNameById from "../../utils/GetFactoryName";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -27,19 +28,19 @@ function OrderNotAvailable() {
   const [selectedOrderNotAvailable, setSelectedOrderNotAvailable] = useState(
     []
   );
+  const [factories, setFactories] = useState([]);
+  const [checkBox, setCheckBox] = useState(false);
 
-  const FactoryNameColumn = ({ factoryId }) => {
-    const [factoryName, setFactoryName] = React.useState("");
-
-    React.useEffect(() => {
-      const fetchFactoryName = async () => {
-        const name = await getFactoryNameById(factoryId);
-        setFactoryName(name);
-      };
-      fetchFactoryName();
-    }, [factoryId]);
-
-    return <>{factoryName}</>;
+  console.log(selectedOrderNotAvailable, "selectedOrderNotAvailable");
+  const fetchFactories = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}wp-json/custom-factory/v1/fetch-factories/`
+      );
+      setFactories(response.data);
+    } catch (error) {
+      console.error("Error fetching factories:", error);
+    }
   };
 
   const handleStatusChange = (event, itemData) => {
@@ -48,21 +49,33 @@ function OrderNotAvailable() {
       if (order.id === itemData.id) order.customer_status = value;
     });
   };
-  console.log(OrderNotAvailable, "OrderNotAvailable");
 
   const handleCheckboxChange = (e, rowData) => {
-    const index = selectedOrderNotAvailable?.findIndex(
-      (order) => order?.id == rowData.id
-    );
-    if (index === -1 && e.target.checked) {
-      setSelectedOrderNotAvailable((prevSelectedOrders) => [
-        ...prevSelectedOrders,
-        rowData,
-      ]);
-    } else if (index !== -1 && !e.target.checked) {
-      const updatedSelectedOrders = [...selectedOrderNotAvailable];
-      updatedSelectedOrders.splice(index, 1);
-      setSelectedOrderNotAvailable(updatedSelectedOrders);
+    if (!rowData.customer_status) {
+      Swal.fire({
+        icon: "error",
+        title:
+          "please confirm your customer status first!",
+      });
+    } else {
+      rowData.isSelected = true;
+      setCheckBox(true);
+      const index = selectedOrderNotAvailable?.findIndex(
+        (order) => order?.id == rowData.id
+      );
+      if (index === -1 && e.target.checked) {
+        ordersNotAvailableData[rowData.id].isSelected = true;
+        setSelectedOrderNotAvailable((prevSelectedOrders) => [
+          ...prevSelectedOrders,
+          rowData,
+        ]);
+      } else if (index !== -1 && !e.target.checked) {
+        ordersNotAvailableData[rowData.id].isSelected = false;
+        setCheckBox(false);
+        const updatedSelectedOrders = [...selectedOrderNotAvailable];
+        updatedSelectedOrders.splice(index, 1);
+        setSelectedOrderNotAvailable(updatedSelectedOrders);
+      }
     }
   };
 
@@ -75,7 +88,11 @@ function OrderNotAvailable() {
       })
     )
       .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+        let data = response.data.orders.map((v, i) => ({
+          ...v,
+          id: i,
+          isSelected: false,
+        }));
         setOrdersNotAvailableData(data);
         setTotalPages(response.data.total_pages);
       })
@@ -84,6 +101,54 @@ function OrderNotAvailable() {
       });
   }
 
+  const handleGenerateSchedulePo = () => {
+    const customerStatus = selectedOrderNotAvailable.filter(
+      (order) => order.customer_status === "Confirmed"
+    );
+
+    const estimatedTime = selectedOrderNotAvailable.map(
+      (order) => order.estimated_production_time
+    );
+
+    const factoryNames = selectedOrderNotAvailable.map(
+      (order) => order.factory_id
+    );
+
+    if (!checkBox) {
+      Swal.fire({
+        icon: "error",
+        title: "please select products for generating schedule po",
+      })
+    } else if (customerStatus.length < selectedOrderNotAvailable.length) {
+      Swal.fire({
+        icon: "error",
+        title: "Only for confirmed items we can raise the scheduled PO!",
+      })
+    } else if (new Set(estimatedTime).size !== 1) {
+      Swal.fire({
+        icon: "error",
+        title:
+          "Estimated production time should be the same for all selected items!",
+      })
+    } else if (new Set(factoryNames).size !== 1) {
+      Swal.fire({
+        icon: "error",
+        title: "Factory name should be the same for all selected items!",
+      })
+    } else {
+      setShowModal(true);
+    }
+  };
+
+  const handleModalClose = () => {
+    ordersNotAvailableData.forEach((order) => {
+      order.isSelected = false;
+      order.customer_status = "";
+    });
+    setShowModal(false);
+    setSelectedOrderNotAvailable([]);
+  };
+
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "order_id", headerName: "Order ID", flex: 1 },
@@ -91,7 +156,10 @@ function OrderNotAvailable() {
       field: "factory_id",
       headerName: "Factory Name",
       flex: 1,
-      renderCell: (params) => <FactoryNameColumn factoryId={params.value} />,
+      renderCell: (params) => {
+        return factories.find((factory) => factory.id === params.row.factory_id)
+          ?.factory_name;
+      },
     },
     { field: "product_name", headerName: "Item Name", flex: 1 },
     {
@@ -99,9 +167,7 @@ function OrderNotAvailable() {
       headerName: "Image",
       flex: 1,
       renderCell: (params) => (
-        <Box
-          className="h-100 w-100 d-flex align-items-center"
-        >
+        <Box className="h-100 w-100 d-flex align-items-center">
           <Avatar
             src={params.value}
             alt="Product Image"
@@ -149,6 +215,7 @@ function OrderNotAvailable() {
             fullWidth
             style={{ height: "60%", width: "100%" }}
           >
+            <MenuItem value={""}></MenuItem>
             {["Confirmed", "NotConfirmed", "Exchange", "Refund"].map(
               (status) => (
                 <MenuItem key={status} value={status}>
@@ -168,6 +235,7 @@ function OrderNotAvailable() {
         return (
           <FormGroup>
             <FormControlLabel
+              checked={params.row.isSelected}
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               onChange={(event) => handleCheckboxChange(event, params.row)}
@@ -183,6 +251,10 @@ function OrderNotAvailable() {
   };
 
   useEffect(() => {
+    fetchFactories();
+  }, []);
+
+  useEffect(() => {
     fetchOrdersNotAvailableData();
   }, [pageSize, page]);
 
@@ -193,7 +265,7 @@ function OrderNotAvailable() {
         <Button
           variant="primary w-25 h4"
           className="fw-semibold"
-          onClick={() => setShowModal(true)}
+          onClick={handleGenerateSchedulePo}
         >
           Release Scheduled PO
         </Button>
@@ -210,7 +282,7 @@ function OrderNotAvailable() {
       </div>
       <ReleaseSchedulePoModal
         show={showModal}
-        handleCloseReleaseSchedulePoModal={() => setShowModal(false)}
+        handleCloseReleaseSchedulePoModal={handleModalClose}
         showModal={showModal}
         OrderNotAvailable={selectedOrderNotAvailable}
       />
