@@ -10,10 +10,13 @@ import Row from 'react-bootstrap/Row';
 // import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
-import { useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { API_URL } from '../../redux/constants/Constants';
 import axios from 'axios';
-import { Col } from 'react-bootstrap';
+import { Card, Col } from 'react-bootstrap';
+import DataTable from '../DataTable';
+import { Box, MenuItem, Select, Typography } from '@mui/material';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 
 
@@ -25,17 +28,28 @@ const PoDetails = () => {
     const paymentS = ['Paid', 'Unpaid', 'Hold', 'Cancelled']
     const POStatusFilter = ['Open', 'Checking with factory', 'Closed'];
     const [PoStatus, setPoStatus] = useState("open");
+    const navigate = useNavigate();
 
     const fetchOrder = async () => {
         let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`
         const response = await axios.get(apiUrl);
         // console.log(response.data, 'response');
-        setPO_OrderList(response.data)
+        let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
+         data = data.map((v, i) => ({ ...v, dispatch_status : 'Dispatched' }));
+        console.log(data, 'data======');
+        const row = [
+            ...data,
+            // { id: 'SUBTOTAL', label: 'Subtotal', subtotal: 624 },
+            { id: 'TAX', label: 'Total:', taxRate: response.data.total_count, taxTotal: 8100,totals:response.data.total_cost },
+            // { id: 'TOTAL', label: 'Total', total: 686.4 },
+        ]
+        console.log(row, 'data======');
+
+        setPO_OrderList(row)
         setData(response.data.line_items)
     }
 
     useEffect(() => {
-        console.log('PO_OrderList:', PO_OrderList);
         fetchOrder()
     }, [])
     const tableHeaders = [
@@ -109,6 +123,7 @@ const PoDetails = () => {
     const totalEstdCostRMB = PODetails.reduce((acc, cur) => acc + (cur.qtyOrdered * cur.estimatedCostRMB), 0);
     const totalEstdCostAED = PODetails.reduce((acc, cur) => acc + (cur.qtyOrdered * cur.estimatedCostAED), 0);
     const availabilityStatus = ['Confirmed', '1 week', '2 week', '3 weeks', '1 month', 'Out of Stock'];
+    const dispatchedStatus = ['Dispatched', 'Not Dispatched'];
 
     // const handleStatusChange = (index, event) => {
     //     const newAvailabilityStatus = [...PO_OrderList.availability_status];
@@ -121,9 +136,17 @@ const PoDetails = () => {
     // };
 
     const handleStatusChange = (index, event) => {
-        console.log(index, event);
-        console.log(PO_OrderList.line_items[index].availability_status = event.target.value, 'PO_OrderList');
-        console.log(PO_OrderList, 'PO_OrderList========');
+        console.log(index.target, event);
+        const updatedData = PO_OrderList.map(item => {
+            if (item.product_id === event.product_id) {
+                return { ...item, availability_status: index.target.value };
+            }
+            return item;
+        });
+        console.log(updatedData, 'updatedData====');
+        setPO_OrderList(updatedData)
+        // console.log(PO_OrderList.line_items[index].availability_status = event.target.value, 'PO_OrderList');
+        // console.log(PO_OrderList, 'PO_OrderList========');
         // PO_OrderList?.availability_status[index]
         // Check if PO_OrderList and availability_status are defined and is an array
         // if (PO_OrderList && Array.isArray(PO_OrderList.availability_status)) {
@@ -136,6 +159,18 @@ const PoDetails = () => {
         // } else {
         //     console.error("PO_OrderList or availability_status is not defined or not an array");
         // }
+    };
+    const handleDispatchStatusChange = (index, event) => {
+        console.log(index.target, event);
+        const updatedData = PO_OrderList.map(item => {
+            if (item.product_id === event.product_id) {
+                return { ...item, dispatch_status: index.target.value };
+            }
+            return item;
+        });
+        console.log(updatedData, 'updatedData====');
+        setPO_OrderList(updatedData)
+       
     };
 
     const handleUpdate = async () => {
@@ -169,28 +204,268 @@ const PoDetails = () => {
     const handlePOStatus = (e) => {
         setPoStatus(e.target.value)
     }
+    // const handleAvailableQtyChange = (index, event) => {
+    //     console.log(index.row, event.target.value);
+    //     console.log(PO_OrderList[index.row.id].available_quantity = event.target.value, 'PO_OrderList');
+    //     // console.log(PO_OrderList, 'PO_OrderList========');
+    //     // PO_OrderList?.availability_status[index]
+    //     // Check if PO_OrderList and availability_status are defined and is an array
+    //     // if (PO_OrderList && Array.isArray(PO_OrderList.availability_status)) {
+    //     //     const newAvailabilityStatus = [...PO_OrderList.availability_status];
+    //     //     newAvailabilityStatus[index] = event.target.value;
+    //     //     setPO_OrderList(prevState => ({
+    //     //         ...prevState,
+    //     //         availability_status: newAvailabilityStatus
+    //     //     }));
+    //     // } else {
+    //     //     console.error("PO_OrderList or availability_status is not defined or not an array");
+
+    // }
+
     const handleAvailableQtyChange = (index, event) => {
-        console.log(index, event);
-        console.log(PO_OrderList.line_items[index].available_quantity = event.target.value, 'PO_OrderList');
-        console.log(PO_OrderList, 'PO_OrderList========');
-        // PO_OrderList?.availability_status[index]
-        // Check if PO_OrderList and availability_status are defined and is an array
-        // if (PO_OrderList && Array.isArray(PO_OrderList.availability_status)) {
-        //     const newAvailabilityStatus = [...PO_OrderList.availability_status];
-        //     newAvailabilityStatus[index] = event.target.value;
-        //     setPO_OrderList(prevState => ({
-        //         ...prevState,
-        //         availability_status: newAvailabilityStatus
-        //     }));
-        // } else {
-        //     console.error("PO_OrderList or availability_status is not defined or not an array");
+        console.log(index.target, event);
+        const updatedData = PO_OrderList.map(item => {
+            if (item.product_id === event.product_id) {
+                return { ...item, available_quantity: index.target.value };
+            }
+            return item;
+        });
+        console.log(updatedData, 'updatedData====');
+        setPO_OrderList(updatedData)
        
-    }
+    };
+
+    const columns = [
+        {
+            field: "product_name",
+            headerName: "Product Name", flex: 2,
+            colSpan: (value, row) => {
+                // if (row.id === 'SUBTOTAL' || row.id === 'TOTAL') {
+                //   return 3;
+                // }
+                if (row.id === 'TAX') {
+                  return 2;
+                }
+                return undefined;
+              },
+              valueGetter: (value, row) => {
+                if ( row.id === 'TAX' ) {
+                  return row.label;
+                }
+                return value;
+              },
+        },
+        {
+            field: "image",
+            headerName: "product images",
+            flex: 2,
+            type: "html",
+            renderCell: (value, row) => {
+                return (
+                    <>
+                        <img
+                            src={value.row.image}
+                            alt={value.row.product_name}
+                            className="img-fluid"
+                            width={100}
+                        />
+                    </>
+                );
+            },
+        },
+        { field: "quantity", headerName: "Qty Ordered", flex: 2 ,
+        valueGetter: (value, row) => {
+            if (row.id === 'TAX') {
+              return `${row.taxRate}`;
+            }
+            return value;
+          },
+        },
+        { field: "", headerName: "Estimated Cost(RMB)", flex: 3 ,
+        valueGetter: (value, row) => {
+            // if (row.id === 'SUBTOTAL') {
+            //   return row.subtotal;
+            // }
+            if (row.id === 'TAX') {
+              return row.taxTotal;
+            }
+            // if (row.id === 'TOTAL') {
+            //   return row.total;
+            // }
+            return value;
+          },
+      
+        },
+        { field: "total_price", headerName: "Estimated Cost(AED)", flex: 3 ,
+        colSpan: (value, row) => {
+            
+            if (row.id === 'TAX') {
+              return 4;
+            }
+            return undefined;
+          },
+        valueGetter: (value, row) => {
+            if (row.id === 'TAX') {
+              return `${row.totals}`;
+            }
+            return value;
+          },
+        },
+        {
+            field: "available_quantity", headerName: "Available Qty", flex: 3,
+            renderCell: (params) => {
+                return (
+                    <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+                        
+                        <Form.Control style={{ justifyContent: "center" }} type="number" value={params.row.available_quantity} placeholder="0" onChange={(e) => handleAvailableQtyChange(e,params.row)} />
+                    </Form.Group>
+                )
+            }
+        },
+
+        {
+            field: "availability_status",
+            headerName: "Availability Status",
+            flex: 3,
+            renderCell: (params) => {
+                return (
+                    <Select
+                        labelId={`customer-status-${params.row.id}-label`}
+                        id={`customer-status-${params.row.id}`}
+                        value={params.row.availability_status}
+                        onChange={(event) => handleStatusChange(event, params.row)}
+                        fullWidth
+                        style={{ height: "40%", width: "100%" }}
+                    // className="fw-semibold d-flex align-items-center justify-content-center h-100"
+                    >
+                        {availabilityStatus.map(
+                            (status) => (
+                                <MenuItem key={status} value={status}>
+                                    {status}
+                                </MenuItem>
+                            )
+                        )}
+                    </Select>
+                );
+            },
+        },
+        // { field: "---", headerName: "Dispatch Status", flex: 3 },
+        
+        {
+            field: "dispatch_status",
+            headerName: "Dispatch Status",
+            flex: 3,
+            renderCell: (params) => {
+                return (
+                    <Select
+                        labelId={`customer-status-${params.row.id}-label`}
+                        id={`customer-status-${params.row.id}`}
+                        value={params.row.dispatch_status}
+                        onChange={(event) => handleDispatchStatusChange(event, params.row)}
+                        fullWidth
+                        style={{ height: "40%", width: "100%" }}
+                    // className="fw-semibold d-flex align-items-center justify-content-center h-100"
+                    >
+                        {dispatchedStatus.map(
+                            (status) => (
+                                <MenuItem key={status} value={status}>
+                                    {status}
+                                </MenuItem>
+                            )
+                        )}
+                    </Select>
+                );
+            },
+        },
+
+    ];
+    const handalBackButton = () => {
+        navigate("/PO_ManagementSystem");
+    };
     return (
         <Container fluid className='px-5' style={{ height: '100vh' }}>
-            <h3 className='fw-bold text-center my-3'>PO Details</h3>
+            <MDBRow className="my-3">
+                <MDBCol
+                    md="5"
+                    className="d-flex justify-content-start align-items-center"
+                >
+                    <Button
+                        variant="outline-secondary"
+                        className="p-1 me-2 bg-transparent text-secondary"
+                        onClick={handalBackButton}
+                    >
+                        <ArrowBackIcon className="me-1" />
+                    </Button>
+                    <Box></Box>
+                </MDBCol>
+            </MDBRow>
+            <Card className="p-3 mb-3">
+                <Box className="d-flex align-items-center justify-content-between">
+                    <Box>
+                        <Typography variant="h6" className="fw-bold mb-3">
+                            PO Details
+                        </Typography>
+                        <Box>
+                            <Typography className="fw-bold">PO Number# {id}</Typography>
+                        </Box>
+                        <Typography
+                            className=""
+                            sx={{
+                                fontSize: 14,
+                            }}
+                        >
+                            {/* <Badge bg="success">{orderDetails?.order_status}</Badge> */}
+                        </Typography>
+                    </Box>
+                    <Box>
+                        <Typography variant="h6" className="fw-bold mb-3">
+                            XYZ Guangzhon
+                        </Typography>
+                    </Box>
+                    {/* <Box>
+              <Button
+                variant="outline-secondary"
+                className="p-1 me-3 bg-transparent text-secondary"
+                onClick={handleMessageButtonClick}
+              >
+                <AddCommentOutlinedIcon className="me-1" />
+              </Button>
+              <Button
+                variant="outline-primary"
+                className="p-1 me-3 bg-transparent text-primary"
+                onClick={handlePrint}
+              >
+                <LocalPrintshopOutlinedIcon className="me-1" />
+              </Button>
+              {userData?.user_id == orderDetails?.operation_user_id &&
+              orderProcess == "started" ? (
+                <Button
+                  variant="outline-danger"
+                  className="p-1 me-2 bg-transparent text-danger"
+                  onClick={handleCancelOrderProcess}
+                >
+                  <CancelIcon className="me-1" />
+                </Button>
+              ) : orderProcess == "started" &&
+                userData?.user_id != orderDetails?.operation_user_id ? (
+                <Button variant="success" disabled>
+                  Start
+                </Button>
+              ) : (
+                <Button
+                  variant="success"
+                  // disabled
+                  onClick={handleStartOrderProcess}
+                >
+                  Start
+                </Button>
+              )}
+            </Box> */}
+                </Box>
+            </Card>
+            {/* <h3 className='fw-bold text-center my-3'>PO Details</h3>
             <h6 className='fw-bold text-center'>XYZ Guangzhon</h6>
-            <p className='text-center my-3'>PO Number: {PO_OrderList.po_id}</p>
+            <p className='text-center my-3'>PO Number: {id}</p> */}
             {/* <div className='d-flex'>
                 <div className="d-flex justify-content-start align-items-center my-3">
                     <h6 className=''>Payment Status:</h6>
@@ -211,48 +486,50 @@ const PoDetails = () => {
                     </select>
                 </div>
             </div> */}
-            <Row className='mb-3'>
-                <Col xs="auto" lg="4">
-                    <Form.Group className="fw-semibold mb-0">
-                        <Form.Label>Payment Status:</Form.Label>
-                        <Form.Control
-                            as="select"
-                            className="mr-sm-2"
-                            // value={selectedFactory}
-                            onChange={(e) => handlepayMentStatus(e)}
-                        >
-                            {/* <option value="">All </option> */}
-                            {paymentS.map((po) => (
-                                <option key={po} value={po}>
-                                    {po}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
-                <Col xs="auto" lg="4">
-                    <Form.Group className="fw-semibold mb-0">
-                        <Form.Label>PO Status:</Form.Label>
-                        <Form.Control
-                            as="select"
-                            className="mr-sm-2"
-                            // value={selectedFactory}
-                            onChange={handlePOStatus}
-                        >
-                            {/* <option value="">All </option> */}
-                            {POStatusFilter.map((po) => (
-                                <option key={po} value={po}>
-                                    {po}
-                                </option>
-                            ))}
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
-            </Row>
-            <MDBRow className='d-flex justify-content-center align-items-center'>
-                <MDBCol col='10' md='12' sm='12'></MDBCol>
-                <div style={{ overflow: 'auto', height: '350px' }}>
-                    <Table striped bordered hover style={{ boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
+            <Card className="p-3 mb-3">
+
+                <Row className='mb-3'>
+                    <Col xs="auto" lg="4">
+                        <Form.Group className="fw-semibold mb-0">
+                            <Form.Label>Payment Status:</Form.Label>
+                            <Form.Control
+                                as="select"
+                                className="mr-sm-2"
+                                // value={selectedFactory}
+                                onChange={(e) => handlepayMentStatus(e)}
+                            >
+                                {/* <option value="">All </option> */}
+                                {paymentS.map((po) => (
+                                    <option key={po} value={po}>
+                                        {po}
+                                    </option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                    </Col>
+                    <Col xs="auto" lg="4">
+                        <Form.Group className="fw-semibold mb-0">
+                            <Form.Label>PO Status:</Form.Label>
+                            <Form.Control
+                                as="select"
+                                className="mr-sm-2"
+                                // value={selectedFactory}
+                                onChange={handlePOStatus}
+                            >
+                                {/* <option value="">All </option> */}
+                                {POStatusFilter.map((po) => (
+                                    <option key={po} value={po}>
+                                        {po}
+                                    </option>
+                                ))}
+                            </Form.Control>
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <MDBRow className='d-flex justify-content-center align-items-center'>
+                    <MDBCol col='10' md='12' sm='12'></MDBCol>
+                    {/* <div style={{ overflow: 'auto', height: '350px' }}> */}
+                    {/* <Table striped bordered hover style={{ boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
                         <thead>
                             <tr className='table-headers'>
                                 {tableHeaders.map((header, index) => (
@@ -270,7 +547,6 @@ const PoDetails = () => {
                                     <td className='text-center'>{rowData.total_price}</td>
                                     <td className='text-center'>
                                         <Form.Group className="fw-semibold mb-0">
-                                            {/* <Form.Label>Product Filter:</Form.Label> */}
                                             <Form.Control type="text" placeholder="0"  onChange={(e) => handleAvailableQtyChange(rowIndex,e)} />
                                         </Form.Group>
                                     </td>
@@ -278,7 +554,6 @@ const PoDetails = () => {
                                         <Form.Group>
                                             <Form.Select style={{ height: '32px', padding: '0 10px' }}
                                                 onChange={(event) => handleStatusChange(rowIndex, event)}
-                                            // value={ PO_OrderList?.availability_status[rowIndex] }
                                             >
                                                 {availabilityStatus.map(status => (
                                                     <option key={status} value={status}>{status}</option>
@@ -292,19 +567,33 @@ const PoDetails = () => {
                         </tbody>
                         <tfoot>
                             <tr>
-                                {/* <td colSpan={1}></td> */}
                                 <td colspan="2" className=' text-end'><strong>Total:</strong></td>
                                 <td className='text-center'>{PO_OrderList.total_count}</td>
                                 <td className='text-center'>{totalEstdCostRMB}</td>
                                 <td colspan="2">{PO_OrderList.total_cost}</td>
                             </tr>
                         </tfoot>
-                    </Table>
-                </div>
-                <Row>
-                    <Button type="button" className='w-auto' onClick={handleUpdate}>Update</Button>
-                </Row>
-            </MDBRow>
+                    </Table> */}
+                    <div className="mt-2">
+                        <DataTable
+                            columns={columns}
+                            rows={PO_OrderList}
+                            // page={pageSO}
+                            // pageSize={pageSizeSO}
+                            // totalPages={totalPagesSO}
+                            rowHeight={100}
+                        // handleChange={handleChangeSO}
+                        // // onCellEditStart={handleCellEditStart}
+                        // processRowUpdate={processRowUpdateSPO}
+                        />
+
+                    </div>
+                    {/* </div> */}
+                    <Row>
+                        <Button type="button" className='w-auto' onClick={handleUpdate}>Update</Button>
+                    </Row>
+                </MDBRow>
+            </Card>
         </Container>
     )
 }

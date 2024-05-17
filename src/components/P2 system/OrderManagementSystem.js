@@ -211,8 +211,16 @@ function OrderManagementSystem() {
             }
         },
         {
-            field: "Quantity", headerName: "Quantity", flex: 1, editable: true, type: 'number',
-
+            field: "Quantity", headerName: "Quantity", flex: 1, 
+            // editable: true, type: 'number',
+            renderCell: (params) => {
+                return (
+                    <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+                        
+                        <Form.Control style={{ justifyContent: "center" }} type="number" value={params.row.Quantity} placeholder="0" onChange={(e) => handleMOQtyChange(e,params.row)} />
+                    </Form.Group>
+                )
+            }
         }
     ]
     const columnsSPO = [
@@ -273,35 +281,68 @@ function OrderManagementSystem() {
             }
         },
         {
-            field: "Quantity", headerName: "Quantity", flex: 1, editable: true, type: 'number',
+            field: "Quantity", headerName: "Quantity", flex: 1,
+            //  editable: true, type: 'number',
+            renderCell: (params) => {
+                return (
+                    <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+                        
+                        <Form.Control style={{ justifyContent: "center" }} type="number" value={params.row.Quantity} placeholder="0" onChange={(e) => handleSOQtyChange(e,params.row)} />
+                    </Form.Group>
+                )
+            }
 
         }
     ]
-
-    const processRowUpdate = (newRow, i) => {
-        console.log(newRow, 'newRow====');
-        console.log(i, 'i====');
+    const handleMOQtyChange = (index, event) => {
+        console.log(index.target, event);
         const updatedData = manualPOorders.map(item => {
-            if (item.product_id === newRow.product_id) {
-                return { ...item, Quantity: newRow.Quantity };
+            if (item.product_id === event.product_id) {
+                return { ...item, Quantity: index.target.value };
             }
             return item;
         });
         console.log(updatedData, 'updatedData====');
         setManualPoOrders(updatedData)
+       
     };
-    const processRowUpdateSPO = (newRow, i) => {
-        console.log(newRow, 'newRow====');
-        console.log(i, 'i====');
+    const handleSOQtyChange = (index, event) => {
+        console.log(index.target, event);
         const updatedData = scheduledPOorders.map(item => {
-            if (item.product_id === newRow.product_id) {
-                return { ...item, Quantity: newRow.Quantity };
+            if (item.product_id === event.product_id) {
+                return { ...item, Quantity: index.target.value };
             }
             return item;
         });
         console.log(updatedData, 'updatedData====');
-        setScheduleOrders(updatedData)
+        setManualPoOrders(updatedData)
+       
     };
+
+    // const processRowUpdate = (newRow, i) => {
+    //     console.log(newRow, 'newRow====');
+    //     console.log(i, 'i====');
+    //     const updatedData = manualPOorders.map(item => {
+    //         if (item.product_id === newRow.product_id) {
+    //             return { ...item, Quantity: newRow.Quantity };
+    //         }
+    //         return item;
+    //     });
+    //     console.log(updatedData, 'updatedData====');
+    //     setManualPoOrders(updatedData)
+    // };
+    // const processRowUpdateSPO = (newRow, i) => {
+    //     console.log(newRow, 'newRow====');
+    //     console.log(i, 'i====');
+    //     const updatedData = scheduledPOorders.map(item => {
+    //         if (item.product_id === newRow.product_id) {
+    //             return { ...item, Quantity: newRow.Quantity };
+    //         }
+    //         return item;
+    //     });
+    //     console.log(updatedData, 'updatedData====');
+    //     setScheduleOrders(updatedData)
+    // };
 
     useEffect(() => {
         fetchOrders();
@@ -596,27 +637,27 @@ function OrderManagementSystem() {
                 note: manualNote
             };
             console.log(payload, 'payload');
-            // setSelectedProductIds(JSON.stringify(payload));
-            // setAlertMessage("");
+            setSelectedProductIds(JSON.stringify(payload));
+            setAlertMessage("");
 
-            // try {
-            //     const response = await axios.post(
-            //         `${API_URL}wp-json/custom-manual-order/v1/post-order-manual/`,
-            //         payload // Send the payload object
-            //     );
-            //     console.log(response.data);
-            //     if (response.data) {
-            //         Swal.fire({
-            //             text: response.data,
-            //         }).then((result) => {
-            //             if (result.isConfirmed) {
-            //                 navigate("/PO_ManagementSystem");
-            //             }
-            //         });
-            //     }
-            // } catch (error) {
-            //     console.error("Error generating PO IDs:", error);
-            // }
+            try {
+                const response = await axios.post(
+                    `${API_URL}wp-json/custom-manual-order/v1/post-order-manual/`,
+                    payload // Send the payload object
+                );
+                console.log(response.data);
+                if (response.data) {
+                    Swal.fire({
+                        text: response.data,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate("/PO_ManagementSystem");
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error generating PO IDs:", error);
+            }
         } else {
             setAlertMessage(
                 "Selected orders belong to different factories. Please select orders from the same factory."
@@ -997,7 +1038,7 @@ function OrderManagementSystem() {
                                         handleChange={handleChangeMO}
                                         rowHeight={100}
                                         // onCellEditStart={handleCellEditStart}
-                                        processRowUpdate={processRowUpdate}
+                                        // processRowUpdate={processRowUpdate}
                                     />
                                 </div>
                             </Row>
@@ -1136,7 +1177,7 @@ function OrderManagementSystem() {
                                         rowHeight={100}
                                         handleChange={handleChangeSO}
                                         // onCellEditStart={handleCellEditStart}
-                                        processRowUpdate={processRowUpdateSPO}
+                                        // processRowUpdate={processRowUpdateSPO}
                                     />
                                 </div>
                             </Row>
