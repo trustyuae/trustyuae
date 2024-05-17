@@ -8,7 +8,7 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import Pagination from "react-bootstrap/Pagination";
 import { useParams } from 'react-router-dom';
-import { Box, Typography } from "@mui/material";
+import { Box, Checkbox, FormControlLabel, FormGroup, Typography } from "@mui/material";
 import { Badge, Card, Col, Row } from "react-bootstrap";
 import DataTable from "../DataTable";
 
@@ -17,6 +17,7 @@ function OnHoldManagement() {
     const [pageSize, setPageSize] = useState(10);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [selectedOrders, setSelectedOrders] = useState([]);
 
     const data = [
         {
@@ -42,13 +43,43 @@ function OnHoldManagement() {
         },
     ]
 
+    const handleCheckboxChange = (e, rowData) => {
+        const index = selectedOrders?.findIndex(
+            (order) => order?.id == rowData.id
+        );
+        if (index === -1 && e.target.checked) {
+            setSelectedOrders((prevSelectedOrders) => [
+                ...prevSelectedOrders,
+                rowData,
+            ]);
+        } else if (index !== -1 && !e.target.checked) {
+            const updatedSelectedOrders = [...selectedOrders];
+            updatedSelectedOrders.splice(index, 1);
+            setSelectedOrders(updatedSelectedOrders);
+        }
+        console.log(selectedOrders, 'selectedOrders')
+    };
+
     const columns = [
         { field: "order_id", headerName: "Order ID", flex: 1 },
         { field: "shipping_country", headerName: "Shipping Country", flex: 1, },
-        { field: "item_received", headerName: "Item Received", flex: 1 },
+        {
+            field: "item_received", headerName: "Item Received", flex: 1,
+            valueGetter: (value, row) => `${row.item_received} / ${row.ouantity_ordered}`
+        },
         {
             field: "qtyOrdered", headerName: "Select All", flex: 1,
-            valueGetter: (value, row) => `${row.item_received} / ${row.ouantity_ordered}`
+            renderCell: (params) => {
+                return (
+                    <FormGroup>
+                        <FormControlLabel
+                            control={<Checkbox />}
+                            style={{ justifyContent: "center" }}
+                            onChange={(event) => handleCheckboxChange(event, params.row)}
+                        />
+                    </FormGroup>
+                );
+            },
         },
     ];
 
