@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import getFactoryNameById from "../../utils/GetFactoryName";
-import { Image } from "@material-ui/icons";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
