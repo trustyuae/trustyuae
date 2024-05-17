@@ -1,17 +1,19 @@
 import { combineReducers, applyMiddleware, createStore } from "redux";
-import  thunk from "redux-thunk";
-import { UserLoginReducer, UserLogoutReducer} from "./reducers/UserReducer";
+import thunk from "redux-thunk";
+import { UserLoginReducer, UserLogoutReducer } from "./reducers/UserReducer";
 import { composeWithDevTools } from "redux-devtools-extension";
 import AllFactoryReducer from "./reducers/AllFactoryReducer";
 import OrderSystemReducer from "./reducers/OrderSystemReducer";
 import OrderNotAvailableReducer from "./reducers/P2SystemReducer";
+import ManagementSystemReducer from "./reducers/P3SystemReducer";
 
 const reducer = combineReducers({
   loginUser: UserLoginReducer,
-  logoutUser:UserLogoutReducer,
-  allFactoryData:AllFactoryReducer,
-  orderSystemData:OrderSystemReducer,
-  orderNotAvailable:OrderNotAvailableReducer,
+  logoutUser: UserLogoutReducer,
+  allFactoryData: AllFactoryReducer,
+  orderSystemData: OrderSystemReducer,
+  orderNotAvailable: OrderNotAvailableReducer,
+  managementSystem: ManagementSystemReducer
 });
 
 let initialState = {};

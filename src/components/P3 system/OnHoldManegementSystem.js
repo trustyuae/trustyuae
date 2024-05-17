@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     MDBCol,
     MDBRow
@@ -7,13 +7,16 @@ import {
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
 import { Button, Card, Col, Row } from 'react-bootstrap';
-import { Box, Typography } from '@mui/material';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import DataTable from '../DataTable';
+import { API_URL } from '../../redux/constants/Constants';
+import { useDispatch } from 'react-redux';
+import { GetProductManual } from '../../redux/actions/P3SystemActions';
 
 
 function OnHoldManegementSystem() {
@@ -22,9 +25,12 @@ function OnHoldManegementSystem() {
     const [endDate, setEndDate] = useState("");
     const [selectedOperator, setSelectedOperator] = useState("");
     const [receivedBoxes, setReceivedBoxes] = useState(0);
+    const [searchedProduct, setSearchedProduct] = useState("");
+    const [manualProducts, setManualProducts] = useState([]);
     const [pageSize, setPageSize] = useState(10);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const dispatch = useDispatch();
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -108,6 +114,15 @@ function OnHoldManegementSystem() {
     const totalQty = ProductDetails.reduce((acc, cur) => acc + cur.qtyOrdered, 0);
     const availabilityStatus = ['Confirmed', '1 week', '2 week', '3 weeks', '1 month', 'Out of Stock'];
 
+    const top100Films = [
+        { label: 'The Shawshank Redemption', year: 1994 },
+        { label: 'The Godfather', year: 1972 },
+        { label: 'The Godfather: Part II', year: 1974 },
+        { label: 'The Dark Knight', year: 2008 },
+        { label: '12 Angry Men', year: 1957 },
+        { label: "Schindler's List", year: 1993 },
+        { label: 'Pulp Fiction', year: 1994 },
+    ]
 
     const columns = [
         { field: "name", headerName: "Name", flex: 1 },
@@ -130,6 +145,29 @@ function OnHoldManegementSystem() {
         setPage(value);
     };
 
+    const getAllProducts = async () => {
+        let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/`;
+        await dispatch(
+            GetProductManual({
+                apiUrl: apiUrl,
+            })
+        )
+            .then((response) => {
+                console.log(response, 'response')
+                let data = response.data.products.map((v, i) => ({ ...v, id: i }));
+                console.log(data, 'data')
+                setManualProducts(data);
+                console.log(manualProducts, 'manualProducts');
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
+    useEffect(() => {
+        getAllProducts()
+    }, [manualProducts])
+
     return (
         <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
             <Box className="mb-4">
@@ -139,7 +177,7 @@ function OnHoldManegementSystem() {
             </Box>
             {/* <h3 className='fw-bold text-center py-3'>On-hold Management System</h3> */}
             <Form inline className='mb-4'>
-                <Row className="align-items-center">
+                <Row className="align-items-center px-1">
                     <Col xs="auto" lg="3">
                         <Form.Group>
                             <Form.Label className="fw-semibold mb-0">
@@ -210,6 +248,32 @@ function OnHoldManegementSystem() {
             </Form>
             <MDBRow className='px-3'>
                 <Card className='py-3'>
+                    <Col xs="auto" lg="3" className='mb-3'>
+                        <Form.Group>
+                            <Form.Label className="fw-semibold">Search Products:</Form.Label>
+                            {/* <Form.Control
+                                type="text"
+                                placeholder="Search Product by name"
+                                value={searchedProduct}
+                                onChange={(e) => setSearchedProduct(e.target.value)}
+                                className="mr-sm-2 py-2"
+                            /> */}
+                            <Autocomplete
+                                className="mr-sm-2 py-2"
+                                disablePortal
+                                id="combo-box-demo"
+                                options={top100Films}
+                                sx={{
+                                    width: 300,
+                                    "& .MuiInputBase-root": {
+                                        paddingTop: '0px',
+                                        paddingBottom: '0px'
+                                    },
+                                }}
+                                renderInput={(params) => <TextField {...params} />}
+                            />
+                        </Form.Group>
+                    </Col>
                     <div className="mt-2">
                         <DataTable
                             columns={columns}
