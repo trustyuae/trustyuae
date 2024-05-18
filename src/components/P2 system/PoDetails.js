@@ -175,14 +175,22 @@ const PoDetails = () => {
 
     const handleUpdate = async () => {
         console.log(PO_OrderList, 'PO_OrderList======');
-        console.log(PO_OrderList.line_items.map(item => item.product_id), 'PO_OrderList.line_items.map(item => item.product_id)');
+       let updatelist = PO_OrderList.slice(0, -1);
+        console.log(updatelist, 'PO_OrderList pop======');
+        console.log(updatelist?.map(item => item.product_id), 'PO_OrderList.line_items.map(item => item.product_id)');
+        // const orderIds = updatelist.reduce((acc, item) => {
+        //     acc.push(...item.order_ids);
+        //     return acc;
+        // }, []);
+        // console.log(orderIds,'orderIds');
         const updatedData = {
-            availability_status: PO_OrderList.line_items.map(item => item.availability_status),
-            availability_quantity: PO_OrderList.line_items.map(item => item.available_quantity),
-            product_ids: PO_OrderList.line_items.map(item => item.product_id),
-            order_ids: PO_OrderList.line_items.map(item => item.order_id),
-            payment_status: paymentStatus,
-            po_status: PoStatus
+            po_number:id,
+            availability_status: updatelist?.map(item => item.availability_status),
+            request_quantity: updatelist?.map(item => item.available_quantity),
+            product_ids: updatelist?.map(item => item.product_id),
+            // order_ids: updatelist?.map(item => item.order_ids).flat(),
+            po_status: paymentStatus,
+            payment_status: PoStatus
         };
 
         let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`
