@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
@@ -12,6 +12,9 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
+import axios from "axios";
+import { API_URL } from "../../redux/constants/Constants";
+import { Link } from "react-router-dom";
 
 const product = [
     {
@@ -32,19 +35,21 @@ const product = [
 
 function GRNManagement() {
     const [dateFilter, setDateFilter] = useState("");
-    const [statusFilter, setStatusFilter] = useState("All");
+    const [statusFilter, setStatusFilter] = useState('');
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(5);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [grnList, setGrnList] = useState([])
 
     // const handleDateChange = (e) => {
     //     setDateFilter(e.target.value);
     // };
 
     const handleStatusChange = (e) => {
+        console.log(e.target.value, 'e.target.value');
         setStatusFilter(e.target.value);
     };
 
@@ -57,7 +62,7 @@ function GRNManagement() {
 
     console.log(filteredProducts, 'filteredProducts')
 
-    const availabilityStatus = ['All Processed', 'Partially Processed'];
+    const availabilityStatus = ['All Processed', 'Partially Processed', 'Pending for Process'];
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -88,17 +93,19 @@ function GRNManagement() {
             setEndDate(isoEndDate);
         } else {
             console.error("Invalid date range");
+            setStartDate("");
+            setEndDate("");
         }
     };
 
     const columns = [
-        { field: "grnNO", headerName: "GRN NO", flex: 1 },
-        { field: "CDate", headerName: "Date Created", flex: 1 },
-        { field: "CDate", headerName: "Created By", flex: 1 },
+        { field: "grn_no", headerName: "GRN NO", flex: 1 },
+        { field: "created_date", headerName: "Date Created", flex: 1 },
+        { field: "verified_by", headerName: "Created By", flex: 1 },
         {
-            field: "TItem",
+            field: "total_qty",
             headerName: "Total Items",
-            type: "string",
+            // type: "string",
             flex: 1,
         },
         {
@@ -108,25 +115,50 @@ function GRNManagement() {
             type: "string",
         },
         {
-            field: "view_item",
+            field: "",
             headerName: "Action",
             flex: 1,
             type: "html",
             renderCell: (value, row) => {
                 return (
-                    // <Link to={`/order_details/${value?.row?.order_id}`}>
-                    <Button type="button" className="w-auto bg-transparent border-0 text-secondary fs-5">
-                        <FaEye className="mb-1" />
-                    </Button>
-                    // </Link>
+                    <Link to={`/GRN_Edit/${value?.row?.grn_no}`}>
+                        <Button type="button" className="w-auto bg-transparent border-0 text-secondary fs-5">
+                            <FaEye className="mb-1" />
+                        </Button>
+                    </Link>
                 );
             },
         },
     ];
 
+    const handlGetGRNList = async () => {
+        try {
+            let apiUrl
+            apiUrl = `${API_URL}wp-json/custom-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`
+            if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+            if (statusFilter) apiUrl += `&status=${statusFilter}`;
+
+            const response = await axios.get(apiUrl)
+
+            console.log(response, 'response');
+            let data = response.data.data.map((v, i) => ({ ...v, id: i }));
+            console.log(data, 'data');
+            setGrnList(data)
+            console.log(response.data.total_pages,'response.data.data.total_pages');
+            setTotalPages(response.data.total_pages);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     const handleChange = (event, value) => {
         setPage(value);
     };
+
+    useEffect(() => {
+        handlGetGRNList()
+    }, [endDate, selectedDateRange, statusFilter,page])
 
     return (
         <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -175,7 +207,7 @@ function GRNManagement() {
                                 className="mr-sm-2 py-2"
                                 onChange={handleStatusChange} value={statusFilter}
                             >
-                                <option disabled value="">Select Status</option>
+                                <option value="">Select Status</option>
                                 {availabilityStatus.map(status => (
                                     <option key={status} value={status}>{status}</option>
                                 ))}
@@ -190,7 +222,7 @@ function GRNManagement() {
                     <div className="mt-2">
                         <DataTable
                             columns={columns}
-                            rows={filteredProducts}
+                            rows={grnList}
                             page={page}
                             pageSize={pageSize}
                             totalPages={totalPages}
