@@ -9,6 +9,7 @@ const ReleaseSchedulePoModal = ({
   handleCloseReleaseSchedulePoModal,
   showModal,
   OrderNotAvailable,
+  handleUpdatedValues,
 }) => {
   const [dateFilter, setDateFilter] = useState("");
   const dispatch = useDispatch();
@@ -44,18 +45,14 @@ const ReleaseSchedulePoModal = ({
             title: "Uploaded Successfully!",
           });
         }
+        handleUpdatedValues();
         handleCloseReleaseSchedulePoModal();
-        OrderNotAvailable([]);
-      })
-      .then((response) => {
         handleCloseReleaseSchedulePoModal();
       })
       .catch((error) => {
         console.error(error);
       });
   };
-
-  console.log(OrderNotAvailable,'OrderNotAvailable from modal')
 
   return (
     <div>

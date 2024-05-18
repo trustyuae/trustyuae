@@ -5,7 +5,10 @@ import {
     GET_ORDER_NOT_AVAILABLE_FAIL,
     ADD_ORDER_NOT_AVAILABLE_REQUEST,
     ADD_ORDER_NOT_AVAILABLE_SUCCESS,
-    ADD_ORDER_NOT_AVAILABLE_FAIL
+    ADD_ORDER_NOT_AVAILABLE_FAIL,
+    UPDATE_ORDER_NOT_AVAILABLE_STATUS_REQUEST,
+    UPDATE_ORDER_NOT_AVAILABLE_STATUS_SUCCESS,
+    UPDATE_ORDER_NOT_AVAILABLE_STATUS_FAIL
   } from "../constants/Constants";
   
   const initialState = {
@@ -13,6 +16,8 @@ import {
     isOrdersNotAvailable: false,
     ordersNotAvailablePo: [],
     isOrdersNotAvailablePo: false,
+    ordersNotAvailableStatus: [],
+    isOrdersNotAvailableStatus: false,
     error: null,
   };
   
@@ -31,6 +36,13 @@ import {
           return { ...state, isOrdersNotAvailablePo: false, ordersNotAvailablePo: action.payload };
         case ADD_ORDER_NOT_AVAILABLE_FAIL:
           return { ...state, isOrdersNotAvailablePo: false, error: action.payload };
+
+          case UPDATE_ORDER_NOT_AVAILABLE_STATUS_REQUEST:
+            return { ...state, isOrdersNotAvailableStatus: true };
+          case UPDATE_ORDER_NOT_AVAILABLE_STATUS_SUCCESS:
+            return { ...state, isOrdersNotAvailableStatus: false, ordersNotAvailableStatus: action.payload };
+          case UPDATE_ORDER_NOT_AVAILABLE_STATUS_FAIL:
+            return { ...state, isOrdersNotAvailableStatus: false, error: action.payload };
         
       case CLEAR_ERRORS:
         return { ...state, error: null };
