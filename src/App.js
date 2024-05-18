@@ -23,6 +23,7 @@ import OperationAssistantRoute from "./utils/navigation/OperationAssistantRoute"
 import FactoryCoordinatorRoute from "./utils/navigation/FactoryCoordinatorRoute";
 import PageNotFound from "./components/pageNotFound/PageNotFound";
 import CustomerSupportRoute from "./utils/navigation/CustomerSupportRoute";
+import "./index.css";
 
 function App() {
   return (
