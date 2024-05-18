@@ -30,8 +30,8 @@ function OrderNotAvailable() {
   );
   const [factories, setFactories] = useState([]);
   const [checkBox, setCheckBox] = useState(false);
+  const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
-  console.log(selectedOrderNotAvailable, "selectedOrderNotAvailable");
   const fetchFactories = async () => {
     try {
       const response = await axios.get(
@@ -51,11 +51,20 @@ function OrderNotAvailable() {
   };
 
   const handleCheckboxChange = (e, rowData) => {
+     if (selectedOrderNotAvailable.length > 0) {
+          selectedOrderNotAvailable.forEach((order) => {
+            ordersNotAvailableData.forEach((o) => {
+              if (o.id === order.id) {
+                o.isSelected = true;
+                o.customer_status = order.customer_status;
+              }
+            });
+          });
+        }
     if (!rowData.customer_status) {
       Swal.fire({
         icon: "error",
-        title:
-          "please confirm your customer status first!",
+        title: "please confirm your customer status first!",
       });
     } else {
       rowData.isSelected = true;
@@ -64,13 +73,13 @@ function OrderNotAvailable() {
         (order) => order?.id == rowData.id
       );
       if (index === -1 && e.target.checked) {
-        ordersNotAvailableData[rowData.id].isSelected = true;
+        rowData.isSelected = true;
         setSelectedOrderNotAvailable((prevSelectedOrders) => [
           ...prevSelectedOrders,
           rowData,
         ]);
       } else if (index !== -1 && !e.target.checked) {
-        ordersNotAvailableData[rowData.id].isSelected = false;
+        rowData.isSelected = false;
         setCheckBox(false);
         const updatedSelectedOrders = [...selectedOrderNotAvailable];
         updatedSelectedOrders.splice(index, 1);
@@ -90,7 +99,7 @@ function OrderNotAvailable() {
       .then((response) => {
         let data = response.data.orders.map((v, i) => ({
           ...v,
-          id: i,
+          id: i + currentStartIndex,
           isSelected: false,
         }));
         setOrdersNotAvailableData(data);
@@ -114,39 +123,43 @@ function OrderNotAvailable() {
       (order) => order.factory_id
     );
 
-    if (!checkBox) {
+    if (selectedOrderNotAvailable.length === 0) {
       Swal.fire({
         icon: "error",
         title: "please select products for generating schedule po",
-      })
+      });
     } else if (customerStatus.length < selectedOrderNotAvailable.length) {
       Swal.fire({
         icon: "error",
         title: "Only for confirmed items we can raise the scheduled PO!",
-      })
+      });
     } else if (new Set(estimatedTime).size !== 1) {
       Swal.fire({
         icon: "error",
         title:
-          "Estimated production time should be the same for all selected items!",
-      })
+          "Purchase order items are on separate schedules. Do you want to proceed with the action?!",
+      });
     } else if (new Set(factoryNames).size !== 1) {
       Swal.fire({
         icon: "error",
         title: "Factory name should be the same for all selected items!",
-      })
+      });
     } else {
       setShowModal(true);
     }
   };
 
-  const handleModalClose = () => {
-    ordersNotAvailableData.forEach((order) => {
+  const handleUpdateStatus = () => {
+    // const customerStatus =
+  };
+
+  const handleModalClose = async () => {
+    await ordersNotAvailableData.forEach((order) => {
       order.isSelected = false;
       order.customer_status = "";
     });
-    setShowModal(false);
     setSelectedOrderNotAvailable([]);
+    setShowModal(false);
   };
 
   const columns = [
@@ -248,26 +261,35 @@ function OrderNotAvailable() {
 
   const handleChange = (event, value) => {
     setPage(value);
+    let currIndex = value * pageSize - pageSize + 1;
+    setCurrentStartIndex(currIndex, "currIndex");
+  };
+  const handleUpdatedValues = () => {
+    fetchOrdersNotAvailableData();
   };
 
   useEffect(() => {
     fetchFactories();
-  }, []);
-
-  useEffect(() => {
     fetchOrdersNotAvailableData();
-  }, [pageSize, page]);
+  }, [currentStartIndex]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <h3 className="fw-bold text-center py-3">Order Not Available</h3>
-      <div className="d-flex justify-content-start my-3">
+      <div className="d-flex justify-content-between my-3">
         <Button
-          variant="primary w-25 h4"
+          variant="primary w-20 h4"
           className="fw-semibold"
           onClick={handleGenerateSchedulePo}
         >
           Release Scheduled PO
+        </Button>
+        <Button
+          variant="primary w-15 h4"
+          className="fw-semibold"
+          onClick={handleUpdateStatus}
+        >
+          Update Status
         </Button>
       </div>
       <div className="mt-2">
@@ -285,6 +307,7 @@ function OrderNotAvailable() {
         handleCloseReleaseSchedulePoModal={handleModalClose}
         showModal={showModal}
         OrderNotAvailable={selectedOrderNotAvailable}
+        handleUpdatedValues={handleUpdatedValues}
       />
     </Container>
   );
