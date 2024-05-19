@@ -19,9 +19,20 @@ import { useDispatch } from 'react-redux';
 import { GetProductManual } from '../../redux/actions/P3SystemActions';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { FaEye } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
 
 
 function OnHoldManegementSystem() {
+    const getTodayDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -33,7 +44,7 @@ function OnHoldManegementSystem() {
     const [productIDF, setProductID] = useState('')
     const [singleProductD, setSingleProductD] = useState([])
     const [tableData, setTableData] = useState([])
-    const [date, setDate] = useState('')
+    const [date, setDate] = useState(getTodayDate())
     const [selectFile, setFile] = useState(null);
     const [userName, setuserName] = useState('')
 
@@ -175,8 +186,40 @@ function OnHoldManegementSystem() {
                 )
             }
 
+        },
+        {
+          field:'',headerName:"Action",flex:1,
+          type: "html",
+      renderCell: (params) => {
+        return (
+        //   <Link to={`/order_details/${value?.row?.order_id}`}>
+            <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5" onClick={() => handleDelete(params.row.id)}>
+              <MdDelete className="mb-1" />
+            </Button>
+            // <Typography
+            //   variant="label"
+            //   className="fw-semibold text-secondary"
+            //   sx={{
+            //     fontSize: 14,
+            //     textTransform: "capitalize",
+            //   }}
+            // >
+            //   {/* {"  "} */}
+            //   <Badge bg="success" className="m-2">
+            //     {value?.row?.order_process=='started' ? (value?.row?.order_process) : null}
+            //   </Badge>
+            // </Typography>
+        //   </Link>
+        );
+      },
         }
     ];
+
+    const handleDelete = (id) => {
+        console.log(id,'id====');
+        const updatedData = tableData.filter(item => item.id !== id);
+        setTableData(updatedData);
+      };
 
     const handleQtyChange = (index, event) => {
         console.log(index.target, event);
@@ -373,7 +416,7 @@ function OnHoldManegementSystem() {
                         </Form.Group> */}
                         <Form.Group controlId="duedate">
                             <Form.Label>Date filter:</Form.Label>
-                            <Form.Control type="date" name="duedate" placeholder="Due date" onChange={(e) => setDate(e.target.value)} />
+                            <Form.Control type="date" name="duedate" placeholder="Due date" value={date} onChange={(e) => setDate(e.target.value)} />
                         </Form.Group>
                     </Col>
                     <Col xs="auto" lg="3">
