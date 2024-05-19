@@ -51,16 +51,8 @@ function OrderNotAvailable() {
   };
 
   const handleCheckboxChange = (e, rowData) => {
-     if (selectedOrderNotAvailable.length > 0) {
-          selectedOrderNotAvailable.forEach((order) => {
-            ordersNotAvailableData.forEach((o) => {
-              if (o.id === order.id) {
-                o.isSelected = true;
-                o.customer_status = order.customer_status;
-              }
-            });
-          });
-        }
+    console.log(rowData, '<=== rowData')
+
     if (!rowData.customer_status) {
       Swal.fire({
         icon: "error",
@@ -102,6 +94,16 @@ function OrderNotAvailable() {
           id: i + currentStartIndex,
           isSelected: false,
         }));
+        if (selectedOrderNotAvailable.length > 0) {
+          selectedOrderNotAvailable.forEach((order) => {
+            data.forEach((o) => {
+              if (o.id === order.id) {
+                o.isSelected = true;
+                o.customer_status = order.customer_status;
+              }
+            });
+          });
+        }
         setOrdersNotAvailableData(data);
         setTotalPages(response.data.total_pages);
       })
@@ -265,13 +267,14 @@ function OrderNotAvailable() {
     setCurrentStartIndex(currIndex, "currIndex");
   };
   const handleUpdatedValues = () => {
+    setSelectedOrderNotAvailable([]);
     fetchOrdersNotAvailableData();
   };
 
   useEffect(() => {
     fetchFactories();
     fetchOrdersNotAvailableData();
-  }, [currentStartIndex]);
+  }, [currentStartIndex, selectedOrderNotAvailable]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
