@@ -3,12 +3,9 @@ import axios from 'axios';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Table from 'react-bootstrap/Table';
-import Pagination from 'react-bootstrap/Pagination';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { FaEye } from "react-icons/fa";
-import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { Box, Typography } from '@mui/material';
 import { DateRangePicker, LocalizationProvider, SingleInputDateRangeField } from '@mui/x-date-pickers-pro';
@@ -16,56 +13,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { API_URL } from '../../redux/constants/Constants';
 import { Link } from 'react-router-dom';
-import { Badge, Card, Tab, Tabs } from 'react-bootstrap';
+import { Card, Tab, Tabs } from 'react-bootstrap';
 import DataTable from '../DataTable';
 
-const tableHeaders = [
-    "PO Number",
-    "Date created",
-    "Total Quantity",
-    "Estimated Cost(RMB)",
-    "Estimated Cost(AED)",
-    "Status",
-    "Payment Status",
-    "Factory",
-    "Action"
-];
-
-const orders = [
-    {
-        PONumber: 'PO001',
-        DateCreated: '2024-4-24',
-        TotalQuantity: '100',
-        RMB: '500',
-        AED: '150',
-        status: 'Open',
-        P_status: 'Paid',
-        Factory: 'factory A'
-    },
-    {
-        PONumber: 'PO002',
-        DateCreated: '2024-4-25',
-        TotalQuantity: '200',
-        RMB: '1000',
-        AED: '300',
-        status: 'Checking with factory',
-        P_status: 'Not Paid',
-        Factory: 'factory B'
-    },
-    {
-        PONumber: 'PO003',
-        DateCreated: '2024-4-26',
-        TotalQuantity: '150',
-        RMB: '750',
-        AED: '200',
-        status: 'Closed',
-        P_status: 'Not Paid',
-        Factory: 'factory C'
-    }
-]
 function POManagementSystem() {
     const POStatusFilter = ['Open', 'Checking with factory', 'Closed'];
-    const factoryFilter = ['Factory A', 'Factory B', 'Factory c'];
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
     const [selectedFactory, setSelectedFactory] = useState("");
     const [factories, setFactories] = useState([]);
@@ -73,8 +25,6 @@ function POManagementSystem() {
     const [endDate, setEndDate] = useState("");
 
     const [orderList, setOrderList] = useState([]);
-    const [manualorderList, setManualOrderList] = useState([]);
-    const [scheduleorderList, setScheduleOrderList] = useState([]);
 
     const [PoStatus, setPoStatus] = useState("");
     const [poType, setPOType] = useState('po')
@@ -178,8 +128,10 @@ function POManagementSystem() {
     }
 
     const columns = [
-        { field: "po_id", 
-        headerName: "PO \n Number", flex: 2 },
+        {
+            field: "po_id",
+            headerName: "PO \n Number", flex: 2
+        },
         { field: "po_date", headerName: "Date created", flex: 2 },
         { field: "total_quantity", headerName: "Total Quantity", flex: 3 },
         { field: "", headerName: "Estimated Cost(RMB)", flex: 3 },
@@ -193,20 +145,6 @@ function POManagementSystem() {
                 return factories.find((factory) => factory.id == value.row.factory_id)?.factory_name
             }
         },
-        // { field: "customer_name", headerName: "Action", flex: 1 },
-        // {
-        //   field: "shipping_country",
-        //   headerName: "Shipping Country",
-        //   type: "string",
-        //   flex: 1,
-        //   valueGetter: (value, row) => getCountryName(row.shipping_country),
-        // },
-        // {
-        //   field: "order_status",
-        //   headerName: "Order Status",
-        //   flex: 1,
-        //   type: "string",
-        // },
         {
             field: "view_item",
             headerName: "View Item",
@@ -214,25 +152,7 @@ function POManagementSystem() {
             type: "html",
             renderCell: (value, row) => {
                 return (
-                    // <Link to={`/order_details/${value?.row?.order_id}`}>
-                    //     <Button type="button" className="w-auto">
-                    //         <FaEye />
-                    //     </Button>
-                    //     <Typography
-                    //         variant="label"
-                    //         className="fw-semibold text-secondary"
-                    //         sx={{
-                    //             fontSize: 14,
-                    //             textTransform: "capitalize",
-                    //         }}
-                    //     >
-                    //         {/* {"  "} */}
-                    //         <Badge bg="success" className="m-2">
-                    //             {value?.row?.order_process == 'started' ? (value?.row?.order_process) : null}
-                    //         </Badge>
-                    //     </Typography>
-                    // </Link>
-                    < div className='d-flex  align-items-center  justify-content-around'>
+                    <div className='d-flex  align-items-center  justify-content-around'>
                         <Link to={`/PO_details/${value.row.po_id}`}>
                             <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
                                 <FaEye />
@@ -335,54 +255,6 @@ function POManagementSystem() {
                 </Form>
             </Row>
 
-            <Row className='mb-4 mt-4 '>
-                {/* <div style={{ overflow: 'auto', height: '320px' }}>
-                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
-                        <thead>
-                            <tr className='table-headers'>
-                                {tableHeaders.map((header, index) => (
-                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            {
-                                // console.log(orderList,'orderrrr')
-                                orderList?.map((order) => (
-                                    <tr >
-                                        <td>{order.po_id}</td>
-                                        <td>{order.po_date}</td>
-                                        <td>{order.total_quantity}</td>
-                                        <td>--</td>
-                                        <td>--</td>
-                                        <td>{order.po_status}</td>
-                                        <td>{order.payment_status}</td>
-                                        <td>{
-                                            factories.find((factory) => factory.id === order.factory_id)
-                                                ?.factory_name
-                                        }</td>
-                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
-                                            <Link to={`/PO_details/${order.po_id}`}>
-                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                    <FaEye />
-                                                </Button>
-                                            </Link>
-                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                <MdEdit />
-                                            </Button>
-                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                <MdDelete />
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </Table>
-                </div> */}
-            </Row>
-
             <Row>
                 <Card >
                     <Card.Body>
@@ -395,52 +267,6 @@ function POManagementSystem() {
                         >
                             {/* po */}
                             <Tab eventKey="po" title="Order against PO" >
-                                {/* <div style={{ overflow: 'auto', height: '320px' }}>
-                                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
-                                        <thead>
-                                            <tr className='table-headers'>
-                                                {tableHeaders.map((header, index) => (
-                                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            {
-                                                // console.log(orderList,'orderrrr')
-                                                orderList?.map((order) => (
-                                                    <tr >
-                                                        <td>{order.po_id}</td>
-                                                        <td>{order.po_date}</td>
-                                                        <td>{order.total_quantity}</td>
-                                                        <td>--</td>
-                                                        <td>--</td>
-                                                        <td>{order.po_status}</td>
-                                                        <td>{order.payment_status}</td>
-                                                        <td>{
-                                                            factories.find((factory) => factory.id === order.factory_id)
-                                                                ?.factory_name
-                                                        }</td>
-                                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
-                                                            <Link to={`/PO_details/${order.po_id}`}>
-                                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                    <FaEye />
-                                                                </Button>
-                                                            </Link>
-                                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                <MdEdit />
-                                                            </Button>
-                                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                <MdDelete />
-                                                            </Button>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            }
-                                        </tbody>
-                                    </Table>
-                                </div> */}
-
                                 <DataTable
                                     columns={columns}
                                     rows={orderList}
@@ -452,51 +278,6 @@ function POManagementSystem() {
                             </Tab>
                             {/* MPO */}
                             <Tab eventKey="mpo" title="Manual PO" >
-                                {/* <div style={{ overflow: 'auto', height: '320px' }}>
-                                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
-                                        <thead>
-                                            <tr className='table-headers'>
-                                                {tableHeaders.map((header, index) => (
-                                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            {
-                                                // console.log(orderList,'orderrrr')
-                                                orderList?.map((order) => (
-                                                    <tr >
-                                                        <td>{order.po_id}</td>
-                                                        <td>{order.po_date}</td>
-                                                        <td>{order.total_quantity}</td>
-                                                        <td>--</td>
-                                                        <td>--</td>
-                                                        <td>{order.po_status}</td>
-                                                        <td>{order.payment_status}</td>
-                                                        <td>{
-                                                            factories.find((factory) => factory.id === order.factory_id)
-                                                                ?.factory_name
-                                                        }</td>
-                                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
-                                                            <Link to={`/PO_details/${order.po_id}`}>
-                                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                    <FaEye />
-                                                                </Button>
-                                                            </Link>
-                                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                <MdEdit />
-                                                            </Button>
-                                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                <MdDelete />
-                                                            </Button>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            }
-                                        </tbody>
-                                    </Table>
-                                </div> */}
                                 <DataTable
                                     columns={columns}
                                     rows={orderList}
@@ -508,51 +289,6 @@ function POManagementSystem() {
                             </Tab>
                             {/* SPO */}
                             <Tab eventKey="spo" title="Scheduled PO">
-                                {/* <div style={{ overflow: 'auto', height: '320px' }}>
-                                    <Table striped bordered hover style={{ overflow: 'auto', height: '320px', boxShadow: '4px 4px 11px 0rem rgb(0 0 0 / 25%)' }}>
-                                        <thead>
-                                            <tr className='table-headers'>
-                                                {tableHeaders.map((header, index) => (
-                                                    <th style={{ backgroundColor: '#dee2e6', padding: '8px', textAlign: 'center' }} key={index}>{header}</th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            {
-                                                // console.log(orderList,'orderrrr')
-                                                orderList?.map((order) => (
-                                                    <tr >
-                                                        <td>{order.po_id}</td>
-                                                        <td>{order.po_date}</td>
-                                                        <td>{order.total_quantity}</td>
-                                                        <td>--</td>
-                                                        <td>--</td>
-                                                        <td>{order.po_status}</td>
-                                                        <td>{order.payment_status}</td>
-                                                        <td>{
-                                                            factories.find((factory) => factory.id === order.factory_id)
-                                                                ?.factory_name
-                                                        }</td>
-                                                        <td className='text-center d-flex  align-items-center  justify-content-around '>
-                                                            <Link to={`/PO_details/${order.po_id}`}>
-                                                                <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                    <FaEye />
-                                                                </Button>
-                                                            </Link>
-                                                            <Button className='btn btn-success m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                <MdEdit />
-                                                            </Button>
-                                                            <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                                                <MdDelete />
-                                                            </Button>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            }
-                                        </tbody>
-                                    </Table>
-                                </div> */}
                                 <DataTable
                                     columns={columns}
                                     rows={orderList}
