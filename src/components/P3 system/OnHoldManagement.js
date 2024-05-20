@@ -78,7 +78,7 @@ function OnHoldManagement() {
   }, []);
 
   const handleOrderPerp = async () => {
-    const productId = selectedOrders.map((order) => order.product_id);
+    // const productId = selectedOrders.map((order) => order.product_id);
     const orderId = selectedOrders.map((order) => order.order_id);
     const quantity = selectedOrders.map((order) => order.quantity);
 
@@ -90,7 +90,7 @@ function OnHoldManagement() {
       });
     } else {
       const requestedDataP = {
-        product_id: productId,
+        product_id: params.id,
         order_id: orderId,
         quantity: quantity,
       };
