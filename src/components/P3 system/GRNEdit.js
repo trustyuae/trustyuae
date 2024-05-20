@@ -10,13 +10,14 @@ import Row from 'react-bootstrap/Row';
 // import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Container from 'react-bootstrap/Container';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { API_URL } from '../../redux/constants/Constants';
 import axios from 'axios';
 import { Card, Col } from 'react-bootstrap';
 import DataTable from '../DataTable';
 import { Box, MenuItem, Select, Typography } from '@mui/material';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { FaEye } from 'react-icons/fa';
 
 
 
@@ -263,104 +264,24 @@ const GRNEdit = () => {
         },
         { field: "qty_received", headerName: "Qty Received", flex: 2 ,
         },
-        { field: "qty_remain", headerName: "Qty Renain", flex: 2 ,
+        { field: "qty_remain", headerName: "Qty Remain", flex: 2 ,
         },
-        // { field: "", headerName: "Estimated Cost(RMB)", flex: 3 ,
-        // valueGetter: (value, row) => {
-        //     // if (row.id === 'SUBTOTAL') {
-        //     //   return row.subtotal;
-        //     // }
-        //     if (row.id === 'TAX') {
-        //       return row.taxTotal;
-        //     }
-        //     // if (row.id === 'TOTAL') {
-        //     //   return row.total;
-        //     // }
-        //     return value;
-        //   },
-      
-        // },
-        // { field: "total_price", headerName: "Estimated Cost(AED)", flex: 3 ,
-        // colSpan: (value, row) => {
-            
-        //     if (row.id === 'TAX') {
-        //       return 4;
-        //     }
-        //     return undefined;
-        //   },
-        // valueGetter: (value, row) => {
-        //     if (row.id === 'TAX') {
-        //       return `${row.totals}`;
-        //     }
-        //     return value;
-        //   },
-        // },
-        // {
-        //     field: "available_quantity", headerName: "Available Qty", flex: 3,
-        //     renderCell: (params) => {
-        //         return (
-        //             <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
-                        
-        //                 <Form.Control style={{ justifyContent: "center" }} type="number" value={params.row.available_quantity} placeholder="0" onChange={(e) => handleAvailableQtyChange(e,params.row)} />
-        //             </Form.Group>
-        //         )
-        //     }
-        // },
-
-        // {
-        //     field: "availability_status",
-        //     headerName: "Availability Status",
-        //     flex: 3,
-        //     renderCell: (params) => {
-        //         return (
-        //             <Select
-        //                 labelId={`customer-status-${params.row.id}-label`}
-        //                 id={`customer-status-${params.row.id}`}
-        //                 value={params.row.availability_status}
-        //                 onChange={(event) => handleStatusChange(event, params.row)}
-        //                 fullWidth
-        //                 style={{ height: "40%", width: "100%" }}
-        //             // className="fw-semibold d-flex align-items-center justify-content-center h-100"
-        //             >
-        //                 {availabilityStatus.map(
-        //                     (status) => (
-        //                         <MenuItem key={status} value={status}>
-        //                             {status}
-        //                         </MenuItem>
-        //                     )
-        //                 )}
-        //             </Select>
-        //         );
-        //     },
-        // },
-        // // { field: "---", headerName: "Dispatch Status", flex: 3 },
-        
-        // {
-        //     field: "dispatch_status",
-        //     headerName: "Dispatch Status",
-        //     flex: 3,
-        //     renderCell: (params) => {
-        //         return (
-        //             <Select
-        //                 labelId={`customer-status-${params.row.id}-label`}
-        //                 id={`customer-status-${params.row.id}`}
-        //                 value={params.row.dispatch_status}
-        //                 onChange={(event) => handleDispatchStatusChange(event, params.row)}
-        //                 fullWidth
-        //                 style={{ height: "40%", width: "100%" }}
-        //             // className="fw-semibold d-flex align-items-center justify-content-center h-100"
-        //             >
-        //                 {dispatchedStatus.map(
-        //                     (status) => (
-        //                         <MenuItem key={status} value={status}>
-        //                             {status}
-        //                         </MenuItem>
-        //                     )
-        //                 )}
-        //             </Select>
-        //         );
-        //     },
-        // },
+        {
+            field: "",
+            headerName: "Action",
+            flex: 1,
+            type: "html",
+            renderCell: (value, row) => {
+                console.log(value,'value details of grn edite page')
+                return (
+                    <Link to={`/On_Hold_Management/${value.row.product_id}`}>
+                        <Button type="button" className="w-auto bg-transparent border-0 text-secondary fs-5">
+                            <FaEye className="mb-1" />
+                        </Button>
+                    </Link>
+                );
+            },
+        },
     ];
     const handalBackButton = () => {
         navigate("/GRN_Management");
