@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
 * Template Name: NiceAdmin
 * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
@@ -7,7 +8,7 @@
 */
 
 (function() {
-  "use strict";
+  
 
   /**
    * Easy selector helper function
@@ -112,10 +113,8 @@
   /**
    * Initiate tooltips
    */
+  // eslint-disable-next-line no-unused-vars
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-  var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl)
-  })
 
   /**
    * Initiate quill editors
@@ -185,7 +184,6 @@
    */
 
   const useDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const isSmallScreen = window.matchMedia('(max-width: 1023.5px)').matches;
 
   tinymce.init({
     selector: 'textarea.tinymce-editor',

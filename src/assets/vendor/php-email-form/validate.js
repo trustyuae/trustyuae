@@ -1,10 +1,11 @@
+/* eslint-disable eqeqeq */
 /**
 * PHP Email Form Validation - v3.7
 * URL: https://bootstrapmade.com/php-email-form/
 * Author: BootstrapMade.com
 */
 (function () {
-  "use strict";
+  
 
   let forms = document.querySelectorAll('.php-email-form');
 
@@ -29,9 +30,9 @@
 
       if ( recaptcha ) {
         if(typeof grecaptcha !== "undefined" ) {
-          grecaptcha.ready(function() {
+          recaptcha.ready(function() {
             try {
-              grecaptcha.execute(recaptcha, {action: 'php_email_form_submit'})
+              recaptcha.execute(recaptcha, {action: 'php_email_form_submit'})
               .then(token => {
                 formData.set('recaptcha-response', token);
                 php_email_form_submit(thisForm, action, formData);
