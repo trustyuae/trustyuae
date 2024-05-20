@@ -170,7 +170,6 @@ const PoDetails = () => {
         });
         console.log(updatedData, 'updatedData====');
         setPO_OrderList(updatedData)
-       
     };
 
     const handleUpdate = async () => {
