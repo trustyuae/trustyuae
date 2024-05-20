@@ -45,14 +45,16 @@ function OrderNotAvailable() {
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
-    ordersNotAvailableData.forEach((order) => {
-      if (order.id === itemData.id) order.customer_status = value;
-    });
+    console.log(itemData,'itemData')
+    // ordersNotAvailableData.forEach((order) => {
+    //   if (order.id === itemData.id) order.customer_status = value;
+    // });
+    ordersNotAvailableData?.forEach((order) => {
+        if (order.id === itemData.id) order.customer_status = value;
+      });
   };
 
   const handleCheckboxChange = (e, rowData) => {
-    console.log(rowData, '<=== rowData')
-
     if (!rowData.customer_status) {
       Swal.fire({
         icon: "error",
@@ -170,6 +172,9 @@ function OrderNotAvailable() {
       customer_status:customerStatus
     }
     await dispatch(OrderNotAvailableDataStatus(requestedDataS))
+    .then(()=>{
+      setSelectedOrderNotAvailable([]);
+    })
   };
 
   const handleModalClose = async () => {
