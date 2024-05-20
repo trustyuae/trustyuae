@@ -6,8 +6,8 @@ import {
     from 'mdb-react-ui-kit';
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
-import { Badge, Button, Card, Col, Row } from 'react-bootstrap';
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Badge, Button, Card, Col, FormControl, Row } from 'react-bootstrap';
+import { Autocomplete, Box, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -30,7 +30,7 @@ function OnHoldManegementSystem() {
         const month = (today.getMonth() + 1).toString().padStart(2, '0');
         const day = today.getDate().toString().padStart(2, '0');
         return `${year}-${month}-${day}`;
-      };
+    };
 
 
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
@@ -86,80 +86,11 @@ function OnHoldManegementSystem() {
             console.error("Invalid date range");
         }
     };
-
-    const tableHeaders = [
-        "Name",
-        "Image",
-        "Qty Ordered",
-    ];
-    const ProductDetails = [{
-        id: 1,
-        name: "Product A",
-        image: "product_a.jpg",
-        qtyOrdered: 10
-    },
-    {
-        id: 2,
-        name: "Product B",
-        image: "product_b.jpg",
-        qtyOrdered: 5
-    },
-    {
-        id: 3,
-        name: "Product C",
-        image: "product_c.jpg",
-        qtyOrdered: 8
-    },
-    {
-        id: 4,
-        name: "Product D",
-        image: "product_d.jpg",
-        qtyOrdered: 3
-    },
-    {
-        id: 5,
-        name: "Product E",
-        image: "product_e.jpg",
-        qtyOrdered: 6
-    },
-    {
-        id: 6,
-        name: "Product F",
-        image: "product_f.jpg",
-        qtyOrdered: 12
-    },
-    {
-        id: 7,
-        name: "Product G",
-        image: "product_g.jpg",
-        qtyOrdered: 4
-    }];
-    const totalQty = ProductDetails.reduce((acc, cur) => acc + cur.qtyOrdered, 0);
-    const availabilityStatus = ['Confirmed', '1 week', '2 week', '3 weeks', '1 month', 'Out of Stock'];
-
-    const top100Films = [
-        { label: 'The Shawshank Redemption', year: 1994 },
-        { label: 'The Godfather', year: 1972 },
-        { label: 'The Godfather: Part II', year: 1974 },
-        { label: 'The Dark Knight', year: 2008 },
-        { label: '12 Angry Men', year: 1957 },
-        { label: "Schindler's List", year: 1993 },
-        { label: 'Pulp Fiction', year: 1994 },
-    ]
-
     const columns = [
         { field: "product_name", headerName: "product name", flex: 1 },
         {
             field: "product_image", headerName: "product image", flex: 1,
             type: "html",
-            // renderCell: (value, row) => {
-            //     return (
-            //         <Box>
-            //             <img src={value?.row?.image ? value?.row?.image : require('../../assets/default.png')} alt={value?.row?.name} />
-
-            //         </Box>
-            //     );
-            // }
             renderCell: (value, row) => {
                 return (
                     <>
@@ -176,7 +107,6 @@ function OnHoldManegementSystem() {
         },
         {
             field: "Quantity", headerName: "Quantity", flex: 1,
-            //  editable: true, type: 'number',
             renderCell: (params) => {
                 return (
                     <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
@@ -188,45 +118,131 @@ function OnHoldManegementSystem() {
 
         },
         {
-          field:'',headerName:"Action",flex:1,
-          type: "html",
-      renderCell: (params) => {
-        return (
-        //   <Link to={`/order_details/${value?.row?.order_id}`}>
-            <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5" onClick={() => handleDelete(params.row.id)}>
-              <MdDelete className="mb-1" />
-            </Button>
-            // <Typography
-            //   variant="label"
-            //   className="fw-semibold text-secondary"
-            //   sx={{
-            //     fontSize: 14,
-            //     textTransform: "capitalize",
-            //   }}
-            // >
-            //   {/* {"  "} */}
-            //   <Badge bg="success" className="m-2">
-            //     {value?.row?.order_process=='started' ? (value?.row?.order_process) : null}
-            //   </Badge>
-            // </Typography>
-        //   </Link>
-        );
-      },
+            field: "variation_values",
+            headerName: "Variation values",
+            flex: 3,
+            renderCell: (params) => {
+                const { color, size } = params.row.variation_values;
+                const noVariation = params.row.variation_values.length == 0;
+                const colorAvailable = color?.length > 0;
+                const sizeAvailable = size?.length > 0;
+
+                return (
+                    <div className='d-flex justify-content-between align-items-center'>
+                        {noVariation ? (
+                            <div>No any variation</div>
+                        ) : (
+                            <>
+                                {colorAvailable && (
+                                    <div className='w-100 me-3 d-flex flex-column'>
+                                        <InputLabel id={`customer-color-${params.row.id}-label`}>Color</InputLabel>
+                                        <Select
+                                            labelId={`customer-color-${params.row.id}-label`}
+                                            id={`customer-color-${params.row.id}`}
+                                            // value={params.row.availability_status}
+                                            onChange={(event) => handleColorChange(event, params.row)}
+                                            fullWidth
+                                            style={{ height: "40%", width: "100%" }}
+                                        >
+                                            {color?.map(
+                                                (status) => (
+                                                    <MenuItem key={status} value={status}>
+                                                        {status}
+                                                    </MenuItem>
+                                                )
+                                            )}
+                                        </Select>
+                                    </div>
+                                )}
+
+                                {sizeAvailable && (
+                                    <div className='w-100 d-flex flex-column'>
+                                        <InputLabel id={`customer-size-${params.row.id}-label`}>Size</InputLabel>
+                                        <Select
+                                            labelId={`customer-size-${params.row.id}-label`}
+                                            id={`customer-size-${params.row.id}`}
+                                            // value={params.row.availability_status}
+                                            onChange={(event) => handleSizeChange(event, params.row)}
+                                            fullWidth
+                                            style={{ height: "40%", width: "100%" }}
+                                        >
+                                            {size.map(
+                                                (status) => (
+                                                    <MenuItem key={status} value={status}>
+                                                        {status}
+                                                    </MenuItem>
+                                                )
+                                            )}
+                                        </Select>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                );
+            },
+        },
+
+        {
+            field: '', headerName: "Action", flex: 1,
+            type: "html",
+            renderCell: (params) => {
+                return (
+                    <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5" onClick={() => handleDelete(params.row.id)}>
+                        <MdDelete className="mb-1" />
+                    </Button>
+                );
+            },
         }
     ];
 
+    const handleColorChange = (index, event) => {
+
+        console.log(index.target, event);
+        const updatedData = tableData.map(item => {
+            if (item.id === event.id) {
+                return { ...item, variationColor: index.target.value };
+            }
+            // if (item.product_id === event.product_id) {
+            //     return { ...item, Quantity: index.target.value };
+            // }
+            return item;
+        });
+        console.log(updatedData, 'updatedData====');
+        setTableData(updatedData)
+
+    }
+    const handleSizeChange = (index, event) => {
+
+        console.log(index.target, event);
+        const updatedData = tableData.map(item => {
+            if (item.id === event.id) {
+                return { ...item, variationSize: index.target.value };
+            }
+            // if (item.product_id === event.product_id) {
+            //     return { ...item, Quantity: index.target.value };
+            // }
+            return item;
+        });
+        console.log(updatedData, 'updatedData====');
+        setTableData(updatedData)
+
+    }
     const handleDelete = (id) => {
-        console.log(id,'id====');
+        console.log(id, 'id====');
         const updatedData = tableData.filter(item => item.id !== id);
         setTableData(updatedData);
-      };
+    };
 
     const handleQtyChange = (index, event) => {
         console.log(index.target, event);
         const updatedData = tableData.map(item => {
-            if (item.product_id === event.product_id) {
+            if (item.id === event.id) {
                 return { ...item, Quantity: index.target.value };
             }
+            // if (item.product_id === event.product_id) {
+            //     return { ...item, Quantity: index.target.value };
+            // }
             return item;
         });
         console.log(updatedData, 'updatedData====');
@@ -256,9 +272,22 @@ function OnHoldManegementSystem() {
                 console.log(response, 'response')
                 let data = response.data.products.map((v, i) => ({ ...v, id: i }));
                 console.log(data, 'data=====')
-                console.log(data[0], 'data[0]=====')
-                setManualProducts(data);
-                setSingleProductD([data[0]])
+                const modifiedData = data.map(item => {
+                    if (item.variation_values.length === 0) {
+                        // If variation_values is an empty array, return the item as it is
+                        return item;
+                    } else {
+                        // If variation_values is not an empty array, add variationColor and variationSize properties
+                        return {
+                            ...item,
+                            variationColor: '',
+                            variationSize: ''
+                        };
+                    }
+                });
+                console.log(modifiedData[0], 'data[0]=====')
+                setManualProducts(modifiedData);
+                setSingleProductD([modifiedData[0]])
                 console.log(manualProducts, 'manualProducts');
                 console.log(singleProductD, 'singleProductD');
                 console.log(productNameF, 'productNameF');
@@ -293,6 +322,24 @@ function OnHoldManegementSystem() {
     const handalADDProduct = () => {
         console.log(singleProductD, 'singleProductD======');
 
+        // // Check if variation_values contains data
+        // if (singleProductD.variationValues.color.length > 0 || singleProductD.variationValues.size.length > 0) {
+        //     console.log('variation_values contains data');
+        // } else {
+        //     console.log('variation_values is an empty array');
+        // }
+        // if (singleProductD[0].variation_values.length === 0) {
+        //     console.log('variation_values is an empty array');
+        // } else {
+        //     console.log('variation_values contains data');
+
+        //     let data = singleProductD.map((v,i)=>({
+        //         ...v,variation_size:'',variation_color:''
+        //     }))
+
+        //     console.log(data,'data');
+        // }
+        console.log(singleProductD, 'singleProductD');
         let data = [
             ...tableData, ...singleProductD
         ]
@@ -328,6 +375,7 @@ function OnHoldManegementSystem() {
         console.log(receivedBoxes, 'receivedBoxes');
         console.log(selectFile, 'selectFile');
         console.log(tableData, 'tableData');
+
         const currentDate = new Date().toISOString().split('T')[0];
 
         const convertedData = tableData.map(item => ({
@@ -335,12 +383,22 @@ function OnHoldManegementSystem() {
             product_name: item.product_name,
             product_image: item.product_image,
             variation_id: 1, // Assuming a default variation ID
-            variation_value: item.variation_values,
+            // variation_value: item.variation_values={color:[item.variation_color],size:[item.variation_size]},
+
+            variations: item.variationColor !== undefined && item.variationSize !== undefined ? { color: item.variationColor, size: item.variationSize } : [],
             qty_received: parseInt(item.Quantity),
             qty_remain: parseInt(item.Quantity),
             updated_date: currentDate, // Assuming a default updated date
             allocated_order: [789, 790] // Assuming a default allocated order
         }));
+
+        const formData = new FormData();
+        formData.append("created_date", date);
+        formData.append("verified_by", userName);
+        formData.append("boxes_received", receivedBoxes);
+        formData.append("attachment_bill_image", selectFile);
+        formData.append("status", "Pending for process");
+        formData.append("products", JSON.stringify(convertedData));
 
         const payload = {
             "created_date": date,
@@ -353,23 +411,61 @@ function OnHoldManegementSystem() {
 
         console.log(convertedData, 'convertedData');
         console.log(payload, 'payload');
+        console.log(formData.values, 'formData');
 
-        try {
-            let url = `${API_URL}wp-json/custom-api/v1/add-grn`
-            const response = await axios.post(url, payload);
-
-            console.log(response, 'response');
-            if(response){
+        tableData.map(async (item) => {
+            if (item.Quantity === "") {
                 Swal.fire({
-                    icon: "success",
-                    title: response.data,
-                    showConfirmButton: true,
-                  })
+                    icon: 'error',
+                    title: 'Missing Quantity',
+                    text: 'The quantity for this item is missing.'
+                });
+            } else {
+                if (item.variation_values.length !== 0) {
+                    if (item.variationSize === '' && item.variationColor === '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Missing Size and Color',
+                            text: 'This item has variations but both size and color are missing.'
+                        });
+                    } else if (item.variationSize === '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Missing Size',
+                            text: 'This item has variations but size is missing.'
+                        });
+                    } else if (item.variationColor === '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Missing Color',
+                            text: 'This item has variations but color is missing.'
+                        });
+                    } else {
+                        console.log('hiii');
+                        try {
+                            let url = `${API_URL}wp-json/custom-api/v1/add-grn`
+                            const response = await axios.post(url, payload);
+                            // const response = await axios.post(url, formData);
+
+                            console.log(response, 'response');
+                            if (response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: response.data,
+                                    showConfirmButton: true,
+                                })
+                            }
+
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    }
+                }
             }
-            
-        } catch (error) {
-            console.log(error);
-        }
+
+        });
+
+
 
 
 
@@ -381,39 +477,10 @@ function OnHoldManegementSystem() {
                     On-hold Management System
                 </Typography>
             </Box>
-            {/* <h3 className='fw-bold text-center py-3'>On-hold Management System</h3> */}
             <Form inline className='mb-4'>
                 <Row className="align-items-center px-1">
                     <Col xs="auto" lg="3">
-                        {/* <Form.Group>
-                            <Form.Label className="fw-semibold mb-0">
-                                Date filter:
-                            </Form.Label>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer sx={{
-                                    "& .MuiFormControl-root": {
-                                        minWidth: 'unset !important'
-                                    },
-                                }} components={["SingleInputDateRangeField"]}>
-                                    <DateRangePicker
-                                        sx={{
-                                            "& .MuiInputBase-root": {
-                                                paddingRight: 0,
-                                            },
-                                            "& .MuiInputBase-input": {
-                                                padding: ".5rem .75rem .5rem .75rem",
-                                                "&:hover": {
-                                                    borderColor: "#dee2e6",
-                                                },
-                                            },
-                                        }}
-                                        value={selectedDateRange}
-                                        onChange={handleDateChange}
-                                        slots={{ field: SingleInputDateRangeField }}
-                                    />
-                                </DemoContainer>
-                            </LocalizationProvider>
-                        </Form.Group> */}
+
                         <Form.Group controlId="duedate">
                             <Form.Label>Date filter:</Form.Label>
                             <Form.Control type="date" name="duedate" placeholder="Due date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -422,15 +489,7 @@ function OnHoldManegementSystem() {
                     <Col xs="auto" lg="3">
                         <Form.Group>
                             <Form.Label className="fw-semibold">Verified By:</Form.Label>
-                            {/* <Form.Select
-                                className="mr-sm-2 py-2"
-                                onChange={(e) => setSelectedOperator(e.target.value)}
-                            >
-                                <option disabled value="">Select Operator</option>
-                                <option value="test1">Test1</option>
-                                <option value="test2">Test2</option>
-                                <option value="test3">Test3</option>
-                            </Form.Select> */}
+
                             <Form.Control
                                 type="text"
                                 placeholder="Enter No of received boxes"
@@ -470,25 +529,6 @@ function OnHoldManegementSystem() {
                 <Card className='py-3'>
                     <Row className=' justify-content-start'>
 
-                        {/* <Form.Group>
-                            <Form.Label className="fw-semibold">Search Products:</Form.Label>
-                            
-                            <Autocomplete
-                                className="mr-sm-2 py-2"
-                                disablePortal
-                                id="combo-box-demo"
-                                options={top100Films}
-                                sx={{
-                                    width: 300,
-                                    "& .MuiInputBase-root": {
-                                        paddingTop: '0px',
-                                        paddingBottom: '0px'
-                                    },
-                                }}
-                                renderInput={(params) => <TextField {...params} />}
-                            />
-                            value={manualProductF} onChange={(e) => setManualProductF(e.target.value)}
-                        </Form.Group> */}
                         <Col xs="auto" lg="4">
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product Name:</Form.Label>

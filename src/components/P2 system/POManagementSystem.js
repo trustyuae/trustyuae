@@ -18,6 +18,7 @@ import { API_URL } from '../../redux/constants/Constants';
 import { Link } from 'react-router-dom';
 import { Badge, Card, Tab, Tabs } from 'react-bootstrap';
 import DataTable from '../DataTable';
+import Swal from 'sweetalert2';
 
 const tableHeaders = [
     "PO Number",
@@ -238,7 +239,7 @@ function POManagementSystem() {
                                 <FaEye />
                             </Button>
                         </Link>
-                        <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
+                        <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }} onClick={()=>handleDeletePO(value.row.po_id)}>
                             <MdDelete />
                         </Button>
                     </div>
@@ -246,6 +247,35 @@ function POManagementSystem() {
             },
         },
     ];
+
+    const handleDeletePO = async (id) => {
+        Swal.fire({
+            icon: "error",
+            title: 'Are you sure you want to delete this order?',
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No"
+        }).then(async (result) => {
+            try {
+                if (result.isConfirmed) {
+                    console.log('yes');
+                    // Handle deletion logic if user clicks "Yes"
+                    const response = await axios.post(`${API_URL}wp-json/delete-record/v1/delete-po-record/`, {
+                        po_id: id
+                    });
+                    console.log(response, 'res====');
+                } else {
+                    // Handle cancellation logic if user clicks "No" or outside the dialog
+                    console.log('no');
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        });
+    
+        console.log(id, 'id delete');
+    };
+    
 
     const handleTabChange = (e) => {
         console.log(e);

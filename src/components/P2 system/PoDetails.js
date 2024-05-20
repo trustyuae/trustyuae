@@ -13,7 +13,7 @@ import Container from 'react-bootstrap/Container';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { API_URL } from '../../redux/constants/Constants';
 import axios from 'axios';
-import { Card, Col } from 'react-bootstrap';
+import { Badge, Card, Col } from 'react-bootstrap';
 import DataTable from '../DataTable';
 import { Box, MenuItem, Select, Typography } from '@mui/material';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -29,6 +29,9 @@ const PoDetails = () => {
     const paymentS = ['Paid', 'Unpaid', 'Hold', 'Cancelled']
     const POStatusFilter = ['Open', 'Checking with factory', 'Closed'];
     const [PoStatus, setPoStatus] = useState("open");
+    const [factories, setFactories] = useState([]);
+    const [factorieName, setFactorieName] = useState('');
+
     const navigate = useNavigate();
 
     const fetchOrder = async () => {
@@ -45,10 +48,23 @@ const PoDetails = () => {
 
         setPO_OrderList(row)
         setData(response.data.line_items)
+        setFactorieName(response.data.factory_id)
     }
+
+    const fetchFactories = async () => {
+        try {
+            const response = await axios.get(
+                `${API_URL}wp-json/custom-factory/v1/fetch-factories`
+            );
+            setFactories(response.data);
+        } catch (error) {
+            console.error("Error fetching factories:", error);
+        }
+    };
 
     useEffect(() => {
         fetchOrder()
+        fetchFactories()
     }, [])
 
 
@@ -306,6 +322,17 @@ const PoDetails = () => {
     const handalBackButton = () => {
         navigate("/PO_ManagementSystem");
     };
+
+    const POTypes=(id)=>{
+        const getPOType = id.substring(0,2)
+        if(getPOType=='PO'){
+            return ',PO against Orders'
+        }else if(getPOType=='MO'){
+            return 'Manual PO'
+        }else if(getPOType=='SO'){
+            return'Scheduled PO'
+        }
+    }
     return (
         <Container fluid className='px-5' style={{ height: '100vh' }}>
             <MDBRow className="my-3">
@@ -330,7 +357,9 @@ const PoDetails = () => {
                             PO Details
                         </Typography>
                         <Box>
-                            <Typography className="fw-bold">PO Number# {id}</Typography>
+                            <Typography className="fw-bold">
+                                {/* PO Number */}
+                                # {id}</Typography>
                         </Box>
                         <Typography
                             className=""
@@ -338,12 +367,18 @@ const PoDetails = () => {
                                 fontSize: 14,
                             }}
                         >
-                            {/* <Badge bg="success">{orderDetails?.order_status}</Badge> */}
+                            <Badge bg="success">
+                            {
+                                POTypes(id)
+                            }
+                            </Badge>
                         </Typography>
                     </Box>
                     <Box>
                         <Typography variant="h6" className="fw-bold mb-3">
-                            XYZ Guangzhon
+                            {
+                                factories.find((factory) => factory.id == factorieName)?.factory_name
+                            }
                         </Typography>
                     </Box>
                 </Box>
