@@ -261,6 +261,13 @@ const GRNEdit = () => {
             },
         },
         { field: "variation_value", headerName: "Variation", flex: 2 ,
+        renderCell: (params) => {
+            if (params.row.variations != '') {
+                return formatVariations(params.row.variations)
+            } else {
+                return ''
+            }
+        }
         },
         { field: "qty_received", headerName: "Qty Received", flex: 2 ,
         },
@@ -285,6 +292,14 @@ const GRNEdit = () => {
     ];
     const handalBackButton = () => {
         navigate("/GRN_Management");
+    };
+    const formatVariations = (variations) => {
+        const parsedVariations = JSON.parse(variations);
+        if (Object.keys(parsedVariations).length === 0) {
+            return "No variations"; // If variations are empty
+        } else {
+            return Object.entries(parsedVariations).map(([key, value]) => `${key}: ${value}`).join(", ");
+        }
     };
     return (
         <Container fluid className='px-5' style={{ height: '100vh' }}>
