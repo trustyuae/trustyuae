@@ -154,23 +154,30 @@ function OrderNotAvailable() {
   };
 
   const handleUpdateStatus = async () => {
-    const poId = selectedOrderNotAvailable.map((order) => order.po_id);
-    const orderId = selectedOrderNotAvailable.map((order) => order.order_id);
-    const productId = selectedOrderNotAvailable.map((order) => order.product_id);
-    const customerStatus = selectedOrderNotAvailable.map(
-      (order) => order.customer_status
-    );
-
-    const requestedDataS = {
-      po_id: poId,
-      order_id: orderId,
-      product_id: productId,
-      customer_status: customerStatus
+    if(selectedOrderNotAvailable.length === 0){
+      Swal.fire({
+        icon: "error",
+        title: "please select products whose you wanna update status!",
+      });
+    }else{
+      const poId = selectedOrderNotAvailable.map((order) => order.po_id);
+      const orderId = selectedOrderNotAvailable.map((order) => order.order_id);
+      const productId = selectedOrderNotAvailable.map((order) => order.product_id);
+      const customerStatus = selectedOrderNotAvailable.map(
+        (order) => order.customer_status
+      );
+  
+      const requestedDataS = {
+        po_id: poId,
+        order_id: orderId,
+        product_id: productId,
+        customer_status: customerStatus
+      }
+      await dispatch(OrderNotAvailableDataStatus(requestedDataS))
+        .then(() => {
+          setSelectedOrderNotAvailable([]);
+        })
     }
-    await dispatch(OrderNotAvailableDataStatus(requestedDataS))
-      .then(() => {
-        setSelectedOrderNotAvailable([]);
-      })
   };
 
   const handleModalClose = async () => {
