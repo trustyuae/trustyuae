@@ -56,7 +56,7 @@ function App() {
               </Route>
               <Route exact path="/GRN_Management" element={<GRNManagement/>} />
               <Route exact path="/GRN_Edit/:id" element={<GRNEdit/>} />
-              <Route exact path="/On_Hold_Management" element={<OnHoldManagement/>} />
+              <Route exact path="/On_Hold_Management/:id" element={<OnHoldManagement/>} />
               <Route exact path="/On_Hold_Manegement_System" element={<OnHoldManegementSystem/>} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
             </Route>
