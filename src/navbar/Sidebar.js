@@ -78,12 +78,6 @@ const Sidebar = () => {
                   <span>GRN Management</span>
                 </Link>
               </li>
-              <li>
-                <Link to="/On_Hold_Management">
-                  <i className="bi bi-circle"></i>
-                  <span>On Hold Management</span>
-                </Link>
-              </li>
             </ul>
           </li>
 
@@ -142,7 +136,6 @@ const Sidebar = () => {
               </li>
             </ul>
           </li>
-
         </ul>
       </aside>
     </>
