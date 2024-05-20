@@ -315,7 +315,7 @@ function OrderManagementSystem() {
             return item;
         });
         console.log(updatedData, 'updatedData====');
-        setManualPoOrders(updatedData)
+        setScheduleOrders(updatedData)
        
     };
 
