@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { useDispatch } from "react-redux";
-import { OrderNotAvailableData } from "../../redux/actions/P2SystemActions";
+import { OrderNotAvailableData, OrderNotAvailableDataStatus } from "../../redux/actions/P2SystemActions";
 import DataTable from "../DataTable";
 import ReleaseSchedulePoModal from "./ReleaseSchedulePoModal";
 import {
@@ -45,14 +45,16 @@ function OrderNotAvailable() {
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
-    ordersNotAvailableData.forEach((order) => {
-      if (order.id === itemData.id) order.customer_status = value;
-    });
+    console.log(itemData,'itemData')
+    // ordersNotAvailableData.forEach((order) => {
+    //   if (order.id === itemData.id) order.customer_status = value;
+    // });
+    ordersNotAvailableData?.forEach((order) => {
+        if (order.id === itemData.id) order.customer_status = value;
+      });
   };
 
   const handleCheckboxChange = (e, rowData) => {
-    console.log(rowData, '<=== rowData')
-
     if (!rowData.customer_status) {
       Swal.fire({
         icon: "error",
@@ -151,8 +153,28 @@ function OrderNotAvailable() {
     }
   };
 
-  const handleUpdateStatus = () => {
-    // const customerStatus =
+  const handleUpdateStatus = async() => {
+    const poId = selectedOrderNotAvailable.map((order) => order.po_id);
+    const orderId = selectedOrderNotAvailable.map((order) => order.order_id);
+    const productId = selectedOrderNotAvailable.map((order) => order.product_id);
+    const customerStatus = selectedOrderNotAvailable.map(
+      (order) => order.customer_status
+    );
+    console.log(poId,'poId')
+    console.log(orderId,'orderId')
+    console.log(productId,'productId')
+    console.log(customerStatus,'customerStatus')
+
+    const requestedDataS = {
+      po_id:poId,
+      order_id:orderId,
+      product_id:productId,
+      customer_status:customerStatus
+    }
+    await dispatch(OrderNotAvailableDataStatus(requestedDataS))
+    .then(()=>{
+      setSelectedOrderNotAvailable([]);
+    })
   };
 
   const handleModalClose = async () => {
