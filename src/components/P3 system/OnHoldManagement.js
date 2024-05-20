@@ -19,7 +19,11 @@ import { Badge, Card, Col, Row } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { useDispatch } from "react-redux";
 import { API_URL } from "../../redux/constants/Constants";
-import { GetProductOrderDetails } from "../../redux/actions/P3SystemActions";
+import {
+  AddProductOrderForPre,
+  GetProductOrderDetails,
+} from "../../redux/actions/P3SystemActions";
+import Swal from "sweetalert2";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -28,73 +32,118 @@ function OnHoldManagement() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrders, setSelectedOrders] = useState([]);
-  const [productData, setProductData]=useState([]);
-  const data = [
-    {
-      id: 1,
-      order_id: 86700,
-      shipping_country: "Saudia Arabia",
-      item_received: 1,
-      ouantity_ordered: 1,
-    },
-    {
-      id: 2,
-      order_id: 88802,
-      shipping_country: "Kuwait",
-      item_received: 1,
-      ouantity_ordered: 2,
-    },
-    {
-      id: 3,
-      order_id: 89065,
-      shipping_country: "UAE",
-      item_received: 1,
-      ouantity_ordered: 3,
-    },
-  ];
+  const [productData, setProductData] = useState([]);
+  const [overallProductData, setOverallProductData] = useState([]);
 
   async function fetchProductOrderDetails() {
-    // let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}`;
-    let apiUrl = `https://ghostwhite-guanaco-836757.hostingersite.com/wp-json/on-hold-product/v1/product-in-grn/${params.id}`;
-    console.log(params.id,'params.id')
+    let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}`;
     await dispatch(
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
       })
     )
-      .then((response)=>{
+      .then((response) => {
         let data = response.data.records.map((v, i) => ({
           ...v,
           id: i,
         }));
-        console.log(response.data.records,'response')
-        setProductData(data)
+        console.log(response.data, "responseeeeeeee");
+        setProductData(data);
+        setOverallProductData(response.data);
       })
       .catch((error) => {
         console.error(error);
       });
   }
 
-  console.log(productData,'productData')
-
   const handleCheckboxChange = (e, rowData) => {
+    rowData.isSelected = true;
     const index = selectedOrders?.findIndex((order) => order?.id == rowData.id);
     if (index === -1 && e.target.checked) {
+      rowData.isSelected = true;
       setSelectedOrders((prevSelectedOrders) => [
         ...prevSelectedOrders,
         rowData,
       ]);
     } else if (index !== -1 && !e.target.checked) {
+      rowData.isSelected = false;
       const updatedSelectedOrders = [...selectedOrders];
       updatedSelectedOrders.splice(index, 1);
       setSelectedOrders(updatedSelectedOrders);
     }
-    console.log(selectedOrders, "selectedOrders");
   };
 
   useEffect(() => {
     fetchProductOrderDetails();
   }, []);
+
+  const handleOrderPerp = async () => {
+    const productId = selectedOrders.map((order) => order.product_id);
+    const orderId = selectedOrders.map((order) => order.order_id);
+    const quantity = selectedOrders.map((order) => order.quantity);
+
+    console.log(selectedOrders, "selectedOrders in handleOrderPerp");
+    if (selectedOrders.length === 0) {
+      Swal.fire({
+        icon: "error",
+        title: "please select products for generating schedule po",
+      });
+    } else {
+      const requestedDataP = {
+        product_id: productId,
+        order_id: orderId,
+        quantity: quantity,
+      };
+
+      await dispatch(AddProductOrderForPre(requestedDataP))
+      .then((response) => {
+        if (response) {
+          Swal.fire({
+            icon: "success",
+            title: "Uploaded Successfully!",
+          })
+        }
+      })
+    }
+  };
+
+  // const handleSubmitReleaseSchedulePoModal = async () => {
+  //   const poId = selectedOrders.map((order) => order.po_id);
+  //   const orderId = OrderNotAvailable.map((order) => order.order_id);
+  //   const productId = OrderNotAvailable.map((order) => order.product_id);
+  //   const productQuantity = OrderNotAvailable.map((order) => order.quantity);
+  //   const customerStatus = OrderNotAvailable.map(
+  //     (order) => order.customer_status
+  //   );
+  //   const reminder = dateFilter;
+
+  //   const requestData = {
+  //     po_id: poId,
+  //     order_id: orderId,
+  //     product_id: productId,
+  //     quantity: productQuantity,
+  //     customer_status: customerStatus,
+  //     reminder_date: reminder,
+  //   };
+
+  //   await dispatch(OrderNotAvailableDataPo(requestData))
+  //     .then((response) => {
+  //       if (response.data.message === "Sales Orders created successfully") {
+  //         Swal.fire({
+  //           icon: "success",
+  //           title: "Uploaded Successfully!",
+  //         }).then(res => {
+  //           if (res.isConfirmed) {
+  //             handleUpdatedValues();
+  //             handleCloseReleaseSchedulePoModal();
+  //           }
+  //         });
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // };
 
   const columns = [
     { field: "order_id", headerName: "Order ID", flex: 1 },
@@ -103,21 +152,21 @@ function OnHoldManagement() {
       field: "item_received",
       headerName: "Item Received",
       flex: 1,
-      valueGetter: (value, row) =>{
-        console.log(row,'row')
-        console.log(value,'value')
-        return `${row.quantity} / ${row.available_quantity
-          }`
-      }
+      valueGetter: (value, row) => {
+        console.log(row, "row");
+        console.log(value, "value");
+        return `${row.quantity} / ${row.quantity}`;
+      },
     },
     {
-      field: "qtyOrdered",
-      headerName: "Select All",
+      field: "select",
+      headerName: "Select",
       flex: 1,
       renderCell: (params) => {
         return (
           <FormGroup>
             <FormControlLabel
+              checked={params.row.isSelected}
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               onChange={(event) => handleCheckboxChange(event, params.row)}
@@ -155,10 +204,24 @@ function OnHoldManagement() {
                     <Typography
                       className=""
                       sx={{
+                        display: "flex",
                         fontSize: 14,
+                        alignItems: "center",
+                        justifyContent: "space-between",
                       }}
                     >
-                      <Badge bg="success">{"Order ID"}</Badge>
+                      <Box>
+                        <span>Product Id:</span>{" "}
+                        <Badge bg="success">
+                          {overallProductData.product_id}
+                        </Badge>
+                      </Box>
+                      <Box>
+                        <span>Quantity Received:</span>{" "}
+                        <Badge bg="success">
+                          {overallProductData.qty_remain}
+                        </Badge>
+                      </Box>
                     </Typography>
                   </Box>
                 </Box>
@@ -198,7 +261,9 @@ function OnHoldManagement() {
       </MDBRow>
       <MDBRow>
         <MDBCol md="12" className="d-flex justify-content-end">
-          <Button variant="success">Send for Preparation</Button>
+          <Button variant="success" onClick={handleOrderPerp}>
+            Send for Preparation
+          </Button>
         </MDBCol>
       </MDBRow>
     </Container>
