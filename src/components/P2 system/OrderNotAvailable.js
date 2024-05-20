@@ -13,6 +13,7 @@ import {
   FormGroup,
   MenuItem,
   Select,
+  Typography,
 } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
@@ -30,6 +31,7 @@ function OrderNotAvailable() {
   );
   const [factories, setFactories] = useState([]);
   const [checkBox, setCheckBox] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(0);
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
   const fetchFactories = async () => {
@@ -45,13 +47,11 @@ function OrderNotAvailable() {
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
-    console.log(itemData,'itemData')
-    // ordersNotAvailableData.forEach((order) => {
-    //   if (order.id === itemData.id) order.customer_status = value;
-    // });
-    ordersNotAvailableData?.forEach((order) => {
-        if (order.id === itemData.id) order.customer_status = value;
-      });
+    setSelectedStatus(itemData.id)
+    ordersNotAvailableData.forEach((order) => {
+      if (order.id === itemData.id) order.customer_status = value;
+    });
+
   };
 
   const handleCheckboxChange = (e, rowData) => {
@@ -153,32 +153,28 @@ function OrderNotAvailable() {
     }
   };
 
-  const handleUpdateStatus = async() => {
+  const handleUpdateStatus = async () => {
     const poId = selectedOrderNotAvailable.map((order) => order.po_id);
     const orderId = selectedOrderNotAvailable.map((order) => order.order_id);
     const productId = selectedOrderNotAvailable.map((order) => order.product_id);
     const customerStatus = selectedOrderNotAvailable.map(
       (order) => order.customer_status
     );
-    console.log(poId,'poId')
-    console.log(orderId,'orderId')
-    console.log(productId,'productId')
-    console.log(customerStatus,'customerStatus')
 
     const requestedDataS = {
-      po_id:poId,
-      order_id:orderId,
-      product_id:productId,
-      customer_status:customerStatus
+      po_id: poId,
+      order_id: orderId,
+      product_id: productId,
+      customer_status: customerStatus
     }
     await dispatch(OrderNotAvailableDataStatus(requestedDataS))
-    .then(()=>{
-      setSelectedOrderNotAvailable([]);
-    })
+      .then(() => {
+        setSelectedOrderNotAvailable([]);
+      })
   };
 
   const handleModalClose = async () => {
-    await ordersNotAvailableData.forEach((order) => {
+    ordersNotAvailableData.forEach((order) => {
       order.isSelected = false;
       order.customer_status = "";
     });
@@ -242,27 +238,22 @@ function OrderNotAvailable() {
       field: "customer_status",
       headerName: "Customer Status",
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <Select
-            labelId={`customer-status-${params.row.id}-label`}
-            id={`customer-status-${params.row.id}`}
-            value={params.row.customer_status}
-            onChange={(event) => handleStatusChange(event, params.row)}
-            fullWidth
-            style={{ height: "60%", width: "100%" }}
-          >
-            <MenuItem value={""}></MenuItem>
-            {["Confirmed", "NotConfirmed", "Exchange", "Refund"].map(
-              (status) => (
-                <MenuItem key={status} value={status}>
-                  {status}
-                </MenuItem>
-              )
-            )}
-          </Select>
-        );
-      },
+      renderCell: (params) =>
+        <Select
+          value={params.row.customer_status}
+          onChange={(event) => handleStatusChange(event, params.row)}
+          fullWidth
+          style={{ height: "60%", width: "100%" }}
+        >
+          <MenuItem value={""}></MenuItem>
+          {["Confirmed", "NotConfirmed", "Exchange", "Refund"].map(
+            (status) => (
+              <MenuItem key={status} value={status}>
+                {status}
+              </MenuItem>
+            )
+          )}
+        </Select>
     },
     {
       field: "select",
@@ -290,17 +281,22 @@ function OrderNotAvailable() {
   };
   const handleUpdatedValues = () => {
     setSelectedOrderNotAvailable([]);
+    setSelectedStatus(0)
     fetchOrdersNotAvailableData();
   };
 
   useEffect(() => {
     fetchFactories();
     fetchOrdersNotAvailableData();
-  }, [currentStartIndex, selectedOrderNotAvailable]);
+  }, [currentStartIndex, selectedOrderNotAvailable, setSelectedStatus]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
-      <h3 className="fw-bold text-center py-3">Order Not Available</h3>
+      <Box className="mb-4">
+        <Typography variant="h4" className="fw-semibold">
+          Order Not Available
+        </Typography>
+      </Box>
       <div className="d-flex justify-content-between my-3">
         <Button
           variant="primary w-20 h4"

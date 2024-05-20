@@ -43,11 +43,13 @@ const ReleaseSchedulePoModal = ({
           Swal.fire({
             icon: "success",
             title: "Uploaded Successfully!",
+          }).then(res => {
+            if (res.isConfirmed) {
+              handleUpdatedValues();
+              handleCloseReleaseSchedulePoModal();
+            }
           });
         }
-        handleUpdatedValues();
-        handleCloseReleaseSchedulePoModal();
-        handleCloseReleaseSchedulePoModal();
       })
       .catch((error) => {
         console.error(error);
