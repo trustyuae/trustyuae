@@ -154,19 +154,19 @@ function OrderNotAvailable() {
   };
 
   const handleUpdateStatus = async () => {
-    if(selectedOrderNotAvailable.length === 0){
+    if (selectedOrderNotAvailable.length === 0) {
       Swal.fire({
         icon: "error",
         title: "please select products whose you wanna update status!",
       });
-    }else{
+    } else {
       const poId = selectedOrderNotAvailable.map((order) => order.po_id);
       const orderId = selectedOrderNotAvailable.map((order) => order.order_id);
       const productId = selectedOrderNotAvailable.map((order) => order.product_id);
       const customerStatus = selectedOrderNotAvailable.map(
         (order) => order.customer_status
       );
-  
+
       const requestedDataS = {
         po_id: poId,
         order_id: orderId,
@@ -190,22 +190,24 @@ function OrderNotAvailable() {
   };
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "order_id", headerName: "Order ID", flex: 1 },
+    { field: "id", headerName: "ID", className: "order-not-available", flex: 1 },
+    { field: "order_id", headerName: "Order ID", className: "order-not-available", flex: 1 },
     {
       field: "factory_id",
       headerName: "Factory Name",
+      className: "order-not-available",
       flex: 1,
       renderCell: (params) => {
         return factories.find((factory) => factory.id === params.row.factory_id)
           ?.factory_name;
       },
     },
-    { field: "product_name", headerName: "Item Name", flex: 1 },
+    { field: "product_name", headerName: "Item Name", className: "order-not-available", flex: 1 },
     {
       field: "product_image",
       headerName: "Image",
       flex: 1,
+      className: "order-not-available",
       renderCell: (params) => (
         <Box className="h-100 w-100 d-flex align-items-center">
           <Avatar
@@ -230,21 +232,25 @@ function OrderNotAvailable() {
       field: "quantity",
       headerName: "QTY",
       flex: 1,
+      className: "order-not-available",
     },
     {
       field: "custom_number",
       headerName: "Customer Contact Number",
       flex: 1,
+      className: "order-not-available",
     },
     {
       field: "estimated_production_time",
       headerName: "Estimated Production Timing",
       flex: 1,
+      className: "order-not-available",
     },
     {
       field: "customer_status",
       headerName: "Customer Status",
       flex: 1,
+      className: "order-not-available",
       renderCell: (params) =>
         <Select
           value={params.row.customer_status}
@@ -266,6 +272,7 @@ function OrderNotAvailable() {
       field: "select",
       headerName: "Select",
       flex: 1,
+      className: "order-not-available",
       renderCell: (params) => {
         return (
           <FormGroup>

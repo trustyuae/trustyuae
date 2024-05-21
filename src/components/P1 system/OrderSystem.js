@@ -45,9 +45,7 @@ function OrderSystem() {
     )
       .then((response) => {
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        console.log(data,'data');
         setOrders(data);
-        console.log(orders,'orders');
         setTotalPages(response.data.total_pages);
       })
       .catch((error) => {
@@ -74,13 +72,14 @@ function OrderSystem() {
   };
 
   const columns = [
-    { field: "date", headerName: "Date", flex: 1 },
-    { field: "order_id", headerName: "Order ID", flex: 1 },
-    { field: "customer_name", headerName: "Customer Name", flex: 1 },
+    { field: "date", headerName: "Date", className: "order-system", flex: 1 },
+    { field: "order_id", headerName: "Order ID", className: "order-system", flex: 1 },
+    { field: "customer_name", headerName: "Customer Name", className: "order-system", flex: 1 },
     {
       field: "shipping_country",
       headerName: "Shipping Country",
       type: "string",
+      className: "order-system",
       flex: 1,
       valueGetter: (value, row) => getCountryName(row.shipping_country),
     },
@@ -88,12 +87,14 @@ function OrderSystem() {
       field: "order_status",
       headerName: "Order Status",
       flex: 1,
+      className: "order-system",
       type: "string",
     },
     {
       field: "view_item",
       headerName: "View Item",
       flex: 1,
+      className: "order-system",
       type: "html",
       renderCell: (value, row) => {
         return (
@@ -111,7 +112,7 @@ function OrderSystem() {
             >
               {/* {"  "} */}
               <Badge bg="success" className="m-2">
-                {value?.row?.order_process=='started' ? (value?.row?.order_process) : null}
+                {value?.row?.order_process == 'started' ? (value?.row?.order_process) : null}
               </Badge>
             </Typography>
           </Link>
