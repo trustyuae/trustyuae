@@ -411,60 +411,26 @@ function OnHoldManegementSystem() {
 
         console.log(convertedData, 'convertedData');
         console.log(payload, 'payload');
-        console.log(formData.values, 'formData');
+        
 
-        tableData.map(async (item) => {
-            if (item.Quantity === "") {
+
+        try {
+            let url = `${API_URL}wp-json/custom-api/v1/add-grn`
+            const response = await axios.post(url, payload);
+            // const response = await axios.post(url, formData);
+
+            console.log(response, 'response');
+            if (response) {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Missing Quantity',
-                    text: 'The quantity for this item is missing.'
-                });
-            } else {
-                if (item.variation_values.length !== 0) {
-                    if (item.variationSize === '' && item.variationColor === '') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Missing Size and Color',
-                            text: 'This item has variations but both size and color are missing.'
-                        });
-                    } else if (item.variationSize === '') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Missing Size',
-                            text: 'This item has variations but size is missing.'
-                        });
-                    } else if (item.variationColor === '') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Missing Color',
-                            text: 'This item has variations but color is missing.'
-                        });
-                    } else {
-                        console.log('hiii');
-                        try {
-                            let url = `${API_URL}wp-json/custom-api/v1/add-grn`
-                            const response = await axios.post(url, payload);
-                            // const response = await axios.post(url, formData);
-
-                            console.log(response, 'response');
-                            if (response) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: response.data,
-                                    showConfirmButton: true,
-                                })
-                            }
-
-                        } catch (error) {
-                            console.log(error);
-                        }
-                    }
-                }
+                    icon: "success",
+                    title: response.data,
+                    showConfirmButton: true,
+                })
             }
 
-        });
-
+        } catch (error) {
+            console.log(error);
+        }
 
 
 
