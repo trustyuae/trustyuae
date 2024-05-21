@@ -18,6 +18,9 @@ import {
   CUSTOM_ORDER_FINISH_REQUEST,
   CUSTOM_ORDER_FINISH_SUCCESS,
   CUSTOM_ORDER_FINISH_FAIL,
+  ADD_MESSAGE_REQUEST,
+  ADD_MESSAGE_SUCCESS,
+  ADD_MESSAGE_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -27,6 +30,8 @@ const initialState = {
   isOrderDetails: false,
   uploadAttachFile:[],
   isUploadAttachFile:false,
+  Message: [],
+  isMessage: false,
   orderPickUp: [],
   isOrderPickUp: false,
   orderPickUpCancel: [],
@@ -58,6 +63,13 @@ const OrderSystemReducer = (state = initialState, action) => {
       return { ...state, isOrderPickUp: false, uploadAttachFile: action.payload };
     case UPLOAD_ATTACH_FILE_FAIL:
       return { ...state, isOrderPickUp: false, error: action.payload };
+
+      case ADD_MESSAGE_REQUEST:
+        return { ...state, isMessage: true };
+      case  ADD_MESSAGE_SUCCESS:
+        return { ...state, isMessage: false, Message: action.payload };
+      case ADD_MESSAGE_FAIL:
+        return { ...state, isMessage: false, error: action.payload };
 
     case INSERT_ORDER_PICKUP_REQUEST:
       return { ...state, isOrderPickUp: true };

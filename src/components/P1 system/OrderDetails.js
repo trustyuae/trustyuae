@@ -18,6 +18,7 @@ import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlin
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  AddMessage,
   AttachmentFileUpload,
   CustomOrderFinish,
   InsertOrderPickup,
@@ -41,17 +42,17 @@ function OrderDetails() {
   const fileInputRef = useRef(null);
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
-  console.log(userData, "userData date-13-05-2024");
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const [message, setMessage]=useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
-
+ console.log(orderDetailsDataOrderId?.operation_user_note,'orderDetailsDataOrderId?.operation_user_note')
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedFileUrl(imageSrc);
@@ -68,7 +69,6 @@ function OrderDetails() {
         console.error("Error converting data URL to file:", error);
       });
     setShowAttachmentModal(true);
-    // handleSubmitAttachment(itemId);
   }, [webcamRef]);
 
   const retake = () => {
@@ -95,9 +95,29 @@ function OrderDetails() {
       });
   }
 
+  const handleAddMessage =async()=>{
+    const orderId = parseInt(id, 10);
+    const requestedMessage ={
+      message:message,
+      order_id:orderId
+    }
+  await dispatch(AddMessage(requestedMessage))
+  .then((response)=>{
+    if(response.data === "Message added successfully"){
+      Swal.fire({
+        icon: "success",
+        title: "Message uploaded Successfully!",
+      }).then(() => {
+        setMessage('');
+        handleMessageCloseModal();
+      });
+    }
+  })
+  }
+
   useEffect(() => {
     fetchOrder();
-  }, []);
+  }, [message]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -641,6 +661,9 @@ function OrderDetails() {
         <Alert variant={"info"}>
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
+        <Alert variant={"success"}>
+          <label>Meesage :-</label> <Box>{orderDetailsDataOrderId?.operation_user_note}</Box>
+        </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
@@ -735,8 +758,10 @@ function OrderDetails() {
               as="textarea"
               placeholder="Enter your message here..."
               rows={3}
+              value={message}
+              onChange={(e)=>setMessage(e.target.value)}
             />
-            <Button className="mt-2">Add Message</Button>
+            <Button className="mt-2" onClick={handleAddMessage}>Add Message</Button>
           </Modal.Body>
         </Modal>
 
