@@ -2,10 +2,10 @@ import * as React from 'react';
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 import { Box, Pagination } from '@mui/material';
 
-export default function DataTable({ columns, rows, page = 1, totalPages = 1, handleChange = () => {}, pageSize = 10 ,checkboxSelection=false,onCellEditStart=()=>{},processRowUpdate=()=>{},rowHeight=50}) {
+export default function DataTable({ columns, rows, page = 1, totalPages = 1, handleChange = () => { }, pageSize = 10, checkboxSelection = false, onCellEditStart = () => { }, processRowUpdate = () => { }, rowHeight = 50 }) {
   return (
     <Box style={{
-       width: '100%',
+      width: '100%',
       [`.${gridClasses.cell}.hot`]: {
         backgroundColor: '#ff943975',
         color: '#1a3e72',
@@ -44,10 +44,18 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
           },
         }}
         getCellClassName={(params) => {
-          if (!params.row.order_status) {
-            return '';
+          if (params.colDef.className == "order-not-available") {
+            if (!params.row.customer_status) {
+              return '';
+            }
+            return params.row.customer_status == 'Confirmed' ? 'bg-green' : params.row.customer_status == 'Exchange' ? 'bg-yellow' : params.row.customer_status == 'Refund' ? 'bg-danger' : params.row.customer_status == 'NotConfirmed' ? 'bg-secondary' : '';
           }
-          return params.row.order_status == 'Dispatch' ? 'bg-green' : params.row.order_status == 'Reserve' ? 'bg-yellow' : '';
+          if (params.colDef.className == "order-system") {
+            if (!params.row.order_status) {
+              return '';
+            }
+            return params.row.order_status == 'Dispatch' ? 'bg-green' : params.row.order_status == 'Reserve' ? 'bg-yellow' : '';
+          }
         }}
         checkboxSelection={checkboxSelection}
         onCellEditStart={onCellEditStart}
