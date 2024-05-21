@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MDBRow } from 'mdb-react-ui-kit';
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
-import { Badge, Button, Card, Col, Row } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Modal, Row } from 'react-bootstrap';
 import { Box, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import DataTable from '../DataTable';
 import { API_URL } from '../../redux/constants/Constants';
@@ -34,6 +34,9 @@ function OnHoldManegementSystem() {
     const dispatch = useDispatch();
     const [isValid, setIsValid] = useState(false);
     const navigate = useNavigate();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [imageURL, setImageURL] = useState("");
+
 
     const renderVariationValues = (params) => {
         const { color, size } = params.row.variation_values;
@@ -93,8 +96,9 @@ function OnHoldManegementSystem() {
             type: "html",
             renderCell: (value, row) =>
                 <img
-                    src={value.row.product_image}
+                    src={value.row.product_image || `${require("../../assets/default.png")}`}
                     alt={value.row.product_name}
+                    onClick={() => ImageModule(value.row.product_image)}
                     className="img-fluid"
                     width={100}
                 />
@@ -140,7 +144,7 @@ function OnHoldManegementSystem() {
     };
 
     const handleQtyChange = (id, event) => {
-        
+
         handleFieldChange(id.target.value, 'Quantity', event);
     };
 
@@ -216,8 +220,8 @@ function OnHoldManegementSystem() {
         const isValid = data.every(item => item.Quantity);
         const isValidSize = data.every(item => item.variationSize);
         setIsValid(isValid);
-      };
-    
+    };
+
 
     const handleSubmit = async () => {
         // console.log(tableData,'tableData');
@@ -254,15 +258,15 @@ function OnHoldManegementSystem() {
 
         console.log(convertedData, 'convertedData');
         console.log(payload, 'payload');
-        
+
 
 
         try {
             let url = `${API_URL}wp-json/custom-api/v1/add-grn`
-            const response = await axios.post(url, payload,{
+            const response = await axios.post(url, payload, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                  }
+                }
             });
             // const response = await axios.post(url, formData);
 
@@ -282,11 +286,13 @@ function OnHoldManegementSystem() {
         } catch (error) {
             console.log(error);
         }
-
-
-
-
     }
+
+    const ImageModule = (url) => {
+        setImageURL(url);
+        setShowEditModal(true);
+      };
+
     return (
         <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
             <Box className="mb-4">
@@ -389,7 +395,7 @@ function OnHoldManegementSystem() {
                                             <Col md="6">
                                                 <Box className="w-100" sx={{ height: '200px' }}>
                                                     {/* <img className="w-100 h-100" style={{ objectFit: 'cover' }} src={require('../../assets/default.png')} /> */}
-                                                    <img className="w-100 h-100" style={{ objectFit: 'cover' }} src={d.product_image} alt={d.product_image} />
+                                                    <img className="" style={{ objectFit: 'cover', height: '150px' }} src={d.product_image || `${require("../../assets/default.png")}`} alt={d.product_image} />
                                                 </Box>
                                             </Col>
                                         </Row>
@@ -429,6 +435,22 @@ function OnHoldManegementSystem() {
 
                 </Card>
             </MDBRow>
+
+            <Modal
+                show={showEditModal}
+                // onHide={handleCloseEditModal}
+                onHide={() => setShowEditModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Product Image</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Card className="factory-card">
+                        <img src={imageURL || `${require("../../assets/default.png")}`} alt="Product" />
+                    </Card>
+                </Modal.Body>
+            </Modal>
 
         </Container >
     )
