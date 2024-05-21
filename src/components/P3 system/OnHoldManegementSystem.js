@@ -145,6 +145,7 @@ function OnHoldManegementSystem() {
 
     const handleQtyChange = (id, event) => {
 
+
         handleFieldChange(id.target.value, 'Quantity', event);
     };
 
@@ -179,7 +180,7 @@ function OnHoldManegementSystem() {
 
     useEffect(() => {
         getAllProducts()
-    }, [productNameF, productIDF])
+    }, [productNameF, productIDF, tableData])
 
     useEffect(() => {
         let info = JSON.parse(localStorage.getItem('user_data'))
@@ -189,9 +190,8 @@ function OnHoldManegementSystem() {
     const handalADDProduct = () => {
         let data = [...tableData, ...singleProductD]
         let Updatedata = data.map((v, i) => ({ ...v, id: i }));
-        setTableData(Updatedata)
         validateForm(Updatedata);
-
+        setTableData(Updatedata)
         setProductName('')
         setProductID('')
     }
@@ -208,24 +208,16 @@ function OnHoldManegementSystem() {
         setFile(e.target.files[0]);
     };
 
-    const handleSwalError = (title, text) => {
-        Swal.fire({
-            icon: 'error',
-            title,
-            text
-        });
-    };
-
     const validateForm = (data) => {
-        const isValid = data.every(item => item.Quantity);
-        const isValidSize = data.every(item => item.variationSize);
-        setIsValid(isValid);
+        let dataa = data.filter(o => (Object.keys(o.variation_values).length > 0))
+        const isValid = dataa.every(item => item.variationColor !== '');
+        const isValidSize = dataa.every(item => item.variationSize !== '');
+        const isQuantityAvailable = data.every(item => item.Quantity !== '')
+        setIsValid(isValid && isValidSize && isQuantityAvailable);
     };
 
 
     const handleSubmit = async () => {
-        // console.log(tableData,'tableData');
-        // console.log(tableData.find(d=>d.variation_values.length!==0));
         const currentDate = new Date().toISOString().split('T')[0];
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
@@ -255,12 +247,6 @@ function OnHoldManegementSystem() {
             "status": "Pending for process",
             products: convertedData
         };
-
-        console.log(convertedData, 'convertedData');
-        console.log(payload, 'payload');
-
-
-
         try {
             let url = `${API_URL}wp-json/custom-api/v1/add-grn`
             const response = await axios.post(url, payload, {
@@ -268,9 +254,6 @@ function OnHoldManegementSystem() {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            // const response = await axios.post(url, formData);
-
-            console.log(response, 'response');
             if (response) {
                 Swal.fire({
                     icon: "success",
@@ -284,7 +267,7 @@ function OnHoldManegementSystem() {
             }
 
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }
 
@@ -406,7 +389,7 @@ function OnHoldManegementSystem() {
                         </Card>
                     </MDBRow>
                     <MDBRow className='justify-content-end px-3'>
-                        <Button variant="primary" style={{ width: '100px' }} disabled={(productNameF == '' && productIDF == '')} onClick={handalADDProduct}>
+                        <Button variant="primary" className='w-auto' disabled={(productNameF == '' && productIDF == '')} onClick={handalADDProduct}>
                             Add Product
                         </Button>
                     </MDBRow>

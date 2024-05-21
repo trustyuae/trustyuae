@@ -39,7 +39,7 @@ const ReleaseSchedulePoModal = ({
 
     await dispatch(OrderNotAvailableDataPo(requestData))
       .then((response) => {
-        if (response.data.message === "Sales Orders created successfully") {
+        if (response.data.message) {
           Swal.fire({
             icon: "success",
             title: "Uploaded Successfully!",
