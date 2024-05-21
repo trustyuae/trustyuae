@@ -11,6 +11,7 @@ import { GetProductManual } from '../../redux/actions/P3SystemActions';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { MdDelete } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 
 
 function OnHoldManegementSystem() {
@@ -31,6 +32,8 @@ function OnHoldManegementSystem() {
     const [selectFile, setFile] = useState(null);
     const [userName, setuserName] = useState('')
     const dispatch = useDispatch();
+    const [isValid, setIsValid] = useState(false);
+    const navigate = useNavigate();
 
     const renderVariationValues = (params) => {
         const { color, size } = params.row.variation_values;
@@ -124,6 +127,8 @@ function OnHoldManegementSystem() {
             return item;
         });
         setTableData(updatedData);
+        validateForm(updatedData);
+
     };
 
     const handleColorChange = (id, event) => {
@@ -135,8 +140,7 @@ function OnHoldManegementSystem() {
     };
 
     const handleQtyChange = (id, event) => {
-        console.log(id.target.value, event,'id, event====');
-        console.log(tableData,'tableData');
+        
         handleFieldChange(id.target.value, 'Quantity', event);
     };
 
@@ -182,6 +186,8 @@ function OnHoldManegementSystem() {
         let data = [...tableData, ...singleProductD]
         let Updatedata = data.map((v, i) => ({ ...v, id: i }));
         setTableData(Updatedata)
+        validateForm(Updatedata);
+
         setProductName('')
         setProductID('')
     }
@@ -206,19 +212,27 @@ function OnHoldManegementSystem() {
         });
     };
 
-    const handleSubmit = async () => {
-        const currentDate = new Date().toISOString().split('T')[0];
+    const validateForm = (data) => {
+        const isValid = data.every(item => item.Quantity);
+        const isValidSize = data.every(item => item.variationSize);
+        setIsValid(isValid);
+      };
+    
 
+    const handleSubmit = async () => {
+        // console.log(tableData,'tableData');
+        // console.log(tableData.find(d=>d.variation_values.length!==0));
+        const currentDate = new Date().toISOString().split('T')[0];
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
             product_image: item.product_image,
             variation_id: 1,
-            variations: item.variationColor !== undefined && item.variationSize !== undefined ? { color: item.variationColor, size: item.variationSize } : [],
+            variations: item.variationColor !== "" && item.variationSize !== "" ? { color: item.variationColor, size: item.variationSize } : [],
             qty_received: parseInt(item.Quantity),
             qty_remain: parseInt(item.Quantity),
             updated_date: currentDate,
-            allocated_order: [789, 790]
+            // allocated_order: [789, 790]
         }));
 
         const formData = new FormData();
@@ -233,7 +247,7 @@ function OnHoldManegementSystem() {
             "created_date": date,
             "verified_by": userName,
             "boxes_received": receivedBoxes,
-            "attachment_bill_image": "",
+            "attachment_bill_image": selectFile,
             "status": "Pending for process",
             products: convertedData
         };
@@ -245,7 +259,11 @@ function OnHoldManegementSystem() {
 
         try {
             let url = `${API_URL}wp-json/custom-api/v1/add-grn`
-            const response = await axios.post(url, payload);
+            const response = await axios.post(url, payload,{
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                  }
+            });
             // const response = await axios.post(url, formData);
 
             console.log(response, 'response');
@@ -254,7 +272,11 @@ function OnHoldManegementSystem() {
                     icon: "success",
                     title: response.data,
                     showConfirmButton: true,
-                })
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        navigate("/GRN_Management");
+                    }
+                });
             }
 
         } catch (error) {
@@ -397,7 +419,7 @@ function OnHoldManegementSystem() {
                                     />
                                 </div>
                                 <MDBRow className='justify-content-end px-3'>
-                                    <Button variant="primary" style={{ width: '100px' }} onClick={handleSubmit}>
+                                    <Button variant="primary" disabled={!isValid} style={{ width: '100px' }} onClick={handleSubmit}>
                                         submit
                                     </Button>
                                 </MDBRow>
