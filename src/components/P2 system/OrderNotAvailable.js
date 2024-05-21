@@ -311,22 +311,22 @@ function OrderNotAvailable() {
           Order Not Available
         </Typography>
       </Box>
-      <div className="d-flex justify-content-between my-3">
+      <Box className="d-flex justify-content-end my-3">
         <Button
-          variant="primary w-20 h4"
-          className="fw-semibold"
+          variant="outline-success w-20 h4"
+          className="fw-semibold me-3"
           onClick={handleGenerateSchedulePo}
         >
           Release Scheduled PO
         </Button>
         <Button
-          variant="primary w-15 h4"
+          variant="outline-primary w-15 h4"
           className="fw-semibold"
           onClick={handleUpdateStatus}
         >
           Update Status
         </Button>
-      </div>
+      </Box>
       <div className="mt-2">
         <DataTable
           columns={columns}
