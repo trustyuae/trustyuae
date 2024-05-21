@@ -1,7 +1,6 @@
 import { Box, Card } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
-import Dashboard from "../components/Dashboardd";
 import { Outlet } from "react-router-dom";
 import Header from "../navbar/Header";
 import SideBar from "../navbar/Sidebar";
@@ -39,7 +38,6 @@ export const Layout = () => {
   return (
     <OuterContainer>
       <InnerContainer>
-        {/* <Dashboard /> */}
         <Header />
         <SideBar />
         <StyledMain id="main" className="overflow-visible">
