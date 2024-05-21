@@ -167,7 +167,6 @@ function OnHoldManagement() {
                     <Typography
                       className=""
                       sx={{
-                        display: "flex",
                         fontSize: 14,
                         alignItems: "center",
                         justifyContent: "space-between",

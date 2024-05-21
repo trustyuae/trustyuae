@@ -101,7 +101,7 @@ const GRNEdit = () => {
   //   }
   // };
   const formatVariations = (variations) => {
-    const parsedVariations = JSON.parse(variations);
+    const parsedVariations = variations;
     if (Object.keys(parsedVariations) === '') {
       return "No variations"; // If variations are empty
     } else {

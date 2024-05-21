@@ -742,7 +742,6 @@ function OrderDetails() {
           show={showModal}
           handleClosePrintModal={() => setShowModal(false)}
           showModal={showModal}
-          selectedOrder={selectedOrder}
           orderData={orderData}
         />
         <Modal
