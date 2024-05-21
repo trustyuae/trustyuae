@@ -18,6 +18,7 @@ import {
 import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { Card, Modal } from "react-bootstrap";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -33,6 +34,9 @@ function OrderNotAvailable() {
   const [checkBox, setCheckBox] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(0);
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
+  const [imageURL, setImageURL] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+
 
   const fetchFactories = async () => {
     try {
@@ -209,7 +213,10 @@ function OrderNotAvailable() {
       flex: 1,
       className: "order-not-available",
       renderCell: (params) => (
-        <Box className="h-100 w-100 d-flex align-items-center">
+        <Box className="h-100 w-100 d-flex align-items-center" 
+        onClick={() => ImageModule(params.value)}
+        
+        >
           <Avatar
             src={params.value}
             alt="Product Image"
@@ -304,6 +311,11 @@ function OrderNotAvailable() {
     fetchOrdersNotAvailableData();
   }, [currentStartIndex, selectedOrderNotAvailable, setSelectedStatus]);
 
+  const ImageModule = (url) => {
+    setImageURL(url);
+    setShowEditModal(true);
+  };
+
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -344,6 +356,21 @@ function OrderNotAvailable() {
         OrderNotAvailable={selectedOrderNotAvailable}
         handleUpdatedValues={handleUpdatedValues}
       />
+      <Modal
+        show={showEditModal}
+        // onHide={handleCloseEditModal}
+        onHide={() => setShowEditModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Product Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card className="factory-card">
+            <img src={imageURL || `${require("../../assets/default.png")}`} alt="Product" />
+          </Card>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 }
