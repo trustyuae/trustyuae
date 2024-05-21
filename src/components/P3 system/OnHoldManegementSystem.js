@@ -118,8 +118,8 @@ function OnHoldManegementSystem() {
 
     const handleFieldChange = (id, field, value) => {
         const updatedData = tableData.map(item => {
-            if (item.id === id) {
-                return { ...item, [field]: value };
+            if (item.id === value.id) {
+                return { ...item, [field]: id };
             }
             return item;
         });
@@ -127,15 +127,17 @@ function OnHoldManegementSystem() {
     };
 
     const handleColorChange = (id, event) => {
-        handleFieldChange(id, 'variationColor', event.target.value);
+        handleFieldChange(id.target.value, 'variationColor', event);
     };
 
     const handleSizeChange = (id, event) => {
-        handleFieldChange(id, 'variationSize', event.target.value);
+        handleFieldChange(id.target.value, 'variationSize', event);
     };
 
     const handleQtyChange = (id, event) => {
-        handleFieldChange(id, 'Quantity', event.target.value);
+        console.log(id.target.value, event,'id, event====');
+        console.log(tableData,'tableData');
+        handleFieldChange(id.target.value, 'Quantity', event);
     };
 
     const handleDelete = (id) => {
@@ -236,33 +238,31 @@ function OnHoldManegementSystem() {
             products: convertedData
         };
 
+        console.log(convertedData, 'convertedData');
+        console.log(payload, 'payload');
+        
+
+
         try {
-            await Promise.all(tableData.map(async (item) => {
-                if (item.Quantity === "") {
-                    handleSwalError('Missing Quantity', 'The quantity for this item is missing.');
-                } else if (item.variation_values.length !== 0) {
-                    if (item.variationSize === '' && item.variationColor === '') {
-                        handleSwalError('Missing Size and Color', 'This item has variations but both size and color are missing.');
-                    } else if (item.variationSize === '') {
-                        handleSwalError('Missing Size', 'This item has variations but size is missing.');
-                    } else if (item.variationColor === '') {
-                        handleSwalError('Missing Color', 'This item has variations but color is missing.');
-                    } else {
-                        let url = `${API_URL}wp-json/custom-api/v1/add-grn`;
-                        const response = await axios.post(url, payload);
-                        if (response) {
-                            Swal.fire({
-                                icon: "success",
-                                title: response.data,
-                                showConfirmButton: true,
-                            });
-                        }
-                    }
-                }
-            }));
+            let url = `${API_URL}wp-json/custom-api/v1/add-grn`
+            const response = await axios.post(url, payload);
+            // const response = await axios.post(url, formData);
+
+            console.log(response, 'response');
+            if (response) {
+                Swal.fire({
+                    icon: "success",
+                    title: response.data,
+                    showConfirmButton: true,
+                })
+            }
+
         } catch (error) {
-            console.error(error);
+            console.log(error);
         }
+
+
+
 
     }
     return (
