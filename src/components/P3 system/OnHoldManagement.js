@@ -70,7 +70,7 @@ function OnHoldManagement() {
 
   useEffect(() => {
     fetchProductOrderDetails();
-  }, [productData,selectedOrders,overallProductData]);
+  }, [selectedOrders]);
 
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
@@ -97,16 +97,18 @@ function OnHoldManagement() {
             title: "Uploaded Successfully!",
           })
         }
-      }).then(()=>{
-        handleUpdatedValues();
+        selectedOrders.forEach((order) => {
+          order.isSelected = false;
+        });
+        setSelectedOrders([]);
       })
     }
   };
 
-  const handleUpdatedValues = () => {
-    setSelectedOrders([]);
-    fetchProductOrderDetails();
-  };
+  // const handleUpdatedValues = () => {
+  //   setSelectedOrders([]);
+  //   fetchProductOrderDetails();
+  // };
 
   const columns = [
     { field: "order_id", headerName: "Order ID", flex: 1 },

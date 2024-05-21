@@ -7,14 +7,13 @@ import { Box, InputLabel, MenuItem, Select, Typography } from '@mui/material';
 import DataTable from '../DataTable';
 import { API_URL } from '../../redux/constants/Constants';
 import { useDispatch } from 'react-redux';
-import { GetProductManual } from '../../redux/actions/P3SystemActions';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import { AddGrn, GetProductManual } from '../../redux/actions/P3SystemActions';
 import { MdDelete } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
-
 function OnHoldManegementSystem() {
+    const dispatch=useDispatch()
+    const navigate = useNavigate()
     const getTodayDate = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -31,9 +30,7 @@ function OnHoldManegementSystem() {
     const [date, setDate] = useState(getTodayDate())
     const [selectFile, setFile] = useState(null);
     const [userName, setuserName] = useState('')
-    const dispatch = useDispatch();
     const [isValid, setIsValid] = useState(false);
-    const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
 
@@ -228,16 +225,7 @@ function OnHoldManegementSystem() {
             qty_received: parseInt(item.Quantity),
             qty_remain: parseInt(item.Quantity),
             updated_date: currentDate,
-            // allocated_order: [789, 790]
         }));
-
-        const formData = new FormData();
-        formData.append("created_date", date);
-        formData.append("verified_by", userName);
-        formData.append("boxes_received", receivedBoxes);
-        formData.append("attachment_bill_image", selectFile);
-        formData.append("status", "Pending for process");
-        formData.append("products", JSON.stringify(convertedData));
 
         const payload = {
             "created_date": date,
@@ -248,24 +236,7 @@ function OnHoldManegementSystem() {
             products: convertedData
         };
         try {
-            let url = `${API_URL}wp-json/custom-api/v1/add-grn`
-            const response = await axios.post(url, payload, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            if (response) {
-                Swal.fire({
-                    icon: "success",
-                    title: response.data,
-                    showConfirmButton: true,
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        navigate("/GRN_Management");
-                    }
-                });
-            }
-
+            dispatch(AddGrn(payload,navigate))
         } catch (error) {
             console.error(error);
         }
@@ -377,7 +348,6 @@ function OnHoldManegementSystem() {
                                             </Col>
                                             <Col md="6">
                                                 <Box className="w-100" sx={{ height: '200px' }}>
-                                                    {/* <img className="w-100 h-100" style={{ objectFit: 'cover' }} src={require('../../assets/default.png')} /> */}
                                                     <img className="" style={{ objectFit: 'cover', height: '150px' }} src={d.product_image || `${require("../../assets/default.png")}`} alt={d.product_image} />
                                                 </Box>
                                             </Col>
@@ -413,15 +383,12 @@ function OnHoldManegementSystem() {
                                     </Button>
                                 </MDBRow>
                             </>
-                        )
-                    }
-
+                            )}
                 </Card>
             </MDBRow>
 
             <Modal
                 show={showEditModal}
-                // onHide={handleCloseEditModal}
                 onHide={() => setShowEditModal(false)}
                 centered
             >

@@ -24,7 +24,7 @@ import FactoryCoordinatorRoute from "./utils/navigation/FactoryCoordinatorRoute"
 import PageNotFound from "./components/pageNotFound/PageNotFound";
 import CustomerSupportRoute from "./utils/navigation/CustomerSupportRoute";
 import "./index.css";
-import GRNEdit from "./components/P3 system/GRNEdit";
+import GRNView from './components/P3 system/GRNView'
 
 function App() {
   return (
@@ -55,7 +55,7 @@ function App() {
               <Route exact path="/PO_ManagementSystem" element={<POManagementSystem/>} />
               </Route>
               <Route exact path="/GRN_Management" element={<GRNManagement/>} />
-              <Route exact path="/GRN_Edit/:id" element={<GRNEdit/>} />
+              <Route exact path="/GRN_View/:id" element={<GRNView/>} />
               <Route exact path="/On_Hold_Management/:id" element={<OnHoldManagement/>} />
               <Route exact path="/On_Hold_Manegement_System" element={<OnHoldManegementSystem/>} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
