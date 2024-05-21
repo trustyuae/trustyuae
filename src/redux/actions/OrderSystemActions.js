@@ -5,6 +5,9 @@ import {
   GET_ORDER_DETAILS_REQUEST,
   GET_ORDER_DETAILS_SUCCESS,
   GET_ORDER_DETAILS_FAIL,
+  ADD_MESSAGE_REQUEST,
+  ADD_MESSAGE_SUCCESS,
+  ADD_MESSAGE_FAIL,
   API_URL,
   UPLOAD_ATTACH_FILE_REQUEST,
   UPLOAD_ATTACH_FILE_SUCCESS,
@@ -74,6 +77,19 @@ export const OrderDetailsGet =
       dispatch({ type: UPLOAD_ATTACH_FILE_FAIL, error: error.message });
     }
   };
+
+  export const AddMessage = (requestData) => async (dispatch) => {
+    try {
+      dispatch({ type: ADD_MESSAGE_REQUEST });
+      const response = await axios.post(
+        `${API_URL}wp-json/custom-message-note/v1/order-note/`,
+        requestData,);
+      dispatch({ type: ADD_MESSAGE_SUCCESS, payload: response?.data });
+      return response;
+    } catch (error) {
+      dispatch({ type: ADD_MESSAGE_FAIL, error: error.message });
+    }
+  }; 
   
 
 export const InsertOrderPickup = (requestData) => async (dispatch) => {
