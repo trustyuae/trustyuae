@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
-import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
-import axios from "axios";
 import Pagination from "react-bootstrap/Pagination";
 import { useParams } from "react-router-dom";
 import {
@@ -47,7 +43,6 @@ function OnHoldManagement() {
           ...v,
           id: i,
         }));
-        console.log(response.data, "responseeeeeeee");
         setProductData(data);
         setOverallProductData(response.data);
       })
@@ -112,42 +107,6 @@ function OnHoldManagement() {
     setSelectedOrders([]);
     fetchProductOrderDetails();
   };
-  //   const poId = selectedOrders.map((order) => order.po_id);
-  //   const orderId = OrderNotAvailable.map((order) => order.order_id);
-  //   const productId = OrderNotAvailable.map((order) => order.product_id);
-  //   const productQuantity = OrderNotAvailable.map((order) => order.quantity);
-  //   const customerStatus = OrderNotAvailable.map(
-  //     (order) => order.customer_status
-  //   );
-  //   const reminder = dateFilter;
-
-  //   const requestData = {
-  //     po_id: poId,
-  //     order_id: orderId,
-  //     product_id: productId,
-  //     quantity: productQuantity,
-  //     customer_status: customerStatus,
-  //     reminder_date: reminder,
-  //   };
-
-  //   await dispatch(OrderNotAvailableDataPo(requestData))
-  //     .then((response) => {
-  //       if (response.data.message === "Sales Orders created successfully") {
-  //         Swal.fire({
-  //           icon: "success",
-  //           title: "Uploaded Successfully!",
-  //         }).then(res => {
-  //           if (res.isConfirmed) {
-  //             handleUpdatedValues();
-  //             handleCloseReleaseSchedulePoModal();
-  //           }
-  //         });
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error(error);
-  //     });
-  // };
 
   const columns = [
     { field: "order_id", headerName: "Order ID", flex: 1 },
