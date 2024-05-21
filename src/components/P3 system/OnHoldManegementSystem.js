@@ -118,8 +118,8 @@ function OnHoldManegementSystem() {
 
     const handleFieldChange = (id, field, value) => {
         const updatedData = tableData.map(item => {
-            if (item.id === id) {
-                return { ...item, [field]: value };
+            if (item.id === value.id) {
+                return { ...item, [field]: id };
             }
             return item;
         });
@@ -127,15 +127,17 @@ function OnHoldManegementSystem() {
     };
 
     const handleColorChange = (id, event) => {
-        handleFieldChange(id, 'variationColor', event.target.value);
+        handleFieldChange(id.target.value, 'variationColor', event);
     };
 
     const handleSizeChange = (id, event) => {
-        handleFieldChange(id, 'variationSize', event.target.value);
+        handleFieldChange(id.target.value, 'variationSize', event);
     };
 
     const handleQtyChange = (id, event) => {
-        handleFieldChange(id, 'Quantity', event.target.value);
+        console.log(id.target.value, event,'id, event====');
+        console.log(tableData,'tableData');
+        handleFieldChange(id.target.value, 'Quantity', event);
     };
 
     const handleDelete = (id) => {
