@@ -75,10 +75,9 @@ function OnHoldManagement() {
 
   useEffect(() => {
     fetchProductOrderDetails();
-  }, []);
+  }, [productData,selectedOrders,overallProductData]);
 
   const handleOrderPerp = async () => {
-    // const productId = selectedOrders.map((order) => order.product_id);
     const orderId = selectedOrders.map((order) => order.order_id);
     const quantity = selectedOrders.map((order) => order.quantity);
 
@@ -103,11 +102,16 @@ function OnHoldManagement() {
             title: "Uploaded Successfully!",
           })
         }
+      }).then(()=>{
+        handleUpdatedValues();
       })
     }
   };
 
-  // const handleSubmitReleaseSchedulePoModal = async () => {
+  const handleUpdatedValues = () => {
+    setSelectedOrders([]);
+    fetchProductOrderDetails();
+  };
   //   const poId = selectedOrders.map((order) => order.po_id);
   //   const orderId = OrderNotAvailable.map((order) => order.order_id);
   //   const productId = OrderNotAvailable.map((order) => order.product_id);
@@ -218,6 +222,12 @@ function OnHoldManagement() {
                       </Box>
                       <Box>
                         <span>Quantity Received:</span>{" "}
+                        <Badge bg="success">
+                          {overallProductData.qty_received}
+                        </Badge>
+                      </Box>
+                      <Box>
+                        <span>Quantity Remain:</span>{" "}
                         <Badge bg="success">
                           {overallProductData.qty_remain}
                         </Badge>
