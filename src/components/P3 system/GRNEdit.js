@@ -61,7 +61,7 @@ const GRNEdit = () => {
         if (params.row.variations != "") {
           return formatVariations(params.row.variations);
         } else {
-          return "";
+          return "No any variations";
         }
       },
     },
@@ -90,9 +90,19 @@ const GRNEdit = () => {
   const handalBackButton = () => {
     navigate("/GRN_Management");
   };
+  // const formatVariations = (variations) => {
+  //   const parsedVariations = variations;
+  //   if (Object.keys(parsedVariations).length === 0) {
+  //     return "No variations"; // If variations are empty
+  //   } else {
+  //     return Object.entries(parsedVariations)
+  //       .map(([key, value]) => `${key}: ${value}`)
+  //       .join(", ");
+  //   }
+  // };
   const formatVariations = (variations) => {
-    const parsedVariations = variations;
-    if (Object.keys(parsedVariations).length === 0) {
+    const parsedVariations = JSON.parse(variations);
+    if (Object.keys(parsedVariations) === '') {
       return "No variations"; // If variations are empty
     } else {
       return Object.entries(parsedVariations)
