@@ -121,7 +121,7 @@ function GRNManagement() {
             type: "html",
             renderCell: (value, row) => {
                 return (
-                    <Link to={`/GRN_Edit/${value?.row?.grn_no}`}>
+                    <Link to={`/GRN_View/${value?.row?.grn_no}`}>
                         <Button type="button" className="w-auto bg-transparent border-0 text-secondary fs-5">
                             <FaEye className="mb-1" />
                         </Button>

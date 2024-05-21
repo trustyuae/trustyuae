@@ -23,7 +23,7 @@ const OrderDetailsPrintModal = ({
     html2canvas(input).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
-        orientation: "l", // Landscape orientation for a wider page
+        orientation: "l",
         unit: "mm",
         format: "a4",
       });

@@ -2,27 +2,30 @@ import React, { useEffect, useState } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import { Link,useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
 import { Card } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Box,Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { GetGRNView } from "../../redux/actions/P3SystemActions";
 
-const GRNEdit = () => {
+const GRNView = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
-  const [data, setData] = useState(null);
   const navigate = useNavigate();
 
   const fetchOrder = async () => {
     let apiUrl = `${API_URL}wp-json/custom-api/v1/view-grn-details/${id}`;
-    const response = await axios.get(apiUrl);
-    let data = response.data.map((v, i) => ({ ...v, id: i }));
-    setPO_OrderList(data);
-    setData(response.data.line_items);
+    await dispatch(GetGRNView({ apiUrl })).then((response) => {
+      console.log(response, "response og grn view");
+      let data = response?.data?.map((v, i) => ({ ...v, id: i }));
+      setPO_OrderList(data);
+    });
   };
 
   useEffect(() => {
@@ -90,22 +93,15 @@ const GRNEdit = () => {
   const handalBackButton = () => {
     navigate("/GRN_Management");
   };
-  // const formatVariations = (variations) => {
-  //   const parsedVariations = variations;
-  //   if (Object.keys(parsedVariations).length === 0) {
-  //     return "No variations"; // If variations are empty
-  //   } else {
-  //     return Object.entries(parsedVariations)
-  //       .map(([key, value]) => `${key}: ${value}`)
-  //       .join(", ");
-  //   }
-  // };
+
   const formatVariations = (variations) => {
-    const parsedVariations = variations;
-    if (Object.keys(parsedVariations) === '') {
-      return "No variations"; // If variations are empty
+    const data = JSON.parse(variations);
+    console.log(data, "data");
+
+    if (Object.keys(data).length === 0) {
+      return "No variations";
     } else {
-      return Object.entries(parsedVariations)
+      return Object.entries(data)
         .map(([key, value]) => `${key}: ${value}`)
         .join(", ");
     }
@@ -155,4 +151,4 @@ const GRNEdit = () => {
     </Container>
   );
 };
-export default GRNEdit;
+export default GRNView;
