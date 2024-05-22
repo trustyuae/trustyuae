@@ -168,10 +168,17 @@ function OnHoldManegementSystem() {
                 variationColor: item.variation_values.length === 0 ? '' : '',
                 variationSize: item.variation_values.length === 0 ? '' : ''
             }));
-
+            console.log(response,'data');
             setSingleProductD([modifiedData[0]]);
+            // if(response.data.products.data.message){
+            //     console.log(response.data.products,'response.data.products');
+            //     setSingleProductD([]);
+            // }else{
+            //     setSingleProductD([modifiedData[0]]);
+            // }
         } catch (error) {
             console.error(error);
+            setSingleProductD([]);
         }
     }
 
