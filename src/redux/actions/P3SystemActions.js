@@ -16,6 +16,9 @@ import {
   GET_GRN_VIEW_FAIL,
   GET_GRN_VIEW_REQUEST,
   GET_GRN_VIEW_SUCCESS,
+  GET_PRODUCT_DETAILS_FAIL,
+  GET_PRODUCT_DETAILS_REQUEST,
+  GET_PRODUCT_DETAILS_SUCCESS,
   GET_PRODUCT_MANUAL_FAIL,
   GET_PRODUCT_MANUAL_REQUEST,
   GET_PRODUCT_MANUAL_SUCCESS,
@@ -105,6 +108,23 @@ export const GetProductManual =
     }
   };
 
+  export const GetProductDetails =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_PRODUCT_DETAILS_REQUEST});
+      const response = await axios.get(apiUrl);
+      console.log(response, "response of GetProductDetails");
+      dispatch({
+        type: GET_PRODUCT_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_PRODUCT_DETAILS_FAIL, error: error.message });
+    }
+  };
+
 export const GetProductOrderDetails =
   ({ apiUrl }) =>
   async (dispatch) => {
@@ -139,12 +159,19 @@ export const AddProductOrderForPre = (requestedDataP) => async (dispatch) => {
   }
 };
 
-export const AddProductOrderForStock = (requestedDataP) => async (dispatch) => {
+export const AddProductOrderForStock = (requestedData,product_id,username,password) => async (dispatch) => {
   try {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST });
+    const basicAuth = {
+      username: username,
+      password: password
+    };
     const response = await axios.post(
-      `${API_URL}wp-json/product-instock-api/v1/product-instock-from-factory/`,
-      requestedDataP
+      `${API_URL}wp-json/wc/v3/products/${product_id}`,
+      requestedData,
+      {
+        auth: basicAuth
+      }
     );
     dispatch({
       type: ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS,
@@ -155,4 +182,6 @@ export const AddProductOrderForStock = (requestedDataP) => async (dispatch) => {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_FAIL, error: error.message });
   }
 };
+
+
 

@@ -17,6 +17,8 @@ import { useDispatch } from "react-redux";
 import { API_URL } from "../../redux/constants/Constants";
 import {
   AddProductOrderForPre,
+  AddProductOrderForStock,
+  GetProductDetails,
   GetProductOrderDetails,
 } from "../../redux/actions/P3SystemActions";
 import Swal from "sweetalert2";
@@ -29,8 +31,27 @@ function OnHoldManagement() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [productData, setProductData] = useState([]);
-  const [overallProductData, setOverallProductData] = useState([]);
+  const [productDetailsData, setProductDetailsData] = useState([]);
+  
+  console.log(productDetailsData, "productDetailsData");
   console.log(productData, "productData");
+  
+  async function fetchProductDetails() {
+    let apiUrl = `${API_URL}wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}`;
+    await dispatch(
+      GetProductDetails({
+        apiUrl: `${apiUrl}`,
+      })
+    )
+      .then((response) => {
+        let data = response.data
+        setProductDetailsData(data)
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
   async function fetchProductOrderDetails() {
     let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}`;
     await dispatch(
@@ -44,7 +65,6 @@ function OnHoldManagement() {
           id: i,
         }));
         setProductData(data);
-        setOverallProductData(response.data);
       })
       .catch((error) => {
         console.error(error);
@@ -69,6 +89,7 @@ function OnHoldManagement() {
   };
 
   useEffect(() => {
+    fetchProductDetails();
     fetchProductOrderDetails();
   }, [selectedOrders]);
 
@@ -106,7 +127,24 @@ function OnHoldManagement() {
   };
 
   const handleOrderStock= async()=>{
-
+  const product_id= params.id;
+  const username ="ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
+  const password ="cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
+     const requestedData={
+      stock_status:"instock",
+      stock_quantity:productDetailsData?.grn_details?.qty_received
+     }
+     await dispatch(AddProductOrderForStock(requestedData,product_id,username,password))
+     .then((response)=>{
+      if (response) {
+        Swal.fire({
+          icon: "success",
+          title: "product added in InStock Successfully!",
+        });
+      } 
+     }).catch((error) => {
+      console.error(error);
+    });
   }
 
   // const handleUpdatedValues = () => {
@@ -188,19 +226,19 @@ function OnHoldManagement() {
                       <Box>
                         <span>Product Id:</span>{" "}
                         <Badge bg="success">
-                          {overallProductData.product_id}
+                          {productDetailsData?.product_details?.product_id}
                         </Badge>
                       </Box>
                       <Box>
                         <span>Quantity Received:</span>{" "}
                         <Badge bg="success">
-                          {overallProductData.qty_received}
+                          {productDetailsData?.grn_details?.qty_received}
                         </Badge>
                       </Box>
                       <Box>
                         <span>Quantity Remain:</span>{" "}
                         <Badge bg="success">
-                          {overallProductData.qty_remain}
+                          {productDetailsData?.grn_details?.qty_remain}
                         </Badge>
                       </Box>
                     </Typography>
