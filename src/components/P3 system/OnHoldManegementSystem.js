@@ -12,7 +12,7 @@ import { MdDelete } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 
 function OnHoldManegementSystem() {
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const getTodayDate = () => {
         const today = new Date();
@@ -31,15 +31,20 @@ function OnHoldManegementSystem() {
     const [selectFile, setFile] = useState(null);
     const [userName, setuserName] = useState('')
     const [isValid, setIsValid] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [imageURL, setImageURL] = useState("");
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [imageURL, setImageURL] = useState("");
 
 
     const renderVariationValues = (params) => {
+        console.log(params,'params');
         const { color, size } = params.row.variation_values;
+        const { attribute_color, attribute_size } = params.row.variation_values;
+        console.log(attribute_size,attribute_color,'---------------');
         const noVariation = params.row.variation_values.length === 0;
         const colorAvailable = color?.length > 0;
         const sizeAvailable = size?.length > 0;
+
+        const singleColorAvailable = color
 
         return (
             <Box className='d-flex justify-content-between align-items-center'>
@@ -79,6 +84,13 @@ function OnHoldManegementSystem() {
                                     ))}
                                 </Select>
                             </Box>
+                        )}
+
+                        {attribute_color&&(
+                            <Box>Color:{attribute_color}</Box>
+                        )}
+                        {attribute_size&&(
+                            <Box>Size:{attribute_size}</Box>
                         )}
                     </>
                 )}
@@ -168,17 +180,14 @@ function OnHoldManegementSystem() {
                 variationColor: item.variation_values.length === 0 ? '' : '',
                 variationSize: item.variation_values.length === 0 ? '' : ''
             }));
-            console.log(response,'data');
+            console.log(response, 'data');
+            console.log(modifiedData, 'modifiedData');
             setSingleProductD([modifiedData[0]]);
-            // if(response.data.products.data.message){
-            //     console.log(response.data.products,'response.data.products');
-            //     setSingleProductD([]);
-            // }else{
-            //     setSingleProductD([modifiedData[0]]);
-            // }
+
+
         } catch (error) {
             console.error(error);
-            setSingleProductD([]);
+            // setSingleProductD([]);
         }
     }
 
@@ -193,7 +202,8 @@ function OnHoldManegementSystem() {
 
     const handalADDProduct = () => {
         let data = [...tableData, ...singleProductD]
-        let Updatedata = data.map((v, i) => ({ ...v, id: i }));
+        let Updatedata = data.map((v, i) => ({ ...v, id: i ,variationColor:v.variation_values.attribute_color!==undefined?v.variation_values.attribute_color:'',variationSize:v.variation_values.attribute_size!==undefined?v.variation_values.attribute_size:''}));
+        console.log(Updatedata,'Updatedata====');
         validateForm(Updatedata);
         setTableData(Updatedata)
         setProductName('')
@@ -214,6 +224,7 @@ function OnHoldManegementSystem() {
 
     const validateForm = (data) => {
         let dataa = data.filter(o => (Object.keys(o.variation_values).length > 0))
+        console.log(dataa,'dataa');
         const isValid = dataa.every(item => item.variationColor !== '');
         const isValidSize = dataa.every(item => item.variationSize !== '');
         const isQuantityAvailable = data.every(item => item.Quantity !== '')
@@ -223,6 +234,7 @@ function OnHoldManegementSystem() {
 
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
+        console.log(tableData,'tableData');
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
@@ -242,8 +254,9 @@ function OnHoldManegementSystem() {
             "status": "Pending for process",
             products: convertedData
         };
+        console.log(payload,'payload');
         try {
-            dispatch(AddGrn(payload,navigate))
+            dispatch(AddGrn(payload, navigate))
         } catch (error) {
             console.error(error);
         }
@@ -252,7 +265,7 @@ function OnHoldManegementSystem() {
     const ImageModule = (url) => {
         setImageURL(url);
         setShowEditModal(true);
-      };
+    };
 
     return (
         <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -390,7 +403,7 @@ function OnHoldManegementSystem() {
                                     </Button>
                                 </MDBRow>
                             </>
-                            )}
+                        )}
                 </Card>
             </MDBRow>
 
