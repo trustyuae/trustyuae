@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
-import axios from "axios";
 import { Card } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";
@@ -78,7 +77,7 @@ const GRNView = () => {
       renderCell: (value, row) => {
         console.log(value, "value details of grn edite page");
         return (
-          <Link to={`/On_Hold_Management/${value.row.product_id}`}>
+          <Link to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}`}>
             <Button
               type="button"
               className="w-auto bg-transparent border-0 text-secondary fs-5"

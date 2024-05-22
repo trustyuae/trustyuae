@@ -32,7 +32,7 @@ function OrderNotAvailable() {
   );
   const [factories, setFactories] = useState([]);
   const [checkBox, setCheckBox] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(0);
+  const [selectedStatus, setSelectedStatus] = useState({ id: 0, status: '' });
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
   const [imageURL, setImageURL] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
@@ -51,7 +51,7 @@ function OrderNotAvailable() {
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
-    setSelectedStatus(itemData.id)
+    setSelectedStatus({ id: itemData.id, status: itemData.customer_status })
     ordersNotAvailableData.forEach((order) => {
       if (order.id === itemData.id) order.customer_status = value;
     });
@@ -213,9 +213,9 @@ function OrderNotAvailable() {
       flex: 1,
       className: "order-not-available",
       renderCell: (params) => (
-        <Box className="h-100 w-100 d-flex align-items-center" 
-        onClick={() => ImageModule(params.value)}
-        
+        <Box className="h-100 w-100 d-flex align-items-center"
+          onClick={() => ImageModule(params.value)}
+
         >
           <Avatar
             src={params.value}
@@ -302,7 +302,7 @@ function OrderNotAvailable() {
   };
   const handleUpdatedValues = () => {
     setSelectedOrderNotAvailable([]);
-    setSelectedStatus(0)
+    setSelectedStatus({ id: 0, status: '' })
     fetchOrdersNotAvailableData();
   };
 

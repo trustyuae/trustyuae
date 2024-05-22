@@ -15,6 +15,8 @@ import DataTable from "../DataTable";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { GetGRNList } from "../../redux/actions/P3SystemActions";
 
 const product = [
     {
@@ -34,6 +36,7 @@ const product = [
 ];
 
 function GRNManagement() {
+    const dispatch = useDispatch(); 
     const [dateFilter, setDateFilter] = useState("");
     const [statusFilter, setStatusFilter] = useState('');
     const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
@@ -137,16 +140,11 @@ function GRNManagement() {
             apiUrl = `${API_URL}wp-json/custom-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`
             if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
             if (statusFilter) apiUrl += `&status=${statusFilter}`;
-
-            const response = await axios.get(apiUrl)
-
-            console.log(response, 'response');
-            let data = response.data.data.map((v, i) => ({ ...v, id: i }));
-            console.log(data, 'data');
-            setGrnList(data)
-            console.log(response.data.total_pages,'response.data.data.total_pages');
-            setTotalPages(response.data.total_pages);
-
+            await dispatch(GetGRNList({apiUrl})).then((response)=>{
+                let data = response.data.data.map((v, i) => ({ ...v, id: i }));
+                setGrnList(data)
+                setTotalPages(response.data.total_pages);
+            })
         } catch (error) {
             console.log(error);
         }
