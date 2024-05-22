@@ -32,7 +32,7 @@ function OnHoldManagement() {
   const [overallProductData, setOverallProductData] = useState([]);
 
   async function fetchProductOrderDetails() {
-    let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}`;
+    let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}`;
     await dispatch(
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
@@ -89,26 +89,25 @@ function OnHoldManagement() {
         quantity: quantity,
       };
 
-      await dispatch(AddProductOrderForPre(requestedDataP))
-      .then((response) => {
+      await dispatch(AddProductOrderForPre(requestedDataP)).then((response) => {
         if (response) {
           Swal.fire({
             icon: "success",
             title: "Uploaded Successfully!",
-          })
+          });
         }
-        selectedOrders.forEach((order) => {
-          order.isSelected = false;
-        });
-        setSelectedOrders([]);
-      })
+        handleUpdatedValues();
+      });
     }
   };
 
-  // const handleUpdatedValues = () => {
-  //   setSelectedOrders([]);
-  //   fetchProductOrderDetails();
-  // };
+  const handleUpdatedValues = () => {
+    selectedOrders.forEach((order) => {
+      order.isSelected = false;
+    });
+    setSelectedOrders([]);
+    fetchProductOrderDetails();
+  };
 
   const columns = [
     { field: "order_id", headerName: "Order ID", flex: 1 },

@@ -7,6 +7,9 @@ import {
   ADD_PRODUCT_ORDER_FOR_PREP_REQUEST,
   ADD_PRODUCT_ORDER_FOR_PREP_SUCCESS,
   API_URL,
+  GET_GRN_LIST_FAIL,
+  GET_GRN_LIST_REQUEST,
+  GET_GRN_LIST_SUCCESS,
   GET_GRN_VIEW_FAIL,
   GET_GRN_VIEW_REQUEST,
   GET_GRN_VIEW_SUCCESS,
@@ -63,6 +66,22 @@ export const GetProductManual =
       return response;
     } catch (error) {
       dispatch({ type: ADD_GRN_FAIL, error: error.message });
+    }
+  };
+
+  export const GetGRNList =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_GRN_LIST_REQUEST});
+      const response = await axios.get(apiUrl);
+      dispatch({
+        type: GET_GRN_LIST_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_GRN_LIST_FAIL, error: error.message });
     }
   };
 
