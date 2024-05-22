@@ -346,7 +346,7 @@ const PoDetails = () => {
   const POTypes = (id) => {
     const getPOType = id.substring(0, 2);
     if (getPOType == "PO") {
-      return ",PO against Orders";
+      return "PO against Orders";
     } else if (getPOType == "MO") {
       return "Manual PO";
     } else if (getPOType == "SO") {
