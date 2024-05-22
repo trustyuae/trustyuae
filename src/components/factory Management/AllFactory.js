@@ -6,6 +6,10 @@ import Form from "react-bootstrap/Form";
 import { useDispatch, useSelector } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
 import { AllFactoryActions, FactoryEdit } from "../../redux/actions/AllFactoryActions";
+import { Button, Row } from "react-bootstrap";
+import { FaEye } from "react-icons/fa";
+import DataTable from "../DataTable";
+import { Box, Typography } from "@mui/material";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -29,7 +33,9 @@ function AllFactory() {
 
   useEffect(() => {
     if (Array.isArray(allFactoryDatas)) {
-      setFactories(allFactoryDatas);
+      console.log(allFactoryDatas,'allFactoryDatas=====');
+      let data = allFactoryDatas.map((v, i) => ({ ...v, id: i }));
+      setFactories(data);
     }
   }, [allFactoryDatas]);
 
@@ -85,10 +91,38 @@ function AllFactory() {
         : true)
   );
 
-
+  const columns = [
+    { field: "factory_name", headerName: "factory name", flex: 1 },
+    { field: "address", headerName: "address", flex: 1 },
+    { field: "contact_person", headerName: "contact person", flex: 1 },
+    { field: "contact_number", headerName: "contact Number", flex: 1 },
+    { field: "contact_email", headerName: "contact email", flex: 1 },
+    { field: "bank_account_details", headerName: "bank account details", flex: 1 },
+    {
+      field: "view_item",
+      headerName: "View Item",
+      flex: 1,
+      className: "order-system",
+      type: "html",
+      renderCell: (value, row) => {
+        console.log(value,'value');
+        return (
+            <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+            onClick={() => handleEdit(value.row.id)}
+            >
+              <FaEye className="mb-1" />
+            </Button>
+        );
+      },
+    },
+  ];
   return (
-    <Container fluid className="px-5" style={{ height: "98vh" }}>
-      <h3 className="fw-bold text-center py-3 ">All Factory List</h3>
+    <Container fluid className="py-3" style={{ maxHeight: "100%"}}>
+      <Box className="mb-4">
+          <Typography variant="h4" className="fw-semibold">
+          All Factory List
+          </Typography>
+        </Box>
       <MDBRow className="d-flex justify-content-start align-items-center mb-3">
         <MDBCol md="2">
           <Form.Label className="me-2">Factory Name:</Form.Label>
@@ -137,7 +171,7 @@ function AllFactory() {
         </MDBCol>
       </MDBRow>
 
-      <MDBRow className="d-flex justify-content-center align-items-center">
+      {/* <MDBRow className="d-flex justify-content-center align-items-center">
         <MDBCol col="10" md="12" sm="12"></MDBCol>
         <Table
           striped
@@ -234,7 +268,20 @@ function AllFactory() {
             ))}
           </tbody>
         </Table>
-      </MDBRow>
+      </MDBRow> */}
+      <Row>
+      <div className="mt-2">
+        <DataTable
+          columns={columns}
+          rows={filteredProducts}
+          // rows={factories}
+          // page={page}
+          // pageSize={pageSize}
+          // totalPages={totalPages}
+          // handleChange={handleChange}
+        />
+      </div>
+      </Row>
       <EditFactoryModal
         show={showEditModal}
         handleCloseEditModal={handleCloseEditModal}
