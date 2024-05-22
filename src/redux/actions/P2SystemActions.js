@@ -10,6 +10,9 @@ import {
   UPDATE_ORDER_NOT_AVAILABLE_STATUS_REQUEST,
   UPDATE_ORDER_NOT_AVAILABLE_STATUS_SUCCESS,
   UPDATE_ORDER_NOT_AVAILABLE_STATUS_FAIL,
+  ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
+  ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
+  ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -64,10 +67,10 @@ export const OrderNotAvailableDataStatus =
           requestedDataS
         )
         .then((response) => {
-            Swal.fire({
-              icon: "success",
-              title: "Status Updated Successfully!",
-            })
+          Swal.fire({
+            icon: "success",
+            title: "Status Updated Successfully!",
+          });
         })
         .catch((error) => {
           console.error(error);
@@ -84,3 +87,85 @@ export const OrderNotAvailableDataStatus =
       });
     }
   };
+
+// export const OrderNotAvailableRefund = (requestedInfo,id,username,password) => async (dispatch) => {
+//   try {
+//     dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST });
+//     const basicAuth = {
+//       username: username,
+//       password: password
+//     };
+//     const response = await axios
+//       .post(
+//         `${API_URL}/wp-json/wc/v3/orders/${id}/refunds`,
+//         requestedInfo,
+//         {
+//           auth: basicAuth
+//         }
+//       )
+//       .then((response) => {
+//         Swal.fire({
+//           icon: "success",
+//           title: "refund process completed Successfully!",
+//         });
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//       });
+//     dispatch({
+//       type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
+//       payload: response?.data,
+//     });
+//     return response;
+//   } catch (error) {
+//     dispatch({
+//       type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
+//       error: error.message,
+//     });
+//   }
+// };
+
+export const OrderNotAvailableRefund = (requestedInfo, orderIds, username, password) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST });
+    const basicAuth = {
+      username: username,
+      password: password,
+    };
+    const refundPromises = orderIds.map(async (id) => {
+      const response = await axios.post(
+        `${API_URL}/wp-json/wc/v3/orders/${id}/refunds`,
+        requestedInfo,
+        {
+          auth: basicAuth,
+        }
+      );
+      return response.data;
+    });
+
+    const refunds = await Promise.all(refundPromises);
+    
+    Swal.fire({
+      icon: "success",
+      title: "Refund process completed successfully!",
+    });
+
+    dispatch({
+      type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
+      payload: refunds,
+    });
+    
+    return refunds;
+  } catch (error) {
+    console.error(error);
+    Swal.fire({
+      icon: "error",
+      title: "Error in refund process!",
+    });
+    dispatch({
+      type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
+      error: error.message,
+    });
+    throw error;
+  }
+};
