@@ -6,6 +6,9 @@ import {
   ADD_PRODUCT_ORDER_FOR_PREP_REQUEST,
   ADD_PRODUCT_ORDER_FOR_PREP_SUCCESS,
   CLEAR_ERRORS,
+  GET_GRN_LIST_FAIL,
+  GET_GRN_LIST_REQUEST,
+  GET_GRN_LIST_SUCCESS,
   GET_GRN_VIEW_FAIL,
   GET_GRN_VIEW_REQUEST,
   GET_GRN_VIEW_SUCCESS,
@@ -22,6 +25,8 @@ const initialState = {
   isProductManualAvailable: false,
   grn: [],
   isGrn: false,
+  grnList: [],
+  isGrnList: false,
   grnView: [],
   isGrnView: false,
   productOrderDetails: [],
@@ -54,6 +59,13 @@ const ManagementSystemReducer = (state = initialState, action) => {
       return { ...state, isGrn: false, grn: action.payload };
     case ADD_GRN_FAIL:
       return { ...state, isGrn: false, error: action.payload };
+
+    case GET_GRN_LIST_REQUEST:
+      return { ...state, isGrnList: true };
+    case GET_GRN_LIST_SUCCESS:
+      return { ...state, isGrnList: false, grnView: action.payload };
+    case GET_GRN_LIST_FAIL:
+      return { ...state, isGrnList: false, error: action.payload };
 
     case GET_GRN_VIEW_REQUEST:
       return { ...state, isGrnView: true };
