@@ -354,7 +354,7 @@ const PoDetails = () => {
     }
   };
   return (
-    <Container fluid className="px-5" style={{ height: "100vh" }}>
+    <Container fluid className="px-5" >
       <MDBRow className="my-3">
         <MDBCol className="d-flex justify-content-between align-items-center">
           <Button

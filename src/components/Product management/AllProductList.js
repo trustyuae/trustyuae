@@ -26,16 +26,9 @@ function AllProductList() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
 
-  // const filteredProducts = products?.filter(
-  //   (product) =>
-  //     product.product_id.toLowerCase().includes(searchId.toLowerCase()) &&
-  //     (product.product_name
-  //       ? product.product_name.toLowerCase().includes(searchName.toLowerCase())
-  //       : true)
-  //   //  &&
-  //   // (product.label_name ? product.label_name.toLowerCase().includes(searchLabel.toLowerCase()) : true)
-  // );
-
+  // useEffect(()=>{
+  //   setItemsPerPage(5)
+  // },[])
   const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
   const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
 
@@ -165,19 +158,6 @@ function AllProductList() {
     setItemsPerPage(parseInt(e.target.value));
   };
 
-  // Pagination logic (same as before)
-  // const indexOfLastItem = currentPage * itemsPerPage;
-  // const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = filteredProducts.slice(
-  //   indexOfFirstItem,
-  //   indexOfLastItem
-  // );
-
-  // const pageNumbers = [];
-
-  // for (let i = 1; i <= Math.ceil(filteredProducts.length / itemsPerPage); i++) {
-  //   pageNumbers.push(i);
-  // }
   const columns = [
     { field: "product_id", headerName: "product id", flex: 1 },
     { field: "product_name", headerName: "product name", flex: 1 },
@@ -240,7 +220,7 @@ function AllProductList() {
 
   return (
     <Container
-      fluid className="py-3" style={{ maxHeight: "100%" }}
+      fluid className="py-3" style={{ maxHeight: "100%"}}
     >
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
@@ -285,132 +265,7 @@ function AllProductList() {
         </MDBCol>
       </MDBRow>
 
-      {/* <MDBRow className="d-flex justify-content-center align-items-center">
-        <MDBCol col="10" md="12" sm="12"></MDBCol>
-        <Table
-          striped
-          bordered
-          hover
-          style={{ boxShadow: "4px 4px 11px 0rem rgb(0 0 0 / 25%)" }}
-        >
-          <thead>
-            <tr className="table-headers">
-              <th
-                style={{
-                  backgroundColor: "#DEE2E6",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                Product ID
-              </th>
-              <th
-                style={{
-                  backgroundColor: "#DEE2E6",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                Product Name
-              </th>
-              <th
-                style={{
-                  backgroundColor: "#DEE2E6",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                Factory Image
-              </th>
-              <th
-                style={{
-                  backgroundColor: "#DEE2E6",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                Factory
-              </th>
-              <th
-                style={{
-                  backgroundColor: "#DEE2E6",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                Quantity
-              </th>
-              <th
-                style={{
-                  backgroundColor: "#DEE2E6",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                Status
-              </th>
-              <th
-                style={{
-                  backgroundColor: "#DEE2E6",
-                  padding: "8px",
-                  textAlign: "center",
-                }}
-              >
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((product, index) => (
-              <tr key={index}>
-                <td className="text-center">{product.product_id}</td>
-                <td className="text-center">{product.product_name}</td>
-                <td className="text-center">
-                  <img
-                    src={product.factory_image}
-                    alt={product.product_name}
-                    style={{ maxWidth: "100px" }}
-                  />
-                </td>
-                <td className="text-center">
-                  {
-                    // product.factory_id
-                    factories.find(
-                      (factory) => factory.id === product.factory_id
-                    )?.factory_name
-                  }
-                </td>
-                <td className="text-center">{product.stock_quantity}</td>
-                <td className="text-center">{product.stock_status}</td>
-                <td className="text-center">
-                  <button
-                    type="button"
-                    className="btn btn-primary mr-2"
-                    onClick={() => handleEdit(product.id)}
-                  >
-                    Edit
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </MDBRow>
-      <MDBRow className="d-flex justify-content-center align-items-center">
-        <Pagination>
-          <Pagination.Prev />
-          {pageNumbers.map((number) => (
-            <Pagination.Item
-              key={number}
-              active={number === currentPage}
-              onClick={() => setCurrentPage(number)}
-            >
-              {number}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next />
-        </Pagination>
-      </MDBRow> */}
+      
       <Row>
         <div className="mt-2">
           <DataTable
