@@ -6,6 +6,9 @@ import {
   ADD_PRODUCT_ORDER_FOR_PREP_FAIL,
   ADD_PRODUCT_ORDER_FOR_PREP_REQUEST,
   ADD_PRODUCT_ORDER_FOR_PREP_SUCCESS,
+  ADD_PRODUCT_ORDER_FOR_STOCK_FAIL,
+  ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST,
+  ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS,
   API_URL,
   GET_GRN_VIEW_FAIL,
   GET_GRN_VIEW_REQUEST,
@@ -116,3 +119,21 @@ export const AddProductOrderForPre = (requestedDataP) => async (dispatch) => {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_PREP_FAIL, error: error.message });
   }
 };
+
+export const AddProductOrderForStock = (requestedDataP) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST });
+    const response = await axios.post(
+      `${API_URL}wp-json/product-instock-api/v1/product-instock-from-factory/`,
+      requestedDataP
+    );
+    dispatch({
+      type: ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_FAIL, error: error.message });
+  }
+};
+

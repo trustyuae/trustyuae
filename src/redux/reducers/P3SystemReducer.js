@@ -5,6 +5,9 @@ import {
   ADD_PRODUCT_ORDER_FOR_PREP_FAIL,
   ADD_PRODUCT_ORDER_FOR_PREP_REQUEST,
   ADD_PRODUCT_ORDER_FOR_PREP_SUCCESS,
+  ADD_PRODUCT_ORDER_FOR_STOCK_FAIL,
+  ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST,
+  ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS,
   CLEAR_ERRORS,
   GET_GRN_VIEW_FAIL,
   GET_GRN_VIEW_REQUEST,
@@ -28,6 +31,8 @@ const initialState = {
   isProductOrderDetails: false,
   productOrdersPrep: [],
   isProductOrdersPrep: false,
+  productOrdersStock: [],
+  isProductOrdersStock: false,
   error: null,
 };
 
@@ -83,6 +88,17 @@ const ManagementSystemReducer = (state = initialState, action) => {
       };
     case ADD_PRODUCT_ORDER_FOR_PREP_FAIL:
       return { ...state, isProductOrdersPrep: false, error: action.payload };
+
+      case ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST:
+        return { ...state, isProductOrdersPrep: true };
+      case ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS:
+        return {
+          ...state,
+          isProductOrdersStock: false,
+          productOrdersStock: action.payload,
+        };
+      case ADD_PRODUCT_ORDER_FOR_STOCK_FAIL:
+        return { ...state, isProductOrdersStock: false, error: action.payload };
 
     case CLEAR_ERRORS:
       return { ...state, error: null };

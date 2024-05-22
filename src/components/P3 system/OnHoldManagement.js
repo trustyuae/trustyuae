@@ -30,7 +30,7 @@ function OnHoldManagement() {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [productData, setProductData] = useState([]);
   const [overallProductData, setOverallProductData] = useState([]);
-
+  console.log(productData, "productData");
   async function fetchProductOrderDetails() {
     let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}`;
     await dispatch(
@@ -89,21 +89,24 @@ function OnHoldManagement() {
         quantity: quantity,
       };
 
-      await dispatch(AddProductOrderForPre(requestedDataP))
-      .then((response) => {
+      await dispatch(AddProductOrderForPre(requestedDataP)).then((response) => {
         if (response) {
           Swal.fire({
             icon: "success",
             title: "Uploaded Successfully!",
-          })
+          });
         }
         selectedOrders.forEach((order) => {
           order.isSelected = false;
         });
         setSelectedOrders([]);
-      })
+      });
     }
   };
+
+  const handleOrderStock= async()=>{
+
+  }
 
   // const handleUpdatedValues = () => {
   //   setSelectedOrders([]);
@@ -231,9 +234,13 @@ function OnHoldManagement() {
       </MDBRow>
       <MDBRow>
         <MDBCol md="12" className="d-flex justify-content-end">
-          <Button variant="success" onClick={handleOrderPerp}>
-            Send for Preparation
-          </Button>
+          {productData.length === 0 ? (
+            <Button variant="success" onClick={handleOrderStock}>Send For InStock</Button>
+          ) : (
+            <Button variant="success" onClick={handleOrderPerp}>
+              Send for Preparation
+            </Button>
+          )}
         </MDBCol>
       </MDBRow>
     </Container>
