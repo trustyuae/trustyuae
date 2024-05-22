@@ -3,11 +3,12 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Card } from "react-bootstrap";
+import { Card, Container } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { FactoryAdd } from "../../redux/actions/AllFactoryActions";
 import { useNavigate } from "react-router-dom";
 import { isValidEmail } from "../../utils/validation";
+import { Box, Typography } from "@mui/material";
 
 function FactoryForm() {
   const dispatch = useDispatch();
@@ -69,42 +70,17 @@ function FactoryForm() {
   };
 
   return (
-    <div>
-      <style>
-        {`
-                    .factory-card {
-                        border: 1px solid #E0E0E0;
-                        border-radius: 10px;
-                        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
-                        background-color: #F9F9F9;
-                    }
-                    .factory-card-header {
-                        background-color: #007BFF;
-                        color: #fff;
-                    }
-                    .form-control {
-                        border-radius: 5px;
-                        border-color: #CED4DA;
-                    }
-                    .btn-submit {
-                        margin-top: 20px;
-                        background-color: #007BFF;
-                        border-color: #007BFF;
-                    }
-                    .btn-submit:hover {
-                        background-color: #0056B3;
-                        border-color: #0056B3;
-                    }
-                `}
-      </style>
-      <Row className="justify-content-center mt-5">
-        <Col md={8}>
-          <Card className="factory-card border-0 shadow-lg">
-            <Card.Header as="h4" className="factory-card-header px-4 py-3 border-0 fw-bold">
-              Add New Factory
-            </Card.Header>
-            <Card.Body className="p-4 pt-3">
-              <Form noValidate validated={validated} onSubmit={handleSubmit}>
+    <>
+      <Container fluid className="py-3" style={{ maxHeight: "100%",height:'85vh' }}>
+        <Box className="mb-4">
+          <Typography variant="h4" className="fw-semibold">
+            Add New Factory
+          </Typography>
+        </Box>
+        <Card className="p-3 mb-3">
+          <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Row className="mb-3">
+              <Col xs="auto" lg="4">
                 <Form.Group className="mb-3" controlId="formFactoryName">
                   <Form.Label className="fw-semibold">Factory Name</Form.Label>
                   <Form.Control
@@ -118,6 +94,8 @@ function FactoryForm() {
                   />
                   <Form.Control.Feedback type="invalid">Please enter factory name.</Form.Control.Feedback>
                 </Form.Group>
+              </Col>
+              <Col xs="auto" lg="4">
                 <Form.Group className="mb-3" controlId="formFactoryAddress">
                   <Form.Label className="fw-semibold">Address</Form.Label>
                   <Form.Control
@@ -131,6 +109,8 @@ function FactoryForm() {
                   />
                   <Form.Control.Feedback type="invalid">Please enter factory address.</Form.Control.Feedback>
                 </Form.Group>
+              </Col>
+              <Col xs="auto" lg="4">
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryContactPerson"
@@ -147,6 +127,10 @@ function FactoryForm() {
                   />
                   <Form.Control.Feedback type="invalid">Please enter cntact person.</Form.Control.Feedback>
                 </Form.Group>
+              </Col>
+            </Row>
+            <Row className="mb-3">
+              <Col xs="auto" lg="4">
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryContactNumber"
@@ -163,6 +147,8 @@ function FactoryForm() {
                   />
                   <Form.Control.Feedback type="invalid">Please enter cpntact number.</Form.Control.Feedback>
                 </Form.Group>
+              </Col>
+              <Col xs="auto" lg="4">
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryContactEmail"
@@ -179,6 +165,8 @@ function FactoryForm() {
                   />
                   <Form.Control.Feedback type="invalid">Please entercontact email.</Form.Control.Feedback>
                 </Form.Group>
+              </Col>
+              <Col xs="auto" lg="4">
                 <Form.Group
                   className="mb-3"
                   controlId="formFactoryBankAccountDetails"
@@ -195,22 +183,24 @@ function FactoryForm() {
                   />
                   <Form.Control.Feedback type="invalid">Please enter bank account details.</Form.Control.Feedback>
                 </Form.Group>
-                <div className="text-end mb-2">
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    className="btn-submit py-2 fw-bold"
-                  >
-                    Add Factory
-                  </Button>
-                </div>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </div>
-    // </Container>
+              </Col>
+            </Row>
+            <Row>
+              <Col md="12" className="d-flex justify-content-end">
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className="btn-submit py-2 fw-bold"
+                >
+                  Add Factory
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        </Card>
+      </Container>
+    </>
+    
   );
 }
 export default FactoryForm;
