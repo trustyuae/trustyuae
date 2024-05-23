@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { API_URL } from '../redux/constants/Constants';
+import { CompressImage } from '../utils/CompressImage';
 
 const ImageUpload = () => {
   const [image, setImage] = useState(null);
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  const handleImageChange = async (e) => {
+    if (e.target.files[0]) {
+      const file = await CompressImage(e?.target.files[0])
+      setImage(file);
+    }
   };
 
   const handleUpload = async () => {
