@@ -20,6 +20,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
+    "browser-image-compression": "^2.0.2",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "html2canvas": "^1.4.1",

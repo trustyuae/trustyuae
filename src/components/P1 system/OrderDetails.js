@@ -26,6 +26,7 @@ import {
   OrderDetailsGet,
 } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
+import { CompressImage } from "../../utils/CompressImage";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -45,14 +46,14 @@ function OrderDetails() {
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
-  const [message, setMessage]=useState('');
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
- console.log(orderDetailsDataOrderId?.operation_user_note,'orderDetailsDataOrderId?.operation_user_note')
+  console.log(orderDetailsDataOrderId?.operation_user_note, 'orderDetailsDataOrderId?.operation_user_note')
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedFileUrl(imageSrc);
@@ -95,24 +96,24 @@ function OrderDetails() {
       });
   }
 
-  const handleAddMessage =async()=>{
+  const handleAddMessage = async () => {
     const orderId = parseInt(id, 10);
-    const requestedMessage ={
-      message:message,
-      order_id:orderId
+    const requestedMessage = {
+      message: message,
+      order_id: orderId
     }
-  await dispatch(AddMessage(requestedMessage))
-  .then((response)=>{
-    if(response.data === "Message added successfully"){
-      Swal.fire({
-        icon: "success",
-        title: "Message uploaded Successfully!",
-      }).then(() => {
-        setMessage('');
-        handleMessageCloseModal();
-      });
-    }
-  })
+    await dispatch(AddMessage(requestedMessage))
+      .then((response) => {
+        if (response.data === "Message added successfully") {
+          Swal.fire({
+            icon: "success",
+            title: "Message uploaded Successfully!",
+          }).then(() => {
+            setMessage('');
+            handleMessageCloseModal();
+          });
+        }
+      })
   }
 
   useEffect(() => {
@@ -131,15 +132,17 @@ function OrderDetails() {
   };
 
   const handleFileInputChange = async (e, itemId) => {
-    const file = e.target.files[0];
-    var fr = new FileReader();
-    fr.onload = function () {
-      setSelectedFileUrl(fr.result);
-    };
-    fr.readAsDataURL(file);
-    setSelectedFile(file);
-    setShowAttachmentModal(true);
-    setSelectedItemId(itemId);
+    if (e.target.files[0]) {
+      const file = await CompressImage(e.target.files[0])
+      const fr = new FileReader();
+      fr.onload = function () {
+        setSelectedFileUrl(fr.result);
+        setSelectedFile(file);
+        setShowAttachmentModal(true);
+        setSelectedItemId(itemId);
+      };
+      fr.readAsDataURL(file);
+    }
   };
 
   const handleCancel = () => {
@@ -150,6 +153,7 @@ function OrderDetails() {
 
   const handleSubmitAttachment = async () => {
     const { user_id } = userData ?? {};
+    console.log(selectedFile, 'selectedfile')
     dispatch(
       AttachmentFileUpload({
         user_id: user_id,
@@ -339,7 +343,7 @@ function OrderDetails() {
                 <LocalPrintshopOutlinedIcon className="me-1" />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+                orderProcess == "started" ? (
                 <Button
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
@@ -541,7 +545,7 @@ function OrderDetails() {
                           <Card className="factory-card me-1 shadow-sm mb-0">
                             {userData?.user_id ==
                               orderDetails?.operation_user_id &&
-                            orderProcess == "started" ? (
+                              orderProcess == "started" ? (
                               <Button
                                 className="bg-transparent border-0  text-black"
                                 onClick={() => fileInputRef.current.click()}
@@ -561,7 +565,7 @@ function OrderDetails() {
                               </Button>
                             ) : orderProcess == "started" &&
                               userData?.user_id !=
-                                orderDetails?.operation_user_id ? (
+                              orderDetails?.operation_user_id ? (
                               <Button
                                 className="bg-transparent border-0  text-black"
                                 disabled
@@ -604,7 +608,7 @@ function OrderDetails() {
                           <Card className="factory-card ms-1 shadow-sm mb-0">
                             {userData?.user_id ==
                               orderDetails?.operation_user_id &&
-                            orderProcess == "started" ? (
+                              orderProcess == "started" ? (
                               <Button
                                 className="bg-transparent border-0 text-black"
                                 onClick={() => {
@@ -619,7 +623,7 @@ function OrderDetails() {
                               </Button>
                             ) : orderProcess == "started" &&
                               userData?.user_id !=
-                                orderDetails?.operation_user_id ? (
+                              orderDetails?.operation_user_id ? (
                               <Button
                                 className="bg-transparent border-0 text-black"
                                 disabled
@@ -667,7 +671,7 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" ? (
+              orderProcess == "started" ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
@@ -758,7 +762,7 @@ function OrderDetails() {
               placeholder="Enter your message here..."
               rows={3}
               value={message}
-              onChange={(e)=>setMessage(e.target.value)}
+              onChange={(e) => setMessage(e.target.value)}
             />
             <Button className="mt-2" onClick={handleAddMessage}>Add Message</Button>
           </Modal.Body>
@@ -781,9 +785,9 @@ function OrderDetails() {
             <Button className="mt-2">Add Message</Button> */}
             <Box className="text-center">
               <Box
-                className="mx-auto mb-2"
+                className="mx-auto mb-4"
                 sx={{
-                  height: "80px",
+                  height: "150px",
                   width: "100%",
                   position: "relative",
                 }}
@@ -798,19 +802,21 @@ function OrderDetails() {
                   onClick={handleCancel}
                 />
                 <img
-                  style={{ objectFit: "cover" }}
+                  style={{ objectFit: "contain" }}
                   className="h-100 w-100"
                   alt=""
                   src={selectedFileUrl}
                 />
               </Box>
-              <Button
-                variant="primary"
-                className="me-3"
-                onClick={handleSubmitAttachment}
-              >
-                Submit
-              </Button>
+              <Box className="text-center">
+                <Button
+                  variant="primary"
+                  className="me-3"
+                  onClick={handleSubmitAttachment}
+                >
+                  Submit
+                </Button>
+              </Box>
             </Box>
           </Modal.Body>
         </Modal>

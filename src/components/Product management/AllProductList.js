@@ -11,6 +11,7 @@ import { API_URL } from "../../redux/constants/Constants";
 import DataTable from "../DataTable";
 import { Col, Row } from "react-bootstrap";
 import { Avatar, Box, Typography } from "@mui/material";
+import { CompressImage } from "../../utils/CompressImage";
 
 function AllProductList() {
   const [products, setProducts] = useState([]);
@@ -146,11 +147,11 @@ function AllProductList() {
 
   };
 
-  const handleFileChange = (e) => {
-    console.log(e.target.files[0]);
-    setFile(e.target.files[0]);
-    // setFile({ ...selectFile, factoryImage: e.target.files[0] });
-
+  const handleFileChange = async (e) => {
+    if (e.target.files[0]) {
+      const file = await CompressImage(e?.target?.files[0])
+      setFile(file);
+    }
   };
 
   const handlePageSizeChange = (e) => {
@@ -203,12 +204,12 @@ function AllProductList() {
       type: "html",
       renderCell: (value, row) => {
         return (
-          
-            <Button type="button" className="btn btn-primary mr-2" onClick={() => handleEdit(value.row.id)}>
-              Edit
-            </Button>
-            
-         
+
+          <Button type="button" className="btn btn-primary mr-2" onClick={() => handleEdit(value.row.id)}>
+            Edit
+          </Button>
+
+
         );
       },
     },
@@ -220,7 +221,7 @@ function AllProductList() {
 
   return (
     <Container
-      fluid className="py-3" style={{ maxHeight: "100%"}}
+      fluid className="py-3" style={{ maxHeight: "100%" }}
     >
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
@@ -265,7 +266,7 @@ function AllProductList() {
         </MDBCol>
       </MDBRow>
 
-      
+
       <Row>
         <div className="mt-2">
           <DataTable

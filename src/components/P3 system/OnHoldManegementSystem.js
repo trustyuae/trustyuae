@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { AddGrn, GetProductManual } from '../../redux/actions/P3SystemActions';
 import { MdDelete } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import { CompressImage } from '../../utils/CompressImage';
 
 function OnHoldManegementSystem() {
     const dispatch = useDispatch()
@@ -36,10 +37,10 @@ function OnHoldManegementSystem() {
 
 
     const renderVariationValues = (params) => {
-        console.log(params,'params');
+        console.log(params, 'params');
         const { color, size } = params.row.variation_values;
         const { attribute_color, attribute_size } = params.row.variation_values;
-        console.log(attribute_size,attribute_color,'---------------');
+        console.log(attribute_size, attribute_color, '---------------');
         const noVariation = params.row.variation_values.length === 0;
         const colorAvailable = color?.length > 0;
         const sizeAvailable = size?.length > 0;
@@ -86,10 +87,10 @@ function OnHoldManegementSystem() {
                             </Box>
                         )}
 
-                        {attribute_color&&(
+                        {attribute_color && (
                             <Box>Color:{attribute_color}</Box>
                         )}
-                        {attribute_size&&(
+                        {attribute_size && (
                             <Box>Size:{attribute_size}</Box>
                         )}
                     </>
@@ -202,8 +203,8 @@ function OnHoldManegementSystem() {
 
     const handalADDProduct = () => {
         let data = [...tableData, ...singleProductD]
-        let Updatedata = data.map((v, i) => ({ ...v, id: i ,variationColor:v.variation_values.attribute_color!==undefined?v.variation_values.attribute_color:'',variationSize:v.variation_values.attribute_size!==undefined?v.variation_values.attribute_size:''}));
-        console.log(Updatedata,'Updatedata====');
+        let Updatedata = data.map((v, i) => ({ ...v, id: i, variationColor: v.variation_values.attribute_color !== undefined ? v.variation_values.attribute_color : '', variationSize: v.variation_values.attribute_size !== undefined ? v.variation_values.attribute_size : '' }));
+        console.log(Updatedata, 'Updatedata====');
         validateForm(Updatedata);
         setTableData(Updatedata)
         setProductName('')
@@ -218,13 +219,16 @@ function OnHoldManegementSystem() {
         setProductID('')
         setProductName(e)
     }
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+    const handleFileChange = async (e) => {
+        if (e.target.files[0]) {
+            const file = await CompressImage(e?.target?.files[0])
+            setFile(file);
+        }
     };
 
     const validateForm = (data) => {
         let dataa = data.filter(o => (Object.keys(o.variation_values).length > 0))
-        console.log(dataa,'dataa');
+        console.log(dataa, 'dataa');
         const isValid = dataa.every(item => item.variationColor !== '');
         const isValidSize = dataa.every(item => item.variationSize !== '');
         const isQuantityAvailable = data.every(item => item.Quantity !== '')
@@ -234,7 +238,7 @@ function OnHoldManegementSystem() {
 
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
-        console.log(tableData,'tableData');
+        console.log(tableData, 'tableData');
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
@@ -254,7 +258,7 @@ function OnHoldManegementSystem() {
             "status": "Pending for process",
             products: convertedData
         };
-        console.log(payload,'payload');
+        console.log(payload, 'payload');
         try {
             dispatch(AddGrn(payload, navigate))
         } catch (error) {
