@@ -48,7 +48,7 @@ function OnHoldManegementSystem() {
         const singleColorAvailable = color
 
         return (
-            <Box className='d-flex justify-content-between align-items-center'>
+            <Box className='d-flex justify-content-around align-items-center'>
                 {noVariation ? (
                     <Box>No any variation</Box>
                 ) : (
@@ -87,11 +87,11 @@ function OnHoldManegementSystem() {
                             </Box>
                         )}
 
-                        {attribute_color && (
-                            <Box>Color:{attribute_color}</Box>
+                        {attribute_color&&(
+                            <Box className="fw-bold fs-5">Color:{attribute_color}</Box>
                         )}
-                        {attribute_size && (
-                            <Box>Size:{attribute_size}</Box>
+                        {attribute_size&&(
+                            <Box className="fw-bold fs-5">Size:{attribute_size}</Box>
                         )}
                     </>
                 )}

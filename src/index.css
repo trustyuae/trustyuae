@@ -632,6 +632,14 @@ h6 {
     left: -300px;
   }
 }
+.toggle-sidebar-btn {
+  display: none;
+}
+@media (max-width: 1024px) {
+  .toggle-sidebar-btn {
+    display: block;
+  }
+}
 
 .sidebar::-webkit-scrollbar {
   width: 5px;
