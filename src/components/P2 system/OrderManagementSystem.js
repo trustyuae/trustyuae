@@ -657,6 +657,12 @@ function OrderManagementSystem() {
         setPageSO(value);
     };
 
+    const [activeKey, setActiveKey] = useState('against_PO'); // Initially set to your defaultActiveKey
+
+    const handleTabSelect = (key) => {
+        setActiveKey(key);
+    };
+
     return (
         <Container
             fluid
@@ -675,8 +681,9 @@ function OrderManagementSystem() {
                         id="fill-tab-example"
                         className="mb-3"
                         justify
+                        onSelect={handleTabSelect} 
                     >
-                        <Tab eventKey="against_PO" title="Order against PO">
+                        <Tab eventKey="against_PO" title={<span style={{ backgroundColor: activeKey === "against_PO" ? 'blue' : 'inherit', color: activeKey === "against_PO" ? 'white' : 'inherit' ,display:'block',borderRadius:'5px'}}>Order against PO</span>}>
                             <Box>
                                 <Row className="mb-4 mt-4">
                                     <Form inline>
@@ -758,7 +765,9 @@ function OrderManagementSystem() {
                                 </Box>
                             </Box>
                         </Tab>
-                        <Tab eventKey="manual_PO" title="Manual PO">
+                        <Tab eventKey="manual_PO"
+                        title={<span style={{ backgroundColor: activeKey === "manual_PO" ? 'blue' : 'inherit', color: activeKey === "manual_PO" ? 'white' : 'inherit' ,display:'block',borderRadius:'5px'}}>Manual PO</span>}
+                        >
                             <Box>
                                 <Row className="mb-4 mt-4">
                                     <Form inline>
@@ -830,7 +839,9 @@ function OrderManagementSystem() {
                                 </Box>
                             </Box>
                         </Tab>
-                        <Tab eventKey="scheduled_PO" title="Scheduled PO">
+                        <Tab eventKey="scheduled_PO" 
+                        title={<span style={{ backgroundColor: activeKey === "scheduled_PO" ? 'blue' : 'inherit', color: activeKey === "scheduled_PO" ? 'white' : 'inherit' ,display:'block',borderRadius:'5px'}}>Scheduled PO</span>}
+                        >
                             <Box>
                                 <Row className="mb-4 mt-4">
                                     <Form inline>
