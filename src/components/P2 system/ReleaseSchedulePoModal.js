@@ -46,6 +46,7 @@ const ReleaseSchedulePoModal = ({
           }).then(res => {
             if (res.isConfirmed) {
               handleUpdatedValues();
+              setDateFilter('');
               handleCloseReleaseSchedulePoModal();
             }
           });
