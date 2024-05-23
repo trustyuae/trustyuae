@@ -298,7 +298,9 @@ function POManagementSystem() {
                             onSelect={(key) => handleTabChange(key)}
                         >
                             {/* po */}
-                            <Tab eventKey="po" title="Order against PO" >
+                            <Tab eventKey="po" 
+                            title={<span style={{ backgroundColor: poType === "po" ? 'blue' : 'inherit', color: poType === "po" ? 'white' : 'inherit' ,display:'block',borderRadius:'5px'}}>Order against PO</span>}
+                            >
                                 <DataTable
                                     columns={columns}
                                     rows={orderList}
@@ -309,7 +311,10 @@ function POManagementSystem() {
                                 />
                             </Tab>
                             {/* MPO */}
-                            <Tab eventKey="mpo" title="Manual PO" >
+                            <Tab eventKey="mpo" 
+                            title={<span style={{ backgroundColor: poType === "mpo" ? 'blue' : 'inherit', color: poType === "mpo" ? 'white' : 'inherit' ,display:'block',borderRadius:'5px'}}>Manual PO</span>}
+                            
+                            >
                                 <DataTable
                                     columns={columns}
                                     rows={orderList}
@@ -320,7 +325,10 @@ function POManagementSystem() {
                                 />
                             </Tab>
                             {/* SPO */}
-                            <Tab eventKey="spo" title="Scheduled PO">
+                            <Tab eventKey="spo" 
+                            title={<span style={{ backgroundColor: poType === "spo" ? 'blue' : 'inherit', color: poType === "spo" ? 'white' : 'inherit' ,display:'block',borderRadius:'5px'}}>Scheduled PO</span>}
+                            
+                            >
                                 <DataTable
                                     columns={columns}
                                     rows={orderList}
