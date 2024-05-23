@@ -65,7 +65,17 @@ function OnHoldManagement() {
         let data = response.data.records.map((v, i) => ({
           ...v,
           id: i,
+          isSelected: false,
         }));
+        if (selectedOrders.length > 0) {
+          selectedOrders.forEach((order) => {
+            data.forEach((o) => {
+              if (o.id === order.id) {
+                o.isSelected = true;
+              }
+            });
+          });
+        }
         setProductData(data);
       })
       .catch((error) => {
@@ -122,7 +132,6 @@ function OnHoldManagement() {
         selectedOrders.forEach((order) => {
           order.isSelected = false;
         });
-        setSelectedOrders([]);
         handleUpdatedValues();
       });
     }
@@ -152,10 +161,6 @@ function OnHoldManagement() {
       });
   };
 
-  // const handleUpdatedValues = () => {
-  //   setSelectedOrders([]);
-  //   fetchProductOrderDetails();
-  // };
   const handleUpdatedValues = () => {
     selectedOrders.forEach((order) => {
       order.isSelected = false;
