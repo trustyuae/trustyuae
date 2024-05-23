@@ -223,7 +223,7 @@ function OnHoldManagement() {
                 <Box className="d-flex justify-content-center align-items-center h-100">
                   <Box>
                     <Typography variant="h5" className="fw-bold">
-                      Product - Chanel Double Flap
+                      Product - {productDetailsData?.product_details?.product_name}
                     </Typography>
                     <Typography
                       className=""
