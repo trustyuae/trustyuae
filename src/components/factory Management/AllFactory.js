@@ -33,7 +33,7 @@ function AllFactory() {
 
   useEffect(() => {
     if (Array.isArray(allFactoryDatas)) {
-      console.log(allFactoryDatas,'allFactoryDatas=====');
+      console.log(allFactoryDatas, 'allFactoryDatas=====');
       let data = allFactoryDatas.map((v, i) => ({ ...v, id: i }));
       setFactories(data);
     }
@@ -105,27 +105,27 @@ function AllFactory() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value,'value');
+        console.log(value, 'value');
         return (
-            <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+          <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
             onClick={() => handleEdit(value.row.id)}
-            >
-              <FaEye className="mb-1" />
-            </Button>
+          >
+            <FaEye className="mb-1" />
+          </Button>
         );
       },
     },
   ];
   return (
-    <Container fluid className="py-3" style={{ maxHeight: "100%"}}>
+    <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
-          <Typography variant="h4" className="fw-semibold">
+        <Typography variant="h4" className="fw-semibold">
           All Factory List
-          </Typography>
-        </Box>
+        </Typography>
+      </Box>
       <MDBRow className="d-flex justify-content-start align-items-center mb-3">
         <MDBCol md="2">
-          <Form.Label className="me-2">Factory Name:</Form.Label>
+          <Form.Label className="me-2 fw-semibold">Factory Name:</Form.Label>
           <Form.Control
             type="text"
             placeholder="Search by Product ID"
@@ -134,7 +134,7 @@ function AllFactory() {
           />
         </MDBCol>
         <MDBCol md="2">
-          <Form.Label className="me-2">Address</Form.Label>
+          <Form.Label className="me-2 fw-semibold">Address</Form.Label>
           <Form.Control
             type="text"
             placeholder="Search by Product Name"
@@ -143,7 +143,7 @@ function AllFactory() {
           />
         </MDBCol>
         <MDBCol md="2">
-          <Form.Label className="me-2">Contact person</Form.Label>
+          <Form.Label className="me-2 fw-semibold">Contact person</Form.Label>
           <Form.Control
             type="text"
             placeholder="Search by Product Name"
@@ -152,7 +152,7 @@ function AllFactory() {
           />
         </MDBCol>
         <MDBCol md="2">
-          <Form.Label className="me-2">Contact Number</Form.Label>
+          <Form.Label className="me-2 fw-semibold">Contact Number</Form.Label>
           <Form.Control
             type="text"
             placeholder="Search by Product Name"
@@ -161,7 +161,7 @@ function AllFactory() {
           />
         </MDBCol>
         <MDBCol md="2">
-          <Form.Label className="me-2">Contact email</Form.Label>
+          <Form.Label className="me-2 fw-semibold">Contact email</Form.Label>
           <Form.Control
             type="text"
             placeholder="Search by Product Name"
@@ -270,24 +270,24 @@ function AllFactory() {
         </Table>
       </MDBRow> */}
       <Row>
-      <div className="mt-2">
-        <DataTable
-          columns={columns}
-          rows={filteredProducts}
+        <div className="mt-2">
+          <DataTable
+            columns={columns}
+            rows={filteredProducts}
           // rows={factories}
           // page={page}
           // pageSize={pageSize}
           // totalPages={totalPages}
           // handleChange={handleChange}
-        />
-      </div>
+          />
+        </div>
       </Row>
       <EditFactoryModal
         show={showEditModal}
         handleCloseEditModal={handleCloseEditModal}
         selectedFactory={selectedFactory}
         handleSaveEdit={handleSaveEdit}
-        setSelectedFactory={setSelectedFactory} 
+        setSelectedFactory={setSelectedFactory}
       />
     </Container>
   );

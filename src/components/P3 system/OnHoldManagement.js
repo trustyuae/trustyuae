@@ -191,6 +191,7 @@ function OnHoldManagement() {
           <FormGroup>
             <FormControlLabel
               checked={params.row.isSelected}
+              className="mx-auto"
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               onChange={(event) => handleCheckboxChange(event, params.row)}
@@ -297,7 +298,7 @@ function OnHoldManagement() {
             </div>
           ) : (
             <div className="mt-2">
-               <Alert severity="warning" sx={{fontFamily:'monospace',fontSize:'18px'}}>above product dosen't have any order yet !</Alert>
+              <Alert severity="warning" sx={{ fontFamily: 'monospace', fontSize: '18px' }}>above product dosen't have any order yet !</Alert>
             </div>
           )}
         </Card>

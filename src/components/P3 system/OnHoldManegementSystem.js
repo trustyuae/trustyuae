@@ -45,8 +45,6 @@ function OnHoldManegementSystem() {
         const colorAvailable = color?.length > 0;
         const sizeAvailable = size?.length > 0;
 
-        const singleColorAvailable = color
-
         return (
             <Box className='d-flex justify-content-around align-items-center'>
                 {noVariation ? (
@@ -87,10 +85,10 @@ function OnHoldManegementSystem() {
                             </Box>
                         )}
 
-                        {attribute_color&&(
+                        {attribute_color && (
                             <Box className="fw-bold fs-5">Color:{attribute_color}</Box>
                         )}
-                        {attribute_size&&(
+                        {attribute_size && (
                             <Box className="fw-bold fs-5">Size:{attribute_size}</Box>
                         )}
                     </>
@@ -283,7 +281,7 @@ function OnHoldManegementSystem() {
                     <Col xs="auto" lg="3">
 
                         <Form.Group controlId="duedate">
-                            <Form.Label>Date filter:</Form.Label>
+                            <Form.Label className="fw-semibold">Date filter:</Form.Label>
                             <Form.Control type="date" name="duedate" placeholder="Due date" value={date} onChange={(e) => setDate(e.target.value)} />
                         </Form.Group>
                     </Col>
