@@ -1,5 +1,5 @@
 import { Box, Card } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Outlet } from "react-router-dom";
 import Header from "../navbar/Header";
@@ -35,11 +35,26 @@ const StyledMain = styled("main")(({ theme }) => ({
 }));
 
 export const Layout = () => {
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  useEffect(() => {
+    function handleResize() {
+      setIsSidebarVisible(window.innerWidth > 1024);
+    }
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call the function once to set initial state
+    return () => window.removeEventListener('resize', handleResize); // Clean up event listener
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
   return (
     <OuterContainer>
       <InnerContainer>
-        <Header />
-        <SideBar />
+        {/* <Header /> */}
+        <Header onToggleSidebar={toggleSidebar} />
+        {/* <SideBar /> */}
+        {isSidebarVisible && <SideBar />}
         <StyledMain id="main" className="overflow-visible">
           <Card className="border-0 p-2 overflow-visible">
             <Outlet />

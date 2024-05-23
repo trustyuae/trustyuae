@@ -9,7 +9,7 @@ const Sidebar = () => {
   }, [location]);
   return (
     <>
-      <aside id="sidebar" className="sidebar">
+      <aside id="sidebar" className="sidebar" style={{left:'0'}}>
         <ul className="sidebar-nav" id="sidebar-nav">
           <li className="nav-item">
             <Link to="/ordersystem"  className={"nav-link underline" + (url === "/ordersystem" ?" active" : "")} >

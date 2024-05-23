@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
 
-const Header = () => {
+const Header = ({onToggleSidebar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogOut = async () => {
@@ -29,7 +29,7 @@ const Header = () => {
             />
           </Box>
         </Link>
-        {/* <i className="bi bi-list toggle-sidebar-btn"></i> */}
+        <i className="bi bi-list toggle-sidebar-btn" onClick={onToggleSidebar}></i>
       </div>
       {/* <div className="search-bar">
         <form
