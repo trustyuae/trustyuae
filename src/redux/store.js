@@ -6,6 +6,7 @@ import AllFactoryReducer from "./reducers/AllFactoryReducer";
 import OrderSystemReducer from "./reducers/OrderSystemReducer";
 import OrderNotAvailableReducer from "./reducers/P2SystemReducer";
 import ManagementSystemReducer from "./reducers/P3SystemReducer";
+import ProductManagementReducer from "./reducers/ProductManagementReducer";
 
 const reducer = combineReducers({
   loginUser: UserLoginReducer,
@@ -13,7 +14,8 @@ const reducer = combineReducers({
   allFactoryData: AllFactoryReducer,
   orderSystemData: OrderSystemReducer,
   orderNotAvailable: OrderNotAvailableReducer,
-  managementSystem: ManagementSystemReducer
+  managementSystem: ManagementSystemReducer,
+  allProducts:ProductManagementReducer,
 });
 
 let initialState = {};
