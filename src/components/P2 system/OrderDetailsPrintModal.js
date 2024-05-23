@@ -70,7 +70,7 @@ const OrderDetailsPrintModal = ({
       renderCell: (value, row) => {
         console.log(value.row.image, 'valueeeeeeee')
         // getBase64ImageFromUrl(''https://graph.facebook.com/3938027626271800/picture?type=normal'')
-        // getBase64ImageFromUrl('https://ghostwhite-guanaco-836757.hostingersite.com/wp-content/uploads/2024/04/4E2837DDA3_worn_2.webp')
+        // getBase64ImageFromUrl('https://wordpress.trustysystem.com/wp-content/uploads/2024/04/4E2837DDA3_worn_2.webp')
         //   .then(result => console.log(result, 'result'))
         //   .catch(err => console.error(err));
         return (

@@ -16,6 +16,8 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
         columns={columns}
         rowLength={totalPages}
         rowHeight={rowHeight}
+        disableColumnSorting 
+        disableColumnMenu 
         initialState={{
           pagination: { paginationModel: { pageSize: pageSize } },
         }}
@@ -31,14 +33,20 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
             display: 'none',
           },
           '& .MuiDataGrid-cell': {
+            textAlign: 'center',
             borderLeft: '1px solid rgba(224, 224, 224, 1)',
             borderRight: '1px solid rgba(224, 224, 224, 1)'
           },
           '& .MuiDataGrid-columnHeader': {
+            textAlign: 'center',
             borderLeft: '1px solid rgba(224, 224, 224, 1)',
             borderRight: '1px solid rgba(224, 224, 224, 1)'
           },
+          "& .MuiDataGrid-columnHeaderTitleContainerContent": {
+            width: '100%'
+          },
           '& .MuiDataGrid-columnHeaderTitle': {
+            width: '100%',
             fontWeight: 700,
             fontSize: 16
           },

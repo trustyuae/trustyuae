@@ -12,6 +12,7 @@ import DataTable from "../DataTable";
 import { Col, Row } from "react-bootstrap";
 import { Avatar, Box, Typography } from "@mui/material";
 import { CompressImage } from "../../utils/CompressImage";
+import EditIcon from '@mui/icons-material/Edit';
 
 function AllProductList() {
   const [products, setProducts] = useState([]);
@@ -204,10 +205,17 @@ function AllProductList() {
       type: "html",
       renderCell: (value, row) => {
         return (
+          <Box className="text-center">
+            <Button className='m-2 mx-auto d-flex align-items-center justify-content-center'
+              style={{ padding: '5px 5px', fontSize: '16px' }}
+              onClick={() => handleEdit(value.row.id)}>
+              <EditIcon fontSize='inherit' />
+            </Button>
+          </Box>
 
-          <Button type="button" className="btn btn-primary mr-2" onClick={() => handleEdit(value.row.id)}>
-            Edit
-          </Button>
+          // <Button type="button" className="btn btn-primary mr-2" onClick={() => handleEdit(value.row.id)}>
+          //   Edit
+          // </Button>
 
 
         );
@@ -231,7 +239,7 @@ function AllProductList() {
       <MDBRow className="d-flex justify-content-start align-items-center mb-3">
         <Col xs="auto" lg="4">
           <Form.Group>
-            <Form.Label className="me-2">Product ID:</Form.Label>
+            <Form.Label className="me-2 fw-semibold">Product ID:</Form.Label>
             <Form.Control
               type="text"
               placeholder="Search by Product ID"
@@ -242,7 +250,7 @@ function AllProductList() {
         </Col>
         <Col xs="auto" lg="4">
           <Form.Group>
-            <Form.Label className="me-2">Product Name:</Form.Label>
+            <Form.Label className="me-2 fw-semibold">Product Name:</Form.Label>
             <Form.Control
               type="text"
               placeholder="Search by Product Name"
@@ -251,8 +259,8 @@ function AllProductList() {
             />
           </Form.Group>
         </Col>
-        <MDBCol md="1">
-          <Form.Label className="me-2">Page Size:</Form.Label>
+        <MDBCol md="2">
+          <Form.Label className="me-2 fw-semibold">Page Size:</Form.Label>
           <Form.Control
             as="select"
             value={itemsPerPage}

@@ -16,6 +16,8 @@ import { Link } from 'react-router-dom';
 import { Card, Tab, Tabs } from 'react-bootstrap';
 import DataTable from '../DataTable';
 import Swal from 'sweetalert2';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 function POManagementSystem() {
     const POStatusFilter = ['Open', 'Checking with factory', 'Closed'];
@@ -156,11 +158,11 @@ function POManagementSystem() {
                     <div className='d-flex  align-items-center  justify-content-around'>
                         <Link to={`/PO_details/${value.row.po_id}`}>
                             <Button className='m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }}>
-                                <FaEye />
+                                <VisibilityIcon fontSize='inherit' />
                             </Button>
                         </Link>
-                        <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }} onClick={()=>handleDeletePO(value.row.po_id)}>
-                            <MdDelete />
+                        <Button className='btn btn-danger m-2 d-flex align-items-center justify-content-center' style={{ padding: '5px 5px', fontSize: '16px' }} onClick={() => handleDeletePO(value.row.po_id)}>
+                            <DeleteIcon fontSize='inherit' />
                         </Button>
                     </div>
                 );
@@ -192,10 +194,10 @@ function POManagementSystem() {
                 console.log(error);
             }
         });
-    
+
         console.log(id, 'id delete');
     };
-    
+
 
     const handleTabChange = (e) => {
         console.log(e);

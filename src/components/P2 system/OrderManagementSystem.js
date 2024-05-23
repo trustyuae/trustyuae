@@ -13,7 +13,7 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import Swal from "sweetalert2";
 import DataTable from "../DataTable";
-import { Box, Checkbox, FormControlLabel, FormGroup, Typography } from "@mui/material";
+import { Avatar, Box, Checkbox, FormControlLabel, FormGroup, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import { Card, Tab, Tabs } from "react-bootstrap";
 
@@ -75,6 +75,7 @@ function OrderManagementSystem() {
                 return (
                     <FormGroup>
                         <FormControlLabel
+                            className="mx-auto"
                             control={<Checkbox />}
                             style={{ justifyContent: "center" }}
                             checked={selectedOrderIds.includes(params.row.product_name)}
@@ -96,12 +97,25 @@ function OrderManagementSystem() {
             flex: 1,
             type: "html",
             renderCell: (value, row) =>
-                <img
-                    src={value.row.product_image}
-                    alt={value.row.product_name}
-                    className="img-fluid"
-                    width={100}
-                />
+                <Box
+                    className="h-100 w-100 d-flex align-items-center"
+                >
+                    <Avatar
+                        src={value.row.product_image || require('../../assets/default.png')}
+                        alt={value.row.product_image}
+                        sx={{
+                            height: "45px",
+                            width: "45px",
+                            borderRadius: "2px",
+                            margin: "0 auto",
+                            "& .MuiAvatar-img": {
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: "2px",
+                            },
+                        }}
+                    />
+                </Box>
 
         },
         { field: "total_quantity", headerName: "total quantity", flex: 1 },
@@ -120,6 +134,7 @@ function OrderManagementSystem() {
             renderCell: (params) =>
                 <FormGroup>
                     <FormControlLabel
+                        className="mx-auto"
                         control={<Checkbox />}
                         style={{ justifyContent: "center" }}
                         checked={selectedManualOrderIds.includes(params.row.product_id)}
@@ -140,12 +155,25 @@ function OrderManagementSystem() {
             flex: 1,
             type: "html",
             renderCell: (value, row) =>
-                <img
-                    src={value.row.product_image}
-                    alt={value.row.product_name}
-                    className="img-fluid"
-                    width={100}
-                />
+                <Box
+                    className="h-100 w-100 d-flex align-items-center"
+                >
+                    <Avatar
+                        src={value.row.product_image || require('../../assets/default.png')}
+                        alt={value.row.product_image}
+                        sx={{
+                            height: "45px",
+                            width: "45px",
+                            borderRadius: "2px",
+                            margin: "0 auto",
+                            "& .MuiAvatar-img": {
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: "2px",
+                            },
+                        }}
+                    />
+                </Box>
         },
         {
             field: "variation_values", headerName: "variation values", flex: 1,
@@ -179,6 +207,7 @@ function OrderManagementSystem() {
                 return (
                     <FormGroup>
                         <FormControlLabel
+                            className="mx-auto"
                             control={<Checkbox />}
                             style={{ justifyContent: "center" }}
                             checked={selectedScheduleOrderIds.includes(params.row.product_id)}
@@ -201,12 +230,25 @@ function OrderManagementSystem() {
             flex: 1,
             type: "html",
             renderCell: (value, row) =>
-                <img
-                    src={value.row.product_image}
-                    alt={value.row.product_name}
-                    className="img-fluid"
-                    width={100}
-                />
+                <Box
+                    className="h-100 w-100 d-flex align-items-center"
+                >
+                    <Avatar
+                        src={value.row.product_image || require('../../assets/default.png')}
+                        alt={value.row.product_image}
+                        sx={{
+                            height: "45px",
+                            width: "45px",
+                            borderRadius: "2px",
+                            margin: "0 auto",
+                            "& .MuiAvatar-img": {
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: "2px",
+                            },
+                        }}
+                    />
+                </Box>
         },
         {
             field: "variation_values", headerName: "variation values", flex: 1,
@@ -694,7 +736,7 @@ function OrderManagementSystem() {
                                         page={page}
                                         pageSize={pageSize}
                                         totalPages={totalPages}
-                                        rowHeight={100}
+                                        // rowHeight={100}
                                         handleChange={(handleChange)}
                                     />
                                 </Box>

@@ -159,53 +159,7 @@ function OrderNotAvailable() {
     }
   };
 
-  // const handleUpdateStatus = async () => {
-  //   console.log(
-  //     selectedOrderNotAvailable,
-  //     "selectedOrderNotAvailable handle update"
-  //   );
-  //   const poId = selectedOrderNotAvailable.map((order) => order.po_id);
-  //   const orderId = selectedOrderNotAvailable.map((order) => order.order_id);
-  //   const productId = selectedOrderNotAvailable.map(
-  //     (order) => order.product_id
-  //   );
-  //   const customerStatus = selectedOrderNotAvailable.map(
-  //     (order) => order.customer_status
-  //   );
-  //   if (selectedOrderNotAvailable.length === 0) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "please select products whose you wanna update status!",
-  //     });
-  //   }
-
-  //   if (customerStatus === "Refund") {
-  //     console.log(customerStatus,'customerStatus in loop')
-  //     Swal.fire({
-  //       icon: "Success",
-  //       title: "are you sure to refund this project?",
-  //       showConfirmButton: true,
-  //     }).then((result) => {
-  //       console.log(result, "result");
-  //     });
-  //   } else {
-  //     const requestedDataS = {
-  //       po_id: poId,
-  //       order_id: orderId,
-  //       product_id: productId,
-  //       customer_status: customerStatus,
-  //     };
-  //     await dispatch(OrderNotAvailableDataStatus(requestedDataS)).then(() => {
-  //       setSelectedOrderNotAvailable([]);
-  //     });
-  //   }
-  // };
-
   const handleUpdateStatus = async () => {
-    console.log(
-      selectedOrderNotAvailable,
-      "selectedOrderNotAvailable handle update"
-    );
     const poIds = selectedOrderNotAvailable.map((order) => order.po_id);
     const orderIds = selectedOrderNotAvailable.map((order) => order.order_id);
     const productIds = selectedOrderNotAvailable.map(
@@ -249,7 +203,6 @@ function OrderNotAvailable() {
               icon: "success",
               title: "Refund process completed successfully!",
             });
-            console.log("Refund response:", response);
           } catch (error) {
             console.error("Error in refund process:", error);
             Swal.fire({
@@ -258,10 +211,10 @@ function OrderNotAvailable() {
             });
           }
         } else {
-          console.log("Refund cancelled");
+          console.error("Refund cancelled");
         }
       });
-    }else {
+    } else {
       const requestedDataS = {
         po_id: poIds,
         order_id: orderIds,
@@ -323,7 +276,7 @@ function OrderNotAvailable() {
           onClick={() => ImageModule(params.value)}
         >
           <Avatar
-            src={params.value}
+            src={params.value || require('../../assets/default.png')}
             alt="Product Image"
             sx={{
               height: "45px",
@@ -389,6 +342,7 @@ function OrderNotAvailable() {
           <FormGroup>
             <FormControlLabel
               checked={params.row.isSelected}
+              className="mx-auto"
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               onChange={(event) => handleCheckboxChange(event, params.row)}
