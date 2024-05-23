@@ -48,7 +48,7 @@ const GRNView = () => {
             <img
               src={value.row.product_image}
               alt={value.row.product_name}
-              className="img-fluid"
+              className="img-fluid "
               width={100}
             />
           </>
