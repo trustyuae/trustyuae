@@ -5,13 +5,14 @@ import Button from "react-bootstrap/Button";
 import Pagination from "react-bootstrap/Pagination";
 import { useParams } from "react-router-dom";
 import {
+  Alert,
   Box,
   Checkbox,
   FormControlLabel,
   FormGroup,
   Typography,
 } from "@mui/material";
-import { Badge, Card, Col, Row } from "react-bootstrap";
+import { Badge, Card, Col, Modal, Row } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { useDispatch } from "react-redux";
 import { API_URL } from "../../redux/constants/Constants";
@@ -32,10 +33,11 @@ function OnHoldManagement() {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [productData, setProductData] = useState([]);
   const [productDetailsData, setProductDetailsData] = useState([]);
-  
+  const [showImageModal, setShowImageModal] = useState(false);
+
   console.log(productDetailsData, "productDetailsData");
   console.log(productData, "productData");
-  
+
   async function fetchProductDetails() {
     let apiUrl = `${API_URL}wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}`;
     await dispatch(
@@ -44,8 +46,8 @@ function OnHoldManagement() {
       })
     )
       .then((response) => {
-        let data = response.data
-        setProductDetailsData(data)
+        let data = response.data;
+        setProductDetailsData(data);
       })
       .catch((error) => {
         console.error(error);
@@ -126,26 +128,29 @@ function OnHoldManagement() {
     }
   };
 
-  const handleOrderStock= async()=>{
-  const product_id= params.id;
-  const username ="ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-  const password ="cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
-     const requestedData={
-      stock_status:"instock",
-      stock_quantity:productDetailsData?.grn_details?.qty_received
-     }
-     await dispatch(AddProductOrderForStock(requestedData,product_id,username,password))
-     .then((response)=>{
-      if (response) {
-        Swal.fire({
-          icon: "success",
-          title: "product added in InStock Successfully!",
-        });
-      } 
-     }).catch((error) => {
-      console.error(error);
-    });
-  }
+  const handleOrderStock = async () => {
+    const product_id = params.id;
+    const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
+    const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
+    const requestedData = {
+      stock_status: "instock",
+      stock_quantity: productDetailsData?.grn_details?.qty_received,
+    };
+    await dispatch(
+      AddProductOrderForStock(requestedData, product_id, username, password)
+    )
+      .then((response) => {
+        if (response) {
+          Swal.fire({
+            icon: "success",
+            title: "product added in InStock Successfully!",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   // const handleUpdatedValues = () => {
   //   setSelectedOrders([]);
@@ -208,7 +213,7 @@ function OnHoldManagement() {
             Product Details
           </Typography>
           <Box>
-            <Row className="justify-content-center">
+            <Row className="d-flex justify-content-center align-ite">
               <Col md="6">
                 <Box className="d-flex justify-content-center align-items-center h-100">
                   <Box>
@@ -246,12 +251,20 @@ function OnHoldManagement() {
                 </Box>
               </Col>
               <Col md="6">
-                <Box className="w-100" sx={{ height: "200px" }}>
+                <Box
+                  className="w-100"
+                  sx={{ height: "200px" }}
+                  onClick={() => setShowImageModal(true)}
+                >
                   <img
                     className="w-100 h-100"
-                    alt=""
-                    style={{ objectFit: "cover" }}
-                    src={require("../../assets/default.png")}
+                    style={{
+                      objectFit: "contain",
+                      width: "auto",
+                      height: "auto",
+                    }}
+                    src={productDetailsData?.product_details?.product_image}
+                    alt="Product"
                   />
                 </Box>
               </Col>
@@ -266,22 +279,30 @@ function OnHoldManagement() {
           <Typography variant="h6" className="fw-bold mb-3">
             Order Details
           </Typography>
-          <div className="mt-2">
-            <DataTable
-              columns={columns}
-              rows={productData}
-              page={page}
-              pageSize={pageSize}
-              totalPages={totalPages}
-              handleChange={handleChange}
-            />
-          </div>
+          {productData && productData.length !== 0 ? (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={productData}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
+              />
+            </div>
+          ) : (
+            <div className="mt-2">
+               <Alert severity="warning" sx={{fontFamily:'monospace',fontSize:'18px'}}>above product dosen't have any order yet !</Alert>
+            </div>
+          )}
         </Card>
       </MDBRow>
       <MDBRow>
         <MDBCol md="12" className="d-flex justify-content-end">
           {productData.length === 0 ? (
-            <Button variant="success" onClick={handleOrderStock}>Send For InsStock</Button>
+            <Button variant="success" onClick={handleOrderStock}>
+              Send For InStock
+            </Button>
           ) : (
             <Button variant="success" onClick={handleOrderPerp}>
               Send for Preparation
@@ -289,6 +310,26 @@ function OnHoldManagement() {
           )}
         </MDBCol>
       </MDBRow>
+      <Modal
+        show={showImageModal}
+        onHide={() => setShowImageModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Product Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card className="factory-card">
+            <img
+              src={
+                productDetailsData?.product_details?.product_image ||
+                `${require("../../assets/default.png")}`
+              }
+              alt="Product"
+            />
+          </Card>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 }

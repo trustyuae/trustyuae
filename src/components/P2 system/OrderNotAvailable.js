@@ -462,7 +462,6 @@ function OrderNotAvailable() {
       />
       <Modal
         show={showEditModal}
-        // onHide={handleCloseEditModal}
         onHide={() => setShowEditModal(false)}
         centered
       >
