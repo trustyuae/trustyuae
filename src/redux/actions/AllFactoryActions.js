@@ -9,17 +9,19 @@ import {
   ADD_FACTORY_REQUEST,
   ADD_FACTORY_SUCCESS,
   ADD_FACTORY_FAIL,
+  API_URL,
 } from "../constants/Constants";
 import axios from "axios";
 
-export const AllFactoryActions = (data) => async (dispatch) => {
+export const AllFactoryActions = () => async (dispatch) => {
   try {
     dispatch({ type: GET_All_FACTORY_REQUEST });
-
-    const response = await axios.get(`${url}custom-factory/v1/fetch-factories`);
-    dispatch({ type: GET_All_FACTORY_SUCCESS, payload: response?.data });
+    const response = await axios.get(`https://wordpress.trustysystem.com/wp-json/custom-factory/v1/fetch-factories`);
+    console.log(response, 'response of factories from reducer');
+    dispatch({ type: GET_All_FACTORY_SUCCESS, payload: response.data });
   } catch (error) {
-    dispatch({ type: GET_All_FACTORY_FAIL, error: error });
+    console.error("Error fetching factories:", error.message);
+    dispatch({ type: GET_All_FACTORY_FAIL, error: error.message });
   }
 };
 

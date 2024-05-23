@@ -1,5 +1,4 @@
-export const url =
-  "https://wordpress.trustysystem.com/wp-json/";
+export const url = "https://wordpress.trustysystem.com/wp-json/";
 export const API_URL = "https://wordpress.trustysystem.com/";
 
 export const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
@@ -122,5 +121,15 @@ export const ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS =
   "ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS";
 export const ADD_PRODUCT_ORDER_FOR_STOCK_FAIL =
   "ADD_PRODUCT_ORDER_FOR_STOCK_FAIL";
+
+export const GET_ALL_PRODUCTS_LIST_REQUEST =
+  "ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST";
+export const GET_ALL_PRODUCTS_LIST_SUCCESS =
+  "ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS";
+export const GET_ALL_PRODUCTS_LIST_FAIL = "ADD_PRODUCT_ORDER_FOR_STOCK_FAIL";
+
+export const EDIT_PRODUCT_LIST_REQUEST = "EDIT_PRODUCT_LIST_REQUEST";
+export const EDIT_PRODUCT_LIST_SUCCESS = "EDIT_PRODUCT_LIST_SUCCESS";
+export const EDIT_PRODUCT_LIST_FAIL = "EDIT_PRODUCT_LIST_FAIL";
 
 export const CLEAR_ERRORS = "CLEAR_ERRORS";
