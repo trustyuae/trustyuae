@@ -468,7 +468,7 @@ function OnHoldManegementSystem() {
                                 <Form.Control type="text" placeholder="Enter Product ID" value={productIDF} onChange={(e) => handalonChangeProductId(e.target.value)} />
                             </Form.Group>
                         </Col>
-                        <Col xs="auto" lg="2">
+                        {/* <Col xs="auto" lg="2">
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product Name:</Form.Label>
                                 <Select
@@ -487,7 +487,7 @@ function OnHoldManegementSystem() {
                                     options={optionsArray}
                                 />
                             </Form.Group>
-                        </Col>
+                        </Col> */}
 
                     </Row>
                     {
