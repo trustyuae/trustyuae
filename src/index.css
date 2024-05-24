@@ -1253,3 +1253,11 @@ h6 {
   font-size: 13px;
   color: #012970;
 }
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; 
+  height: 100%; 
+  top: 0;
+}

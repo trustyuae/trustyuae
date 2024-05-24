@@ -8,15 +8,19 @@ const Loader = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80vh;
   `;
   return (
     <Container>
-      <ReactLoader
-        type='spinner-default'
-        bgColor={Color.theme_first}
-        size={50}
-      />
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <ReactLoader
+          type="spinner-default"
+          bgColor={Color.theme_first}
+          size={40}
+          title={
+            <span style={{ color: "black", margin: "0" }}>just a moment ...!</span>
+          }
+        />
+      </div>
     </Container>
   );
 };

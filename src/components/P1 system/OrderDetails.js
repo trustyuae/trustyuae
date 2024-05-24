@@ -49,7 +49,10 @@ function OrderDetails() {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const loader = useSelector(
+    (state) => state?.orderSystemData?.isOrderDetails
+  );
+  console.log(loader,'loader')
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
@@ -777,12 +780,6 @@ function OrderDetails() {
             <Modal.Title>Attachment</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {/* <Form.Control
-              as="textarea"
-              placeholder="Enter your message here..."
-              rows={3}
-            />
-            <Button className="mt-2">Add Message</Button> */}
             <Box className="text-center">
               <Box
                 className="mx-auto mb-4"
