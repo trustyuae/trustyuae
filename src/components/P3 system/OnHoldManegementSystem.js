@@ -3,7 +3,7 @@ import { MDBRow } from 'mdb-react-ui-kit';
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
 import { Badge, Button, Card, Col, Modal, Row } from 'react-bootstrap';
-import { Box, InputLabel, MenuItem, Select, Typography } from '@mui/material';
+import { Box, InputLabel, MenuItem, Select as MuiSelect, Typography } from '@mui/material';
 import DataTable from '../DataTable';
 import { API_URL } from '../../redux/constants/Constants';
 import { useDispatch } from 'react-redux';
@@ -11,6 +11,11 @@ import { AddGrn, GetProductManual } from '../../redux/actions/P3SystemActions';
 import { MdDelete } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { CompressImage } from '../../utils/CompressImage';
+import axios from 'axios';
+
+import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
+import makeAnimated from 'react-select/animated';
 
 function OnHoldManegementSystem() {
     const dispatch = useDispatch()
@@ -35,12 +40,32 @@ function OnHoldManegementSystem() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [imageURL, setImageURL] = useState("");
 
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [optionsArray, setoptionsArray] = useState([])
+
+    const getall = async () => {
+        let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`
+        // let url = `https://wordpress.trustysystem.com/wp-json/custom-manual-po/v1/get-product-manual/?`
+        const response = await axios.get(url);
+        setoptionsArray(response.data.products.map(user => ({ label: user.product_name, value: user.product_id })))
+    }
+
+    useEffect(() => {
+        getall()
+    }, [])
+
+    useEffect(() => {
+        if (selectedOption) {
+            setProductName(selectedOption.label)
+            setProductID(selectedOption.value)
+        }
+    }, [selectedOption])
+
 
     const renderVariationValues = (params) => {
-        console.log(params, 'params');
+        // console.log(params,'params');
         const { color, size } = params.row.variation_values;
         const { attribute_color, attribute_size } = params.row.variation_values;
-        console.log(attribute_size, attribute_color, '---------------');
         const noVariation = params.row.variation_values.length === 0;
         const colorAvailable = color?.length > 0;
         const sizeAvailable = size?.length > 0;
@@ -54,7 +79,7 @@ function OnHoldManegementSystem() {
                         {colorAvailable && (
                             <Box className='w-100 me-3 d-flex flex-column'>
                                 <InputLabel id={`customer-color-${params.row.id}-label`}>Color</InputLabel>
-                                <Select
+                                <MuiSelect
                                     labelId={`customer-color-${params.row.id}-label`}
                                     id={`customer-color-${params.row.id}`}
                                     onChange={(event) => handleColorChange(event, params.row)}
@@ -64,14 +89,14 @@ function OnHoldManegementSystem() {
                                     {color?.map((status) => (
                                         <MenuItem key={status} value={status}>{status}</MenuItem>
                                     ))}
-                                </Select>
+                                </MuiSelect>
                             </Box>
                         )}
 
                         {sizeAvailable && (
                             <Box className='w-100 d-flex flex-column'>
                                 <InputLabel id={`customer-size-${params.row.id}-label`}>Size</InputLabel>
-                                <Select
+                                <MuiSelect
                                     labelId={`customer-size-${params.row.id}-label`}
                                     id={`customer-size-${params.row.id}`}
                                     onChange={(event) => handleSizeChange(event, params.row)}
@@ -81,7 +106,7 @@ function OnHoldManegementSystem() {
                                     {size.map((status) => (
                                         <MenuItem key={status} value={status}>{status}</MenuItem>
                                     ))}
-                                </Select>
+                                </MuiSelect>
                             </Box>
                         )}
 
@@ -132,12 +157,31 @@ function OnHoldManegementSystem() {
     ];
 
     const handleFieldChange = (id, field, value) => {
+        console.log(id, field, value,'id, field, value');
         const updatedData = tableData.map(item => {
             if (item.id === value.id) {
-                return { ...item, [field]: id };
+                return { ...item, [field]: id ,
+                    ...(field === 'variationColor' && 
+                    { variation_values:{attribute_color :id,
+                        ...(value.variation_values.size === undefined
+                            ?{attribute_size:value.variationSize}
+                        :{size:value.variation_values.size}
+                        ),
+                        } }
+                ),
+                ...(field === 'variationSize' && {
+                    variation_values: {
+                        attribute_size: id,
+                        ...(value.variation_values.color === undefined 
+                            ? { attribute_color: value.variationColor } 
+                            : { color: value.variation_values.color })
+                    }
+                })
+                };
             }
             return item;
         });
+        console.log(updatedData, 'updatedData');
         setTableData(updatedData);
         validateForm(updatedData);
 
@@ -163,32 +207,49 @@ function OnHoldManegementSystem() {
     };
 
     const getAllProducts = async () => {
-        let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
-
-        if (productNameF) {
+        // let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
+        let apiUrl = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
+        if (productNameF && productIDF) {
+            apiUrl += `product_name=${productNameF}&product_id=${productIDF}`;
+        } else if (productNameF) {
             apiUrl += `product_name=${productNameF}`;
         } else if (productIDF) {
             apiUrl += `product_id=${productIDF}`;
         }
-
         try {
-            const response = await dispatch(GetProductManual({ apiUrl }));
-            const data = response.data.products.map((v, i) => ({ ...v, id: i }));
-            const modifiedData = data.map(item => ({
-                ...item,
-                variationColor: item.variation_values.length === 0 ? '' : '',
-                variationSize: item.variation_values.length === 0 ? '' : ''
-            }));
-            console.log(response, 'data');
-            console.log(modifiedData, 'modifiedData');
-            setSingleProductD([modifiedData[0]]);
-
-
+            if (productIDF.length > 3) {
+                setSelectedOption(null)
+                const response = await dispatch(GetProductManual({ apiUrl }));
+                const data = response.data.products.map((v, i) => ({ ...v, id: i }));
+                const modifiedData = data.map(item => ({
+                    ...item,
+                    variationColor: item.variation_values.length === 0 ? '' : '',
+                    variationSize: item.variation_values.length === 0 ? '' : ''
+                }));
+                setSingleProductD(modifiedData);
+            } else if (productNameF && productIDF) {
+                const response = await dispatch(GetProductManual({ apiUrl }));
+                if (response.data.products) {
+                    setSelectedOption(null)
+                }
+                const data = response.data.products.map((v, i) => ({ ...v, id: i }));
+                const modifiedData = data.map(item => ({
+                    ...item,
+                    variationColor: item.variation_values.length === 0 ? '' : '',
+                    variationSize: item.variation_values.length === 0 ? '' : ''
+                }));
+                console.log(modifiedData,'modifiedData');
+                setSingleProductD(modifiedData);
+            }
         } catch (error) {
             console.error(error);
             // setSingleProductD([]);
         }
     }
+
+    useEffect(() => {
+        handalADDProduct()
+    }, [singleProductD])
 
     useEffect(() => {
         getAllProducts()
@@ -200,18 +261,85 @@ function OnHoldManegementSystem() {
     }, [])
 
     const handalADDProduct = () => {
-        let data = [...tableData, ...singleProductD]
-        let Updatedata = data.map((v, i) => ({ ...v, id: i, variationColor: v.variation_values.attribute_color !== undefined ? v.variation_values.attribute_color : '', variationSize: v.variation_values.attribute_size !== undefined ? v.variation_values.attribute_size : '' }));
-        console.log(Updatedata, 'Updatedata====');
+        let data = [...tableData,...singleProductD ]
+        let Updatedata = data.map((v, i) => ({ ...v, id: i, Quantity: v.Quantity !== "" ? v.Quantity : 1, variationColor: v.variation_values.attribute_color !== undefined ? v.variation_values.attribute_color : '', variationSize: v.variation_values.attribute_size !== undefined ? v.variation_values.attribute_size : '' }));
         validateForm(Updatedata);
-        setTableData(Updatedata)
+        console.log(Updatedata,'Updatedata');
+        const newData = Updatedata.reduce((acc, obj) => {
+            console.log(acc, obj,'acc, obj');
+            const existingIndex = acc.findIndex(item =>
+                item.product_name === obj.product_name &&
+                (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
+                (item.variationSize === obj.variationSize || (!item.variationSize && !obj.variationSize))
+            );
+            if (existingIndex !== -1) {
+                acc[existingIndex].Quantity = String(Number(acc[existingIndex].Quantity) + 1);
+                const originalArray = [acc[existingIndex]];
+                const filteredComparedArray = acc.filter(comparedItem => {
+                    return !originalArray.some(originalItem => {
+                        return (
+                            originalItem.product_name === comparedItem.product_name &&
+                            (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
+                            (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
+                        );
+                    });
+                });
+                const outputArray = [...originalArray, ...filteredComparedArray];
+                acc = outputArray
+            } else {
+                console.log(obj,acc,'obj,acc');
+                // acc.push(obj);
+                // acc.unshift(obj);
+                const originalArray = [obj];
+                const filteredComparedArray = acc.filter(comparedItem => {
+                    return !originalArray.some(originalItem => {
+                        return (
+                            originalItem.product_name === comparedItem.product_name &&
+                            (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
+                            (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
+                        );
+                    });
+                });
+                const outputArray = [...originalArray, ...filteredComparedArray];
+                console.log(outputArray,'outputArray');
+                // acc.push(obj);
+                acc = outputArray
+            }
+            return acc;
+        }, []);
+        console.log(newData,'newData');
+        setTableData(newData)
         setProductName('')
         setProductID('')
+    }
+
+    const verify = (data) => {
+
+        console.log(data, 'verify');
+        data.reduce((acc, obj) => {
+            // Check if there's already an object with the same product_name, variationColor, and variationSize
+            const existingIndex = acc.findIndex(item =>
+                item.product_name === obj.product_name &&
+                (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
+                (item.variationSize === obj.variationSize || (!item.variationSize && !obj.variationSize))
+            );
+
+            if (existingIndex !== -1) {
+                // If a matching object is found, increment the Quantity by 1
+                acc[existingIndex].Quantity = String(Number(acc[existingIndex].Quantity) + 1);
+            } else {
+                // If no matching object is found, add the current object to the accumulator
+                acc.push(obj);
+            }
+
+            return acc;
+        }, []);
     }
 
     const handalonChangeProductId = (e) => {
         setProductName('')
         setProductID(e)
+
     }
     const handalonChangeProductName = (e) => {
         setProductID('')
@@ -226,17 +354,14 @@ function OnHoldManegementSystem() {
 
     const validateForm = (data) => {
         let dataa = data.filter(o => (Object.keys(o.variation_values).length > 0))
-        console.log(dataa, 'dataa');
         const isValid = dataa.every(item => item.variationColor !== '');
         const isValidSize = dataa.every(item => item.variationSize !== '');
         const isQuantityAvailable = data.every(item => item.Quantity !== '')
-        setIsValid(isValid && isValidSize && isQuantityAvailable);
+        setIsValid((isValid || isValidSize) && isQuantityAvailable);
     };
-
 
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
-        console.log(tableData, 'tableData');
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
@@ -256,8 +381,8 @@ function OnHoldManegementSystem() {
             "status": "Pending for process",
             products: convertedData
         };
-        console.log(payload, 'payload');
         try {
+            console.log(payload,'payload');
             dispatch(AddGrn(payload, navigate))
         } catch (error) {
             console.error(error);
@@ -293,7 +418,6 @@ function OnHoldManegementSystem() {
                                 type="text"
                                 placeholder="Enter No of received boxes"
                                 value={userName}
-                                // onChange={(e) => setReceivedBoxes(e.target.value)}
                                 readOnly
                                 disabled
                                 className="mr-sm-2 py-2"
@@ -331,60 +455,41 @@ function OnHoldManegementSystem() {
                         <Col xs="auto" lg="4">
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product Name:</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Product" value={productNameF} onChange={(e) => handalonChangeProductName(e.target.value)} />
+                                <Select
+                                    value={selectedOption}
+                                    onChange={(option) => setSelectedOption(option)}
+                                    options={optionsArray}
+                                />
                             </Form.Group>
                         </Col>
-
-
                         <Col xs="auto" lg="4">
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product ID:</Form.Label>
                                 <Form.Control type="text" placeholder="Enter Product ID" value={productIDF} onChange={(e) => handalonChangeProductId(e.target.value)} />
                             </Form.Group>
                         </Col>
+                        <Col xs="auto" lg="2">
+                            <Form.Group className="fw-semibold mb-0">
+                                <Form.Label>Product Name:</Form.Label>
+                                <Select
+                                    value={selectedOption}
+                                    onChange={(option) => setSelectedOption(option)}
+                                    options={optionsArray}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col xs="auto" lg="2">
+                            <Form.Group className="fw-semibold mb-0">
+                                <Form.Label>Product Name:</Form.Label>
+                                <Select
+                                    value={selectedOption}
+                                    onChange={(option) => setSelectedOption(option)}
+                                    options={optionsArray}
+                                />
+                            </Form.Group>
+                        </Col>
 
                     </Row>
-                    <MDBRow className="px-3 mt-3">
-                        <Card className="p-3 mb-3">
-                            <Typography variant="h6" className="fw-bold mb-3">
-                                Product Details
-                            </Typography>
-                            <Box>
-                                {
-                                    (productNameF != '' || productIDF != '') && singleProductD?.map((d) => (
-                                        <Row className="justify-content-center">
-                                            <Col md="6">
-                                                <Box className="d-flex justify-content-center align-items-center h-100">
-                                                    <Box>
-                                                        <Typography variant="h5" className="fw-bold">{d.product_name}</Typography>
-                                                        <Typography
-                                                            className=""
-                                                            sx={{
-                                                                fontSize: 14,
-                                                            }}
-                                                        >
-                                                            <Badge bg="success">{d.product_id}</Badge>
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
-                                            </Col>
-                                            <Col md="6">
-                                                <Box className="w-100" sx={{ height: '200px' }}>
-                                                    <img className="" style={{ objectFit: 'cover', height: '150px' }} src={d.product_image || `${require("../../assets/default.png")}`} alt={d.product_image} />
-                                                </Box>
-                                            </Col>
-                                        </Row>
-                                    ))
-                                }
-
-                            </Box>
-                        </Card>
-                    </MDBRow>
-                    <MDBRow className='justify-content-end px-3'>
-                        <Button variant="primary" className='w-auto' disabled={(productNameF == '' && productIDF == '')} onClick={handalADDProduct}>
-                            Add Product
-                        </Button>
-                    </MDBRow>
                     {
                         tableData.length > 0 && (
                             <>
