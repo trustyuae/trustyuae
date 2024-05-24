@@ -109,6 +109,7 @@ function OrderSystem() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
+        console.log(value,'value from order systemmmmmm.........')
         return (
           <Link to={`/order_details/${value?.row?.order_id}`}>
             <Button
