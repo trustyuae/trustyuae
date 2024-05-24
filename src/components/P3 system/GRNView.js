@@ -9,14 +9,16 @@ import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GetGRNView } from "../../redux/actions/P3SystemActions";
+import Loader from "../../utils/Loader";
 
 const GRNView = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
+  const loader = useSelector((state) => state?.managementSystem?.isGrnView);
 
   const fetchOrder = async () => {
     let apiUrl = `${API_URL}wp-json/custom-api/v1/view-grn-details/${id}`;
@@ -77,7 +79,9 @@ const GRNView = () => {
       renderCell: (value, row) => {
         console.log(value, "value details of grn edite page");
         return (
-          <Link to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}`}>
+          <Link
+            to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}`}
+          >
             <Button
               type="button"
               className="w-auto bg-transparent border-0 text-secondary fs-5"
@@ -135,16 +139,20 @@ const GRNView = () => {
       <Card className="p-3 mb-3">
         <MDBRow className="d-flex justify-content-center align-items-center">
           <MDBCol col="10" md="12" sm="12"></MDBCol>
-          <div className="mt-2">
-            <DataTable
-              columns={columns}
-              rows={PO_OrderList}
-              // page={pageSO}
-              // pageSize={pageSizeSO}
-              // totalPages={totalPagesSO}
-              rowHeight={100}
-            />
-          </div>
+          {loader ? (
+            <Loader />
+          ) : (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={PO_OrderList}
+                // page={pageSO}
+                // pageSize={pageSizeSO}
+                // totalPages={totalPagesSO}
+                rowHeight={100}
+              />
+            </div>
+          )}
         </MDBRow>
       </Card>
     </Container>

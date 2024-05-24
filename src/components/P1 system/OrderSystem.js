@@ -15,9 +15,10 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
+import Loader from "../../utils/Loader";
 
 function OrderSystem() {
   const [dispatchType, setDispatchType] = useState("all");
@@ -31,6 +32,7 @@ function OrderSystem() {
   const [totalPages, setTotalPages] = useState(1);
   const [isReset, setIsReset] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
+  const loader = useSelector((state) => state?.orderSystemData?.isOrders);
 
   const dispatch = useDispatch();
 
@@ -73,8 +75,18 @@ function OrderSystem() {
 
   const columns = [
     { field: "date", headerName: "Date", className: "order-system", flex: 1 },
-    { field: "order_id", headerName: "Order ID", className: "order-system", flex: 1 },
-    { field: "customer_name", headerName: "Customer Name", className: "order-system", flex: 1 },
+    {
+      field: "order_id",
+      headerName: "Order ID",
+      className: "order-system",
+      flex: 1,
+    },
+    {
+      field: "customer_name",
+      headerName: "Customer Name",
+      className: "order-system",
+      flex: 1,
+    },
     {
       field: "shipping_country",
       headerName: "Shipping Country",
@@ -99,7 +111,10 @@ function OrderSystem() {
       renderCell: (value, row) => {
         return (
           <Link to={`/order_details/${value?.row?.order_id}`}>
-            <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5">
+            <Button
+              type="button"
+              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+            >
               <FaEye className="mb-1" />
             </Button>
             <Typography
@@ -112,7 +127,9 @@ function OrderSystem() {
             >
               {/* {"  "} */}
               <Badge bg="success" className="m-2">
-                {value?.row?.order_process == 'started' ? (value?.row?.order_process) : null}
+                {value?.row?.order_process == "started"
+                  ? value?.row?.order_process
+                  : null}
               </Badge>
             </Typography>
           </Link>
@@ -275,16 +292,20 @@ function OrderSystem() {
           </Box>
         </Form>
       </Row>
-      <div className="mt-2">
-        <DataTable
-          columns={columns}
-          rows={orders}
-          page={page}
-          pageSize={pageSize}
-          totalPages={totalPages}
-          handleChange={handleChange}
-        />
-      </div>
+      {loader ? (
+        <Loader />
+      ) : (
+        <div className="mt-2">
+          <DataTable
+            columns={columns}
+            rows={orders}
+            page={page}
+            pageSize={pageSize}
+            totalPages={totalPages}
+            handleChange={handleChange}
+          />
+        </div>
+      )}
     </Container>
   );
 }

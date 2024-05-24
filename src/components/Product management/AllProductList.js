@@ -16,6 +16,7 @@ import {
   GetAllProductsList,
 } from "../../redux/actions/ProductManagementActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+import Loader from "../../utils/Loader";
 
 function AllProductList() {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ function AllProductList() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const allFactoryDatas = useSelector((state) => state.allFactoryData.factory);
+  const loader = useSelector((state) => state?.allProducts?.isAllProducts);
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -264,21 +266,25 @@ function AllProductList() {
       </MDBRow>
 
       <Row>
-        <div className="mt-2">
-          <DataTable
-            columns={columns}
-            rows={products}
-            // rows={factories}
-            // page={page}
-            // pageSize={pageSize}
-            // totalPages={totalPages}
-            // handleChange={handleChange}
-            page={currentPage}
-            pageSize={itemsPerPage}
-            totalPages={totalPages}
-            handleChange={handleChange}
-          />
-        </div>
+        {loader ? (
+          <Loader />
+        ) : (
+          <div className="mt-2">
+            <DataTable
+              columns={columns}
+              rows={products}
+              // rows={factories}
+              // page={page}
+              // pageSize={pageSize}
+              // totalPages={totalPages}
+              // handleChange={handleChange}
+              page={currentPage}
+              pageSize={itemsPerPage}
+              totalPages={totalPages}
+              handleChange={handleChange}
+            />
+          </div>
+        )}
       </Row>
 
       {/* Edit Modal */}
