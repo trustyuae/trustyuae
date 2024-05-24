@@ -16,7 +16,7 @@ import axios from "axios";
 export const AllFactoryActions = () => async (dispatch) => {
   try {
     dispatch({ type: GET_All_FACTORY_REQUEST });
-    const response = await axios.get(`https://wordpress.trustysystem.com/wp-json/custom-factory/v1/fetch-factories`);
+    const response = await axios.get(`${API_URL}wp-json/custom-factory/v1/fetch-factories`);
     console.log(response, 'response of factories from reducer');
     dispatch({ type: GET_All_FACTORY_SUCCESS, payload: response.data });
   } catch (error) {

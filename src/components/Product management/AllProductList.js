@@ -4,8 +4,6 @@ import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import axios from "axios";
-import Pagination from "react-bootstrap/Pagination";
 import { API_URL } from "../../redux/constants/Constants";
 import DataTable from "../DataTable";
 import { Col, Row } from "react-bootstrap";
@@ -18,6 +16,7 @@ import {
   GetAllProductsList,
 } from "../../redux/actions/ProductManagementActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+import Loader from "../../utils/Loader";
 
 function AllProductList() {
   const dispatch = useDispatch();
@@ -32,18 +31,16 @@ function AllProductList() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const allFactoryDatas = useSelector((state) => state.allFactoryData.factory);
+  const loader = useSelector((state) => state?.allProducts?.isAllProducts);
 
   useEffect(() => {
     dispatch(AllFactoryActions());
     setFactories(allFactoryDatas);
   }, [dispatch, allFactoryDatas]);
 
-  console.log(allFactoryDatas, "allFactoryDatas");
-  const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-  const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
-
+  console.log(selectedProduct, "selectedProduct from modal");
   const fetchProducts = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-products-api/v1/fetch-products/?`;
+    let apiUrl = `${API_URL}wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
     if (searchId) apiUrl += `&product_id=${searchId}`;
     if (searchName) apiUrl += `&product_name=${searchName}`;
     try {
@@ -116,12 +113,14 @@ function AllProductList() {
   // };
 
   const handleSaveEdit = async () => {
-    console.log(selectedProduct,'selectedProduct from modal')
+    console.log(selectedProduct, "selectedProduct from modal");
     try {
-      const id = selectedProduct.product_id;
+      const id = selectedProduct?.product_id;
+      console.log(id, "selected product id from modal");
       const formData = new FormData();
       formData.append("factory_id", selectedProduct.factory_id);
       formData.append("id", selectedProduct.id);
+      formData.append("product_image", selectedProduct.product_image);
       formData.append("product_id", selectedProduct.product_id);
       formData.append("product_name", selectedProduct.product_name);
       formData.append("stock_quantity", selectedProduct.stock_quantity);
@@ -129,12 +128,11 @@ function AllProductList() {
       formData.append("name", selectedProduct?.product_name);
 
       if (selectFile) {
-        formData.append("product_image", selectFile);
         formData.append("factory_image", selectFile);
+      } else {
+        formData.append("factory_image", selectedProduct.factory_image);
       }
-
-      await dispatch(EditProductsList({id, formData}));
-
+      await dispatch(EditProductsList(formData, id));
       setShowEditModal(false);
       fetchProducts();
     } catch (error) {
@@ -150,7 +148,7 @@ function AllProductList() {
   };
 
   const handlePageSizeChange = (e) => {
-    setCurrentPage(1); // Reset to first page when page size changes
+    setCurrentPage(1);
     setItemsPerPage(parseInt(e.target.value));
   };
 
@@ -219,6 +217,7 @@ function AllProductList() {
 
   const handleChange = (event, value) => {
     setCurrentPage(value);
+    console.log(value, "value of pagination");
   };
 
   return (
@@ -267,21 +266,25 @@ function AllProductList() {
       </MDBRow>
 
       <Row>
-        <div className="mt-2">
-          <DataTable
-            columns={columns}
-            rows={products}
-            // rows={factories}
-            // page={page}
-            // pageSize={pageSize}
-            // totalPages={totalPages}
-            // handleChange={handleChange}
-            page={currentPage}
-            pageSize={itemsPerPage}
-            totalPages={totalPages}
-            handleChange={handleChange}
-          />
-        </div>
+        {loader ? (
+          <Loader />
+        ) : (
+          <div className="mt-2">
+            <DataTable
+              columns={columns}
+              rows={products}
+              // rows={factories}
+              // page={page}
+              // pageSize={pageSize}
+              // totalPages={totalPages}
+              // handleChange={handleChange}
+              page={currentPage}
+              pageSize={itemsPerPage}
+              totalPages={totalPages}
+              handleChange={handleChange}
+            />
+          </div>
+        )}
       </Row>
 
       {/* Edit Modal */}

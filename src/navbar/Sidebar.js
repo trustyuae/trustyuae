@@ -2,20 +2,46 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useLocation } from "react-router-dom";
 const Sidebar = () => {
-  const location = useLocation(); // once ready it returns the 'window.location' object
-  const [url, setUrl] = useState(null);
+  const location = useLocation();
+  const [activeMenuItem, setActiveMenuItem] = useState("");
+
   useEffect(() => {
-    setUrl(location.pathname);
+    const currentPath = location.pathname;
+    setActiveMenuItem(currentPath);
   }, [location]);
   return (
     <>
-      <aside id="sidebar" className="sidebar" style={{left:'0'}}>
+      <aside id="sidebar" className="sidebar" style={{ left: "0" }}>
         <ul className="sidebar-nav" id="sidebar-nav">
           <li className="nav-item">
-            <Link to="/ordersystem"  className={"nav-link underline" + (url === "/ordersystem" ?" active" : "")} >
-              <i className="bi bi-grid"></i>
+            <a
+              className="nav-link collapsed"
+              data-bs-target="#icons-nav"
+              data-bs-toggle="collapse"
+              href="/"
+            >
+              <i className="bi bi-menu-button-wide"></i>
               <span>P1 System</span>
-            </Link>
+              <i className="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul
+              id="icons-nav"
+              className="nav-content collapse "
+              data-bs-parent="#sidebar-nav"
+            >
+              <li>
+                <Link
+                  to="/ordersystem"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/ordersystem" ? " active" : "")
+                  }
+                >
+                  <i className="bi bi-circle"></i>
+                  <span>Order Fulfillment System</span>
+                </Link>
+              </li>
+            </ul>
           </li>
 
           <li className="nav-item">
@@ -35,19 +61,39 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <Link to="/order_management_system" className={"nav-link underline" + (url === "/order_management_system" ?" active" : "")}>
+                <Link
+                  to="/order_management_system"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/order_management_system"
+                      ? " active"
+                      : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>Order Management System</span>
                 </Link>
               </li>
               <li>
-                <Link to="/PO_ManagementSystem" className={"nav-link underline" + (url === "/PO_ManagementSystem" ?" active" : "")}>
+                <Link
+                  to="/PO_ManagementSystem"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/PO_ManagementSystem" ? " active" : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>PO management System</span>
                 </Link>
               </li>
               <li>
-                <Link to="/order_not_available" className={"nav-link underline" + (url === "/order_not_available" ?" active" : "")}>
+                <Link
+                  to="/order_not_available"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/order_not_available" ? " active" : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>Order Not Available</span>
                 </Link>
@@ -72,13 +118,27 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <Link to="/On_Hold_Manegement_System" className={"nav-link underline" + (url === "/On_Hold_Manegement_System" ?" active" : "")}>
+                <Link
+                  to="/On_Hold_Manegement_System"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/On_Hold_Manegement_System"
+                      ? " active"
+                      : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>On Hold Management system</span>
                 </Link>
               </li>
               <li>
-                <Link to="/GRN_Management" className={"nav-link underline" + (url === "/GRN_Management" ?" active" : "")}>
+                <Link
+                  to="/GRN_Management"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/GRN_Management" ? " active" : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>GRN Management</span>
                 </Link>
@@ -103,13 +163,25 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <Link to="/all_factory" className={"nav-link underline" + (url === "/all_factory" ?" active" : "")}>
+                <Link
+                  to="/all_factory"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/all_factory" ? " active" : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>All Factories</span>
                 </Link>
               </li>
               <li>
-                <Link to="/factory_form" className={"nav-link underline" + (url === "/factory_form" ?" active" : "")}>
+                <Link
+                  to="/factory_form"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/factory_form" ? " active" : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>Add Factory</span>
                 </Link>
@@ -134,7 +206,13 @@ const Sidebar = () => {
               data-bs-parent="#sidebar-nav"
             >
               <li>
-                <Link to="/all_products_list" className={"nav-link underline" + (url === "/all_products_list" ?" active" : "")}>
+                <Link
+                  to="/all_products_list"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/all_products_list" ? " active" : "")
+                  }
+                >
                   <i className="bi bi-circle"></i>
                   <span>All Products</span>
                 </Link>

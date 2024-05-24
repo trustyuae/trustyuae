@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { Badge, Card, Col, Modal, Row } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { API_URL } from "../../redux/constants/Constants";
 import {
   AddProductOrderForPre,
@@ -23,6 +23,7 @@ import {
   GetProductOrderDetails,
 } from "../../redux/actions/P3SystemActions";
 import Swal from "sweetalert2";
+import Loader from "../../utils/Loader";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -34,6 +35,13 @@ function OnHoldManagement() {
   const [productData, setProductData] = useState([]);
   const [productDetailsData, setProductDetailsData] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
+  const loader = useSelector(
+    (state) => state?.managementSystem?.isProductOrderDetails
+  );
+
+  const loader2 = useSelector(
+    (state) => state?.managementSystem?.isProductDetails
+  );
 
   console.log(productDetailsData, "productDetailsData");
   console.log(productData, "productData");
@@ -218,64 +226,69 @@ function OnHoldManagement() {
           <Typography variant="h6" className="fw-bold mb-3">
             Product Details
           </Typography>
-          <Box>
-            <Row className="d-flex justify-content-center align-ite">
-              <Col md="6">
-                <Box className="d-flex justify-content-center align-items-center h-100">
-                  <Box>
-                    <Typography variant="h5" className="fw-bold">
-                      Product - {productDetailsData?.product_details?.product_name}
-                    </Typography>
-                    <Typography
-                      className=""
-                      sx={{
-                        fontSize: 14,
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Box>
-                        <span>Product Id:</span>{" "}
-                        <Badge bg="success">
-                          {productDetailsData?.product_details?.product_id}
-                        </Badge>
-                      </Box>
-                      <Box>
-                        <span>Quantity Received:</span>{" "}
-                        <Badge bg="success">
-                          {productDetailsData?.grn_details?.qty_received}
-                        </Badge>
-                      </Box>
-                      <Box>
-                        <span>Quantity Remain:</span>{" "}
-                        <Badge bg="success">
-                          {productDetailsData?.grn_details?.qty_remain}
-                        </Badge>
-                      </Box>
-                    </Typography>
+          {loader2 ? (
+            <Loader />
+          ) : (
+            <Box>
+              <Row className="d-flex justify-content-center align-ite">
+                <Col md="6">
+                  <Box className="d-flex justify-content-center align-items-center h-100">
+                    <Box>
+                      <Typography variant="h5" className="fw-bold">
+                        Product -{" "}
+                        {productDetailsData?.product_details?.product_name}
+                      </Typography>
+                      <Typography
+                        className=""
+                        sx={{
+                          fontSize: 14,
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Box>
+                          <span>Product Id:</span>{" "}
+                          <Badge bg="success">
+                            {productDetailsData?.product_details?.product_id}
+                          </Badge>
+                        </Box>
+                        <Box>
+                          <span>Quantity Received:</span>{" "}
+                          <Badge bg="success">
+                            {productDetailsData?.grn_details?.qty_received}
+                          </Badge>
+                        </Box>
+                        <Box>
+                          <span>Quantity Remain:</span>{" "}
+                          <Badge bg="success">
+                            {productDetailsData?.grn_details?.qty_remain}
+                          </Badge>
+                        </Box>
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-              </Col>
-              <Col md="6">
-                <Box
-                  className="w-100"
-                  sx={{ height: "200px" }}
-                  onClick={() => setShowImageModal(true)}
-                >
-                  <img
-                    className="w-100 h-100"
-                    style={{
-                      objectFit: "contain",
-                      width: "auto",
-                      height: "auto",
-                    }}
-                    src={productDetailsData?.product_details?.product_image}
-                    alt="Product"
-                  />
-                </Box>
-              </Col>
-            </Row>
-          </Box>
+                </Col>
+                <Col md="6">
+                  <Box
+                    className="w-100"
+                    sx={{ height: "200px" }}
+                    onClick={() => setShowImageModal(true)}
+                  >
+                    <img
+                      className="w-100 h-100"
+                      style={{
+                        objectFit: "contain",
+                        width: "auto",
+                        height: "auto",
+                      }}
+                      src={productDetailsData?.product_details?.product_image}
+                      alt="Product"
+                    />
+                  </Box>
+                </Col>
+              </Row>
+            </Box>
+          )}
         </Card>
       </MDBRow>
 
@@ -285,20 +298,29 @@ function OnHoldManagement() {
           <Typography variant="h6" className="fw-bold mb-3">
             Order Details
           </Typography>
-          {productData && productData.length !== 0 ? (
-            <div className="mt-2">
-              <DataTable
-                columns={columns}
-                rows={productData}
-                page={page}
-                pageSize={pageSize}
-                totalPages={totalPages}
-                handleChange={handleChange}
-              />
+          {loader ? (
+            <div className="loader-container">
+              <Loader className="loader" />
             </div>
           ) : (
             <div className="mt-2">
-              <Alert severity="warning" sx={{ fontFamily: 'monospace', fontSize: '18px' }}>above product dosen't have any order yet !</Alert>
+              {productData && productData.length !== 0 ? (
+                <DataTable
+                  columns={columns}
+                  rows={productData}
+                  page={page}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  handleChange={handleChange}
+                />
+              ) : (
+                <Alert
+                  severity="warning"
+                  sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                >
+                  Above product doesn't have any order yet!
+                </Alert>
+              )}
             </div>
           )}
         </Card>
