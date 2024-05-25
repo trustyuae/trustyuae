@@ -12,9 +12,44 @@ import {
   ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST,
   ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
   ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
+  GET_SCHEDULE_PO_DETAILS_REQUEST,
+  GET_SCHEDULE_PO_DETAILS_FAIL,
+  GET_SCHEDULE_PO_DETAILS_SUCCESS,
+  GET_MANUAL_PO_DETAILS_REQUEST,
+  GET_MANUAL_PO_DETAILS_SUCCESS,
+  GET_MANUAL_PO_DETAILS_FAIL,
+  GET_PO_DETAILS_REQUEST,
+  GET_PO_DETAILS_FAIL,
+  GET_PO_DETAILS_SUCCESS,
+  ADD_PO_REQUEST,
+  ADD_PO_SUCCESS,
+  ADD_PO_FAIL,
+  ADD_MANUAL_PO_REQUEST,
+  ADD_MANUAL_PO_SUCCESS,
+  ADD_MANUAL_PO_FAIL,
+  ADD_SCHEDULE_PO_REQUEST,
+  ADD_SCHEDULE_PO_SUCCESS,
+  ADD_SCHEDULE_PO_FAIL,
+  GET_PERTICULAR_PO_DETAILS_REQUEST,
+  GET_PERTICULAR_PO_DETAILS_FAIL,
+  GET_PERTICULAR_PO_DETAILS_SUCCESS,
 } from "../constants/Constants";
 
 const initialState = {
+  poDetailsData: [],
+  isPoDetailsData: false,
+  manualPoDetailsData: [],
+  isManualPoDetailsData: false,
+  schedulePoDetailsData: [],
+  isSchedulePoDetailsData: false,
+  perticularPoDetailsData: [],
+  isPerticularPoDetailsData: false,
+  addedPoData: [],
+  isAddedPoData: false,
+  addedManualPoData: [],
+  isAddedManualPoData: false,
+  addedSchedulePoData: [],
+  isAddedSchedulePoData: false,
   ordersNotAvailable: [],
   isOrdersNotAvailable: false,
   ordersNotAvailablePo: [],
@@ -28,6 +63,91 @@ const initialState = {
 
 const OrderNotAvailableReducer = (state = initialState, action) => {
   switch (action.type) {
+    case GET_PO_DETAILS_REQUEST:
+      return { ...state, isPoDetailsData: true };
+    case GET_PO_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isPoDetailsData: false,
+        poDetailsData: action.payload,
+      };
+    case GET_PO_DETAILS_FAIL:
+      return { ...state, isPoDetailsData: false, error: action.payload };
+
+    case GET_MANUAL_PO_DETAILS_REQUEST:
+      return { ...state, isManualPoDetailsData: true };
+    case GET_MANUAL_PO_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isManualPoDetailsData: false,
+        manualPoDetailsData: action.payload,
+      };
+    case GET_MANUAL_PO_DETAILS_FAIL:
+      return { ...state, isManualPoDetailsData: false, error: action.payload };
+
+    case GET_SCHEDULE_PO_DETAILS_REQUEST:
+      return { ...state, isSchedulePoDetailsData: true };
+    case GET_SCHEDULE_PO_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isSchedulePoDetailsData: false,
+        schedulePoDetailsData: action.payload,
+      };
+    case GET_SCHEDULE_PO_DETAILS_FAIL:
+      return {
+        ...state,
+        isSchedulePoDetailsData: false,
+        error: action.payload,
+      };
+
+      case GET_PERTICULAR_PO_DETAILS_REQUEST:
+      return { ...state, isPerticularPoDetailsData: true };
+    case GET_PERTICULAR_PO_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isPerticularPoDetailsData: false,
+        perticularPoDetailsData: action.payload,
+      };
+    case GET_PERTICULAR_PO_DETAILS_FAIL:
+      return {
+        ...state,
+        isPerticularPoDetailsData: false,
+        error: action.payload,
+      };
+
+    case ADD_PO_REQUEST:
+      return { ...state, isAddedPoData: true };
+    case ADD_PO_SUCCESS:
+      return {
+        ...state,
+        isAddedPoData: false,
+        addedPoData: action.payload,
+      };
+    case ADD_PO_FAIL:
+      return { ...state, isAddedPoData: false, error: action.payload };
+
+    case ADD_MANUAL_PO_REQUEST:
+      return { ...state, isAddedManualPoData: true };
+    case ADD_MANUAL_PO_SUCCESS:
+      return {
+        ...state,
+        isAddedManualPoData: false,
+        addedManualPoData: action.payload,
+      };
+    case ADD_MANUAL_PO_FAIL:
+      return { ...state, isAddedManualPoData: false, error: action.payload };
+
+    case ADD_SCHEDULE_PO_REQUEST:
+      return { ...state, isAddedSchedulePoData: true };
+    case ADD_SCHEDULE_PO_SUCCESS:
+      return {
+        ...state,
+        isAddedSchedulePoData: false,
+        addedSchedulePoData: action.payload,
+      };
+    case ADD_SCHEDULE_PO_FAIL:
+      return { ...state, isAddedSchedulePoData: false, error: action.payload };
+
     case GET_ORDER_NOT_AVAILABLE_REQUEST:
       return { ...state, isOrdersNotAvailable: true };
     case GET_ORDER_NOT_AVAILABLE_SUCCESS:

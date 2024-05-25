@@ -13,8 +13,168 @@ import {
   ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
   ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
   ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST,
+  GET_PO_DETAILS_REQUEST,
+  GET_PO_DETAILS_SUCCESS,
+  GET_PO_DETAILS_FAIL,
+  GET_MANUAL_PO_DETAILS_REQUEST,
+  GET_MANUAL_PO_DETAILS_SUCCESS,
+  GET_MANUAL_PO_DETAILS_FAIL,
+  GET_SCHEDULE_PO_DETAILS_REQUEST,
+  GET_SCHEDULE_PO_DETAILS_SUCCESS,
+  GET_SCHEDULE_PO_DETAILS_FAIL,
+  ADD_PO_REQUEST,
+  ADD_PO_SUCCESS,
+  ADD_PO_FAIL,
+  ADD_MANUAL_PO_REQUEST,
+  ADD_MANUAL_PO_SUCCESS,
+  ADD_MANUAL_PO_FAIL,
+  ADD_SCHEDULE_PO_REQUEST,
+  ADD_SCHEDULE_PO_SUCCESS,
+  ADD_SCHEDULE_PO_FAIL,
+  GET_PERTICULAR_PO_DETAILS_REQUEST,
+  GET_PERTICULAR_PO_DETAILS_SUCCESS,
+  GET_PERTICULAR_PO_DETAILS_FAIL,
 } from "../constants/Constants";
 import axios from "axios";
+
+export const PoDetailsData =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_PO_DETAILS_REQUEST });
+      const response = await axios.get(apiUrl);
+      dispatch({
+        type: GET_PO_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_PO_DETAILS_FAIL, error: error.message });
+    }
+  };
+
+export const ManualPoDetailsData =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_MANUAL_PO_DETAILS_REQUEST });
+      const response = await axios.get(apiUrl);
+      dispatch({
+        type: GET_MANUAL_PO_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_MANUAL_PO_DETAILS_FAIL, error: error.message });
+    }
+  };
+
+export const SchedulePoDetailsData =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_SCHEDULE_PO_DETAILS_REQUEST });
+      const response = await axios.get(apiUrl);
+      dispatch({
+        type: GET_SCHEDULE_PO_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_SCHEDULE_PO_DETAILS_FAIL, error: error.message });
+    }
+  };
+
+  export const PerticularPoDetails =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_PERTICULAR_PO_DETAILS_REQUEST });
+      const response = await axios.get(apiUrl);
+      dispatch({
+        type: GET_PERTICULAR_PO_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_PERTICULAR_PO_DETAILS_FAIL, error: error.message });
+    }
+  };
+
+export const AddPO = (payload, navigate) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_PO_REQUEST });
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
+      payload
+    );
+    if (response.data) {
+      await Swal.fire({
+        text: response.data,
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+      navigate("/PO_ManagementSystem");
+    }
+    dispatch({
+      type: ADD_PO_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({ type: ADD_PO_FAIL, error: error.message });
+  }
+};
+
+export const AddManualPO = (payload, navigate) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_MANUAL_PO_REQUEST });
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-manual-order/v1/post-order-manual/`,
+      payload
+    );
+    if (response.data) {
+      await Swal.fire({
+        text: response.data,
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+      navigate("/PO_ManagementSystem");
+    }
+    dispatch({
+      type: ADD_MANUAL_PO_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({ type: ADD_MANUAL_PO_FAIL, error: error.message });
+  }
+};
+
+export const AddSchedulePO = (payload, navigate) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_SCHEDULE_PO_REQUEST });
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-schedule-order/v1/post-order-schedule/`,
+      payload
+    );
+    if (response.data) {
+      await Swal.fire({
+        text: response.data,
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+      navigate("/PO_ManagementSystem");
+    }
+    dispatch({
+      type: ADD_SCHEDULE_PO_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({ type: ADD_SCHEDULE_PO_FAIL, error: error.message });
+  }
+};
 
 export const OrderNotAvailableData =
   ({ apiUrl }) =>
@@ -125,47 +285,48 @@ export const OrderNotAvailableDataStatus =
 //   }
 // };
 
-export const OrderNotAvailableRefund = (requestedInfo, orderIds, username, password) => async (dispatch) => {
-  try {
-    dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST });
-    const basicAuth = {
-      username: username,
-      password: password,
-    };
-    const refundPromises = orderIds.map(async (id) => {
-      const response = await axios.post(
-        `${API_URL}/wp-json/wc/v3/orders/${id}/refunds`,
-        requestedInfo,
-        {
-          auth: basicAuth,
-        }
-      );
-      return response.data;
-    });
+export const OrderNotAvailableRefund =
+  (requestedInfo, orderIds, username, password) => async (dispatch) => {
+    try {
+      dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST });
+      const basicAuth = {
+        username: username,
+        password: password,
+      };
+      const refundPromises = orderIds.map(async (id) => {
+        const response = await axios.post(
+          `${API_URL}/wp-json/wc/v3/orders/${id}/refunds`,
+          requestedInfo,
+          {
+            auth: basicAuth,
+          }
+        );
+        return response.data;
+      });
 
-    const refunds = await Promise.all(refundPromises);
-    
-    Swal.fire({
-      icon: "success",
-      title: "Refund process completed successfully!",
-    });
+      const refunds = await Promise.all(refundPromises);
 
-    dispatch({
-      type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
-      payload: refunds,
-    });
-    
-    return refunds;
-  } catch (error) {
-    console.error(error);
-    Swal.fire({
-      icon: "error",
-      title: "Error in refund process!",
-    });
-    dispatch({
-      type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
-      error: error.message,
-    });
-    throw error;
-  }
-};
+      Swal.fire({
+        icon: "success",
+        title: "Refund process completed successfully!",
+      });
+
+      dispatch({
+        type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
+        payload: refunds,
+      });
+
+      return refunds;
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error in refund process!",
+      });
+      dispatch({
+        type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
+        error: error.message,
+      });
+      throw error;
+    }
+  };

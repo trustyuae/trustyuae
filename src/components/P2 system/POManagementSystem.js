@@ -5,8 +5,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { FaEye } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { Box, Typography } from '@mui/material';
 import { DateRangePicker, LocalizationProvider, SingleInputDateRangeField } from '@mui/x-date-pickers-pro';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -133,16 +131,16 @@ function POManagementSystem() {
     const columns = [
         {
             field: "po_id",
-            headerName: "PO \n Number", flex: 2
+            headerName: "PO No.", flex: 1.5
         },
-        { field: "po_date", headerName: "Date created", flex: 2 },
-        { field: "total_quantity", headerName: "Total Quantity", flex: 3 },
-        { field: "", headerName: "Estimated Cost(RMB)", flex: 3 },
-        { field: "estimated_cost_aed", headerName: "Estimated Cost(AED)", flex: 3 },
-        { field: "po_status", headerName: "Status", flex: 1 },
-        { field: "payment_status", headerName: "Payment Status", flex: 1 },
+        { field: "po_date", headerName: "Date", flex: 1.5 },
+        { field: "total_quantity", headerName: "Quantity", flex: 1.5 },
+        { field: "", headerName: "RMB Price", flex: 1.5 },
+        { field: "estimated_cost_aed", headerName: "AED Price", flex: 1.5 },
+        { field: "po_status", headerName: "Status", flex: 1.5 },
+        { field: "payment_status", headerName: "Status", flex: 1.5 },
         {
-            field: "factory_id", headerName: "Factory", flex: 1,
+            field: "factory_id", headerName: "Factory", flex: 1.5,
             type: "html",
             renderCell: (value, row) => {
                 return factories.find((factory) => factory.id == value.row.factory_id)?.factory_name

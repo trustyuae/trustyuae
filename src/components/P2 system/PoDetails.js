@@ -14,9 +14,13 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import { useDispatch, useSelector } from "react-redux";
+import { PerticularPoDetails } from "../../redux/actions/P2SystemActions";
+import Loader from "../../utils/Loader";
 
 const PoDetails = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const [data, setData] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState("Paid");
@@ -26,32 +30,37 @@ const PoDetails = () => {
   const [factories, setFactories] = useState([]);
   const [factorieName, setFactorieName] = useState("");
   const [printModal, setPrintModal] = useState(false);
-  const [productData, setProductData] = useState(null);
-
-  console.log(PO_OrderList, "PO_OrderList by akash");
   const navigate = useNavigate();
 
-  const fetchOrder = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`;
-    const response = await axios.get(apiUrl);
-    let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
-    data = data.map((v, i) => ({ ...v, dispatch_status: "Dispatched" }));
-    console.log(data, "data======");
-    const row = [
-      ...data,
-      {
-        id: "TAX",
-        label: "Total:",
-        taxRate: response.data.total_count,
-        taxTotal: 8100,
-        totals: response.data.total_cost,
-      },
-    ];
-    console.log(row, "data======");
+  const perticularOrderDetailsLoader = useSelector(
+    (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
+  );
 
-    setPO_OrderList(row);
-    setData(response.data.line_items);
-    setFactorieName(response.data.factory_id);
+  const fetchPO = async () => {
+    try {
+      let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`;
+      await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
+        let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
+        data = data.map((v, i) => ({ ...v, dispatch_status: "Dispatched" }));
+        console.log(data, "data======");
+        const row = [
+          ...data,
+          {
+            id: "TAX",
+            label: "Total:",
+            taxRate: response.data.total_count,
+            taxTotal: 8100,
+            totals: response.data.total_cost,
+          },
+        ];
+        console.log(row, "data======");
+        setPO_OrderList(row);
+        setData(response.data.line_items);
+        setFactorieName(response.data.factory_id);
+      });
+    } catch {
+      console.error("Error fetching PO:");
+    }
   };
 
   const fetchFactories = async () => {
@@ -66,7 +75,7 @@ const PoDetails = () => {
   };
 
   useEffect(() => {
-    fetchOrder();
+    fetchPO();
     fetchFactories();
   }, []);
 
@@ -114,23 +123,11 @@ const PoDetails = () => {
   };
 
   const handleUpdate = async () => {
-    console.log(PO_OrderList, "PO_OrderList======");
     let updatelist = PO_OrderList.slice(0, -1);
-    console.log(updatelist, "PO_OrderList pop======");
-    console.log(
-      updatelist?.map((item) => item.product_id),
-      "PO_OrderList.line_items.map(item => item.product_id)"
-    );
-
     const availabilityStatuses =
       updatelist?.map((item) => item.availability_status) || [];
-
-    // Flatten the array in case availability_status is an array itself
     const flattenedStatuses = availabilityStatuses.flat();
-
-    // Validate the result and set the message
     const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
-    console.log(validationMessage, "validationMessage");
     if (validationMessage == "Availability status is empty.") {
       Swal.fire({
         icon: "error",
@@ -144,14 +141,12 @@ const PoDetails = () => {
       availability_status: updatelist?.map((item) => item.availability_status),
       request_quantity: updatelist?.map((item) => item.available_quantity),
       product_ids: updatelist?.map((item) => item.product_id),
-      // order_ids: updatelist?.map(item => item.order_ids).flat(),
       po_status: paymentStatus,
       payment_status: PoStatus,
     };
     if (validationMessage == "Successful") {
       let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
       const response = await axios.post(apiUrl, updatedData);
-      console.log(response, "response");
       Swal.fire({
         icon: "success",
         title: response.data.message,
@@ -354,7 +349,7 @@ const PoDetails = () => {
     }
   };
   return (
-    <Container fluid className="px-5" >
+    <Container fluid className="px-5">
       <MDBRow className="my-3">
         <MDBCol className="d-flex justify-content-between align-items-center">
           <Button
@@ -444,19 +439,24 @@ const PoDetails = () => {
         </Row>
         <MDBRow className="d-flex justify-content-center align-items-center">
           <MDBCol col="10" md="12" sm="12"></MDBCol>
-          <div className="mt-2">
-            <DataTable
-              columns={columns}
-              rows={PO_OrderList}
-              // page={pageSO}
-              // pageSize={pageSizeSO}
-              // totalPages={totalPagesSO}
-              rowHeight={100}
-              // handleChange={handleChangeSO}
-              // // onCellEditStart={handleCellEditStart}
-              // processRowUpdate={processRowUpdateSPO}
-            />
-          </div>
+
+          {perticularOrderDetailsLoader ? (
+            <Loader />
+          ) : (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={PO_OrderList}
+                // page={pageSO}
+                // pageSize={pageSizeSO}
+                // totalPages={totalPagesSO}
+                rowHeight={100}
+                // handleChange={handleChangeSO}
+                // // onCellEditStart={handleCellEditStart}
+                // processRowUpdate={processRowUpdateSPO}
+              />
+            </div>
+          )}
 
           <Row>
             <Button type="button" className="w-auto" onClick={handleUpdate}>
