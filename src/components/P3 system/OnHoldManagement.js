@@ -43,9 +43,6 @@ function OnHoldManagement() {
     (state) => state?.managementSystem?.isProductDetails
   );
 
-  console.log(productDetailsData, "productDetailsData");
-  console.log(productData, "productData");
-
   async function fetchProductDetails() {
     let apiUrl = `${API_URL}wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}`;
     await dispatch(
@@ -117,7 +114,6 @@ function OnHoldManagement() {
     const orderId = selectedOrders.map((order) => order.order_id);
     const quantity = selectedOrders.map((order) => order.quantity);
 
-    console.log(selectedOrders, "selectedOrders in handleOrderPerp");
     if (selectedOrders.length === 0) {
       Swal.fire({
         icon: "error",
@@ -128,6 +124,7 @@ function OnHoldManagement() {
         product_id: params.id,
         order_id: orderId,
         quantity: quantity,
+        grn_no:params.grn_no
       };
 
       await dispatch(AddProductOrderForPre(requestedDataP)).then((response) => {
@@ -185,8 +182,6 @@ function OnHoldManagement() {
       headerName: "Item Received",
       flex: 1,
       valueGetter: (value, row) => {
-        console.log(row, "row");
-        console.log(value, "value");
         return `${row.quantity} / ${row.quantity}`;
       },
     },

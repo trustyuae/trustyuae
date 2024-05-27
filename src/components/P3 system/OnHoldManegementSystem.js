@@ -185,7 +185,6 @@ function OnHoldManegementSystem() {
         });
         setTableData(updatedData);
         validateForm(updatedData);
-
     };
 
     const handleColorChange = (id, event) => {
@@ -209,7 +208,6 @@ function OnHoldManegementSystem() {
     };
 
     const getAllProducts = async () => {
-        // let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
         let apiUrl = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
         if (productNameF && productIDF) {
             apiUrl += `product_name=${productNameF}&product_id=${productIDF}`;
@@ -244,7 +242,6 @@ function OnHoldManegementSystem() {
             }
         } catch (error) {
             console.error(error);
-            // setSingleProductD([]);
         }
     }
 
