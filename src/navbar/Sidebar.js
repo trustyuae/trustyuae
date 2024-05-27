@@ -149,6 +149,51 @@ const Sidebar = () => {
           <li className="nav-item">
             <a
               className="nav-link collapsed"
+              data-bs-target="#forms-naver"
+              data-bs-toggle="collapse"
+              href="/"
+            >
+              <i className="bi bi-journal-text"></i>
+              <span>ER Management System</span>
+              <i className="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul
+              id="forms-naver"
+              className="nav-content collapse "
+              data-bs-parent="#sidebar-nav"
+            >
+              <li>
+                <Link
+                  to="/On_Hold_Manegement_System"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/On_Hold_Manegement_System"
+                      ? " active"
+                      : "")
+                  }
+                >
+                  <i className="bi bi-circle"></i>
+                  <span>On Hold Management system</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/ER_Management_System"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/GRN_Management" ? " active" : "")
+                  }
+                >
+                  <i className="bi bi-circle"></i>
+                  <span>ER Management System</span>
+                </Link>
+              </li>
+            </ul>
+          </li>
+
+          <li className="nav-item">
+            <a
+              className="nav-link collapsed"
               data-bs-target="#charts-nav"
               data-bs-toggle="collapse"
               href="/"
