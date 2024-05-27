@@ -185,6 +185,7 @@ function OnHoldManegementSystem() {
         });
         setTableData(updatedData);
         validateForm(updatedData);
+
     };
 
     const handleColorChange = (id, event) => {
@@ -242,6 +243,7 @@ function OnHoldManegementSystem() {
             }
         } catch (error) {
             console.error(error);
+            // setSingleProductD([]);
         }
     }
 
@@ -395,7 +397,6 @@ function OnHoldManegementSystem() {
             <Form inline className='mb-4'>
                 <Row className="align-items-center px-1">
                     <Col xs="auto" lg="3">
-
                         <Form.Group controlId="duedate">
                             <Form.Label className="fw-semibold">Date filter:</Form.Label>
                             <Form.Control type="date" name="duedate" placeholder="Due date" value={date} onChange={(e) => setDate(e.target.value)} />
@@ -404,7 +405,6 @@ function OnHoldManegementSystem() {
                     <Col xs="auto" lg="3">
                         <Form.Group>
                             <Form.Label className="fw-semibold">Verified By:</Form.Label>
-
                             <Form.Control
                                 type="text"
                                 placeholder="Enter No of received boxes"
@@ -422,13 +422,12 @@ function OnHoldManegementSystem() {
                                 type="number"
                                 placeholder="Enter No of received boxes"
                                 value={receivedBoxes}
-                                // onChange={(e) => if(e.target.value>=0){ setReceivedBoxes(e.target.value)}}
                                 onChange={(e) => {
                                     const value = e.target.value;
                                     if (value >= 0) {
-                                      setReceivedBoxes(value);
+                                        setReceivedBoxes(value);
                                     }
-                                  }}
+                                }}
                                 className="mr-sm-2 py-2"
                             />
                         </Form.Group>
@@ -465,27 +464,6 @@ function OnHoldManegementSystem() {
                                 <Form.Control type="number" placeholder="Enter Product ID" value={productIDF} onChange={(e) => handalonChangeProductId(e.target.value)} />
                             </Form.Group>
                         </Col>
-                        {/* <Col xs="auto" lg="2">
-                            <Form.Group className="fw-semibold mb-0">
-                                <Form.Label>Product Name:</Form.Label>
-                                <Select
-                                    value={selectedOption}
-                                    onChange={(option) => setSelectedOption(option)}
-                                    options={optionsArray}
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col xs="auto" lg="2">
-                            <Form.Group className="fw-semibold mb-0">
-                                <Form.Label>Product Name:</Form.Label>
-                                <Select
-                                    value={selectedOption}
-                                    onChange={(option) => setSelectedOption(option)}
-                                    options={optionsArray}
-                                />
-                            </Form.Group>
-                        </Col> */}
-
                     </Row>
                     {
                         tableData.length > 0 && (
