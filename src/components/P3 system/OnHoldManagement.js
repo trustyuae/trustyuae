@@ -108,7 +108,7 @@ function OnHoldManagement() {
   useEffect(() => {
     fetchProductDetails();
     fetchProductOrderDetails();
-  }, [selectedOrders]);
+  }, []);
 
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
@@ -171,6 +171,7 @@ function OnHoldManagement() {
       order.isSelected = false;
     });
     setSelectedOrders([]);
+    fetchProductDetails();
     fetchProductOrderDetails();
   };
 
