@@ -63,6 +63,7 @@ function OnHoldManegementSystem() {
 
 
     const renderVariationValues = (params) => {
+        // console.log(params,'params');
         const { color, size } = params.row.variation_values;
         const { attribute_color, attribute_size } = params.row.variation_values;
         const noVariation = params.row.variation_values.length === 0;
@@ -156,35 +157,34 @@ function OnHoldManegementSystem() {
     ];
 
     const handleFieldChange = (id, field, value) => {
+        console.log(id, field, value,'id, field, value');
         const updatedData = tableData.map(item => {
             if (item.id === value.id) {
-                return {
-                    ...item, [field]: id,
-                    ...(field === 'variationColor' &&
-                    {
-                        variation_values: {
-                            attribute_color: id,
-                            ...(value.variation_values.size === undefined
-                                ? { attribute_size: value.variationSize }
-                                : { size: value.variation_values.size }
-                            ),
-                        }
+                return { ...item, [field]: id ,
+                    ...(field === 'variationColor' && 
+                    { variation_values:{attribute_color :id,
+                        ...(value.variation_values.size === undefined
+                            ?{attribute_size:value.variationSize}
+                        :{size:value.variation_values.size}
+                        ),
+                        } }
+                ),
+                ...(field === 'variationSize' && {
+                    variation_values: {
+                        attribute_size: id,
+                        ...(value.variation_values.color === undefined 
+                            ? { attribute_color: value.variationColor } 
+                            : { color: value.variation_values.color })
                     }
-                    ),
-                    ...(field === 'variationSize' && {
-                        variation_values: {
-                            attribute_size: id,
-                            ...(value.variation_values.color === undefined
-                                ? { attribute_color: value.variationColor }
-                                : { color: value.variation_values.color })
-                        }
-                    })
+                })
                 };
             }
             return item;
         });
+        console.log(updatedData, 'updatedData');
         setTableData(updatedData);
         validateForm(updatedData);
+
     };
 
     const handleColorChange = (id, event) => {
@@ -196,10 +196,9 @@ function OnHoldManegementSystem() {
     };
 
     const handleQtyChange = (id, event) => {
-        const value = id.target.value;
-        if (value >= 0) {
-            handleFieldChange(id.target.value, 'Quantity', event);
-        }
+
+
+        handleFieldChange(id.target.value, 'Quantity', event);
     };
 
     const handleDelete = (id) => {
@@ -208,6 +207,7 @@ function OnHoldManegementSystem() {
     };
 
     const getAllProducts = async () => {
+        // let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
         let apiUrl = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
         if (productNameF && productIDF) {
             apiUrl += `product_name=${productNameF}&product_id=${productIDF}`;
@@ -238,10 +238,12 @@ function OnHoldManegementSystem() {
                     variationColor: item.variation_values.length === 0 ? '' : '',
                     variationSize: item.variation_values.length === 0 ? '' : ''
                 }));
+                console.log(modifiedData,'modifiedData');
                 setSingleProductD(modifiedData);
             }
         } catch (error) {
             console.error(error);
+            // setSingleProductD([]);
         }
     }
 
@@ -259,10 +261,12 @@ function OnHoldManegementSystem() {
     }, [])
 
     const handalADDProduct = () => {
-        let data = [...tableData, ...singleProductD]
+        let data = [...tableData,...singleProductD ]
         let Updatedata = data.map((v, i) => ({ ...v, id: i, Quantity: v.Quantity !== "" ? v.Quantity : 1, variationColor: v.variation_values.attribute_color !== undefined ? v.variation_values.attribute_color : '', variationSize: v.variation_values.attribute_size !== undefined ? v.variation_values.attribute_size : '' }));
         validateForm(Updatedata);
+        console.log(Updatedata,'Updatedata');
         const newData = Updatedata.reduce((acc, obj) => {
+            console.log(acc, obj,'acc, obj');
             const existingIndex = acc.findIndex(item =>
                 item.product_name === obj.product_name &&
                 (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
@@ -283,6 +287,7 @@ function OnHoldManegementSystem() {
                 const outputArray = [...originalArray, ...filteredComparedArray];
                 acc = outputArray
             } else {
+                console.log(obj,acc,'obj,acc');
                 // acc.push(obj);
                 // acc.unshift(obj);
                 const originalArray = [obj];
@@ -296,11 +301,13 @@ function OnHoldManegementSystem() {
                     });
                 });
                 const outputArray = [...originalArray, ...filteredComparedArray];
+                console.log(outputArray,'outputArray');
                 // acc.push(obj);
                 acc = outputArray
             }
             return acc;
         }, []);
+        console.log(newData,'newData');
         setTableData(newData)
         setProductName('')
         setProductID('')
@@ -308,6 +315,7 @@ function OnHoldManegementSystem() {
 
     const verify = (data) => {
 
+        console.log(data, 'verify');
         data.reduce((acc, obj) => {
             // Check if there's already an object with the same product_name, variationColor, and variationSize
             const existingIndex = acc.findIndex(item =>
@@ -374,6 +382,7 @@ function OnHoldManegementSystem() {
             products: convertedData
         };
         try {
+            console.log(payload,'payload');
             dispatch(AddGrn(payload, navigate))
         } catch (error) {
             console.error(error);
@@ -422,13 +431,7 @@ function OnHoldManegementSystem() {
                                 type="number"
                                 placeholder="Enter No of received boxes"
                                 value={receivedBoxes}
-                                // onChange={(e) => if(e.target.value>=0){ setReceivedBoxes(e.target.value)}}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (value >= 0) {
-                                      setReceivedBoxes(value);
-                                    }
-                                  }}
+                                onChange={(e) => setReceivedBoxes(e.target.value)}
                                 className="mr-sm-2 py-2"
                             />
                         </Form.Group>
@@ -462,7 +465,7 @@ function OnHoldManegementSystem() {
                         <Col xs="auto" lg="4">
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product ID:</Form.Label>
-                                <Form.Control type="number" placeholder="Enter Product ID" value={productIDF} onChange={(e) => handalonChangeProductId(e.target.value)} />
+                                <Form.Control type="text" placeholder="Enter Product ID" value={productIDF} onChange={(e) => handalonChangeProductId(e.target.value)} />
                             </Form.Group>
                         </Col>
                         {/* <Col xs="auto" lg="2">
