@@ -70,48 +70,6 @@ function AllProductList() {
     setShowEditModal(false);
   };
 
-  // const handleSaveEdit = async () => {
-  //   try {
-  //     const data = {
-  //       ...selectedProduct,
-  //       factory_image: selectFile
-  //     }
-  //     const formData = new FormData();
-  //     const formData2 = new FormData();
-
-  //     formData.append("factory_id", selectedProduct.factory_id);
-  //     formData.append("id", selectedProduct.id);
-  //     formData.append("product_id", selectedProduct.product_id);
-  //     formData.append("product_image", selectedProduct.product_image);
-  //     formData.append("product_name", selectedProduct.product_name);
-  //     formData.append("stock_quantity", selectedProduct.stock_quantity);
-  //     formData.append("stock_status", selectedProduct.stock_status);
-  //     formData2.append("name", selectedProduct?.product_name);
-
-  //     if (selectFile) {
-  //       formData.append("factory_image", selectFile);
-  //     } else {
-  //       console.log(selectedProduct.factory_image, 'selectedProduct.factory_image');
-  //       formData.append("factory_image", selectedProduct.factory_image);
-  //     }
-
-  //     const response = await axios.post(
-  //       `${API_URL}wp-json/custom-proimage-update/v1/update-product/${selectedProduct.product_id}`,
-  //       formData, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data'
-  //       }
-  //     }
-  //     );
-
-  //     setShowEditModal(false);
-  //     fetchProducts();
-  //   } catch (error) {
-  //     console.error('Error saving product:', error);
-  //   }
-
-  // };
-
   const handleSaveEdit = async () => {
     console.log(selectedProduct, "selectedProduct from modal");
     try {
@@ -156,7 +114,7 @@ function AllProductList() {
     { field: "product_id", headerName: "product id", flex: 1 },
     { field: "product_name", headerName: "product name", flex: 1 },
     {
-      field: "product_image",
+      field: "factory_image",
       headerName: "Factory Image",
       flex: 1,
       type: "html",
@@ -291,7 +249,6 @@ function AllProductList() {
       <Modal
         show={showEditModal}
         onHide={handleCloseEditModal}
-        style={{ marginTop: "130px" }}
       >
         <Modal.Header closeButton>
           <Modal.Title>Edit Product</Modal.Title>
@@ -335,11 +292,6 @@ function AllProductList() {
             </Form.Group>
             <Form.Group className="mb-3" controlId="factoryImage">
               <Form.Label>Factory Image</Form.Label>
-              {/* <Form.Check
-                type="checkbox"
-                className="me-2"
-              /> */}
-              {/* <Form.Control type="text" value={selectedProduct?.factoryImage} onChange={(e) => setSelectedProduct({ ...selectedProduct, factoryImage: e.target.value })} /> */}
               <Form.Control type="file" onChange={handleFileChange} />
             </Form.Group>
             <Form.Group className="mb-3" controlId="factory_id">
