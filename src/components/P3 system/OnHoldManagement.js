@@ -124,7 +124,7 @@ function OnHoldManagement() {
         product_id: params.id,
         order_id: orderId,
         quantity: quantity,
-        grn_no:params.grn_no
+        grn_no: params.grn_no,
       };
 
       await dispatch(AddProductOrderForPre(requestedDataP)).then((response) => {
@@ -144,15 +144,12 @@ function OnHoldManagement() {
 
   const handleOrderStock = async () => {
     const product_id = params.id;
-    const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-    const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
+    const grn_no = params.grn_no;
     const requestedData = {
-      stock_status: "instock",
-      stock_quantity: productDetailsData?.grn_details?.qty_received,
+      product_id: product_id,
+      grn_no: grn_no,
     };
-    await dispatch(
-      AddProductOrderForStock(requestedData, product_id, username, password)
-    )
+    await dispatch(AddProductOrderForStock(requestedData))
       .then((response) => {
         if (response) {
           Swal.fire({
@@ -160,6 +157,7 @@ function OnHoldManagement() {
             title: "product added in InStock Successfully!",
           });
         }
+        handleUpdatedValues();
       })
       .catch((error) => {
         console.error(error);

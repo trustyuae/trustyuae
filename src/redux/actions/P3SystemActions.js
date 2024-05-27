@@ -159,19 +159,12 @@ export const AddProductOrderForPre = (requestedDataP) => async (dispatch) => {
   }
 };
 
-export const AddProductOrderForStock = (requestedData,product_id,username,password) => async (dispatch) => {
+export const AddProductOrderForStock = (requestedData) => async (dispatch) => {
   try {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST });
-    const basicAuth = {
-      username: username,
-      password: password
-    };
     const response = await axios.post(
-      `${API_URL}wp-json/wc/v3/products/${product_id}`,
+      `${API_URL}wp-json/custom-instock-api/v1/quantity-instock-api/`,
       requestedData,
-      {
-        auth: basicAuth
-      }
     );
     dispatch({
       type: ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS,
