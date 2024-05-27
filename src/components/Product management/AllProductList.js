@@ -122,7 +122,7 @@ function AllProductList() {
         return (
           <Box className="h-100 w-100 d-flex align-items-center">
             <Avatar
-              src={value.row.product_image}
+              src={value?.row?.factory_image}
               alt="Product Image"
               sx={{
                 height: "45px",
