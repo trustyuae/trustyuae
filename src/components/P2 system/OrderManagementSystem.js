@@ -124,16 +124,16 @@ function OrderManagementSystem() {
         );
       },
     },
-    { field: "product_name", headerName: "product names", flex: 1 },
+    { field: "product_name", headerName: "Product names", flex: 1 },
     {
       field: "variation_value",
-      headerName: "variation values",
+      headerName: "Variation values",
       flex: 1,
       renderCell: (params) => variant(params.row.variation_value),
     },
     {
       field: "product_images",
-      headerName: "product images",
+      headerName: "Product images",
       flex: 1,
       type: "html",
       renderCell: (value, row) => (
@@ -156,10 +156,10 @@ function OrderManagementSystem() {
         </Box>
       ),
     },
-    { field: "total_quantity", headerName: "total quantity", flex: 1 },
+    { field: "total_quantity", headerName: "Total quantity", flex: 1 },
     {
       field: "factory_id",
-      headerName: "factory Name",
+      headerName: "Factory Name",
       flex: 1,
       renderCell: (prams) =>
         factories.find((factory) => factory.id === prams.row.factory_id)
@@ -186,16 +186,16 @@ function OrderManagementSystem() {
     },
     {
       field: "factory_id",
-      headerName: "factory Name",
+      headerName: "Factory Name",
       flex: 1,
       renderCell: (prams) =>
         factories.find((factory) => factory.id === prams.row.factory_id)
           ?.factory_name,
     },
-    { field: "product_name", headerName: "product names", flex: 1 },
+    { field: "product_name", headerName: "Product names", flex: 1 },
     {
       field: "product_image",
-      headerName: "product images",
+      headerName: "Product images",
       flex: 1,
       type: "html",
       renderCell: (value, row) => (
@@ -220,7 +220,7 @@ function OrderManagementSystem() {
     },
     {
       field: "variation_values",
-      headerName: "variation values",
+      headerName: "Variation values",
       flex: 1,
       renderCell: (params) => {
         if (params.row.variation_value == "") {
@@ -273,16 +273,16 @@ function OrderManagementSystem() {
     },
     {
       field: "factory_id",
-      headerName: "factory Name",
+      headerName: "Factory Name",
       flex: 1,
       renderCell: (prams) =>
         factories.find((factory) => factory.id === prams.row.factory_id)
           ?.factory_name,
     },
-    { field: "product_name", headerName: "product names", flex: 1 },
+    { field: "product_name", headerName: "Product names", flex: 1 },
     {
       field: "product_image",
-      headerName: "product images",
+      headerName: "Product images",
       flex: 1,
       type: "html",
       renderCell: (value, row) => (
@@ -307,7 +307,7 @@ function OrderManagementSystem() {
     },
     {
       field: "variation_values",
-      headerName: "variation values",
+      headerName: "Variation values",
       flex: 1,
       renderCell: (params) => {
         if (params.row.variation_value == "") {
@@ -336,22 +336,28 @@ function OrderManagementSystem() {
     },
   ];
   const handleMOQtyChange = (index, event) => {
-    const updatedData = manualPOorders.map((item) => {
-      if (item.product_id === event.product_id) {
-        return { ...item, Quantity: index.target.value };
-      }
-      return item;
-    });
-    setManualPoOrders(updatedData);
+    const value = index.target.value;
+    if(value>=0){
+      const updatedData = manualPOorders.map((item) => {
+        if (item.product_id === event.product_id) {
+          return { ...item, Quantity: index.target.value };
+        }
+        return item;
+      });
+      setManualPoOrders(updatedData);
+    }
   };
   const handleSOQtyChange = (index, event) => {
-    const updatedData = scheduledPOorders.map((item) => {
-      if (item.product_id === event.product_id) {
-        return { ...item, Quantity: index.target.value };
-      }
-      return item;
-    });
-    setScheduleOrders(updatedData);
+    const value = index.target.value;
+    if(value>=0){
+      const updatedData = scheduledPOorders.map((item) => {
+        if (item.product_id === event.product_id) {
+          return { ...item, Quantity: index.target.value };
+        }
+        return item;
+      });
+      setScheduleOrders(updatedData);
+    }
   };
 
   useEffect(() => {
@@ -879,7 +885,7 @@ function OrderManagementSystem() {
                         pageSize={pageSizeMO}
                         totalPages={totalPagesMO}
                         handleChange={handleChangeMO}
-                        rowHeight={100}
+                        // rowHeight={100}
                         // onCellEditStart={handleCellEditStart}
                         // processRowUpdate={processRowUpdate}
                       />
@@ -985,7 +991,7 @@ function OrderManagementSystem() {
                         page={pageSO}
                         pageSize={pageSizeSO}
                         totalPages={totalPagesSO}
-                        rowHeight={100}
+                        // rowHeight={100}
                         handleChange={handleChangeSO}
                         // onCellEditStart={handleCellEditStart}
                         // processRowUpdate={processRowUpdateSPO}
