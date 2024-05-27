@@ -25,6 +25,7 @@ import PageNotFound from "./components/pageNotFound/PageNotFound";
 import CustomerSupportRoute from "./utils/navigation/CustomerSupportRoute";
 import "./index.css";
 import GRNView from './components/P3 system/GRNView'
+import ExchangeAndReturn from "./components/ER system/ExchangeAndReturn";
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
               <Route exact path="/On_Hold_Management/:grn_no/:id" element={<OnHoldManagement/>} />
               <Route exact path="/On_Hold_Manegement_System" element={<OnHoldManegementSystem/>} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
+              <Route exact path='/ExchangeAndReturn' element={<ExchangeAndReturn />} />
             </Route>
           </Route>
         </Routes>
