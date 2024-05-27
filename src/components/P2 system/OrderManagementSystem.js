@@ -161,9 +161,13 @@ function OrderManagementSystem() {
       field: "factory_id",
       headerName: "Factory Name",
       flex: 1,
-      renderCell: (prams) =>
-        factories.find((factory) => factory.id === prams.row.factory_id)
-          ?.factory_name,
+      // renderCell: (prams) =>
+      //   factories.find((factory) => factory.id === prams.row.factory_id)
+      //     ?.factory_name,
+      renderCell: (params) => {
+        const factory = factories.find((factory) => factory.id === params.row.factory_id);
+        return factory ? factory.factory_name : 'Assign to factory';
+      }
     },
   ];
   //MPO
