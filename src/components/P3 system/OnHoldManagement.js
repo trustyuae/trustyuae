@@ -106,8 +106,7 @@ function OnHoldManagement() {
   };
 
   useEffect(() => {
-    fetchProductDetails();
-    fetchProductOrderDetails();
+    handleUpdatedValues()
   }, []);
 
   const handleOrderPerp = async () => {
@@ -137,7 +136,12 @@ function OnHoldManagement() {
         selectedOrders.forEach((order) => {
           order.isSelected = false;
         });
+        const updatedProductData = productData.filter(
+          (order) => !selectedOrders.some((selected) => selected.id === order.id)
+        );
+        setSelectedOrders([]);
         handleUpdatedValues();
+        setProductData(updatedProductData);
       });
     }
   };
@@ -165,9 +169,6 @@ function OnHoldManagement() {
   };
 
   const handleUpdatedValues = () => {
-    selectedOrders.forEach((order) => {
-      order.isSelected = false;
-    });
     setSelectedOrders([]);
     fetchProductDetails();
     fetchProductOrderDetails();
