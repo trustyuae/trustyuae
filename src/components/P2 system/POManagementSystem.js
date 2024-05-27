@@ -74,7 +74,6 @@ function POManagementSystem() {
 
       await dispatch(PomSystemProductsDetails({ apiUrl })).then((response) => {
         let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
-        console.log(data,'data====');
         setOrderList(data);
         setTotalPages(response.data.total_pages);
       });
@@ -206,7 +205,7 @@ function POManagementSystem() {
           );
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     });
   };
