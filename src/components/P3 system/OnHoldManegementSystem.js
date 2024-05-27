@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MDBRow } from 'mdb-react-ui-kit';
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
-import { Badge, Button, Card, Col, Modal, Row } from 'react-bootstrap';
+import {Button, Card, Col, Modal, Row } from 'react-bootstrap';
 import { Box, InputLabel, MenuItem, Select as MuiSelect, Typography } from '@mui/material';
 import DataTable from '../DataTable';
 import { API_URL } from '../../redux/constants/Constants';
@@ -14,8 +14,6 @@ import { CompressImage } from '../../utils/CompressImage';
 import axios from 'axios';
 
 import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
-import makeAnimated from 'react-select/animated';
 
 function OnHoldManegementSystem() {
     const dispatch = useDispatch()
@@ -45,7 +43,6 @@ function OnHoldManegementSystem() {
 
     const getall = async () => {
         let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`
-        // let url = `https://wordpress.trustysystem.com/wp-json/custom-manual-po/v1/get-product-manual/?`
         const response = await axios.get(url);
         setoptionsArray(response.data.products.map(user => ({ label: user.product_name, value: user.product_id })))
     }
@@ -63,7 +60,6 @@ function OnHoldManegementSystem() {
 
 
     const renderVariationValues = (params) => {
-        // console.log(params,'params');
         const { color, size } = params.row.variation_values;
         const { attribute_color, attribute_size } = params.row.variation_values;
         const noVariation = params.row.variation_values.length === 0;
@@ -152,7 +148,6 @@ function OnHoldManegementSystem() {
                 <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5" onClick={() => handleDelete(params.row.id)}>
                     <MdDelete className="mb-1" />
                 </Button>
-
         }
     ];
 
@@ -207,7 +202,6 @@ function OnHoldManegementSystem() {
     };
 
     const getAllProducts = async () => {
-        // let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?`;
         let apiUrl = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
         if (productNameF && productIDF) {
             apiUrl += `product_name=${productNameF}&product_id=${productIDF}`;
@@ -313,38 +307,12 @@ function OnHoldManegementSystem() {
         setProductID('')
     }
 
-    const verify = (data) => {
-
-        console.log(data, 'verify');
-        data.reduce((acc, obj) => {
-            // Check if there's already an object with the same product_name, variationColor, and variationSize
-            const existingIndex = acc.findIndex(item =>
-                item.product_name === obj.product_name &&
-                (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
-                (item.variationSize === obj.variationSize || (!item.variationSize && !obj.variationSize))
-            );
-
-            if (existingIndex !== -1) {
-                // If a matching object is found, increment the Quantity by 1
-                acc[existingIndex].Quantity = String(Number(acc[existingIndex].Quantity) + 1);
-            } else {
-                // If no matching object is found, add the current object to the accumulator
-                acc.push(obj);
-            }
-
-            return acc;
-        }, []);
-    }
-
     const handalonChangeProductId = (e) => {
         setProductName('')
         setProductID(e)
 
     }
-    const handalonChangeProductName = (e) => {
-        setProductID('')
-        setProductName(e)
-    }
+   
     const handleFileChange = async (e) => {
         if (e.target.files[0]) {
             const file = await CompressImage(e?.target?.files[0])
@@ -468,27 +436,6 @@ function OnHoldManegementSystem() {
                                 <Form.Control type="text" placeholder="Enter Product ID" value={productIDF} onChange={(e) => handalonChangeProductId(e.target.value)} />
                             </Form.Group>
                         </Col>
-                        {/* <Col xs="auto" lg="2">
-                            <Form.Group className="fw-semibold mb-0">
-                                <Form.Label>Product Name:</Form.Label>
-                                <Select
-                                    value={selectedOption}
-                                    onChange={(option) => setSelectedOption(option)}
-                                    options={optionsArray}
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col xs="auto" lg="2">
-                            <Form.Group className="fw-semibold mb-0">
-                                <Form.Label>Product Name:</Form.Label>
-                                <Select
-                                    value={selectedOption}
-                                    onChange={(option) => setSelectedOption(option)}
-                                    options={optionsArray}
-                                />
-                            </Form.Group>
-                        </Col> */}
-
                     </Row>
                     {
                         tableData.length > 0 && (

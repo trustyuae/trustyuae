@@ -146,7 +146,7 @@ const Sidebar = () => {
             </ul>
           </li>
 
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <a
               className="nav-link collapsed"
               data-bs-target="#forms-naver"
@@ -189,7 +189,7 @@ const Sidebar = () => {
                 </Link>
               </li>
             </ul>
-          </li>
+          </li> */}
 
           <li className="nav-item">
             <a

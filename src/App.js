@@ -62,7 +62,7 @@ function App() {
               <Route exact path="/On_Hold_Manegement_System" element={<OnHoldManegementSystem/>} />
               <Route exact path="/ER_Management_System" element={<ERManagement/>} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
-              <Route exact path='/ExchangeAndReturn' element={<ExchangeAndReturn />} />
+              <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
             </Route>
           </Route>
         </Routes>
