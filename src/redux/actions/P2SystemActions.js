@@ -34,6 +34,12 @@ import {
   GET_PERTICULAR_PO_DETAILS_REQUEST,
   GET_PERTICULAR_PO_DETAILS_SUCCESS,
   GET_PERTICULAR_PO_DETAILS_FAIL,
+  GET_POM_SYSTEM_PRODUCTS_DETAILS_REQUEST,
+  GET_POM_SYSTEM_PRODUCTS_DETAILS_SUCCESS,
+  GET_POM_SYSTEM_PRODUCTS_DETAILS_FAIL,
+  UPDATE_PO_DETAILS_REQUEST,
+  UPDATE_PO_DETAILS_SUCCESS,
+  UPDATE_PO_DETAILS_FAIL,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -85,7 +91,7 @@ export const SchedulePoDetailsData =
     }
   };
 
-  export const PerticularPoDetails =
+export const PerticularPoDetails =
   ({ apiUrl }) =>
   async (dispatch) => {
     try {
@@ -175,6 +181,54 @@ export const AddSchedulePO = (payload, navigate) => async (dispatch) => {
     dispatch({ type: ADD_SCHEDULE_PO_FAIL, error: error.message });
   }
 };
+
+export const UpdatePODetails =
+  ({ apiUrl }, payload, navigate) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: UPDATE_PO_DETAILS_REQUEST });
+      const response = await axios.post(apiUrl, payload);
+
+      Swal.fire({
+        icon: "success",
+        title: response.data.message,
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/PO_ManagementSystem");
+        }
+      });
+
+      dispatch({
+        type: UPDATE_PO_DETAILS_SUCCESS,
+        payload: response.data,
+      });
+
+      console.log(response.data, "updatedData");
+      return response.data;
+    } catch (error) {
+      dispatch({ type: UPDATE_PO_DETAILS_FAIL, error: error.message });
+    }
+  };
+
+export const PomSystemProductsDetails =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_POM_SYSTEM_PRODUCTS_DETAILS_REQUEST });
+      const response = await axios.get(apiUrl);
+      dispatch({
+        type: GET_POM_SYSTEM_PRODUCTS_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({
+        type: GET_POM_SYSTEM_PRODUCTS_DETAILS_FAIL,
+        error: error.message,
+      });
+    }
+  };
 
 export const OrderNotAvailableData =
   ({ apiUrl }) =>

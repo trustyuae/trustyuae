@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   OrderNotAvailableData,
   OrderNotAvailableDataStatus,
@@ -23,6 +23,8 @@ import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Card, Modal } from "react-bootstrap";
+import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+import Loader from "../../utils/Loader";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -41,16 +43,18 @@ function OrderNotAvailable() {
   const [imageURL, setImageURL] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const fetchFactories = async () => {
-    try {
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-factory/v1/fetch-factories/`
-      );
-      setFactories(response.data);
-    } catch (error) {
-      console.error("Error fetching factories:", error);
-    }
-  };
+  const allFactoryDatas = useSelector(
+    (state) => state?.allFactoryData?.factory
+  );
+
+  const orderNotAvailableLoader = useSelector(
+    (state) => state?.orderNotAvailable?.isOrdersNotAvailable
+  );
+
+  useEffect(() => {
+    dispatch(AllFactoryActions());
+    setFactories(allFactoryDatas);
+  }, [dispatch, allFactoryDatas]);
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
@@ -196,9 +200,19 @@ function OrderNotAvailable() {
             const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
             const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
             const requestedInfo = {
-              amount: selectedOrderNotAvailable.reduce((acc, order) => acc + order.total_price, 0),
+              amount: selectedOrderNotAvailable.reduce(
+                (acc, order) => acc + order.total_price,
+                0
+              ),
             };
-            const response = await dispatch(OrderNotAvailableRefund(requestedInfo, orderIds, username, password));
+            const response = await dispatch(
+              OrderNotAvailableRefund(
+                requestedInfo,
+                orderIds,
+                username,
+                password
+              )
+            );
             Swal.fire({
               icon: "success",
               title: "Refund process completed successfully!",
@@ -276,7 +290,7 @@ function OrderNotAvailable() {
           onClick={() => ImageModule(params.value)}
         >
           <Avatar
-            src={params.value || require('../../assets/default.png')}
+            src={params.value || require("../../assets/default.png")}
             alt="Product Image"
             sx={{
               height: "45px",
@@ -365,7 +379,6 @@ function OrderNotAvailable() {
   };
 
   useEffect(() => {
-    fetchFactories();
     fetchOrdersNotAvailableData();
   }, [currentStartIndex, selectedOrderNotAvailable, setSelectedStatus]);
 
@@ -397,16 +410,20 @@ function OrderNotAvailable() {
           Update Status
         </Button>
       </Box>
-      <div className="mt-2">
-        <DataTable
-          columns={columns}
-          rows={ordersNotAvailableData}
-          page={page}
-          pageSize={pageSize}
-          totalPages={totalPages}
-          handleChange={handleChange}
-        />
-      </div>
+      {orderNotAvailableLoader ? (
+        <Loader />
+      ) : (
+        <div className="mt-2">
+          <DataTable
+            columns={columns}
+            rows={ordersNotAvailableData}
+            page={page}
+            pageSize={pageSize}
+            totalPages={totalPages}
+            handleChange={handleChange}
+          />
+        </div>
+      )}
       <ReleaseSchedulePoModal
         show={showModal}
         handleCloseReleaseSchedulePoModal={handleModalClose}

@@ -33,6 +33,12 @@ import {
   GET_PERTICULAR_PO_DETAILS_REQUEST,
   GET_PERTICULAR_PO_DETAILS_FAIL,
   GET_PERTICULAR_PO_DETAILS_SUCCESS,
+  GET_POM_SYSTEM_PRODUCTS_DETAILS_FAIL,
+  GET_POM_SYSTEM_PRODUCTS_DETAILS_SUCCESS,
+  GET_POM_SYSTEM_PRODUCTS_DETAILS_REQUEST,
+  UPDATE_PO_DETAILS_REQUEST,
+  UPDATE_PO_DETAILS_SUCCESS,
+  UPDATE_PO_DETAILS_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -50,6 +56,10 @@ const initialState = {
   isAddedManualPoData: false,
   addedSchedulePoData: [],
   isAddedSchedulePoData: false,
+  updatedPoDetails: [],
+  isUpdatedPoDetails: false,
+  pomSystemProductDetails: [],
+  isPomSystemProductDetails: false,
   ordersNotAvailable: [],
   isOrdersNotAvailable: false,
   ordersNotAvailablePo: [],
@@ -100,7 +110,7 @@ const OrderNotAvailableReducer = (state = initialState, action) => {
         error: action.payload,
       };
 
-      case GET_PERTICULAR_PO_DETAILS_REQUEST:
+    case GET_PERTICULAR_PO_DETAILS_REQUEST:
       return { ...state, isPerticularPoDetailsData: true };
     case GET_PERTICULAR_PO_DETAILS_SUCCESS:
       return {
@@ -147,6 +157,32 @@ const OrderNotAvailableReducer = (state = initialState, action) => {
       };
     case ADD_SCHEDULE_PO_FAIL:
       return { ...state, isAddedSchedulePoData: false, error: action.payload };
+
+    case UPDATE_PO_DETAILS_REQUEST:
+      return { ...state, isUpdatedPoDetails: true };
+    case UPDATE_PO_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isUpdatedPoDetails: false,
+        updatedPoDetail: action.payload,
+      };
+    case UPDATE_PO_DETAILS_FAIL:
+      return { ...state, isUpdatedPoDetails: false, error: action.payload };
+
+    case GET_POM_SYSTEM_PRODUCTS_DETAILS_REQUEST:
+      return { ...state, isPomSystemProductDetails: true };
+    case GET_POM_SYSTEM_PRODUCTS_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isPomSystemProductDetails: false,
+        pomSystemProductDetails: action.payload,
+      };
+    case GET_POM_SYSTEM_PRODUCTS_DETAILS_FAIL:
+      return {
+        ...state,
+        isPomSystemProductDetails: false,
+        error: action.payload,
+      };
 
     case GET_ORDER_NOT_AVAILABLE_REQUEST:
       return { ...state, isOrdersNotAvailable: true };

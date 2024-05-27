@@ -6,7 +6,6 @@ import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
-import axios from "axios";
 import { Badge, Card, Col } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, MenuItem, Select, Typography } from "@mui/material";
@@ -15,8 +14,9 @@ import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { PerticularPoDetails } from "../../redux/actions/P2SystemActions";
+import { PerticularPoDetails, UpdatePODetails } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
+import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -31,10 +31,18 @@ const PoDetails = () => {
   const [factorieName, setFactorieName] = useState("");
   const [printModal, setPrintModal] = useState(false);
   const navigate = useNavigate();
+  const allFactoryDatas = useSelector(
+    (state) => state?.allFactoryData?.factory
+  );
 
   const perticularOrderDetailsLoader = useSelector(
     (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
   );
+
+  useEffect(() => {
+    dispatch(AllFactoryActions());
+    setFactories(allFactoryDatas);
+  }, [dispatch, allFactoryDatas]);
 
   const fetchPO = async () => {
     try {
@@ -42,7 +50,6 @@ const PoDetails = () => {
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
         let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "Dispatched" }));
-        console.log(data, "data======");
         const row = [
           ...data,
           {
@@ -53,7 +60,6 @@ const PoDetails = () => {
             totals: response.data.total_cost,
           },
         ];
-        console.log(row, "data======");
         setPO_OrderList(row);
         setData(response.data.line_items);
         setFactorieName(response.data.factory_id);
@@ -63,20 +69,8 @@ const PoDetails = () => {
     }
   };
 
-  const fetchFactories = async () => {
-    try {
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-factory/v1/fetch-factories`
-      );
-      setFactories(response.data);
-    } catch (error) {
-      console.error("Error fetching factories:", error);
-    }
-  };
-
   useEffect(() => {
     fetchPO();
-    fetchFactories();
   }, []);
 
   const availabilityStatus = [
@@ -90,25 +84,22 @@ const PoDetails = () => {
   const dispatchedStatus = ["Dispatched", "Not Dispatched"];
 
   const handleStatusChange = (index, event) => {
-    console.log(index.target, event);
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
         return { ...item, availability_status: index.target.value };
       }
       return item;
     });
-    console.log(updatedData, "updatedData====");
     setPO_OrderList(updatedData);
   };
+
   const handleDispatchStatusChange = (index, event) => {
-    console.log(index.target, event);
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
         return { ...item, dispatch_status: index.target.value };
       }
       return item;
     });
-    console.log(updatedData, "updatedData====");
     setPO_OrderList(updatedData);
   };
 
@@ -146,36 +137,25 @@ const PoDetails = () => {
     };
     if (validationMessage == "Successful") {
       let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
-      const response = await axios.post(apiUrl, updatedData);
-      Swal.fire({
-        icon: "success",
-        title: response.data.message,
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/PO_ManagementSystem");
-        }
-      });
-      console.log(updatedData, "updatedData");
+      await dispatch(UpdatePODetails({apiUrl},updatedData,navigate))
     }
   };
 
   const handlepayMentStatus = (e) => {
     setPaymentStatus(e.target.value);
   };
+
   const handlePOStatus = (e) => {
     setPoStatus(e.target.value);
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    console.log(index.target, event);
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
         return { ...item, available_quantity: index.target.value };
       }
       return item;
     });
-    console.log(updatedData, "updatedData====");
     setPO_OrderList(updatedData);
   };
 
@@ -189,9 +169,6 @@ const PoDetails = () => {
       headerName: "Product Name",
       flex: 2,
       colSpan: (value, row) => {
-        // if (row.id === 'SUBTOTAL' || row.id === 'TOTAL') {
-        //   return 3;
-        // }
         if (row.id === "TAX") {
           return 2;
         }
@@ -238,15 +215,9 @@ const PoDetails = () => {
       headerName: "Estimated Cost(RMB)",
       flex: 3,
       valueGetter: (value, row) => {
-        // if (row.id === 'SUBTOTAL') {
-        //   return row.subtotal;
-        // }
         if (row.id === "TAX") {
           return row.taxTotal;
         }
-        // if (row.id === 'TOTAL') {
-        //   return row.total;
-        // }
         return value;
       },
     },
@@ -299,7 +270,6 @@ const PoDetails = () => {
             onChange={(event) => handleStatusChange(event, params.row)}
             fullWidth
             style={{ height: "40%", width: "100%" }}
-            // className="fw-semibold d-flex align-items-center justify-content-center h-100"
           >
             {availabilityStatus.map((status) => (
               <MenuItem key={status} value={status}>
@@ -424,10 +394,8 @@ const PoDetails = () => {
               <Form.Control
                 as="select"
                 className="mr-sm-2"
-                // value={selectedFactory}
                 onChange={handlePOStatus}
               >
-                {/* <option value="">All </option> */}
                 {POStatusFilter.map((po) => (
                   <option key={po} value={po}>
                     {po}
