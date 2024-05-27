@@ -110,7 +110,7 @@ const GRNView = () => {
     }
   };
   return (
-    <Container fluid className="px-5" style={{ height: "100vh" }}>
+    <Container fluid className="px-5" >
       <MDBRow className="my-3">
         <MDBCol
           md="5"
