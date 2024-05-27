@@ -109,9 +109,8 @@ function OrderSystem() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value,'value from order systemmmmmm.........')
         return (
-          <Link to={`/order_details/${value?.row?.order_id}`}>
+          <Link to={`/order_details/${value?.row?.order_id}`} className=" d-flex justify-content-between">
             <Button
               type="button"
               className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
@@ -190,7 +189,7 @@ function OrderSystem() {
   }, [pageSize, page, dispatchType, isReset]);
 
   return (
-    <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
+    <Container fluid className="py-3" >
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
           Order Fulfillment System
@@ -216,12 +215,6 @@ function OrderSystem() {
                 <Form.Label className="fw-semibold mb-0">
                   Date filter:
                 </Form.Label>
-                {/* <Form.Control
-                                    type="date"
-                                    value={startDate}
-                                    onChange={e => setStartDate(e.target.value)}
-                                    className="mr-sm-2 py-2"
-                                /> */}
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
                     <DateRangePicker
