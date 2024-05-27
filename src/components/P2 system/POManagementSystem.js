@@ -74,11 +74,17 @@ function POManagementSystem() {
 
       await dispatch(PomSystemProductsDetails({ apiUrl })).then((response) => {
         let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
+        console.log(data,'data====');
         setOrderList(data);
         setTotalPages(response.data.total_pages);
       });
     } catch (error) {
       console.error("Error Products:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: 'Records not available with this filter',
+      });
     }
   };
 
@@ -208,6 +214,11 @@ function POManagementSystem() {
   const handleTabChange = (e) => {
     setPOType(e);
     setPage(1);
+    setStartDate("");
+    setEndDate("");
+    setSelectedDateRange([null,null])
+    setSelectedFactory('');
+    setPoStatus('');
   };
 
   const handleChange = (event, value) => {
