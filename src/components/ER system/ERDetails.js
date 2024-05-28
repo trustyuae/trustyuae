@@ -143,8 +143,7 @@ const ERDetails = () => {
                     <Col xs="auto" lg="4">
                         <Form.Group className="fw-semibold mb-0">
                             <Form.Label>Status Filter:</Form.Label>
-                            <Form.Control
-                                as="select"
+                            <Form.Select
                                 className="mr-sm-2"
                             // value={selectedFactory}
                             // onChange={(e) => handlepayMentStatus(e)}
@@ -157,7 +156,7 @@ const ERDetails = () => {
                                         {po}
                                     </option>
                                 ))} */}
-                            </Form.Control>
+                            </Form.Select>
                         </Form.Group>
                     </Col>
                 </Row>

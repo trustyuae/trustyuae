@@ -121,7 +121,7 @@ function ERManagement() {
       type: "html",
       renderCell: (value, row) => {
         return (
-          <Link to={`/order_details/${value?.row?.order_id}`} className=" d-flex justify-content-center">
+          <Link to={`/ER_details`} className=" d-flex justify-content-center">
             <Button
               type="button"
               className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"

@@ -40,6 +40,9 @@ import {
   UPDATE_PO_DETAILS_REQUEST,
   UPDATE_PO_DETAILS_SUCCESS,
   UPDATE_PO_DETAILS_FAIL,
+  GET_QUANTITY_DETAILS_REQUEST,
+  GET_QUANTITY_DETAILS_SUCCESS,
+  GET_QUANTITY_DETAILS_FAIL,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -104,6 +107,23 @@ export const PerticularPoDetails =
       return response;
     } catch (error) {
       dispatch({ type: GET_PERTICULAR_PO_DETAILS_FAIL, error: error.message });
+    }
+  };
+
+  export const QuantityPoDetails =
+  (productId) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_QUANTITY_DETAILS_REQUEST });
+      const response = await axios.get(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`);
+      console.log(response,'rsponse of quntity details')
+      dispatch({
+        type: GET_QUANTITY_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_QUANTITY_DETAILS_FAIL, error: error.message });
     }
   };
 

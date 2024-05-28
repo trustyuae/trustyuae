@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -35,6 +34,7 @@ import {
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
+import PoDetailsModal from "./PoDetailsModal";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -81,6 +81,8 @@ function OrderManagementSystem() {
   const [scheduledNote, setScheduledNote] = useState("");
   const [estimatedTime, setEstimatedTime] = useState("");
   const [remainderDate, setRemainderDate] = useState("");
+  const [poDetailsModal, setPoDetailsModal] = useState(false);
+  const [productId, setProductId] = useState(null);
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -116,7 +118,6 @@ function OrderManagementSystem() {
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               checked={selectedOrderIds.includes(params.row.product_name)}
-              // onChange={(event) => handleCheckboxChange(event, params.row)}
               onChange={(event) =>
                 handleOrderSelection(params.row.product_name)
               }
@@ -157,18 +158,26 @@ function OrderManagementSystem() {
         </Box>
       ),
     },
-    { field: "total_quantity", headerName: "Total quantity", flex: 1 },
+    {
+      field: "total_quantity",
+      headerName: "Total quantity",
+      flex: 1,
+      renderCell: (params) => (
+        <Box onClick={() =>handlePoModal(params.row.item_id)}>
+          {params.row.total_quantity}
+        </Box>
+      ),
+    },
     {
       field: "factory_id",
       headerName: "Factory Name",
       flex: 1,
-      // renderCell: (prams) =>
-      //   factories.find((factory) => factory.id === prams.row.factory_id)
-      //     ?.factory_name,
       renderCell: (params) => {
-        const factory = factories.find((factory) => factory.id === params.row.factory_id);
-        return factory ? factory.factory_name : 'Assign to factory';
-      }
+        const factory = factories.find(
+          (factory) => factory.id === params.row.factory_id
+        );
+        return factory ? factory.factory_name : "Assign to factory";
+      },
     },
   ];
   //MPO
@@ -239,7 +248,6 @@ function OrderManagementSystem() {
       field: "Quantity",
       headerName: "Quantity",
       flex: 1,
-      // editable: true, type: 'number',
       renderCell: (params) => {
         return (
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
@@ -326,7 +334,6 @@ function OrderManagementSystem() {
       field: "Quantity",
       headerName: "Quantity",
       flex: 1,
-      //  editable: true, type: 'number',
       renderCell: (params) => (
         <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
           <Form.Control
@@ -533,6 +540,11 @@ function OrderManagementSystem() {
 
   const handleFactoryChange = (e) => {
     setSelectedFactory(e.target.value);
+  };
+
+  const handlePoModal = (itemId) => {
+    setProductId(itemId);
+    setPoDetailsModal(true);
   };
 
   // PO Generate
@@ -1051,6 +1063,14 @@ function OrderManagementSystem() {
           </Tabs>
         </Card.Body>
       </Card>
+      {PoDetailsModal && (
+        <PoDetailsModal
+          show={poDetailsModal}
+          poDetailsModal={poDetailsModal}
+          productId={productId}
+          handleClosePoDetailsModal={() => setPoDetailsModal(false)}
+        />
+      )}
     </Container>
   );
 }
