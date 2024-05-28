@@ -141,28 +141,13 @@ function ERManagement() {
   const handleDateChange = async (newDateRange) => {
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
       setSelectedDateRange(newDateRange);
-      const startDateString = newDateRange[0].$d.toDateString();
-      const endDateString = newDateRange[1].$d.toDateString();
-
-      const formattedStartDate = formatDate(startDateString);
-      const formattedEndDate = formatDate(endDateString);
-
-      const isoStartDate = new Date(formattedStartDate)
-        ?.toISOString()
-        .split("T")[0];
-      const isoEndDate = new Date(formattedEndDate)
-        ?.toISOString()
-        .split("T")[0];
-
+      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format('YYYY-MM-DD');
+      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format('YYYY-MM-DD');
       setStartDate(isoStartDate);
       setEndDate(isoEndDate);
     } else {
       console.error("Invalid date range");
     }
-  };
-
-  const formatDate = (dateString) => {
-    return dayjs(dateString).add(1, 'day').format('MM/DD/YYYY');
   };
 
   const handleSearchFilter = () => {
@@ -229,7 +214,7 @@ function ERManagement() {
               </Form.Group>
             </Col>
             <Col xs="auto" lg="3">
-            <Form.Group className="fw-semibold mb-0">
+              <Form.Group className="fw-semibold mb-0">
                 <Form.Label>Factory Filter:</Form.Label>
                 <Form.Control
                   as="select"

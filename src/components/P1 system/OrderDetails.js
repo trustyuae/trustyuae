@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from "react-router-dom";
-import { Alert, Badge, Card, Col, Row } from "react-bootstrap";
+import { Alert, Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
 import { Avatar, Box, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -86,10 +84,7 @@ function OrderDetails() {
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
       const order = response.data.orders[0];
-      if (order) {
-        setOrderProcess(order.order_process);
-      }
-
+      if (order) setOrderProcess(order.order_process);
       if (data) {
         data.forEach((order, index) => {
           const newData = order.items.map((product, index1) => ({
@@ -111,12 +106,11 @@ function OrderDetails() {
       order_id: orderId,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      console.log(response, 'rresponse')
       if (response.data) {
         const result = await ShowAlert('', response.data, "success");
         if (result.isConfirmed) {
           setMessage("");
-          handleMessageCloseModal();
+          setshowMessageModal(false)
         }
       }
     });
@@ -166,7 +160,6 @@ function OrderDetails() {
       })
     )
       .then(async (response) => {
-        console.log(response, 'response')
         if (response.data.success) {
           setShowAttachmentModal(false);
           setSelectedFile(null);
@@ -419,21 +412,6 @@ function OrderDetails() {
     },
   ];
 
-  const handalBackButton = () => {
-    navigate("/ordersystem");
-  };
-
-  const handleMessageButtonClick = () => {
-    setshowMessageModal(true);
-  };
-
-  const handleMessageCloseModal = () => {
-    setshowMessageModal(false);
-  };
-
-  const handleAttachmentCloseModal = () => {
-    setShowAttachmentModal(false);
-  };
   return (
     <>
       <Container fluid className="px-5">
@@ -445,7 +423,7 @@ function OrderDetails() {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={handalBackButton}
+              onClick={() => navigate("/ordersystem")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
@@ -487,7 +465,7 @@ function OrderDetails() {
               <Button
                 variant="outline-secondary"
                 className="p-1 me-3 bg-transparent text-secondary"
-                onClick={handleMessageButtonClick}
+                onClick={() => setshowMessageModal(true)}
               >
                 <AddCommentOutlinedIcon />
               </Button>
@@ -752,7 +730,7 @@ function OrderDetails() {
         />
         <Modal
           show={showMessageModal}
-          onHide={handleMessageCloseModal}
+          onHide={() => setshowMessageModal(false)}
           centered
         >
           <Modal.Header closeButton>
@@ -766,56 +744,60 @@ function OrderDetails() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <Button className="mt-2" onClick={handleAddMessage}>
-              Add Message
-            </Button>
+            <Box className="text-end my-3">
+              <Button variant="secondary" className="mt-2 fw-semibold" onClick={handleAddMessage}>
+                Add Message
+              </Button>
+            </Box>
           </Modal.Body>
         </Modal>
 
         <Modal
           show={showAttachmentModal}
-          onHide={handleAttachmentCloseModal}
+          onHide={() => setShowAttachmentModal(false)}
           centered
         >
           <Modal.Header closeButton>
             <Modal.Title>Attachment</Modal.Title>
           </Modal.Header>
-          <Modal.Body>
-            <Box className="text-center">
-              <Box
-                className="mx-auto mb-4"
-                sx={{
-                  height: "150px",
-                  width: "100%",
-                  position: "relative",
-                }}
-              >
-                <CancelIcon
+          <Modal.Body className="py-4">
+            <Row className="justify-content-center">
+              <Col md={10}>
+                <Box
+                  className="mx-auto mb-4 border border-secondary rounded-4"
                   sx={{
-                    position: "absolute",
-                    top: "-15px",
-                    right: "-15px",
-                    cursor: "pointer",
+                    height: "150px",
+                    width: "100%",
+                    position: "relative",
                   }}
-                  onClick={handleCancel}
-                />
-                <img
-                  style={{ objectFit: "contain" }}
-                  className="h-100 w-100"
-                  alt=""
-                  src={selectedFileUrl}
-                />
-              </Box>
-              <Box className="text-center">
-                <Button
-                  variant="primary"
-                  className="me-3"
-                  onClick={handleSubmitAttachment}
                 >
-                  Submit
-                </Button>
-              </Box>
-            </Box>
+                  <CancelIcon
+                    sx={{
+                      position: "absolute",
+                      top: "-9px",
+                      right: "-9px",
+                      cursor: "pointer",
+                    }}
+                    onClick={handleCancel}
+                  />
+                  <img
+                    style={{ objectFit: "cover" }}
+                    className="h-100 w-100 rounded-4"
+                    alt=""
+                    src={selectedFileUrl}
+                  />
+                </Box>
+                <Box className="text-end">
+                  <Button
+                    variant="primary"
+                    className=""
+                    onClick={handleSubmitAttachment}
+                  >
+                    Submit
+                  </Button>
+                </Box>
+              </Col>
+            </Row>
           </Modal.Body>
         </Modal>
       </Container>
