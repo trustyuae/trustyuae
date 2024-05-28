@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { QuantityPoDetails } from "../../redux/actions/P2SystemActions";
-import { Box } from "@mui/material";
+import Loader from "../../utils/Loader";
 
 const PoDetailsModal = ({
   show,
@@ -13,6 +13,9 @@ const PoDetailsModal = ({
   const dispatch = useDispatch();
   const [productData, setProductData] = useState([]);
   const [overAllData, setOverAllData] = useState("");
+  const loader = useSelector(
+    (state) => state?.orderNotAvailable?.isQuantityDetailsData
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,20 +46,24 @@ const PoDetailsModal = ({
         <Modal.Body>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Table striped bordered hover>
-              <thead style={{ textAlign: 'center' }}>
+              <thead style={{ textAlign: "center" }}>
                 <tr>
                   <th>Order ID</th>
                   <th>Qty</th>
                 </tr>
               </thead>
-              <tbody style={{ textAlign: 'center' }}>
-                {productData.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.order_id}</td>
-                    <td>{item.quantity}</td>
-                  </tr>
-                ))}
-              </tbody>
+              {loader ? (
+                <Loader />
+              ) : (
+                <tbody style={{ textAlign: "center" }}>
+                  {productData.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.order_id}</td>
+                      <td>{item.quantity}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              )}
             </Table>
           </div>
         </Modal.Body>
