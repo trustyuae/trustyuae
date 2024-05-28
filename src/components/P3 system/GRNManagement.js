@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GetGRNList } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
+import dayjs from "dayjs";
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -41,12 +42,7 @@ function GRNManagement() {
   ];
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + 1);
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date
-      .getDate()
-      .toString()
-      .padStart(2, "0")}/${date.getFullYear()}`;
+    return dayjs(dateString).add(1, 'day').format('MM/DD/YYYY');
   };
 
   const handleDateChange = async (newDateRange) => {

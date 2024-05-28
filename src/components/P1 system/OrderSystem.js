@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
+import dayjs from "dayjs";
 
 function OrderSystem() {
   const [dispatchType, setDispatchType] = useState("all");
@@ -110,7 +111,10 @@ function OrderSystem() {
       type: "html",
       renderCell: (value, row) => {
         return (
-          <Link to={`/order_details/${value?.row?.order_id}`} className=" d-flex justify-content-between">
+          <Link
+            to={`/order_details/${value?.row?.order_id}`}
+            className=" d-flex justify-content-between"
+          >
             <Button
               type="button"
               className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
@@ -166,12 +170,7 @@ function OrderSystem() {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + 1);
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date
-      .getDate()
-      .toString()
-      .padStart(2, "0")}/${date.getFullYear()}`;
+    return dayjs(dateString).add(1, "day").format("MM/DD/YYYY");
   };
 
   const handleSearchFilter = () => {
@@ -189,7 +188,7 @@ function OrderSystem() {
   }, [pageSize, page, dispatchType, isReset]);
 
   return (
-    <Container fluid className="py-3" >
+    <Container fluid className="py-3">
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
           Order Fulfillment System
