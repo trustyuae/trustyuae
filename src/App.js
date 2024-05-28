@@ -26,7 +26,7 @@ import CustomerSupportRoute from "./utils/navigation/CustomerSupportRoute";
 import "./index.css";
 import GRNView from './components/P3 system/GRNView'
 import ExchangeAndReturn from "./components/ER system/ExchangeAndReturn";
-import ERManagement from "./components/ER Management System/ERManagement";
+import ERManagement from "./components/ER system/ERManagement";
 
 function App() {
   return (

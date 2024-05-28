@@ -146,7 +146,7 @@ const Sidebar = () => {
             </ul>
           </li>
 
-          {/* <li className="nav-item">
+          <li className="nav-item">
             <a
               className="nav-link collapsed"
               data-bs-target="#forms-naver"
@@ -154,7 +154,7 @@ const Sidebar = () => {
               href="/"
             >
               <i className="bi bi-journal-text"></i>
-              <span>ER Management System</span>
+              <span>ER System</span>
               <i className="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul
@@ -164,16 +164,16 @@ const Sidebar = () => {
             >
               <li>
                 <Link
-                  to="/On_Hold_Manegement_System"
+                  to="/Exchange_And_Return"
                   className={
                     "nav-link underline" +
-                    (activeMenuItem === "/On_Hold_Manegement_System"
+                    (activeMenuItem === "/Exchange_And_Return"
                       ? " active"
                       : "")
                   }
                 >
                   <i className="bi bi-circle"></i>
-                  <span>On Hold Management system</span>
+                  <span>Exchange And Return</span>
                 </Link>
               </li>
               <li>
@@ -181,7 +181,7 @@ const Sidebar = () => {
                   to="/ER_Management_System"
                   className={
                     "nav-link underline" +
-                    (activeMenuItem === "/GRN_Management" ? " active" : "")
+                    (activeMenuItem === "/ER_Management_System" ? " active" : "")
                   }
                 >
                   <i className="bi bi-circle"></i>
@@ -189,7 +189,7 @@ const Sidebar = () => {
                 </Link>
               </li>
             </ul>
-          </li> */}
+          </li>
 
           <li className="nav-item">
             <a
