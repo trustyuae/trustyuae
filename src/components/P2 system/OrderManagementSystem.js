@@ -393,7 +393,7 @@ function OrderManagementSystem() {
   const fetchOrders = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}`;
-      if (endDate) apiUrl += `start_date=${startDate}&end_date=${endDate}`;
+      if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       await dispatch(PoDetailsData({ apiUrl })).then((response) => {
         let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
@@ -408,8 +408,8 @@ function OrderManagementSystem() {
   const manualPO = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
-      if (selectedManualFactory)
-        apiUrl += `&factory_id=${selectedManualFactory}`;
+      if (selectedFactory)
+        apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
       await dispatch(ManualPoDetailsData({ apiUrl })).then((response) => {
@@ -425,9 +425,9 @@ function OrderManagementSystem() {
   const scheduledPO = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
-      if (selectedShedulFactory)
-        apiUrl += `&factory_id=${selectedShedulFactory}`;
-      if (scheduledProductF) apiUrl += `&product_name=${scheduledProductF}`;
+      if (selectedFactory)
+        apiUrl += `&factory_id=${selectedFactory}`;
+      if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
       await dispatch(SchedulePoDetailsData({ apiUrl })).then((response) => {
         let data = response.data.products.map((v, i) => ({ ...v, id: i }));
@@ -952,20 +952,64 @@ function OrderManagementSystem() {
             </Row>
           ) : null}
           <Box className="d-flex justify-content-end align-items-center pt-3 my-4">
-            <Button
-              variant="outline-primary"
-              className="me-2 fw-semibold"
-              onClick={handleSelectAll}
-            >
-              Select All Orders
-            </Button>
-            <Button
-              variant="primary"
-              className="ms-2 fw-semibold"
-              onClick={handleGeneratePO}
-            >
-              Create PO
-            </Button>
+            {
+              activeKey === "against_PO" ? (
+                <>
+                  <Button
+                    variant="outline-primary"
+                    className="me-2 fw-semibold"
+                    onClick={handleSelectAll}
+                  >
+                    Select All Orders
+                  </Button>
+
+                  <Button
+                    variant="primary"
+                    className="ms-2 fw-semibold"
+                    onClick={handleGeneratePO}
+                  >
+                    Create PO
+                  </Button>
+                </>
+              ) : activeKey === "manual_PO" ? (
+                <>
+                <Button
+                    variant="outline-primary"
+                    className="me-2 fw-semibold"
+                    onClick={handleSelectAllManual}
+                  >
+                    Select All Orders
+                  </Button>
+
+                <Button
+                  variant="primary"
+                  className="ms-2 fw-semibold"
+                  onClick={handleGenerateManualPO}
+                >
+                  Create PO
+                </Button>
+                </>
+              ) : activeKey === "scheduled_PO" ? (
+                <>
+               <Button
+                    variant="outline-primary"
+                    className="me-2 fw-semibold"
+                    onClick={handleSelectAllSchedule}
+                  >
+                    Select All Orders
+                  </Button>
+
+                <Button
+                  variant="primary"
+                  className="ms-2 fw-semibold"
+                  onClick={handleGenerateScheduledPO}
+                >
+                  Create PO
+                </Button>
+                </>
+              ) : null
+            }
+
           </Box>
         </Card.Body>
       </Card>
