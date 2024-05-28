@@ -8,11 +8,13 @@ import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlin
 import { API_URL } from '../../redux/constants/Constants'
 import { PerticularPoDetails } from '../../redux/actions/P2SystemActions'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const ERDetails = () => {
     const dispatch = useDispatch();
     const [ERviewList, setERviewList] = useState([])
-    const [rowModesModel, setRowModesModel] = useState({});
+    const navigate = useNavigate();
+
 
     const fetchER = async () => {
         try {
@@ -63,9 +65,11 @@ const ERDetails = () => {
             ),
         },
         {
-            field: "ER_qty",
+            field: "quantity",
             headerName: "ER Qty",
             flex: 2,
+            editable: true,
+            type: 'number',
         },
         {
             field: "type",
@@ -90,6 +94,24 @@ const ERDetails = () => {
         },
     ]
 
+    const handalBackButton = () => {
+        navigate("/ER_Management_System");
+    };
+
+    const handleUpdate =()=>{
+        console.log(ERviewList,'ERviewList');
+    }
+
+    const handleSOQtyChange =(params)=>{
+        console.log(params,'params');
+        const updatedRows = ERviewList.map((row) => {
+            if (row.id === params.id) {
+                return { ...row, ...params };
+            }
+            return row;
+        });
+        setERviewList(updatedRows);
+    }
     useEffect(() => {
         fetchER()
     }, [])
@@ -101,7 +123,7 @@ const ERDetails = () => {
                     <Button
                         variant="outline-secondary"
                         className="p-1 me-2 bg-transparent text-secondary"
-                    // onClick={handalBackButton}
+                        onClick={handalBackButton}
                     >
                         <ArrowBackIcon className="me-1" />
                     </Button>
@@ -144,6 +166,7 @@ const ERDetails = () => {
                         <Form.Group className="fw-semibold mb-0">
                             <Form.Label>Status Filter:</Form.Label>
                             <Form.Select
+
                                 className="mr-sm-2"
                             // value={selectedFactory}
                             // onChange={(e) => handlepayMentStatus(e)}
@@ -190,25 +213,25 @@ const ERDetails = () => {
                         // rowHeight={100}
                         // handleChange={handleChangeSO}
                         // // onCellEditStart={handleCellEditStart}
-                        // processRowUpdate={processRowUpdateSPO}
+                        processRowUpdate={handleSOQtyChange}
                         />
                     </div>
                     <Row>
-                  <Form.Group
-                    className="mb-3"
-                    controlId="exampleForm.ControlTextarea1"
-                  >
-                    <Form.Label>Add Note</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      rows={2}
-                    //   onChange={(e) => setManualNote(e.target.value)}
-                    />
-                  </Form.Group>
-                </Row>
+                        <Form.Group
+                            className="mb-3"
+                            controlId="exampleForm.ControlTextarea1"
+                        >
+                            <Form.Label>Add Note</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                            //   onChange={(e) => setManualNote(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Row>
                     <Row>
                         <Button type="button" className="w-auto"
-                        // onClick={handleUpdate}
+                        onClick={handleUpdate}
                         >
                             Update
                         </Button>
