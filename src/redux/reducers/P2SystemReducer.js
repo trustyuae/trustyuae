@@ -39,6 +39,9 @@ import {
   UPDATE_PO_DETAILS_REQUEST,
   UPDATE_PO_DETAILS_SUCCESS,
   UPDATE_PO_DETAILS_FAIL,
+  GET_QUANTITY_DETAILS_FAIL,
+  GET_QUANTITY_DETAILS_SUCCESS,
+  GET_QUANTITY_DETAILS_REQUEST,
 } from "../constants/Constants";
 
 const initialState = {
@@ -50,6 +53,8 @@ const initialState = {
   isSchedulePoDetailsData: false,
   perticularPoDetailsData: [],
   isPerticularPoDetailsData: false,
+  quantityDetailsData: [],
+  isQuantityDetailsData: false,
   addedPoData: [],
   isAddedPoData: false,
   addedManualPoData: [],
@@ -122,6 +127,21 @@ const OrderNotAvailableReducer = (state = initialState, action) => {
       return {
         ...state,
         isPerticularPoDetailsData: false,
+        error: action.payload,
+      };
+
+      case GET_QUANTITY_DETAILS_REQUEST:
+      return { ...state, isQuantityDetailsData: true };
+    case GET_QUANTITY_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isQuantityDetailsData: false,
+        quantityDetailsData: action.payload,
+      };
+    case GET_QUANTITY_DETAILS_FAIL:
+      return {
+        ...state,
+        isQuantityDetailsData: false,
         error: action.payload,
       };
 
