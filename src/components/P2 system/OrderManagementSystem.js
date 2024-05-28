@@ -53,6 +53,7 @@ function OrderManagementSystem() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
 
   const [pageMO, setPageMO] = useState(1);
   const [totalPagesMO, setTotalPagesMO] = useState(1);
@@ -163,7 +164,7 @@ function OrderManagementSystem() {
       headerName: "Total quantity",
       flex: 1,
       renderCell: (params) => (
-        <Box onClick={() =>handlePoModal(params.row.item_id)}>
+        <Box onClick={() => handlePoModal(params.row.item_id)}>
           {params.row.total_quantity}
         </Box>
       ),
@@ -695,6 +696,11 @@ function OrderManagementSystem() {
     setActiveKey(key);
   };
 
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(1);
+  };
+
   return (
     <Container
       fluid
@@ -777,6 +783,25 @@ function OrderManagementSystem() {
                             {factories.map((factory) => (
                               <option key={factory.id} value={factory.id}>
                                 {factory.factory_name}
+                              </option>
+                            ))}
+                          </Form.Control>
+                        </Form.Group>
+                      </Col>
+                      <Col xs="auto" lg="4">
+                        <Form.Group>
+                          <Form.Label className="fw-semibold">
+                            Page Size:
+                          </Form.Label>
+                          <Form.Control
+                            as="select"
+                            className="w-auto"
+                            value={pageSize}
+                            onChange={handlePageSizeChange}
+                          >
+                            {pageSizeOptions.map((size) => (
+                              <option key={size} value={size}>
+                                {size}
                               </option>
                             ))}
                           </Form.Control>
