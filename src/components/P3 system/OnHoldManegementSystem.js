@@ -191,9 +191,10 @@ function OnHoldManegementSystem() {
     };
 
     const handleQtyChange = (id, event) => {
-
-
-        handleFieldChange(id.target.value, 'Quantity', event);
+        const value = id.target.value
+        if(value>=0){
+            handleFieldChange(id.target.value, 'Quantity', event);
+        }
     };
 
     const handleDelete = (id) => {
@@ -399,7 +400,12 @@ function OnHoldManegementSystem() {
                                 type="number"
                                 placeholder="Enter No of received boxes"
                                 value={receivedBoxes}
-                                onChange={(e) => setReceivedBoxes(e.target.value)}
+                                onChange={(e) => {
+                                    const value = e.target.value
+                                    if(value>=0){
+                                        setReceivedBoxes(e.target.value)
+                                    }
+                                }}
                                 className="mr-sm-2 py-2"
                             />
                         </Form.Group>
