@@ -27,6 +27,7 @@ import "./index.css";
 import GRNView from './components/P3 system/GRNView'
 import ExchangeAndReturn from "./components/ER system/ExchangeAndReturn";
 import ERManagement from "./components/ER system/ERManagement";
+import ERDetails from "./components/ER system/ERDetails";
 
 function App() {
   return (
@@ -63,6 +64,8 @@ function App() {
               <Route exact path="/ER_Management_System" element={<ERManagement/>} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
               <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
+              <Route exact path='/ER_details' element={<ERDetails />} />
+
             </Route>
           </Route>
         </Routes>
