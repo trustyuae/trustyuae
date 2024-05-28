@@ -706,402 +706,6 @@ function OrderManagementSystem() {
   };
 
   return (
-    // <Container
-    //   fluid
-    //   className="py-3"
-    //   style={{ maxHeight: "100%", minHeight: "100vh" }}
-    // >
-    //   <Box className="mb-4">
-    //     <Typography variant="h4" className="fw-semibold">
-    //       Order Management System
-    //     </Typography>
-    //   </Box>
-    //   <Card>
-    //     <Card.Body>
-    //       <Tabs
-    //         defaultActiveKey="against_PO"
-    //         id="fill-tab-example"
-    //         className="mb-3"
-    //         justify
-    //         onSelect={handleTabSelect}
-    //       >
-    //         <Tab
-    //           eventKey="against_PO"
-    //           title={
-    //             <span
-    //               style={{
-    //                 backgroundColor:
-    //                   activeKey === "against_PO" ? "blue" : "inherit",
-    //                 color: activeKey === "against_PO" ? "white" : "inherit",
-    //                 display: "block",
-    //                 borderRadius: "5px",
-    //               }}
-    //             >
-    //               Order against PO
-    //             </span>
-    //           }
-    //         >
-    //           <Box>
-    //             <Row className="mb-4 mt-4">
-    //               <Form inline>
-    //                 <Row>
-    //                   <Col xs="auto" lg="4">
-    //                     <Form.Group>
-    //                       <Form.Label className="fw-semibold mb-0">
-    //                         Date filter:
-    //                       </Form.Label>
-    //                       <LocalizationProvider dateAdapter={AdapterDayjs}>
-    //                         <DemoContainer
-    //                           components={["SingleInputDateRangeField"]}
-    //                         >
-    //                           <DateRangePicker
-    //                             sx={{
-    //                               "& .MuiInputBase-root": {
-    //                                 paddingRight: 0,
-    //                               },
-    //                               "& .MuiInputBase-input": {
-    //                                 padding: ".5rem .75rem .5rem .75rem",
-    //                                 "&:hover": {
-    //                                   borderColor: "#dee2e6",
-    //                                 },
-    //                               },
-    //                             }}
-    //                             value={selectedDateRange}
-    //                             onChange={handleDateChange}
-    //                             slots={{ field: SingleInputDateRangeField }}
-    //                           />
-    //                         </DemoContainer>
-    //                       </LocalizationProvider>
-    //                     </Form.Group>
-    //                   </Col>
-    //                   <Col xs="auto" lg="4">
-    //                     <Form.Group className="fw-semibold mb-0">
-    //                       <Form.Label>Factory Filter:</Form.Label>
-    //                       <Form.Control
-    //                         as="select"
-    //                         className="mr-sm-2"
-    //                         value={selectedFactory}
-    //                         onChange={handleFactoryChange}
-    //                       >
-    //                         <option value="">All Factory</option>
-    //                         {factories.map((factory) => (
-    //                           <option key={factory.id} value={factory.id}>
-    //                             {factory.factory_name}
-    //                           </option>
-    //                         ))}
-    //                       </Form.Control>
-    //                     </Form.Group>
-    //                   </Col>
-    //                   <Col xs="auto" lg="4">
-    //                     <Form.Group>
-    //                       <Form.Label className="fw-semibold">
-    //                         Page Size:
-    //                       </Form.Label>
-    //                       <Form.Control
-    //                         as="select"
-    //                         className="w-auto"
-    //                         value={pageSize}
-    //                         onChange={handlePageSizeChange}
-    //                       >
-    //                         {pageSizeOptions.map((size) => (
-    //                           <option key={size} value={size}>
-    //                             {size}
-    //                           </option>
-    //                         ))}
-    //                       </Form.Control>
-    //                     </Form.Group>
-    //                   </Col>
-    //                 </Row>
-    //               </Form>
-    //             </Row>
-    //             <Box className="mt-2">
-    //               {poLoader ? (
-    //                 <Loader />
-    //               ) : (
-    //                 <DataTable
-    //                   columns={columns1}
-    //                   rows={orders}
-    //                   page={page}
-    //                   pageSize={pageSize}
-    //                   totalPages={totalPages}
-    //                   // rowHeight={100}
-    //                   handleChange={handleChange}
-    //                 />
-    //               )}
-    //             </Box>
-    //             <Box className="d-flex justify-content-end align-items-center pt-3 my-4">
-    //               <Button
-    //                 variant="outline-primary"
-    //                 className="me-2 fw-semibold"
-    //                 onClick={handleSelectAll}
-    //               >
-    //                 Select All Orders
-    //               </Button>
-    //               <Button
-    //                 variant="primary"
-    //                 className="ms-2 fw-semibold"
-    //                 onClick={handleGeneratePO}
-    //               >
-    //                 Create PO
-    //               </Button>
-    //             </Box>
-    //           </Box>
-    //         </Tab>
-    //         <Tab
-    //           eventKey="manual_PO"
-    //           title={
-    //             <span
-    //               style={{
-    //                 backgroundColor:
-    //                   activeKey === "manual_PO" ? "blue" : "inherit",
-    //                 color: activeKey === "manual_PO" ? "white" : "inherit",
-    //                 display: "block",
-    //                 borderRadius: "5px",
-    //               }}
-    //             >
-    //               Manual PO
-    //             </span>
-    //           }
-    //         >
-    //           <Box>
-    //             <Row className="mb-4 mt-4">
-    //               <Form inline>
-    //                 <Row>
-    //                   <Col xs="auto" lg="4">
-    //                     <Form.Group className="fw-semibold mb-0">
-    //                       <Form.Label>Factory Filter:</Form.Label>
-    //                       <Form.Control
-    //                         as="select"
-    //                         className="mr-sm-2"
-    //                         value={selectedManualFactory}
-    //                         onChange={(e) =>
-    //                           setSelectedManualFactory(e.target.value)
-    //                         }
-    //                       >
-    //                         <option value="">All Factory</option>
-    //                         {factories.map((factory) => (
-    //                           <option key={factory.id} value={factory.id}>
-    //                             {factory.factory_name}
-    //                           </option>
-    //                         ))}
-    //                       </Form.Control>
-    //                     </Form.Group>
-    //                   </Col>
-    //                   <Col xs="auto" lg="4">
-    //                     <Form.Group className="fw-semibold mb-0">
-    //                       <Form.Label>Product Filter:</Form.Label>
-    //                       <Form.Control
-    //                         type="text"
-    //                         placeholder="Enter Product"
-    //                         value={manualProductF}
-    //                         onChange={(e) => setManualProductF(e.target.value)}
-    //                       />
-    //                     </Form.Group>
-    //                   </Col>
-    //                 </Row>
-    //               </Form>
-    //             </Row>
-    //             <Row className="mb-4 mt-4 ">
-    //               <Box className="mt-2">
-    //                 {manualPoLoader ? (
-    //                   <Loader />
-    //                 ) : (
-    //                   <DataTable
-    //                     columns={columnsMPO}
-    //                     rows={manualPOorders}
-    //                     page={page}
-    //                     pageSize={pageSize}
-    //                     totalPages={totalPages}
-    //                     handleChange={handleChange}
-    //                   // rowHeight={100}
-    //                   // onCellEditStart={handleCellEditStart}
-    //                   // processRowUpdate={processRowUpdate}
-    //                   />
-    //                 )}
-    //               </Box>
-    //             </Row>
-    //             <Row>
-    //               <Form.Group
-    //                 className="mb-3"
-    //                 controlId="exampleForm.ControlTextarea1"
-    //               >
-    //                 <Form.Label>Add Note</Form.Label>
-    //                 <Form.Control
-    //                   as="textarea"
-    //                   rows={2}
-    //                   onChange={(e) => setManualNote(e.target.value)}
-    //                 />
-    //               </Form.Group>
-    //             </Row>
-
-    //             <Box className="d-flex justify-content-end align-items-center pt-3 my-4">
-    //               <Button
-    //                 variant="outline-primary"
-    //                 className="me-2 fw-semibold"
-    //                 onClick={handleSelectAllManual}
-    //               >
-    //                 Select All Orders
-    //               </Button>
-    //               <Button
-    //                 variant="primary"
-    //                 className="ms-2 fw-semibold"
-    //                 onClick={handleGenerateManualPO}
-    //               >
-    //                 Create Manual PO
-    //               </Button>
-    //             </Box>
-    //           </Box>
-    //         </Tab>
-    //         <Tab
-    //           eventKey="scheduled_PO"
-    //           title={
-    //             <span
-    //               style={{
-    //                 backgroundColor:
-    //                   activeKey === "scheduled_PO" ? "blue" : "inherit",
-    //                 color: activeKey === "scheduled_PO" ? "white" : "inherit",
-    //                 display: "block",
-    //                 borderRadius: "5px",
-    //               }}
-    //             >
-    //               Scheduled PO
-    //             </span>
-    //           }
-    //         >
-    //           <Box>
-    //             <Row className="mb-4 mt-4">
-    //               <Form inline>
-    //                 <Row>
-    //                   <Col xs="auto" lg="4">
-    //                     <Form.Group className="fw-semibold mb-0">
-    //                       <Form.Label>Factory Filter:</Form.Label>
-    //                       <Form.Control
-    //                         as="select"
-    //                         className="mr-sm-2"
-    //                         value={selectedShedulFactory}
-    //                         onChange={(e) =>
-    //                           setSelectedSheduleFactory(e.target.value)
-    //                         }
-    //                       >
-    //                         <option value="">All Factory</option>
-    //                         {factories.map((factory) => (
-    //                           <option key={factory.id} value={factory.id}>
-    //                             {factory.factory_name}
-    //                           </option>
-    //                         ))}
-    //                       </Form.Control>
-    //                     </Form.Group>
-    //                   </Col>
-    //                   <Col xs="auto" lg="4">
-    //                     <Form.Group className="fw-semibold mb-0">
-    //                       <Form.Label>Product Filter:</Form.Label>
-    //                       <Form.Control
-    //                         type="text"
-    //                         placeholder="Enter Product"
-    //                         value={scheduledProductF}
-    //                         onChange={(e) =>
-    //                           setScheduledProductF(e.target.value)
-    //                         }
-    //                       />
-    //                     </Form.Group>
-    //                   </Col>
-    //                 </Row>
-    //               </Form>
-    //             </Row>
-    //             <Row className="mb-4 mt-4 ">
-    //               <Box className="mt-2">
-    //                 {schedulePoLoader ? (
-    //                   <Loader />
-    //                 ) : (
-    //                   <DataTable
-    //                     columns={columnsSPO}
-    //                     rows={scheduledPOorders}
-    //                     page={page}
-    //                     pageSize={pageSize}
-    //                     totalPages={totalPages}
-    //                     // rowHeight={100}
-    //                     handleChange={handleChange}
-    //                   // onCellEditStart={handleCellEditStart}
-    //                   // processRowUpdate={processRowUpdateSPO}
-    //                   />
-    //                 )}
-    //               </Box>
-    //             </Row>
-    //             <Row>
-    //               <Form.Group
-    //                 className="mb-3"
-    //                 controlId="exampleForm.ControlTextarea1"
-    //               >
-    //                 <Form.Label>Add Note</Form.Label>
-    //                 <Form.Control
-    //                   as="textarea"
-    //                   rows={2}
-    //                   onChange={(e) => setScheduledNote(e.target.value)}
-    //                 />
-    //               </Form.Group>
-    //             </Row>
-    //             <Row>
-    //               <Col xs="auto" lg="4">
-    //                 <Form.Group controlId="duedate">
-    //                   <Form.Label>Estimated time</Form.Label>
-    //                   <Form.Control
-    //                     as="select"
-    //                     className="mr-sm-2"
-    //                     value={estimatedTime}
-    //                     onChange={(e) => setEstimatedTime(e.target.value)}
-    //                   >
-    //                     <option value="">select time</option>
-    //                     {EstimatedTime.map((time) => (
-    //                       <option key={time} value={time}>
-    //                         {time}
-    //                       </option>
-    //                     ))}
-    //                   </Form.Control>
-    //                 </Form.Group>
-    //               </Col>
-    //               <Col xs="auto" lg="4">
-    //                 <Form.Group controlId="duedate">
-    //                   <Form.Label>Remainder date</Form.Label>
-    //                   <Form.Control
-    //                     type="date"
-    //                     name="duedate"
-    //                     placeholder="Due date"
-    //                     onChange={(e) => setRemainderDate(e.target.value)}
-    //                   />
-    //                 </Form.Group>
-    //               </Col>
-    //             </Row>
-    //             <Box className="d-flex justify-content-end align-items-center pt-3 my-4">
-    //               <Button
-    //                 variant="outline-primary"
-    //                 className="me-2 fw-semibold"
-    //                 onClick={handleSelectAllSchedule}
-    //               >
-    //                 Select All Orders
-    //               </Button>
-    //               <Button
-    //                 variant="primary"
-    //                 className="ms-2 fw-semibold"
-    //                 onClick={handleGenerateScheduledPO}
-    //               >
-    //                 Create Scheduled PO
-    //               </Button>
-    //             </Box>
-    //           </Box>
-    //         </Tab>
-    //       </Tabs>
-    //     </Card.Body>
-    //   </Card>
-    //   {PoDetailsModal && (
-    //     <PoDetailsModal
-    //       show={poDetailsModal}
-    //       poDetailsModal={poDetailsModal}
-    //       productId={productId}
-    //       handleClosePoDetailsModal={() => setPoDetailsModal(false)}
-    //     />
-    //   )}
-    // </Container>
-
     <Container
       fluid
       className="py-3"
@@ -1173,33 +777,38 @@ function OrderManagementSystem() {
           <Row className="mb-4 mt-4">
             <Form inline>
               <Row>
-                <Col xs="auto" lg="4">
-                  <Form.Group>
-                    <Form.Label className="fw-semibold mb-0">
-                      Date filter:
-                    </Form.Label>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DemoContainer components={["SingleInputDateRangeField"]}>
-                        <DateRangePicker
-                          sx={{
-                            "& .MuiInputBase-root": {
-                              paddingRight: 0,
-                            },
-                            "& .MuiInputBase-input": {
-                              padding: ".5rem .75rem .5rem .75rem",
-                              "&:hover": {
-                                borderColor: "#dee2e6",
+                {activeKey === "against_PO" ? (
+                  <Col xs="auto" lg="4">
+                    <Form.Group>
+                      <Form.Label className="fw-semibold mb-0">
+                        Date filter:
+                      </Form.Label>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer
+                          components={["SingleInputDateRangeField"]}
+                        >
+                          <DateRangePicker
+                            sx={{
+                              "& .MuiInputBase-root": {
+                                paddingRight: 0,
                               },
-                            },
-                          }}
-                          value={selectedDateRange}
-                          onChange={handleDateChange}
-                          slots={{ field: SingleInputDateRangeField }}
-                        />
-                      </DemoContainer>
-                    </LocalizationProvider>
-                  </Form.Group>
-                </Col>
+                              "& .MuiInputBase-input": {
+                                padding: ".5rem .75rem .5rem .75rem",
+                                "&:hover": {
+                                  borderColor: "#dee2e6",
+                                },
+                              },
+                            }}
+                            value={selectedDateRange}
+                            onChange={handleDateChange}
+                            slots={{ field: SingleInputDateRangeField }}
+                          />
+                        </DemoContainer>
+                      </LocalizationProvider>
+                    </Form.Group>
+                  </Col>
+                ) : null}
+
                 <Col xs="auto" lg="4">
                   <Form.Group className="fw-semibold mb-0">
                     <Form.Label>Factory Filter:</Form.Label>
@@ -1218,6 +827,21 @@ function OrderManagementSystem() {
                     </Form.Control>
                   </Form.Group>
                 </Col>
+
+                {activeKey === "manual_PO" || activeKey === "scheduled_PO" ? (
+                  <Col xs="auto" lg="4">
+                    <Form.Group className="fw-semibold mb-0">
+                      <Form.Label>Product Filter:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter Product"
+                        value={manualProductF}
+                        onChange={(e) => setManualProductF(e.target.value)}
+                      />
+                    </Form.Group>
+                  </Col>
+                ) : null}
+
                 <Col xs="auto" lg="4">
                   <Form.Group>
                     <Form.Label className="fw-semibold">Page Size:</Form.Label>
@@ -1294,37 +918,39 @@ function OrderManagementSystem() {
               </Form.Group>
             </Row>
           ) : null}
-          <Row>
-            <Col xs="auto" lg="4">
-              <Form.Group controlId="duedate">
-                <Form.Label>Estimated time</Form.Label>
-                <Form.Control
-                  as="select"
-                  className="mr-sm-2"
-                  value={estimatedTime}
-                  onChange={(e) => setEstimatedTime(e.target.value)}
-                >
-                  <option value="">select time</option>
-                  {EstimatedTime.map((time) => (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-            </Col>
-            <Col xs="auto" lg="4">
-              <Form.Group controlId="duedate">
-                <Form.Label>Remainder date</Form.Label>
-                <Form.Control
-                  type="date"
-                  name="duedate"
-                  placeholder="Due date"
-                  onChange={(e) => setRemainderDate(e.target.value)}
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          {activeKey === "scheduled_PO" ? (
+            <Row>
+              <Col xs="auto" lg="4">
+                <Form.Group controlId="duedate">
+                  <Form.Label>Estimated time</Form.Label>
+                  <Form.Control
+                    as="select"
+                    className="mr-sm-2"
+                    value={estimatedTime}
+                    onChange={(e) => setEstimatedTime(e.target.value)}
+                  >
+                    <option value="">select time</option>
+                    {EstimatedTime.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+              </Col>
+              <Col xs="auto" lg="4">
+                <Form.Group controlId="duedate">
+                  <Form.Label>Remainder date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="duedate"
+                    placeholder="Due date"
+                    onChange={(e) => setRemainderDate(e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          ) : null}
           <Box className="d-flex justify-content-end align-items-center pt-3 my-4">
             <Button
               variant="outline-primary"
