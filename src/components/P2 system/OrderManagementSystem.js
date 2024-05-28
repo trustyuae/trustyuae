@@ -34,6 +34,7 @@ import {
 } from "../../redux/actions/P2SystemActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
+import dayjs from "dayjs";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -540,14 +541,11 @@ function OrderManagementSystem() {
       setEndDate("");
     }
   };
+
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + 1);
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date
-      .getDate()
-      .toString()
-      .padStart(2, "0")}/${date.getFullYear()}`;
+   return dayjs(dateString).add(1, 'day').format('MM/DD/YYYY');
   };
+  
   const handleFactoryChange = (e) => {
     setSelectedFactory(e.target.value);
   };
