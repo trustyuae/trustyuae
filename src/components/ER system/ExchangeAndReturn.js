@@ -12,7 +12,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge } from "react-bootstrap";
+import { Badge, Card, Modal } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +36,8 @@ function ExchangeAndReturn() {
     const [allPoTypes, setAllPoTypes] = useState([]);
     const [selectedOrderIds, setSelectedOrderIds] = useState([]);
     const [selectPOId, setSelectPOId] = useState('');
+    const [imageURL, setImageURL] = useState("");
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const loader = useSelector((state) => state?.orderSystemData?.isOrders);
     const dispatch = useDispatch();
@@ -60,7 +62,7 @@ function ExchangeAndReturn() {
             renderCell: (params) => (
                 <Box
                     className="h-100 w-100 d-flex align-items-center"
-                //   onClick={() => ImageModule(params.value)}
+                    onClick={() => ImageModule(params.value)}
                 >
                     <Avatar
                         src={params.value || require("../../assets/default.png")}
@@ -245,6 +247,9 @@ function ExchangeAndReturn() {
             console.log(response.data, 'response');
             setAllPoTypes(response.data)
             selectPO(response.data[0])
+            if (response.data.length === 0) {
+                setOrders([])
+            }
         } catch (error) {
             console.error(error);
         }
@@ -281,7 +286,7 @@ function ExchangeAndReturn() {
         }
         console.log(payload, 'payload');
         try {
-            const response = await axios.post(`${API_URL}wp-json/custom-er-generate/v1/create-er/`,payload)
+            const response = await axios.post(`${API_URL}wp-json/custom-er-generate/v1/create-er/`, payload)
             console.log(response, 'response');
         } catch (error) {
             console.error(error);
@@ -289,6 +294,12 @@ function ExchangeAndReturn() {
 
         console.log(payload, 'payload');
     }
+
+    const ImageModule = (url) => {
+        setImageURL(url);
+        setShowEditModal(true);
+    };
+
 
     useEffect(() => {
         if (selectedPOType) {
@@ -406,6 +417,23 @@ function ExchangeAndReturn() {
                     submit
                 </Button>
             </MDBRow>
+            <Modal
+                show={showEditModal}
+                onHide={() => setShowEditModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Product Image</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Card className="factory-card">
+                        <img
+                            src={imageURL || `${require("../../assets/default.png")}`}
+                            alt="Product"
+                        />
+                    </Card>
+                </Modal.Body>
+            </Modal>
         </Container>
     );
 }
