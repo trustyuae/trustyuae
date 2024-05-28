@@ -6,7 +6,6 @@ import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import { Alert, Badge, Card, Col, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
-import Swal from "sweetalert2";
 import { Avatar, Box, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -28,6 +27,8 @@ import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
+import dayjs from 'dayjs';
+import ShowAlert from "../../utils/ShowAlert";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -109,15 +110,14 @@ function OrderDetails() {
       message: message,
       order_id: orderId,
     };
-    await dispatch(AddMessage(requestedMessage)).then((response) => {
-      if (response.data == "Message added successfully") {
-        Swal.fire({
-          icon: "success",
-          title: "Message uploaded Successfully!",
-        }).then(() => {
+    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+      console.log(response, 'rresponse')
+      if (response.data) {
+        const result = await ShowAlert('', response.data, "success");
+        if (result.isConfirmed) {
           setMessage("");
           handleMessageCloseModal();
-        });
+        }
       }
     });
   };
@@ -165,20 +165,15 @@ function OrderDetails() {
         selectedFile: selectedFile,
       })
     )
-      .then((response) => {
+      .then(async (response) => {
+        console.log(response, 'response')
         if (response.data.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Uploaded Successfully!",
-            showConfirmButton: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              handleCancel();
-            }
-          });
+          setShowAttachmentModal(false);
+          setSelectedFile(null);
+          const result = await ShowAlert('', 'Uploaded Successfully!', "success");
+          if (result.isConfirmed) handleCancel();
         }
-        setShowAttachmentModal(false);
-        setSelectedFile(null);
+
       })
       .catch((error) => {
         console.error(error);
@@ -186,15 +181,12 @@ function OrderDetails() {
   };
 
   const handleStartOrderProcess = async () => {
-    const currentDate = new Date();
-    const orderId = parseInt(id, 10);
-    const started = "started";
     const requestData = {
-      order_id: orderId,
+      order_id: Number(id),
       user_id: userData.user_id,
-      start_time: currentDate.toISOString().slice(0, 19).replace("T", " "),
+      start_time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       end_time: "",
-      order_status: started,
+      order_status: "started",
     };
     await dispatch(InsertOrderPickup(requestData))
       .then((response) => {
@@ -206,12 +198,10 @@ function OrderDetails() {
   };
 
   const handleCancelOrderProcess = async () => {
-    const orderId = parseInt(id, 10);
-    const Cancel = "Cancelled";
     const requestData = {
-      order_id: orderId,
+      order_id: parseInt(id, 10),
       operation_id: orderDetails?.operation_user_id,
-      order_status: Cancel,
+      order_status: "Cancelled",
     };
     await dispatch(InsertOrderPickupCancel(requestData))
       .then((response) => {
@@ -225,28 +215,11 @@ function OrderDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-
       await dispatch(CustomOrderFinish({ user_id, id }))
-        .then((response) => {
-          if (response.data.status == "Completed") {
-            Swal.fire({
-              text: response.data?.message,
-            }).then((result) => {
-              if (result.isConfirmed) {
-                navigate("/ordersystem");
-              }
-            });
-          }
-          if (response.data.status == "Dispatch Image") {
-            Swal.fire({
-              text: response.data?.message,
-            });
-          }
-          if (response.data.status == "P2") {
-            Swal.fire({
-              text: response.data?.message,
-            });
-          }
+        .then(async (response) => {
+          const result = await ShowAlert(`${response.data.status}!`, response.data?.message,
+            response.data.status === "Completed" ? "success" : 'error');
+          if (result.isConfirmed && response.data.status === "Completed") navigate("/ordersystem");
         })
         .catch((error) => {
           console.error(error);
@@ -345,14 +318,14 @@ function OrderDetails() {
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         return (
-          <Row className={`${"justify-content-center"}`}>
+          <Row className={`${"justify-content-center"} h-100`}>
             <Col
               md={12}
               className={`d-flex align-items-center justify-content-center my-1`}
             >
               <Card className="factory-card me-1 shadow-sm mb-0">
                 {userData?.user_id == orderDetails?.operation_user_id &&
-                orderProcess == "started" ? (
+                  orderProcess == "started" ? (
                   <Button
                     className="bg-transparent border-0  text-black"
                     onClick={() => fileInputRef.current.click()}
@@ -401,7 +374,7 @@ function OrderDetails() {
               </Card>
               <Card className="factory-card ms-1 shadow-sm mb-0">
                 {userData?.user_id == orderDetails?.operation_user_id &&
-                orderProcess == "started" ? (
+                  orderProcess == "started" ? (
                   <Button
                     className="bg-transparent border-0 text-black"
                     onClick={() => {
@@ -516,23 +489,23 @@ function OrderDetails() {
                 className="p-1 me-3 bg-transparent text-secondary"
                 onClick={handleMessageButtonClick}
               >
-                <AddCommentOutlinedIcon className="me-1" />
+                <AddCommentOutlinedIcon />
               </Button>
               <Button
                 variant="outline-primary"
                 className="p-1 me-3 bg-transparent text-primary"
                 onClick={handlePrint}
               >
-                <LocalPrintshopOutlinedIcon className="me-1" />
+                <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+                orderProcess == "started" ? (
                 <Button
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
                   onClick={handleCancelOrderProcess}
                 >
-                  <CancelIcon className="me-1" />
+                  <CancelIcon />
                 </Button>
               ) : orderProcess == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
@@ -700,7 +673,7 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" ? (
+              orderProcess == "started" ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
