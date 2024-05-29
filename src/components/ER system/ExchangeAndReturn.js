@@ -56,7 +56,7 @@ function ExchangeAndReturn() {
             flex: 1
         },
         {
-            field: "image",
+            field: "factory_image",
             headerName: "Image",
             flex: 1,
             renderCell: (params) => (
@@ -195,16 +195,19 @@ function ExchangeAndReturn() {
         setOrders(updatedData);
 
     }
-    const handleAvailableQtyChange = (index, event) => {
-        console.log(index, event, '======');
-        const updatedData = orders.map((item) => {
-            if (item.id === event.id) {
-                return { ...item, return_qty: index.target.value };
-            }
-            return item;
-        });
-        console.log(updatedData, 'updatedData');
-        setOrders(updatedData);
+    const handleAvailableQtyChange = (event, rowData) => {
+        console.log(event, rowData, '======');
+        if( event.target.value >= 0 && event.target.value <= rowData.quantity){
+            const updatedData = orders.map((item) => {
+                if (item.id === rowData.id) {
+                    return { ...item, return_qty: event.target.value };
+                }
+                return item;
+            });
+            console.log(updatedData, 'updatedData');
+            setOrders(updatedData);
+        }
+       
     };
 
     const handleStatusChange = (index, event) => {
