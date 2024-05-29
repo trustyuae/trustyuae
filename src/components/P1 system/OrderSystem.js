@@ -113,7 +113,7 @@ function OrderSystem() {
         return (
           <Link
             to={`/order_details/${value?.row?.order_id}`}
-            className=" d-flex justify-content-between"
+            className=" d-flex "
           >
             <Button
               type="button"
