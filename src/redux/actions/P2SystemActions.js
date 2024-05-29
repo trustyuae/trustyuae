@@ -16,12 +16,6 @@ import {
   GET_PO_DETAILS_REQUEST,
   GET_PO_DETAILS_SUCCESS,
   GET_PO_DETAILS_FAIL,
-  GET_MANUAL_PO_DETAILS_REQUEST,
-  GET_MANUAL_PO_DETAILS_SUCCESS,
-  GET_MANUAL_PO_DETAILS_FAIL,
-  GET_SCHEDULE_PO_DETAILS_REQUEST,
-  GET_SCHEDULE_PO_DETAILS_SUCCESS,
-  GET_SCHEDULE_PO_DETAILS_FAIL,
   ADD_PO_REQUEST,
   ADD_PO_SUCCESS,
   ADD_PO_FAIL,
@@ -43,89 +37,76 @@ import {
   GET_QUANTITY_DETAILS_REQUEST,
   GET_QUANTITY_DETAILS_SUCCESS,
   GET_QUANTITY_DETAILS_FAIL,
+  GET_MANUAL_OR_SCHEDULED_PO_DETAILS_REQUEST,
+  GET_MANUAL_OR_SCHEDULED_PO_DETAILS_FAIL,
+  GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS,
 } from "../constants/Constants";
 import axios from "axios";
 
 export const PoDetailsData =
   ({ apiUrl }) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: GET_PO_DETAILS_REQUEST });
-      const response = await axios.get(apiUrl);
-      dispatch({
-        type: GET_PO_DETAILS_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({ type: GET_PO_DETAILS_FAIL, error: error.message });
-    }
-  };
+    async (dispatch) => {
+      try {
+        dispatch({ type: GET_PO_DETAILS_REQUEST });
+        const response = await axios.get(apiUrl);
+        dispatch({
+          type: GET_PO_DETAILS_SUCCESS,
+          payload: response?.data,
+        });
+        return response;
+      } catch (error) {
+        dispatch({ type: GET_PO_DETAILS_FAIL, error: error.message });
+      }
+    };
 
-export const ManualPoDetailsData =
+export const ManualOrScheduledPoDetailsData =
   ({ apiUrl }) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: GET_MANUAL_PO_DETAILS_REQUEST });
-      const response = await axios.get(apiUrl);
-      dispatch({
-        type: GET_MANUAL_PO_DETAILS_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({ type: GET_MANUAL_PO_DETAILS_FAIL, error: error.message });
-    }
-  };
-
-export const SchedulePoDetailsData =
-  ({ apiUrl }) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: GET_SCHEDULE_PO_DETAILS_REQUEST });
-      const response = await axios.get(apiUrl);
-      dispatch({
-        type: GET_SCHEDULE_PO_DETAILS_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({ type: GET_SCHEDULE_PO_DETAILS_FAIL, error: error.message });
-    }
-  };
+    async (dispatch) => {
+      try {
+        dispatch({ type: GET_MANUAL_OR_SCHEDULED_PO_DETAILS_REQUEST });
+        const response = await axios.get(apiUrl);
+        dispatch({
+          type: GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS,
+          payload: response?.data,
+        });
+        return response;
+      } catch (error) {
+        dispatch({ type: GET_MANUAL_OR_SCHEDULED_PO_DETAILS_FAIL, error: error.message });
+      }
+    };
 
 export const PerticularPoDetails =
   ({ apiUrl }) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: GET_PERTICULAR_PO_DETAILS_REQUEST });
-      const response = await axios.get(apiUrl);
-      dispatch({
-        type: GET_PERTICULAR_PO_DETAILS_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({ type: GET_PERTICULAR_PO_DETAILS_FAIL, error: error.message });
-    }
-  };
+    async (dispatch) => {
+      try {
+        dispatch({ type: GET_PERTICULAR_PO_DETAILS_REQUEST });
+        const response = await axios.get(apiUrl);
+        dispatch({
+          type: GET_PERTICULAR_PO_DETAILS_SUCCESS,
+          payload: response?.data,
+        });
+        return response;
+      } catch (error) {
+        dispatch({ type: GET_PERTICULAR_PO_DETAILS_FAIL, error: error.message });
+      }
+    };
 
-  export const QuantityPoDetails =
+export const QuantityPoDetails =
   (productId) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: GET_QUANTITY_DETAILS_REQUEST });
-      const response = await axios.get(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`);
-      console.log(response,'rsponse of quntity details')
-      dispatch({
-        type: GET_QUANTITY_DETAILS_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({ type: GET_QUANTITY_DETAILS_FAIL, error: error.message });
-    }
-  };
+    async (dispatch) => {
+      try {
+        dispatch({ type: GET_QUANTITY_DETAILS_REQUEST });
+        const response = await axios.get(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`);
+        console.log(response, 'rsponse of quntity details')
+        dispatch({
+          type: GET_QUANTITY_DETAILS_SUCCESS,
+          payload: response?.data,
+        });
+        return response;
+      } catch (error) {
+        dispatch({ type: GET_QUANTITY_DETAILS_FAIL, error: error.message });
+      }
+    };
 
 export const AddPO = (payload, navigate) => async (dispatch) => {
   try {
@@ -204,68 +185,68 @@ export const AddSchedulePO = (payload, navigate) => async (dispatch) => {
 
 export const UpdatePODetails =
   ({ apiUrl }, payload, navigate) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: UPDATE_PO_DETAILS_REQUEST });
-      const response = await axios.post(apiUrl, payload);
+    async (dispatch) => {
+      try {
+        dispatch({ type: UPDATE_PO_DETAILS_REQUEST });
+        const response = await axios.post(apiUrl, payload);
 
-      Swal.fire({
-        icon: "success",
-        title: response.data.message,
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/PO_ManagementSystem");
-        }
-      });
+        Swal.fire({
+          icon: "success",
+          title: response.data.message,
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/PO_ManagementSystem");
+          }
+        });
 
-      dispatch({
-        type: UPDATE_PO_DETAILS_SUCCESS,
-        payload: response.data,
-      });
+        dispatch({
+          type: UPDATE_PO_DETAILS_SUCCESS,
+          payload: response.data,
+        });
 
-      console.log(response.data, "updatedData");
-      return response.data;
-    } catch (error) {
-      dispatch({ type: UPDATE_PO_DETAILS_FAIL, error: error.message });
-    }
-  };
+        console.log(response.data, "updatedData");
+        return response.data;
+      } catch (error) {
+        dispatch({ type: UPDATE_PO_DETAILS_FAIL, error: error.message });
+      }
+    };
 
 export const PomSystemProductsDetails =
   ({ apiUrl }) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: GET_POM_SYSTEM_PRODUCTS_DETAILS_REQUEST });
-      const response = await axios.get(apiUrl);
-      dispatch({
-        type: GET_POM_SYSTEM_PRODUCTS_DETAILS_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({
-        type: GET_POM_SYSTEM_PRODUCTS_DETAILS_FAIL,
-        error: error.message,
-      });
-    }
-  };
+    async (dispatch) => {
+      try {
+        dispatch({ type: GET_POM_SYSTEM_PRODUCTS_DETAILS_REQUEST });
+        const response = await axios.get(apiUrl);
+        dispatch({
+          type: GET_POM_SYSTEM_PRODUCTS_DETAILS_SUCCESS,
+          payload: response?.data,
+        });
+        return response;
+      } catch (error) {
+        dispatch({
+          type: GET_POM_SYSTEM_PRODUCTS_DETAILS_FAIL,
+          error: error.message,
+        });
+      }
+    };
 
 export const OrderNotAvailableData =
   ({ apiUrl }) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: GET_ORDER_NOT_AVAILABLE_REQUEST });
-      const response = await axios.get(apiUrl);
-      console.log(response, "response of order not available data");
-      dispatch({
-        type: GET_ORDER_NOT_AVAILABLE_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({ type: GET_ORDER_NOT_AVAILABLE_FAIL, error: error.message });
-    }
-  };
+    async (dispatch) => {
+      try {
+        dispatch({ type: GET_ORDER_NOT_AVAILABLE_REQUEST });
+        const response = await axios.get(apiUrl);
+        console.log(response, "response of order not available data");
+        dispatch({
+          type: GET_ORDER_NOT_AVAILABLE_SUCCESS,
+          payload: response?.data,
+        });
+        return response;
+      } catch (error) {
+        dispatch({ type: GET_ORDER_NOT_AVAILABLE_FAIL, error: error.message });
+      }
+    };
 
 export const OrderNotAvailableDataPo = (requestData) => async (dispatch) => {
   try {

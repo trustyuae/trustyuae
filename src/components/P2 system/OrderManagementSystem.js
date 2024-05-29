@@ -27,9 +27,8 @@ import {
   AddManualPO,
   AddPO,
   AddSchedulePO,
-  ManualPoDetailsData,
+  ManualOrScheduledPoDetailsData,
   PoDetailsData,
-  SchedulePoDetailsData,
 } from "../../redux/actions/P2SystemActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
@@ -55,14 +54,6 @@ function OrderManagementSystem() {
   const [pageSize, setPageSize] = useState(5);
   const pageSizeOptions = [5, 10, 20, 50, 100];
 
-  // const [pageMO, setPageMO] = useState(1);
-  // const [totalPagesMO, setTotalPagesMO] = useState(1);
-  // const [pageSizeMO, setPageSizeMO] = useState(5);
-
-  // const [pageSO, setPageSO] = useState(1);
-  // const [totalPagesSO, setTotalPagesSO] = useState(1);
-  // const [pageSizeSO, setPageSizeSO] = useState(5);
-
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
@@ -70,12 +61,9 @@ function OrderManagementSystem() {
 
   //selected  factory filter
   const [selectedFactory, setSelectedFactory] = useState("");
-  const [selectedManualFactory, setSelectedManualFactory] = useState("");
-  const [selectedShedulFactory, setSelectedSheduleFactory] = useState("");
 
   //selected Product filter
   const [manualProductF, setManualProductF] = useState("");
-  const [scheduledProductF, setScheduledProductF] = useState("");
 
   const [manualNote, setManualNote] = useState("");
 
@@ -93,17 +81,9 @@ function OrderManagementSystem() {
     (state) => state?.orderNotAvailable?.isPoDetailsData
   );
 
-  const manualPoLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isManualPoDetailsData
+  const manualOrScheduledPoLoader = useSelector(
+    (state) => state?.orderNotAvailable?.isManualOrScheduledPoDetailsData
   );
-
-  const schedulePoLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isSchedulePoDetailsData
-  );
-  useEffect(() => {
-    dispatch(AllFactoryActions());
-    setFactories(allFactoryDatas);
-  }, [dispatch, allFactoryDatas]);
 
   // po ogainst order colum
   const columns1 = [
@@ -382,13 +362,16 @@ function OrderManagementSystem() {
     pageSize,
     endDate,
     selectedFactory,
-    scheduledProductF,
-    // pageSO,
-    // pageSizeSO,
     manualProductF,
-    // pageMO,
-    // pageSizeMO,
   ]);
+
+  useEffect(() => {
+    dispatch(AllFactoryActions());
+  }, [dispatch]);
+
+  useEffect(() => {
+    setFactories(allFactoryDatas);
+  }, [allFactoryDatas])
 
   const fetchOrders = async () => {
     try {
@@ -412,11 +395,8 @@ function OrderManagementSystem() {
         apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
-      await dispatch(ManualPoDetailsData({ apiUrl })).then((response) => {
-        let data = response.data.products.map((v, i) => ({ ...v, id: i }));
-        setManualPoOrders(data);
-        setTotalPages(response.data.total_pages);
-      });
+      let data = await getManualOrScheduledPO(apiUrl, ManualOrScheduledPoDetailsData, setManualPoOrders, setTotalPages);
+      setManualPoOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -429,81 +409,69 @@ function OrderManagementSystem() {
         apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
-      await dispatch(SchedulePoDetailsData({ apiUrl })).then((response) => {
-        let data = response.data.products.map((v, i) => ({ ...v, id: i }));
-        if (response.data.products) {
-          setScheduleOrders(data);
-          setTotalPages(response.data.total_pages);
-        } else {
-          setScheduleOrders([]);
-        }
-      });
+      let data = await getManualOrScheduledPO(apiUrl, ManualOrScheduledPoDetailsData, setManualPoOrders, setTotalPages);
+      setScheduleOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
+  const getManualOrScheduledPO = async (apiUrl, dispatchFunction, setDataFunction, setTotalPagesFunction) => {
+    let data
+    await dispatch(ManualOrScheduledPoDetailsData({ apiUrl })).then((response) => {
+      data = response.data.products.map((v, i) => ({ ...v, id: i }));
+      if (response.data.products) {
+        setTotalPages(response.data.total_pages);
+        return data
+      }
+    });
+    return data
+  }
+
   const handleOrderSelection = (orderId) => {
-    const filteredOrders = orders.filter(
-      (order) => order.product_name === orderId
-    );
+    const filteredOrders = orders.filter((order) => order.product_name === orderId);
     const orderIds = filteredOrders.map((order) => order.order_ids);
 
-    const selectedIndex = selectedOrderIds.indexOf(orderId);
-    let newSelected = [];
-    let newSelected2 = [];
-
-    if (selectedIndex === -1) {
-      newSelected = [...selectedOrderIds, orderId];
-      newSelected2 = [...selectedOrderIdss, ...orderIds];
-    } else {
-      newSelected = selectedOrderIds.filter((id) => id !== orderId);
-    }
-    const flattenedData = newSelected2.flatMap((str) => str.split(","));
+    const isSelected = selectedOrderIds.includes(orderId);
+    const newSelected = isSelected ? selectedOrderIds.filter(id => id !== orderId) : [...selectedOrderIds, orderId];
+    const newSelected2 = isSelected ? selectedOrderIdss.filter(id => id !== orderId).flatMap(id => id.split(",")) : [...selectedOrderIdss, ...orderIds.flatMap(str => str.split(","))];
 
     setSelectedOrderIds(newSelected);
-    setSelectedOrderIdss(flattenedData);
+    setSelectedOrderIdss(newSelected2);
   };
+
   const handleOrderManualSelection = (orderId) => {
     const selectedIndex = selectedManualOrderIds.indexOf(orderId);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = [...selectedManualOrderIds, orderId];
-    } else {
-      newSelected = selectedManualOrderIds.filter((id) => id !== orderId);
-    }
+    const newSelected = selectedIndex === -1 ?
+      [...selectedManualOrderIds, orderId] :
+      selectedManualOrderIds.filter(id => id !== orderId);
 
     setSelectedManualOrderIds(newSelected);
   };
+
   const handleOrderScheduleSelection = (orderId) => {
     const selectedIndex = selectedScheduleOrderIds.indexOf(orderId);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = [...selectedScheduleOrderIds, orderId];
-    } else {
-      newSelected = selectedScheduleOrderIds.filter((id) => id !== orderId);
-    }
+    const newSelected = selectedIndex === -1 ?
+      [...selectedScheduleOrderIds, orderId] :
+      selectedScheduleOrderIds.filter(id => id !== orderId);
 
     setSelectedScheduleOrderIds(newSelected);
   };
 
   const handleSelectAll = () => {
-    const allOrderIds = orders.map((order) => order.product_name);
-    const allOrderIdss = [];
-    allOrderIds.forEach((productName) => {
-      const orderIds = getOrderIdsByProductName(orders, productName);
-      allOrderIdss.push(...orderIds);
-    });
-    const flattenedData = allOrderIdss.flatMap((str) => str.split(","));
-    setSelectedOrderIds(
-      selectedOrderIds.length === allOrderIds.length ? [] : allOrderIds
-    );
-    setSelectedOrderIdss(
-      selectedOrderIdss.length === flattenedData.length ? [] : flattenedData
-    );
+    if (activeKey === 'against_PO') handleSelectAllAgainst()
+    else if (activeKey === 'manual_PO') handleSelectAllManual()
+    else if (activeKey === 'scheduled_PO') handleSelectAllSchedule()
+  }
+
+  const handleSelectAllAgainst = () => {
+    const allOrderIds = orders.map(order => order.product_name);
+    const allOrderIdss = orders.flatMap(order => order.order_ids);
+    const flattenedData = allOrderIdss.flatMap(str => str.split(","));
+    setSelectedOrderIds(selectedOrderIds.length === allOrderIds.length ? [] : allOrderIds);
+    setSelectedOrderIdss(selectedOrderIdss.length === flattenedData.length ? [] : flattenedData);
   };
+
   const handleSelectAllManual = () => {
     const allOrderIds = manualPOorders.map((order) => order.product_id);
     setSelectedManualOrderIds(
@@ -516,14 +484,6 @@ function OrderManagementSystem() {
       selectedScheduleOrderIds.length === allOrderIds.length ? [] : allOrderIds
     );
   };
-
-  function getOrderIdsByProductName(data, productName) {
-    const filteredOrders = data.filter(
-      (order) => order.product_name === productName
-    );
-    const orderIds = filteredOrders.map((order) => order.order_ids);
-    return orderIds;
-  }
 
   const handleDateChange = async (newDateRange) => {
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
@@ -543,17 +503,19 @@ function OrderManagementSystem() {
     }
   };
 
-  const handleFactoryChange = (e) => {
-    setSelectedFactory(e.target.value);
-  };
-
   const handlePoModal = (itemId) => {
     setProductId(itemId);
     setPoDetailsModal(true);
   };
 
   // PO Generate
-  const handleGeneratePO = async () => {
+  const handleGeneratePO = () => {
+    if (activeKey === 'against_PO') handleGenerateAgainstPO()
+    else if (activeKey === 'manual_PO') handleGenerateManualPO()
+    else if (activeKey === 'scheduled_PO') handleGenerateScheduledPO()
+  }
+
+  const handleGenerateAgainstPO = async () => {
     const selectedOrders = orders.filter((order) =>
       selectedOrderIds.includes(order.product_name)
     );
@@ -687,17 +649,18 @@ function OrderManagementSystem() {
   const handleChange = (event, value) => {
     setPage(value);
   };
-  // const handleChangeMO = (event, value) => {
-  //   setPageMO(value);
-  // };
-  // const handleChangeSO = (event, value) => {
-  //   setPageSO(value);
-  // };
 
-  const [activeKey, setActiveKey] = useState("against_PO"); // Initially set to your defaultActiveKey
+  const [activeKey, setActiveKey] = useState("against_PO");
 
   const handleTabSelect = (key) => {
     setActiveKey(key);
+    if (key === 'manual_PO') {
+      manualPO();
+    } else if (key === 'scheduled_PO') {
+      scheduledPO()
+    } else {
+      fetchOrders();
+    }
   };
 
   const handlePageSizeChange = (e) => {
@@ -816,7 +779,7 @@ function OrderManagementSystem() {
                       as="select"
                       className="mr-sm-2"
                       value={selectedFactory}
-                      onChange={handleFactoryChange}
+                      onChange={(e) => setSelectedFactory(e.target.value)}
                     >
                       <option value="">All Factory</option>
                       {factories.map((factory) => (
@@ -877,7 +840,7 @@ function OrderManagementSystem() {
                 />
               ))}
             {activeKey === "manual_PO" &&
-              (manualPoLoader ? (
+              (manualOrScheduledPoLoader ? (
                 <Loader />
               ) : (
                 <DataTable
@@ -890,7 +853,7 @@ function OrderManagementSystem() {
                 />
               ))}
             {activeKey === "scheduled_PO" &&
-              (schedulePoLoader ? (
+              (manualOrScheduledPoLoader ? (
                 <Loader />
               ) : (
                 <DataTable
@@ -951,65 +914,23 @@ function OrderManagementSystem() {
               </Col>
             </Row>
           ) : null}
+
           <Box className="d-flex justify-content-end align-items-center pt-3 my-4">
-            {
-              activeKey === "against_PO" ? (
-                <>
-                  <Button
-                    variant="outline-primary"
-                    className="me-2 fw-semibold"
-                    onClick={handleSelectAll}
-                  >
-                    Select All Orders
-                  </Button>
+            <Button
+              variant="outline-primary"
+              className="me-2 fw-semibold"
+              onClick={handleSelectAll}
+            >
+              Select All Orders
+            </Button>
 
-                  <Button
-                    variant="primary"
-                    className="ms-2 fw-semibold"
-                    onClick={handleGeneratePO}
-                  >
-                    Create PO
-                  </Button>
-                </>
-              ) : activeKey === "manual_PO" ? (
-                <>
-                <Button
-                    variant="outline-primary"
-                    className="me-2 fw-semibold"
-                    onClick={handleSelectAllManual}
-                  >
-                    Select All Orders
-                  </Button>
-
-                <Button
-                  variant="primary"
-                  className="ms-2 fw-semibold"
-                  onClick={handleGenerateManualPO}
-                >
-                  Create PO
-                </Button>
-                </>
-              ) : activeKey === "scheduled_PO" ? (
-                <>
-               <Button
-                    variant="outline-primary"
-                    className="me-2 fw-semibold"
-                    onClick={handleSelectAllSchedule}
-                  >
-                    Select All Orders
-                  </Button>
-
-                <Button
-                  variant="primary"
-                  className="ms-2 fw-semibold"
-                  onClick={handleGenerateScheduledPO}
-                >
-                  Create PO
-                </Button>
-                </>
-              ) : null
-            }
-
+            <Button
+              variant="primary"
+              className="ms-2 fw-semibold"
+              onClick={handleGeneratePO}
+            >
+              Create PO
+            </Button>
           </Box>
         </Card.Body>
       </Card>

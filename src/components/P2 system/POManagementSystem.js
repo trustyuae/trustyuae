@@ -54,8 +54,11 @@ function POManagementSystem() {
 
   useEffect(() => {
     dispatch(AllFactoryActions());
+  }, [dispatch]);
+
+  useEffect(() => {
     setFactories(allFactoryDatas);
-  }, [dispatch, allFactoryDatas]);
+  }, [allFactoryDatas])
 
   const POM_system_products = async () => {
     try {
@@ -196,7 +199,7 @@ function POManagementSystem() {
     setPage(1);
     setStartDate("");
     setEndDate("");
-    setSelectedDateRange([null,null])
+    setSelectedDateRange([null, null])
     setSelectedFactory('');
     setPoStatus('');
   };

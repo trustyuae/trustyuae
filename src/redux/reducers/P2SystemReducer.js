@@ -12,12 +12,6 @@ import {
   ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST,
   ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
   ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
-  GET_SCHEDULE_PO_DETAILS_REQUEST,
-  GET_SCHEDULE_PO_DETAILS_FAIL,
-  GET_SCHEDULE_PO_DETAILS_SUCCESS,
-  GET_MANUAL_PO_DETAILS_REQUEST,
-  GET_MANUAL_PO_DETAILS_SUCCESS,
-  GET_MANUAL_PO_DETAILS_FAIL,
   GET_PO_DETAILS_REQUEST,
   GET_PO_DETAILS_FAIL,
   GET_PO_DETAILS_SUCCESS,
@@ -42,15 +36,20 @@ import {
   GET_QUANTITY_DETAILS_FAIL,
   GET_QUANTITY_DETAILS_SUCCESS,
   GET_QUANTITY_DETAILS_REQUEST,
+  GET_MANUAL_OR_SCHEDULED_PO_DETAILS_REQUEST,
+  GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS,
+  GET_MANUAL_OR_SCHEDULED_PO_DETAILS_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
   poDetailsData: [],
   isPoDetailsData: false,
-  manualPoDetailsData: [],
-  isManualPoDetailsData: false,
-  schedulePoDetailsData: [],
-  isSchedulePoDetailsData: false,
+  // manualPoDetailsData: [],
+  // isManualPoDetailsData: false,
+  manualOrScheduledPoDetailsData: [],
+  isManualOrScheduledPoDetailsData: false,
+  // schedulePoDetailsData: [],
+  // isSchedulePoDetailsData: false,
   perticularPoDetailsData: [],
   isPerticularPoDetailsData: false,
   quantityDetailsData: [],
@@ -89,31 +88,16 @@ const OrderNotAvailableReducer = (state = initialState, action) => {
     case GET_PO_DETAILS_FAIL:
       return { ...state, isPoDetailsData: false, error: action.payload };
 
-    case GET_MANUAL_PO_DETAILS_REQUEST:
-      return { ...state, isManualPoDetailsData: true };
-    case GET_MANUAL_PO_DETAILS_SUCCESS:
+    case GET_MANUAL_OR_SCHEDULED_PO_DETAILS_REQUEST:
+      return { ...state, isManualOrScheduledPoDetailsData: true };
+    case GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS:
       return {
         ...state,
-        isManualPoDetailsData: false,
-        manualPoDetailsData: action.payload,
+        isManualOrScheduledPoDetailsData: false,
+        manualOrScheduledPoDetailsData: action.payload,
       };
-    case GET_MANUAL_PO_DETAILS_FAIL:
-      return { ...state, isManualPoDetailsData: false, error: action.payload };
-
-    case GET_SCHEDULE_PO_DETAILS_REQUEST:
-      return { ...state, isSchedulePoDetailsData: true };
-    case GET_SCHEDULE_PO_DETAILS_SUCCESS:
-      return {
-        ...state,
-        isSchedulePoDetailsData: false,
-        schedulePoDetailsData: action.payload,
-      };
-    case GET_SCHEDULE_PO_DETAILS_FAIL:
-      return {
-        ...state,
-        isSchedulePoDetailsData: false,
-        error: action.payload,
-      };
+    case GET_MANUAL_OR_SCHEDULED_PO_DETAILS_FAIL:
+      return { ...state, isManualOrScheduledPoDetailsData: false, error: action.payload };
 
     case GET_PERTICULAR_PO_DETAILS_REQUEST:
       return { ...state, isPerticularPoDetailsData: true };
