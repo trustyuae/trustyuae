@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link, useNavigate } from "react-router-dom";
-import { Avatar, Box, Checkbox, FormControlLabel, FormGroup, MenuItem, Select, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Checkbox, FormControlLabel, FormGroup, MenuItem, Select, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -199,7 +199,7 @@ function ExchangeAndReturn() {
     }
     const handleAvailableQtyChange = (event, rowData) => {
         console.log(event, rowData, '======');
-        if( event.target.value >= 0 && event.target.value <= rowData.quantity){
+        if (event.target.value >= 0 && event.target.value <= rowData.quantity) {
             const updatedData = orders.map((item) => {
                 if (item.id === rowData.id) {
                     return { ...item, return_qty: event.target.value };
@@ -209,7 +209,7 @@ function ExchangeAndReturn() {
             console.log(updatedData, 'updatedData');
             setOrders(updatedData);
         }
-       
+
     };
 
     const handleStatusChange = (index, event) => {
@@ -251,7 +251,7 @@ function ExchangeAndReturn() {
             })
             console.log(response.data, 'response');
             setAllPoTypes(response.data)
-            selectPO(response.data[0])
+            // selectPO(response.data[0])
             if (response.data.length === 0) {
                 setOrders([])
             }
@@ -267,8 +267,8 @@ function ExchangeAndReturn() {
             setSelectPOId(id)
             const response = await axios.get(`${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`)
             console.log(response, 'response');
-            let data2=[...response.data.items_with_variations,...response.data.items_without_variations]
-            console.log(data2,'data====');
+            let data2 = [...response.data.items_with_variations, ...response.data.items_without_variations]
+            console.log(data2, 'data====');
             let data = data2.map((v, i) => ({ ...v, id: i }));
             console.log(data, 'data');
             setOrders(data);
@@ -303,7 +303,7 @@ function ExchangeAndReturn() {
                     navigate("/ER_Management_System")
                 );
             }
-            
+
         } catch (error) {
             console.error(error);
         }
@@ -375,6 +375,7 @@ function ExchangeAndReturn() {
                                     // value={selectedPOType}
                                     onChange={(e) => selectPO(e.target.value)}
                                 >
+                                    <option value="">select...</option>
                                     {allPoTypes?.map((po) => (
                                         <option key={po} value={po}>
                                             {po}
@@ -425,7 +426,12 @@ function ExchangeAndReturn() {
                         />
                     </div>
                 ) : (
-                    <div>No orders available</div>
+                    <Alert
+                        severity="warning"
+                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                    >
+                        Please select Factory, PO type, and PO.
+                    </Alert>
                 )
             )}
             <MDBRow className='justify-content-end px-3'>
