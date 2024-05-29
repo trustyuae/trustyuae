@@ -19,7 +19,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 
 const ERDetails = () => {
-    const { id } = useParams();
+    const params = useParams();
     const dispatch = useDispatch();
     const [ERviewList, setERviewList] = useState([])
     const navigate = useNavigate();
@@ -41,7 +41,7 @@ const ERDetails = () => {
 
     const fetchER = async () => {
         try {
-            let apiUrl = `${API_URL}wp-json/custom-er-record/v1/fetch-er-record/${id}/`;
+            let apiUrl = `${API_URL}wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/`;
             await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
                 setStatus(response.data.er_status)
                 setFactoryName(response.data.factory_id)
@@ -264,7 +264,7 @@ const ERDetails = () => {
 
     const handleUpdate = async () => {
         const payload = {
-            "er_no": id,
+            "er_no": params.er_no,
             "er_note": addNote,
             "er_status": status,
             "product_id": ERviewList.map(d => d.product_id),
@@ -317,7 +317,7 @@ const ERDetails = () => {
                         </Typography>
                         <Box>
                             <Typography className="fw-bold">
-                                # {id}
+                                # {params.er_no}
                             </Typography>
                         </Box>
                         <Typography
