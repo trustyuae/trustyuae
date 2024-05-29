@@ -28,6 +28,8 @@ import GRNView from './components/P3 system/GRNView'
 import ExchangeAndReturn from "./components/ER system/ExchangeAndReturn";
 import ERManagement from "./components/ER system/ERManagement";
 import ERDetails from "./components/ER system/ERDetails";
+import CompletedOrderSystem from "./components/P1 system/CompletedOrderSystem";
+import CompletedOrderDetails from "./components/P1 system/CompletedOrderDetails";
 
 function App() {
   return (
@@ -62,10 +64,11 @@ function App() {
               <Route exact path="/On_Hold_Management/:grn_no/:id" element={<OnHoldManagement/>} />
               <Route exact path="/On_Hold_Manegement_System" element={<OnHoldManegementSystem/>} />
               <Route exact path="/ER_Management_System" element={<ERManagement/>} />
-              <Route exact path='/PageNotFound' element={<PageNotFound />} />
               <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
               <Route exact path='/ER_details/:er_no' element={<ERDetails />} />
-
+              <Route exact path='/completed_order_system' element={<CompletedOrderSystem />} />
+              <Route exact path='/completed_order_details' element={<CompletedOrderDetails />} />
+              <Route exact path='/PageNotFound' element={<PageNotFound />} />
             </Route>
           </Route>
         </Routes>

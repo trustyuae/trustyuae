@@ -41,6 +41,18 @@ const Sidebar = () => {
                   <span>Order Fulfillment System</span>
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/completed_order_system"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/completed_order_system" ? " active" : "")
+                  }
+                >
+                  <i className="bi bi-circle"></i>
+                  <span>Completed Orders System</span>
+                </Link>
+              </li>
             </ul>
           </li>
 
