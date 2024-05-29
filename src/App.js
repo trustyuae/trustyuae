@@ -64,7 +64,7 @@ function App() {
               <Route exact path="/ER_Management_System" element={<ERManagement/>} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
               <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
-              <Route exact path='/ER_details' element={<ERDetails />} />
+              <Route exact path='/ER_details/:er_no' element={<ERDetails />} />
 
             </Route>
           </Route>

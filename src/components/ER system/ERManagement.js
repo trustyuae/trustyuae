@@ -117,8 +117,9 @@ function ERManagement() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
+        console.log(value,'row from button')
         return (
-          <Link to={`/ER_details`} className=" d-flex justify-content-center">
+          <Link to={`/ER_details/${value.row.er_no}`} className=" d-flex justify-content-center">
             <Button
               type="button"
               className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
