@@ -7,6 +7,7 @@ import OrderSystemReducer from "./reducers/OrderSystemReducer";
 import OrderNotAvailableReducer from "./reducers/P2SystemReducer";
 import ManagementSystemReducer from "./reducers/P3SystemReducer";
 import ProductManagementReducer from "./reducers/ProductManagementReducer";
+import ErmanagementReducer from "./reducers/ErManagementReducer";
 
 const reducer = combineReducers({
   loginUser: UserLoginReducer,
@@ -16,6 +17,7 @@ const reducer = combineReducers({
   orderNotAvailable: OrderNotAvailableReducer,
   managementSystem: ManagementSystemReducer,
   allProducts:ProductManagementReducer,
+  exchange_And_return_Data:ErmanagementReducer,
 });
 
 let initialState = {};

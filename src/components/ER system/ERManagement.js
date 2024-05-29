@@ -5,62 +5,57 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, TextField, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
-import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
-import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import dayjs from "dayjs";
+import { DatePicker } from "@mui/x-date-pickers-pro";
+import { GetErManagementData } from "../../redux/actions/ErManagementActions";
 
 function ERManagement() {
   const dispatch = useDispatch();
-  const [dueDate, setDueDate] = useState("all");
-  const [dispatchType, setDispatchType] = useState("all");
+  const [dueDate, setDueDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [selectedDueType, setSelectedDueType] = useState("");
+  const [erDate, setErDate] = useState(dayjs());
+  const [selectedDate, setSelectedDate] = useState(
+    dayjs().format("YYYY-MM-DD")
+  );
   const [factories, setFactories] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState("");
   const [orders, setOrders] = useState([]);
-  const [searchOrderID, setSearchOrderID] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isReset, setIsReset] = useState(false);
-  const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
-  const loader = useSelector((state) => state?.orderSystemData?.isOrders);
-
+  const loader = useSelector(
+    (state) => state?.exchange_And_return_Data?.isErmanagementData
+  );
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
   );
 
   useEffect(() => {
     dispatch(AllFactoryActions());
-    setFactories(allFactoryDatas);
-  }, [dispatch, allFactoryDatas]);
+  }, [dispatch]);
 
+  useEffect(() => {
+    setFactories(allFactoryDatas);
+  }, [allFactoryDatas]);
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders/?`;
-    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
-    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
-    await dispatch(
-      OrderSystemGet({
-        apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
-      })
-    )
+    let apiUrl = `${API_URL}wp-json/custom-er-fetch/v1/fetch-all-er/?factory_id=${selectedFactory}&per_page=${pageSize}&page=${page}`;
+    if (dueDate) apiUrl += `&due_date=${dueDate}`;
+    if (selectedDate) apiUrl += `&date=${selectedDate}`;
+    await dispatch(GetErManagementData({ apiUrl }))
       .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+        console.log(response, "response");
+        let data = response.data.er_details.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
         setTotalPages(response.data.total_pages);
       })
@@ -70,21 +65,16 @@ function ERManagement() {
   }
 
   const handleReset = () => {
-    setSearchOrderID("");
-    setStartDate("");
-    setEndDate("");
-    setSelectedDateRange([null, null]);
+    setSelectedDate("");
+    setSelectedDueType("");
+    setSelectedFactory("");
+    setDueDate("");
     setTotalPages(1);
-    if (isReset) {
-      setIsReset(false);
-    } else {
-      setIsReset(true);
-    }
   };
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
-    setPage(1);
+    setPage(e.target.value);
   };
 
   const handleFactoryChange = (e) => {
@@ -92,26 +82,33 @@ function ERManagement() {
   };
 
   const columns = [
-    { field: "date", headerName: "ER No.", className: "order-system", flex: 1 },
     {
-      field: "order_id",
+      field: "er_no",
+      headerName: "ER No.",
+      className: "order-system",
+      flex: 1,
+    },
+    {
+      field: "er_total_qty",
       headerName: "Total Qty",
       className: "order-system",
       flex: 1,
     },
     {
-      field: "customer_name",
+      field: "er_status",
       headerName: "Status",
       className: "order-system",
       flex: 1,
     },
     {
-      field: "shipping_country",
+      field: "received_qty",
       headerName: "Received Status",
       type: "string",
       className: "order-system",
       flex: 1,
-      valueGetter: (value, row) => getCountryName(row.shipping_country),
+      valueGetter: (value, row) => {
+        return `${row.received_qty} / ${row.returned_qty}`;
+      },
     },
     {
       field: "view_item",
@@ -139,12 +136,15 @@ function ERManagement() {
   };
 
   const handleDateChange = async (newDateRange) => {
-    if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
-      setSelectedDateRange(newDateRange);
-      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format('YYYY-MM-DD');
-      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format('YYYY-MM-DD');
-      setStartDate(isoStartDate);
-      setEndDate(isoEndDate);
+    setDueDate("");
+    setErDate(newDateRange);
+    if (newDateRange?.$d) {
+      console.log(dayjs(newDateRange.$d.toDateString()).format("YYYY-MM-DD"));
+      const isoDate = dayjs(newDateRange.$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
+      console.log(isoDate, "isodate");
+      setSelectedDate(isoDate);
     } else {
       console.error("Invalid date range");
     }
@@ -155,17 +155,20 @@ function ERManagement() {
     fetchOrders();
   };
 
-  const searchDueByFilter = (e) => {
-    setDispatchType(e);
+  const searchDueByFilter = (value) => {
+    setSelectedDate("");
+    setSelectedDueType(value);
+    value === "today"
+      ? setDueDate(dayjs().format("YYYY-MM-DD"))
+      : setDueDate(dayjs().add(1, "day").format("YYYY-MM-DD"));
     setPage(1);
   };
 
   useEffect(() => {
     fetchOrders();
-  }, [pageSize, page, dueDate, isReset]);
-
+  }, [pageSize, page, dueDate, selectedFactory, selectedDate]);
   return (
-    <Container fluid className="py-3" >
+    <Container fluid className="py-3">
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
           ER Management
@@ -174,46 +177,32 @@ function ERManagement() {
       <Row className="mb-4 mt-4">
         <Form inline>
           <Row className="mb-4 align-items-center">
-            <Col xs="auto" lg="3">
-              <Form.Group>
-                <Form.Label className="fw-semibold mb-0">
-                  Date filter:
-                </Form.Label>
+            <Col xs="auto" lg="4">
+              <Form.Group className="fw-semibold mb-0">
+                <Form.Label>Date filter:</Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={["SingleInputDateRangeField"]}>
-                    <DateRangePicker
-                      sx={{
-                        "& .MuiInputBase-root": {
-                          paddingRight: 0,
+                  <DatePicker
+                    value={erDate}
+                    format="YYYY-MM-DD"
+                    onChange={(e) => handleDateChange(e)}
+                    sx={{
+                      display: "block",
+                      verticalAlign: "unset",
+                      "& .MuiInputBase-input": {
+                        padding: ".5rem .75rem .5rem .75rem",
+                        "&:hover": {
+                          borderColor: "#dee2e6",
                         },
-                        "& .MuiInputBase-input": {
-                          padding: ".5rem .75rem .5rem .75rem",
-                          "&:hover": {
-                            borderColor: "#dee2e6",
-                          },
-                        },
-                      }}
-                      value={selectedDateRange}
-                      onChange={handleDateChange}
-                      slots={{ field: SingleInputDateRangeField }}
-                    />
-                  </DemoContainer>
+                      },
+                    }}
+                    renderInput={(props) => (
+                      <TextField {...props} helperText="valid mask" />
+                    )}
+                  />
                 </LocalizationProvider>
               </Form.Group>
             </Col>
-            <Col xs="auto" lg="3">
-              <Form.Group>
-                <Form.Label className="fw-semibold">Order Id:</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter Order ID"
-                  value={searchOrderID}
-                  onChange={(e) => setSearchOrderID(e.target.value)}
-                  className="mr-sm-2 py-2"
-                />
-              </Form.Group>
-            </Col>
-            <Col xs="auto" lg="3">
+            <Col xs="auto" lg="4">
               <Form.Group className="fw-semibold mb-0">
                 <Form.Label>Factory Filter:</Form.Label>
                 <Form.Control
@@ -222,7 +211,9 @@ function ERManagement() {
                   value={selectedFactory}
                   onChange={handleFactoryChange}
                 >
-                  <option value="">All Factory</option>
+                  <option disabled selected value="">
+                    All Factory
+                  </option>
                   {factories.map((factory) => (
                     <option key={factory.id} value={factory.id}>
                       {factory.factory_name}
@@ -231,15 +222,19 @@ function ERManagement() {
                 </Form.Control>
               </Form.Group>
             </Col>
-            <Col xs="auto" lg="3">
+            <Col xs="auto" lg="4">
               <Form.Group>
                 <Form.Label className="fw-semibold">Due by Filter:</Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
+                  value={selectedDueType}
                   onChange={(e) => searchDueByFilter(e.target.value)}
                 >
-                  <option value="all">Today</option>
-                  <option value="dispatch">Tommorrow</option>
+                  <option disabled selected value="">
+                    Select...
+                  </option>
+                  <option value="today">Today</option>
+                  <option value="tomorrow">Tomorrow</option>
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -283,14 +278,23 @@ function ERManagement() {
         <Loader />
       ) : (
         <div className="mt-2">
-          <DataTable
-            columns={columns}
-            rows={orders}
-            page={page}
-            pageSize={pageSize}
-            totalPages={totalPages}
-            handleChange={handleChange}
-          />
+          {orders && orders.length ? (
+            <DataTable
+              columns={columns}
+              rows={orders}
+              page={page}
+              pageSize={pageSize}
+              totalPages={totalPages}
+              handleChange={handleChange}
+            />
+          ) : (
+            <Alert
+              severity="warning"
+              sx={{ fontFamily: "monospace", fontSize: "18px" }}
+            >
+              No Exachange and Return Management Data Available!
+            </Alert>
+          )}
         </div>
       )}
     </Container>
