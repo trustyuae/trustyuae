@@ -15,27 +15,29 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
 import { AllFactoryActions } from '../../redux/actions/AllFactoryActions'
+import axios from 'axios'
+import Swal from 'sweetalert2'
 
 const ERDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const [ERviewList, setERviewList] = useState([])
     const navigate = useNavigate();
-    const [status,setStatus]=useState('')
+    const [status, setStatus] = useState('')
     const [factories, setFactories] = useState([]);
-    const [factoryName,setFactoryName]=useState('')
+    const [factoryName, setFactoryName] = useState('')
     const [imageURL, setImageURL] = useState("");
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedOrderIds, setSelectedOrderIds] = useState([]);
-    const [addNote,setNote]=useState('')
+    const [addNote, setNote] = useState('')
 
     const allFactoryDatas = useSelector(
         (state) => state?.allFactoryData?.factory
-      );
+    );
     useEffect(() => {
         dispatch(AllFactoryActions());
         setFactories(allFactoryDatas);
-      }, [dispatch, allFactoryDatas]);
+    }, [dispatch, allFactoryDatas]);
 
     const fetchER = async () => {
         try {
@@ -45,15 +47,15 @@ const ERDetails = () => {
                 setFactoryName(response.data.factory_id)
                 let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
                 console.log(data, 'data');
-                data=data.map(d=>{
-                    if(d.returned_qty==d.received_qty){
-                        return { ...d, received_qty: d.received_qty,received_status:'Received' }
+                data = data.map(d => {
+                    if (d.returned_qty == d.received_qty) {
+                        return { ...d, received_qty: d.received_qty, received_status: 'Received' }
                     }
-                    if(0>=d.received_qty){
-                        return { ...d, received_qty: d.received_qty,received_status:'Not Received' }
+                    if (0 >= d.received_qty) {
+                        return { ...d, received_qty: d.received_qty, received_status: 'Not Received' }
                     }
-                    if(d.returned_qty>=d.received_qty){
-                        return { ...d, received_qty: d.received_qty,received_status:'Partially received' }
+                    if (d.returned_qty >= d.received_qty) {
+                        return { ...d, received_qty: d.received_qty, received_status: 'Partially received' }
                     }
                     return d
                 })
@@ -108,7 +110,7 @@ const ERDetails = () => {
             headerName: "ER Qty",
             flex: 1,
         },
-       
+
         {
             field: "received_qty",
             headerName: "Received Qty",
@@ -134,53 +136,11 @@ const ERDetails = () => {
             field: "return_type",
             headerName: "Return Type",
             flex: 1,
-            // renderCell: (params) => {
-            //     const isDisabled = !selectedOrderIds.includes(params.row.id);
-
-            //     return (
-            //         <Select
-            //             labelId={`customer-status-${params.row.id}-label`}
-            //             id={`customer-status-${params.row.id}`}
-            //             value={params.row.return_type}
-            //             onChange={(event) => handleStatusChange(event, params.row)}
-            //             disabled={isDisabled}
-            //             fullWidth
-            //             style={{ height: "70%", width: "100%" }}
-            //         >
-            //             {ReturnType.map((status) => (
-            //                 <MenuItem key={status} value={status}>
-            //                     {status}
-            //                 </MenuItem>
-            //             ))}
-            //         </Select>
-            //     );
-            // },
         },
         {
             field: "received_status",
             headerName: "Received Status",
             flex: 1,
-            // renderCell: (params) => {
-            //     const isDisabled = !selectedOrderIds.includes(params.row.id);
-
-            //     return (
-            //         <Select
-            //             labelId={`customer-status-${params.row.id}-label`}
-            //             id={`customer-status-${params.row.id}`}
-            //             value={params.row.received_status   }
-            //             onChange={(event) => handleStatusChange(event, params.row)}
-            //             disabled={isDisabled}
-            //             fullWidth
-            //             style={{ height: "70%", width: "100%" }}
-            //         >
-            //             {ReturnType.map((status) => (
-            //                 <MenuItem key={status} value={status}>
-            //                     {status}
-            //                 </MenuItem>
-            //             ))}
-            //         </Select>
-            //     );
-            // },
         },
         {
             field: "expected_delivery_date",
@@ -198,39 +158,22 @@ const ERDetails = () => {
             field: "select",
             headerName: "Select",
             flex: 1,
-            // renderCell: (params) => {
-            //     return (
-            //         <FormGroup>
-            //             <FormControlLabel
-            //                 className="mx-auto"
-            //                 control={<Checkbox />}
-            //                 style={{ justifyContent: "center" }}
-            //                 checked={selectedOrderIds.includes(params.row.id)}
-            //                 onChange={(event) =>
-            //                     handleOrderManualSelection(params.row.id)
-            //                 }
-            //             />
-            //         </FormGroup>
-            //     );
-            // },
-
             renderCell: (params) => {
                 const isInSaveMode = selectedOrderIds.includes(params.row.id)
-
                 if (isInSaveMode) {
-                  return [
-                    <GridActionsCellItem
-                      icon={<SaveIcon />}
-                      label="Save"
-                      sx={{
-                        color: 'primary.main',
-                      }}
-                      onClick={(event) =>
-                        handleOrderManualSelection(params.row.id)
-                    }
-                    />,
-                    
-                  ];
+                    return [
+                        <GridActionsCellItem
+                            icon={<SaveIcon />}
+                            label="Save"
+                            sx={{
+                                color: 'primary.main',
+                            }}
+                            onClick={(event) =>
+                                handleOrderManualSelection(params.row.id)
+                            }
+                        />,
+
+                    ];
                 }
 
                 return [
@@ -244,7 +187,7 @@ const ERDetails = () => {
                             handleOrderManualSelection(params.row.id)
                         }
                     />,
-                    
+
                 ];
             },
         }
@@ -257,31 +200,31 @@ const ERDetails = () => {
 
     const handleAvailableQtyChange = (index, event) => {
         console.log(index.target.value, event, '======');
-        if( index.target.value >= 0 && event.returned_qty>= index.target.value){
-        const updatedData = ERviewList.map((item) => {
-            if (item.id === event.id) {
-                if(event.returned_qty==index.target.value){
-                    return { ...item, received_qty: index.target.value,received_status:'Received' }
+        if (index.target.value >= 0 && event.returned_qty >= index.target.value) {
+            const updatedData = ERviewList.map((item) => {
+                if (item.id === event.id) {
+                    if (event.returned_qty == index.target.value) {
+                        return { ...item, received_qty: index.target.value, received_status: 'Received' }
+                    }
+                    if (0 >= index.target.value) {
+                        return { ...item, received_qty: index.target.value, received_status: 'Not Received' }
+                    }
+                    if (event.returned_qty >= index.target.value) {
+                        return { ...item, received_qty: index.target.value, received_status: 'Partially received' }
+                    }
+
+                    //else if(event.order_qty>=index.target.value){
+                    //     return { ...item, returned_qty: index.target.value,received_status:'Partially received' }
+                    // }else if(index.target.value===0){
+                    //     return { ...item, returned_qty: index.target.value,received_status:'Not Received' }
+                    // }
+                    return { ...item, returned_qty: index.target.value };
                 }
-                if(0>=index.target.value){
-                    return { ...item, received_qty: index.target.value,received_status:'Not Received' }
-                }
-                if(event.returned_qty>=index.target.value){
-                    return { ...item, received_qty: index.target.value,received_status:'Partially received' }
-                }
-                
-                //else if(event.order_qty>=index.target.value){
-                //     return { ...item, returned_qty: index.target.value,received_status:'Partially received' }
-                // }else if(index.target.value===0){
-                //     return { ...item, returned_qty: index.target.value,received_status:'Not Received' }
-                // }
-                return { ...item, returned_qty: index.target.value };
-            }
-            return item;
-        });
-        setERviewList(updatedData);
-        console.log(updatedData, 'updatedData');
-    }
+                return item;
+            });
+            setERviewList(updatedData);
+            console.log(updatedData, 'updatedData');
+        }
     };
 
     const handleStatusChange = (index, event) => {
@@ -319,13 +262,32 @@ const ERDetails = () => {
         navigate("/ER_Management_System");
     };
 
-    const handleUpdate = () => {
-        console.log(ERviewList, 'ERviewList');
+    const handleUpdate = async () => {
         const payload = {
-
+            "er_no": id,
+            "er_note": addNote,
+            "er_status": status,
+            "product_id": ERviewList.map(d => d.product_id),
+            "received_qty": ERviewList.map(d => d.received_qty),
+            "received_status": ERviewList.map(d => d.received_status),
+            "expected_date": ERviewList.map(d => d.expected_delivery_date)
+        }
+        console.log(payload, 'payload');
+        try {
+            const response = await axios.post(`${API_URL}wp-json/custom-er-update/v1/update-er-item/`, payload)
+            if (response.data.message) {
+                Swal.fire({
+                    icon: "success",
+                    title: response.data.message
+                }).then(
+                    navigate("/ER_Management_System")
+                );
+            }
+        } catch (error) {
+            console.error(error);
         }
     }
-    const handleStatusFilter=(e)=>{
+    const handleStatusFilter = (e) => {
         console.log(e.target.value);
         setStatus(e.target.value)
     }
@@ -384,8 +346,8 @@ const ERDetails = () => {
                             <Form.Select
 
                                 className="mr-sm-2"
-                            value={status}
-                            onChange={(e) => handleStatusFilter(e)}
+                                value={status}
+                                onChange={(e) => handleStatusFilter(e)}
                             >
                                 <option value="In Progress">In Progress </option>
                                 <option value="Closed">Closed </option>
@@ -400,13 +362,13 @@ const ERDetails = () => {
                         <DataTable
                             columns={columns}
                             rows={ERviewList}
-                            // page={pageSO}
-                            // pageSize={pageSizeSO}
-                            // totalPages={totalPagesSO}
-                            // rowHeight={100}
-                            // handleChange={handleChangeSO}
-                            // // onCellEditStart={handleCellEditStart}
-                            // processRowUpdate={handleSOQtyChange}
+                        // page={pageSO}
+                        // pageSize={pageSizeSO}
+                        // totalPages={totalPagesSO}
+                        // rowHeight={100}
+                        // handleChange={handleChangeSO}
+                        // // onCellEditStart={handleCellEditStart}
+                        // processRowUpdate={handleSOQtyChange}
                         />
                     </div>
                     <Row>
@@ -418,7 +380,7 @@ const ERDetails = () => {
                             <Form.Control
                                 as="textarea"
                                 rows={2}
-                              onChange={(e) => setNote(e.target.value)}
+                                onChange={(e) => setNote(e.target.value)}
                             />
                         </Form.Group>
                     </Row>

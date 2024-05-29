@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Avatar, Box, Checkbox, FormControlLabel, FormGroup, MenuItem, Select, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -22,8 +22,10 @@ import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import { MDBRow } from "mdb-react-ui-kit";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 function ExchangeAndReturn() {
+    const navigate = useNavigate();
 
     const [orders, setOrders] = useState([]);
     const [pageSize, setPageSize] = useState(10);
@@ -265,7 +267,9 @@ function ExchangeAndReturn() {
             setSelectPOId(id)
             const response = await axios.get(`${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`)
             console.log(response, 'response');
-            let data = response.data.map((v, i) => ({ ...v, id: i }));
+            let data2=[...response.data.items_with_variations,...response.data.items_without_variations]
+            console.log(data2,'data====');
+            let data = data2.map((v, i) => ({ ...v, id: i }));
             console.log(data, 'data');
             setOrders(data);
         } catch (error) {
@@ -280,17 +284,26 @@ function ExchangeAndReturn() {
         );
         console.log(selectedOrders.map(d => d.return_type));
         const payload = {
-            "factory_id": Number(selectedFactory),
-            "po_id": selectPOId,
-            "product_id": selectedOrders.map(d => d.product_id),
-            "return_qty": selectedOrders.map(d => d.return_qty),
-            "return_type": selectedOrders.map(d => d.return_type),
-            "expected_date": selectedOrders.map(d => d.expected_delivery_date)
+            factory_id: Number(selectedFactory),
+            po_id: selectPOId,
+            product_id: selectedOrders.map(d => d.product_id),
+            return_qty: selectedOrders.map(d => d.return_qty),
+            return_type: selectedOrders.map(d => d.return_type),
+            expected_date: selectedOrders.map(d => d.expected_delivery_date)
         }
         console.log(payload, 'payload');
         try {
             const response = await axios.post(`${API_URL}wp-json/custom-er-generate/v1/create-er/`, payload)
             console.log(response, 'response');
+            if (response.data.message) {
+                Swal.fire({
+                    icon: "success",
+                    title: response.data.message + ' ' + response.data.er_no
+                }).then(
+                    navigate("/ER_Management_System")
+                );
+            }
+            
         } catch (error) {
             console.error(error);
         }
