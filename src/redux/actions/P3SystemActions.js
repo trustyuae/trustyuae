@@ -26,7 +26,7 @@ import {
   GET_PRODUCT_ORDER_DETAILS_REQUEST,
   GET_PRODUCT_ORDER_DETAILS_SUCCESS,
 } from "../constants/Constants";
-import Swal from "sweetalert2";
+import ShowAlert from "../../utils/ShowAlert";
 
 export const GetProductManual =
   ({ apiUrl }) =>
@@ -42,38 +42,31 @@ export const GetProductManual =
     }
   };
 
-  export const AddGrn = (payload, navigate) => async (dispatch) => {
-    try {
-      dispatch({ type: ADD_GRN_REQUEST });
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-api/v1/add-grn`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response) {
-        Swal.fire({
-          icon: "success",
-          title: response.data,
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/GRN_Management");
-          }
-        });
+export const AddGrn = (payload, navigate) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_GRN_REQUEST });
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-api/v1/add-grn`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }
-      dispatch({
-        type: ADD_GRN_SUCCESS,
-        payload: response?.data,
-      });
-      return response;
-    } catch (error) {
-      dispatch({ type: ADD_GRN_FAIL, error: error.message });
+    );
+    if (response) {
+      const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
+      if (result.isConfirmed) navigate("/GRN_Management");
     }
-  };
+    dispatch({
+      type: ADD_GRN_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({ type: ADD_GRN_FAIL, error: error.message });
+  }
+};
 
   export const GetGRNList =
   ({ apiUrl }) =>

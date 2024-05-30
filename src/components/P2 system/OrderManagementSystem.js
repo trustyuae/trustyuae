@@ -10,7 +10,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import Swal from "sweetalert2";
 import DataTable from "../DataTable";
 import {
   Avatar,
@@ -34,6 +33,7 @@ import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import PoDetailsModal from "./PoDetailsModal";
+import ShowAlert from "../../utils/ShowAlert";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -541,9 +541,8 @@ function OrderManagementSystem() {
         console.error("Error generating PO IDs:", error);
       }
     } else {
-      Swal.fire({
-        text: "Selected orders belong to different factories. Please select orders from the same factory.",
-      });
+      let errMessage = "Selected orders belong to different factories. Please select orders from the same factory."
+      ShowAlert('', errMessage, "error");
     }
   };
   const handleGenerateManualPO = async () => {
@@ -570,9 +569,7 @@ function OrderManagementSystem() {
         console.error("Error generating PO IDs:", error);
       }
     } else {
-      Swal.fire({
-        text: "Selected orders belong to different factories. Please select orders from the same factory.",
-      });
+      await ShowAlert('', "Selected orders belong to different factories. Please select orders from the same factory.", "error");
     }
   };
 
@@ -602,9 +599,7 @@ function OrderManagementSystem() {
         console.error("Error generating PO IDs:", error);
       }
     } else {
-      Swal.fire({
-        text: "Selected orders belong to different factories. Please select orders from the same factory.",
-      });
+      await ShowAlert('', "Selected orders belong to different factories. Please select orders from the same factory.", "error");
     }
   };
 

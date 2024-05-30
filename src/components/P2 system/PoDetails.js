@@ -10,13 +10,13 @@ import { Badge, Card, Col } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { PerticularPoDetails, UpdatePODetails } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+import ShowAlert from "../../utils/ShowAlert";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -120,11 +120,7 @@ const PoDetails = () => {
     const flattenedStatuses = availabilityStatuses.flat();
     const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
     if (validationMessage == "Availability status is empty.") {
-      Swal.fire({
-        icon: "error",
-        title: validationMessage,
-        showConfirmButton: true,
-      });
+      await ShowAlert(validationMessage, '', "error", true, false, 'OK');
     }
 
     const updatedData = {
@@ -137,7 +133,7 @@ const PoDetails = () => {
     };
     if (validationMessage == "Successful") {
       let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
-      await dispatch(UpdatePODetails({apiUrl},updatedData,navigate))
+      await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate))
     }
   };
 
@@ -419,9 +415,9 @@ const PoDetails = () => {
                 // pageSize={pageSizeSO}
                 // totalPages={totalPagesSO}
                 rowHeight={100}
-                // handleChange={handleChangeSO}
-                // // onCellEditStart={handleCellEditStart}
-                // processRowUpdate={processRowUpdateSPO}
+              // handleChange={handleChangeSO}
+              // // onCellEditStart={handleCellEditStart}
+              // processRowUpdate={processRowUpdateSPO}
               />
             </div>
           )}
@@ -441,7 +437,7 @@ const PoDetails = () => {
         }
         PO_OrderList={PO_OrderList}
         handleClosePrintModal={() => setPrintModal(false)}
-        // showModal={printModal}
+      // showModal={printModal}
       />
     </Container>
   );

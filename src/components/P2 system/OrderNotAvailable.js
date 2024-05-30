@@ -20,11 +20,10 @@ import {
   Typography,
 } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
-import axios from "axios";
-import Swal from "sweetalert2";
 import { Card, Modal } from "react-bootstrap";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
+import ShowAlert from "../../utils/ShowAlert";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -64,12 +63,9 @@ function OrderNotAvailable() {
     });
   };
 
-  const handleCheckboxChange = (e, rowData) => {
+  const handleCheckboxChange = async (e, rowData) => {
     if (!rowData.customer_status) {
-      Swal.fire({
-        icon: "error",
-        title: "please confirm your customer status first!",
-      });
+      await ShowAlert("please confirm your customer status first!", '', "error");
     } else {
       rowData.isSelected = true;
       setCheckBox(true);
@@ -124,7 +120,7 @@ function OrderNotAvailable() {
       });
   }
 
-  const handleGenerateSchedulePo = () => {
+  const handleGenerateSchedulePo = async () => {
     const customerStatus = selectedOrderNotAvailable.filter(
       (order) => order.customer_status === "Confirmed"
     );
@@ -138,26 +134,13 @@ function OrderNotAvailable() {
     );
 
     if (selectedOrderNotAvailable.length === 0) {
-      Swal.fire({
-        icon: "error",
-        title: "please select products for generating schedule po",
-      });
+      await ShowAlert("please select products for generating schedule po", '', "error");
     } else if (customerStatus.length < selectedOrderNotAvailable.length) {
-      Swal.fire({
-        icon: "error",
-        title: "Only for confirmed items we can raise the scheduled PO!",
-      });
+      await ShowAlert("Only for confirmed items we can raise the scheduled PO!", '', "error");
     } else if (new Set(estimatedTime).size !== 1) {
-      Swal.fire({
-        icon: "error",
-        title:
-          "Purchase order items are on separate schedules. Do you want to proceed with the action?!",
-      });
+      await ShowAlert("Purchase order items are on separate schedules. Do you want to proceed with the action?!", '', "error");
     } else if (new Set(factoryNames).size !== 1) {
-      Swal.fire({
-        icon: "error",
-        title: "Factory name should be the same for all selected items!",
-      });
+      await ShowAlert("Factory name should be the same for all selected items!", '', "error");
     } else {
       setShowModal(true);
     }
@@ -174,10 +157,7 @@ function OrderNotAvailable() {
     );
 
     if (selectedOrderNotAvailable.length === 0) {
-      Swal.fire({
-        icon: "error",
-        title: "Please select products you want to update status for!",
-      });
+      await ShowAlert("Please select products you want to update status for!", '', "error");
       return;
     }
 
@@ -189,45 +169,33 @@ function OrderNotAvailable() {
     //   (order) => order.total_price
     // );
     if (hasRefund) {
-      Swal.fire({
-        icon: "question",
-        title: "Are you sure you want to refund this order?",
-        showCancelButton: true,
-        confirmButtonText: "Yes, refund it!",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-            const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
-            const requestedInfo = {
-              amount: selectedOrderNotAvailable.reduce(
-                (acc, order) => acc + order.total_price,
-                0
-              ),
-            };
-            const response = await dispatch(
-              OrderNotAvailableRefund(
-                requestedInfo,
-                orderIds,
-                username,
-                password
-              )
-            );
-            Swal.fire({
-              icon: "success",
-              title: "Refund process completed successfully!",
-            });
-          } catch (error) {
-            console.error("Error in refund process:", error);
-            Swal.fire({
-              icon: "error",
-              title: "Error in refund process!",
-            });
-          }
-        } else {
-          console.error("Refund cancelled");
+      const result = await ShowAlert("Are you sure you want to refund this order?", '', 'question', true, true, "Yes, refund it!", "Cancel");
+      if (result.isConfirmed) {
+        try {
+          const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
+          const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
+          const requestedInfo = {
+            amount: selectedOrderNotAvailable.reduce(
+              (acc, order) => acc + order.total_price,
+              0
+            ),
+          };
+          const response = await dispatch(
+            OrderNotAvailableRefund(
+              requestedInfo,
+              orderIds,
+              username,
+              password
+            )
+          );
+          await ShowAlert('', "Refund process completed successfully!", "success");
+        } catch (error) {
+          console.error("Error in refund process:", error);
+          ShowAlert('', "Error in refund process!", "error");
         }
-      });
+      } else {
+        console.error("Refund cancelled");
+      }
     } else {
       const requestedDataS = {
         po_id: poIds,

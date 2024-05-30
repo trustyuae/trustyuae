@@ -4,25 +4,17 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Alert, Avatar, Box, Checkbox, FormControlLabel, FormGroup, MenuItem, Select, Typography } from "@mui/material";
 import DataTable from "../DataTable";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
-import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge, Card, Modal } from "react-bootstrap";
-import { FaEye } from "react-icons/fa";
+import { Card, Modal } from "react-bootstrap";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
-import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import { MDBRow } from "mdb-react-ui-kit";
 import axios from "axios";
-import Swal from "sweetalert2";
+import ShowAlert from "../../utils/ShowAlert";
 
 function ExchangeAndReturn() {
     const navigate = useNavigate();
@@ -296,12 +288,8 @@ function ExchangeAndReturn() {
             const response = await axios.post(`${API_URL}wp-json/custom-er-generate/v1/create-er/`, payload)
             console.log(response, 'response');
             if (response.data.message) {
-                Swal.fire({
-                    icon: "success",
-                    title: response.data.message + ' ' + response.data.er_no
-                }).then(
-                    navigate("/ER_Management_System")
-                );
+                const result = await ShowAlert(`${response.data.message} ${response.data.er_no}`, '', "success", true, false, 'OK');
+                if (result.isConfirmed) navigate("/ER_Management_System")
             }
 
         } catch (error) {

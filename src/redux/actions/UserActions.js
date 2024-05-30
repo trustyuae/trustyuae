@@ -9,7 +9,7 @@ import {
   CLEAR_STORE,
 } from "../constants/Constants";
 import { loginURL, logoutURL } from "../../utils/constants";
-import Swal from "sweetalert2";
+import ShowAlert from "../../utils/ShowAlert";
 
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
@@ -19,28 +19,16 @@ export const loginUser = (data, navigate) => async (dispatch) => {
     });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
     localStorage.setItem("token", JSON.stringify(res?.data?.token));
-   localStorage.setItem("user_data", JSON.stringify(res?.data?.user_data));
+    localStorage.setItem("user_data", JSON.stringify(res?.data?.user_data));
     if (res.data.token) {
-      Swal.fire({
-        icon: "success",
-        title: res?.data?.message,
-        showConfirmButton: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/ordersystem");
-        }
-      });
+      const result = await ShowAlert('Success', res?.data?.message, "success", true, false, 'OK');
+      if (result.isConfirmed) navigate("/ordersystem");
     } else {
       console.log("error while login");
     }
   } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: error?.response?.data?.message,
-    });
+    await ShowAlert('Error', error?.response?.data?.message, "error");
     dispatch({ type: USER_LOGIN_FAIL });
-    console.log("error occurred");
   }
 };
 
@@ -51,23 +39,11 @@ export const logoutUser = (navigate) => async (dispatch) => {
     console.log(res, "logout res");
     dispatch({ type: USER_LOGOUT_SUCCESS });
     localStorage.clear();
-    Swal.fire({
-      title: "Do You Want Logged Out?",
-      showConfirmButton: true,
-      showCancelButton: true,
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          icon: "success",
-          title: res?.data?.message,
-          showConfirmButton: false,
-          timer: 1500, // Set a timer to automatically close the alert after 1.5 seconds
-        });
-        navigate("/");
-      }
-    });
+    const result = await ShowAlert("Do You Want Logged Out?", '', 'question', true, true, "Confirm", "Cancel");
+    if (result.isConfirmed) {
+      await ShowAlert("Success", res?.data?.message, 'success', false, false, 'OK', '', 1500)
+      navigate("/");
+    }
     dispatch({ type: CLEAR_STORE });
   } catch (error) {
     dispatch({ type: USER_LOGOUT_FAIL });

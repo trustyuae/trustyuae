@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button, Form, Modal, Table } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { OrderNotAvailableDataPo } from "../../redux/actions/P2SystemActions";
-import Swal from "sweetalert2";
+import ShowAlert from "../../utils/ShowAlert";
 
 const ReleaseSchedulePoModal = ({
   handleCloseReleaseSchedulePoModal,
@@ -38,18 +38,14 @@ const ReleaseSchedulePoModal = ({
     };
 
     await dispatch(OrderNotAvailableDataPo(requestData))
-      .then((response) => {
+      .then(async (response) => {
         if (response.data.message) {
-          Swal.fire({
-            icon: "success",
-            title: "Uploaded Successfully!",
-          }).then(res => {
-            if (res.isConfirmed) {
-              handleUpdatedValues();
-              setDateFilter('');
-              handleCloseReleaseSchedulePoModal();
-            }
-          });
+          const result = await ShowAlert("Uploaded Successfully!", '', "success", true, false, 'OK');
+          if (result.isConfirmed) {
+            handleUpdatedValues();
+            setDateFilter('');
+            handleCloseReleaseSchedulePoModal();
+          }
         }
       })
       .catch((error) => {
