@@ -5,45 +5,53 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
+import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 
 function CompletedOrderSystem() {
-  const [dispatchType, setDispatchType] = useState("all");
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [completedStartDate, setCompletedStartDate] = useState("");
+  const [completedEndDate, setCompletedEndDate] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isReset, setIsReset] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
-  const loader = useSelector((state) => state?.orderSystemData?.isOrders);
+  const [selectedCompletedDateRange, setSelectedCompletedDateRange] = useState([
+    null,
+    null,
+  ]);
+  const loader = useSelector((state) => state?.orderSystemData?.isCompletedOrders);
 
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders/?`;
-    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
-    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+    let apiUrl = `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?`;
+    if (searchOrderID)
+      apiUrl += `&orderid=${searchOrderID}&page=${page}&per_page=${pageSize}`;
+    if (endDate)
+      apiUrl += `&start_date=${startDate}&end_date=${endDate}&page=${page}&per_page=${pageSize}`;
+    if (completedEndDate)
+      apiUrl += `&start_date=${completedStartDate}&end_date=${completedEndDate}&page=${page}&per_page=${pageSize}`;
     await dispatch(
-      OrderSystemGet({
-        apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
+      CompletedOrderSystemGet({
+        apiUrl: `${apiUrl}`,
       })
     )
       .then((response) => {
@@ -75,12 +83,12 @@ function CompletedOrderSystem() {
   };
 
   const columns = [
-    { field: "date", headerName: "Date", className: "order-system", flex: 1 },
+    { field: "start_date", headerName: "Started Date", className: "order-system", flex: 1 },
     {
       field: "order_id",
       headerName: "Order ID",
       className: "order-system",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "customer_name",
@@ -103,17 +111,18 @@ function CompletedOrderSystem() {
       className: "order-system",
       type: "string",
     },
+    { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName: "View Item",
-      flex: 1,
+      flex: 0.5,
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
         return (
           <Link
-            to={`/completed_order_details`}
-            className=" d-flex justify-content-between"
+            to={`/completed_order_details/${value?.row?.order_id}`}
+            className=" d-flex justify-content-center"
           >
             <Button
               type="button"
@@ -121,21 +130,6 @@ function CompletedOrderSystem() {
             >
               <FaEye className="mb-1" />
             </Button>
-            <Typography
-              variant="label"
-              className="fw-semibold text-secondary"
-              sx={{
-                fontSize: 14,
-                textTransform: "capitalize",
-              }}
-            >
-              {/* {"  "} */}
-              <Badge bg="success" className="m-2">
-                {value?.row?.order_process == "started"
-                  ? value?.row?.order_process
-                  : null}
-              </Badge>
-            </Typography>
           </Link>
         );
       },
@@ -149,10 +143,30 @@ function CompletedOrderSystem() {
   const handleDateChange = async (newDateRange) => {
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
       setSelectedDateRange(newDateRange);
-      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format('YYYY-MM-DD');
-      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format('YYYY-MM-DD');
+      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
+      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
       setStartDate(isoStartDate);
       setEndDate(isoEndDate);
+    } else {
+      console.error("Invalid date range");
+    }
+  };
+
+  const handleCompltedDateChange = async (newDateRange) => {
+    if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
+      setSelectedCompletedDateRange(newDateRange);
+      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
+      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
+      setCompletedStartDate(isoStartDate);
+      setCompletedEndDate(isoEndDate);
     } else {
       console.error("Invalid date range");
     }
@@ -163,14 +177,9 @@ function CompletedOrderSystem() {
     fetchOrders();
   };
 
-  const searchDispatchTypeFilter = (e) => {
-    setDispatchType(e);
-    setPage(1);
-  };
-
   useEffect(() => {
     fetchOrders();
-  }, [pageSize, page, dispatchType, isReset]);
+  }, [pageSize, page, isReset]);
 
   return (
     <Container fluid className="py-3">
@@ -197,7 +206,7 @@ function CompletedOrderSystem() {
             <Col xs="auto" lg="4">
               <Form.Group>
                 <Form.Label className="fw-semibold mb-0">
-                  Date filter:
+                  Start Date Filter:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -223,15 +232,29 @@ function CompletedOrderSystem() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">Dispatch type:</Form.Label>
-                <Form.Select
-                  className="mr-sm-2 py-2"
-                  onChange={(e) => searchDispatchTypeFilter(e.target.value)}
-                >
-                  <option value="all">All</option>
-                  <option value="dispatch">Dispatch</option>
-                  <option value="reserve">Reserve</option>
-                </Form.Select>
+                <Form.Label className="fw-semibold">
+                  Completed Date Filter:
+                </Form.Label>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={["SingleInputDateRangeField"]}>
+                    <DateRangePicker
+                      sx={{
+                        "& .MuiInputBase-root": {
+                          paddingRight: 0,
+                        },
+                        "& .MuiInputBase-input": {
+                          padding: ".5rem .75rem .5rem .75rem",
+                          "&:hover": {
+                            borderColor: "#dee2e6",
+                          },
+                        },
+                      }}
+                      value={selectedCompletedDateRange}
+                      onChange={handleCompltedDateChange}
+                      slots={{ field: SingleInputDateRangeField }}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
               </Form.Group>
             </Col>
           </Row>
@@ -273,16 +296,27 @@ function CompletedOrderSystem() {
       {loader ? (
         <Loader />
       ) : (
-        <div className="mt-2">
-          <DataTable
-            columns={columns}
-            rows={orders}
-            page={page}
-            pageSize={pageSize}
-            totalPages={totalPages}
-            handleChange={handleChange}
-          />
-        </div>
+        <>
+          {orders && orders.length !== 0 ? (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={orders}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
+              />
+            </div>
+          ) : (
+            <Alert
+              severity="warning"
+              sx={{ fontFamily: "monospace", fontSize: "18px" }}
+            >
+              Records is not Available for above filter
+            </Alert>
+          )}
+        </>
       )}
     </Container>
   );

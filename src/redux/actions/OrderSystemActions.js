@@ -21,6 +21,12 @@ import {
   CUSTOM_ORDER_FINISH_REQUEST,
   CUSTOM_ORDER_FINISH_SUCCESS,
   CUSTOM_ORDER_FINISH_FAIL,
+  GET_COMPLETED_ORDER_SYSTEM_REQUEST,
+  GET_COMPLETED_ORDER_SYSTEM_SUCCESS,
+  GET_COMPLETED_ORDER_SYSTEM_FAIL,
+  GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL,
+  GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
+  GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -38,6 +44,41 @@ export const OrderSystemGet =
       dispatch({ type: GET_ORDER_SYSTEM_FAIL, error: error.message });
     }
   };
+
+
+  export const CompletedOrderSystemGet =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    console.log(apiUrl, "apiUrl");
+    try {
+      dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_REQUEST });
+
+      const response = await axios.get(apiUrl);
+      dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_SUCCESS, payload: response?.data });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_FAIL, error: error.message });
+    }
+  };
+
+
+  export const CompletedOrderDetailsGet =
+  (id) =>
+  async (dispatch) => {
+    console.log(id,'idueeeeeeee')
+    try {
+      dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
+
+      const response = await axios.get(
+        `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`
+      );
+      dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS, payload: response?.data });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL, error: error.message });
+    }
+  };
+
 
 export const OrderDetailsGet =
   ({ id }) =>

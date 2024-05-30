@@ -21,23 +21,33 @@ import {
   ADD_MESSAGE_REQUEST,
   ADD_MESSAGE_SUCCESS,
   ADD_MESSAGE_FAIL,
+  GET_COMPLETED_ORDER_SYSTEM_REQUEST,
+  GET_COMPLETED_ORDER_SYSTEM_SUCCESS,
+  GET_COMPLETED_ORDER_SYSTEM_FAIL,
+  GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL,
+  GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
+  GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST,
 } from "../constants/Constants";
 
 const initialState = {
   orders: [],
   isOrders: false,
+  completedOrders: [],
+  isCompletedOrders: false,
   orderDetails: [],
   isOrderDetails: false,
-  uploadAttachFile:[],
-  isUploadAttachFile:false,
+  completedOrderDetails: [],
+  isCompletedOrderDetails: false,
+  uploadAttachFile: [],
+  isUploadAttachFile: false,
   Message: [],
   isMessage: false,
   orderPickUp: [],
   isOrderPickUp: false,
   orderPickUpCancel: [],
-  isOrderPickUpCancel:false,
-  customOrderData:[],
-  isCustomOrder:false,
+  isOrderPickUpCancel: false,
+  customOrderData: [],
+  isCustomOrder: false,
   error: null,
 };
 
@@ -50,6 +60,32 @@ const OrderSystemReducer = (state = initialState, action) => {
     case GET_ORDER_SYSTEM_FAIL:
       return { ...state, isOrders: false, error: action.payload };
 
+    case GET_COMPLETED_ORDER_SYSTEM_REQUEST:
+      return { ...state, isCompletedOrders: true };
+    case GET_COMPLETED_ORDER_SYSTEM_SUCCESS:
+      return {
+        ...state,
+        isCompletedOrders: false,
+        completedOrders: action.payload,
+      };
+    case GET_COMPLETED_ORDER_SYSTEM_FAIL:
+      return { ...state, isCompletedOrders: false, error: action.payload };
+
+    case GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST:
+      return { ...state, isCompletedOrderDetails: true };
+    case GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS:
+      return {
+        ...state,
+        isCompletedOrderDetails: false,
+        completedOrderDetails: action.payload,
+      };
+    case GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL:
+      return {
+        ...state,
+        isCompletedOrderDetails: false,
+        error: action.payload,
+      };
+
     case GET_ORDER_DETAILS_REQUEST:
       return { ...state, isOrderDetails: true };
     case GET_ORDER_DETAILS_SUCCESS:
@@ -57,19 +93,23 @@ const OrderSystemReducer = (state = initialState, action) => {
     case GET_ORDER_DETAILS_FAIL:
       return { ...state, isOrderDetails: false, error: action.payload };
 
-      case UPLOAD_ATTACH_FILE_REQUEST:
+    case UPLOAD_ATTACH_FILE_REQUEST:
       return { ...state, isOrderPickUp: true };
-    case  UPLOAD_ATTACH_FILE_SUCCESS:
-      return { ...state, isOrderPickUp: false, uploadAttachFile: action.payload };
+    case UPLOAD_ATTACH_FILE_SUCCESS:
+      return {
+        ...state,
+        isOrderPickUp: false,
+        uploadAttachFile: action.payload,
+      };
     case UPLOAD_ATTACH_FILE_FAIL:
       return { ...state, isOrderPickUp: false, error: action.payload };
 
-      case ADD_MESSAGE_REQUEST:
-        return { ...state, isMessage: true };
-      case  ADD_MESSAGE_SUCCESS:
-        return { ...state, isMessage: false, Message: action.payload };
-      case ADD_MESSAGE_FAIL:
-        return { ...state, isMessage: false, error: action.payload };
+    case ADD_MESSAGE_REQUEST:
+      return { ...state, isMessage: true };
+    case ADD_MESSAGE_SUCCESS:
+      return { ...state, isMessage: false, Message: action.payload };
+    case ADD_MESSAGE_FAIL:
+      return { ...state, isMessage: false, error: action.payload };
 
     case INSERT_ORDER_PICKUP_REQUEST:
       return { ...state, isOrderPickUp: true };
@@ -78,17 +118,25 @@ const OrderSystemReducer = (state = initialState, action) => {
     case INSERT_ORDER_PICKUP_FAIL:
       return { ...state, isOrderPickUp: false, error: action.payload };
 
-      case INSERT_ORDER_PICKUP_CANCEL_REQUEST:
-        return { ...state, isOrderPickUpCancel: true };
-      case INSERT_ORDER_PICKUP_CANCEL_SUCCESS:
-        return { ...state, isOrderPickUpCancel: false, orderPickUpCancel: action.payload };
-      case INSERT_ORDER_PICKUP_CANCEL_FAIL:
-        return { ...state, isOrderPickUpCancel: false, error: action.payload };
+    case INSERT_ORDER_PICKUP_CANCEL_REQUEST:
+      return { ...state, isOrderPickUpCancel: true };
+    case INSERT_ORDER_PICKUP_CANCEL_SUCCESS:
+      return {
+        ...state,
+        isOrderPickUpCancel: false,
+        orderPickUpCancel: action.payload,
+      };
+    case INSERT_ORDER_PICKUP_CANCEL_FAIL:
+      return { ...state, isOrderPickUpCancel: false, error: action.payload };
 
     case CUSTOM_ORDER_FINISH_REQUEST:
       return { ...state, isCustomOrder: true };
     case CUSTOM_ORDER_FINISH_SUCCESS:
-      return { ...state, isCustomOrder: false, customOrderData: action.payload };
+      return {
+        ...state,
+        isCustomOrder: false,
+        customOrderData: action.payload,
+      };
     case CUSTOM_ORDER_FINISH_FAIL:
       return { ...state, isCustomOrder: false, error: action.payload };
 
