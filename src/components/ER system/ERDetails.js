@@ -268,7 +268,8 @@ const ERDetails = () => {
             "product_id": ERviewList.map(d => d.product_id),
             "received_qty": ERviewList.map(d => d.received_qty),
             "received_status": ERviewList.map(d => d.received_status),
-            "expected_date": ERviewList.map(d => d.expected_delivery_date)
+            "expected_date": ERviewList.map(d => d.expected_delivery_date),
+            "variation_id":ERviewList.map(d=>d.variation_id)
         }
         console.log(payload, 'payload');
         try {
