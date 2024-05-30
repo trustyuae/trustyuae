@@ -20,12 +20,10 @@ import { GetErManagementData } from "../../redux/actions/ErManagementActions";
 
 function ERManagement() {
   const dispatch = useDispatch();
-  const [dueDate, setDueDate] = useState(dayjs().format("YYYY-MM-DD"));
+  const [dueDate, setDueDate] = useState("");
   const [selectedDueType, setSelectedDueType] = useState("");
   const [erDate, setErDate] = useState(dayjs());
-  const [selectedDate, setSelectedDate] = useState(
-    dayjs().format("YYYY-MM-DD")
-  );
+  const [selectedDate, setSelectedDate] = useState("");
   const [factories, setFactories] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState("");
   const [orders, setOrders] = useState([]);
@@ -49,7 +47,8 @@ function ERManagement() {
   }, [allFactoryDatas]);
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-er-fetch/v1/fetch-all-er/?factory_id=${selectedFactory}&per_page=${pageSize}&page=${page}`;
+    let apiUrl = `${API_URL}wp-json/custom-er-fetch/v1/fetch-all-er/?per_page=${pageSize}&page=${page}`;
+    if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
     if (dueDate) apiUrl += `&due_date=${dueDate}`;
     if (selectedDate) apiUrl += `&date=${selectedDate}`;
     await dispatch(GetErManagementData({ apiUrl }))
@@ -69,6 +68,7 @@ function ERManagement() {
     setSelectedDueType("");
     setSelectedFactory("");
     setDueDate("");
+    // setErDate("");
     setTotalPages(1);
   };
 
@@ -117,9 +117,12 @@ function ERManagement() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value,'row from button')
+        console.log(value, "row from button");
         return (
-          <Link to={`/ER_details/${value.row.er_no}`} className=" d-flex justify-content-center">
+          <Link
+            to={`/ER_details/${value.row.er_no}`}
+            className=" d-flex justify-content-center"
+          >
             <Button
               type="button"
               className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
@@ -138,7 +141,6 @@ function ERManagement() {
 
   const handleDateChange = async (newDateRange) => {
     setDueDate("");
-    setErDate(newDateRange);
     if (newDateRange?.$d) {
       console.log(dayjs(newDateRange.$d.toDateString()).format("YYYY-MM-DD"));
       const isoDate = dayjs(newDateRange.$d.toDateString()).format(
@@ -146,6 +148,7 @@ function ERManagement() {
       );
       console.log(isoDate, "isodate");
       setSelectedDate(isoDate);
+      setErDate(isoDate);
     } else {
       console.error("Invalid date range");
     }

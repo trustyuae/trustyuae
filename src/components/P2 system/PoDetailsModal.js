@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Table } from "react-bootstrap";
+import { Alert, Button, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { QuantityPoDetails } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
@@ -41,7 +41,9 @@ const PoDetailsModal = ({
     <div>
       <Modal show={poDetailsModal} onHide={handleClosePoDetailsModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Product ID: {overAllData?.item_id}</Modal.Title>
+          <Modal.Title>
+            Product ID: {overAllData?.item_id || productId}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -56,12 +58,25 @@ const PoDetailsModal = ({
                 <Loader />
               ) : (
                 <tbody style={{ textAlign: "center" }}>
-                  {productData.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.order_id}</td>
-                      <td>{item.quantity}</td>
+                  {productData && productData.length !== 0 ? (
+                    productData.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.order_id}</td>
+                        <td>{item.quantity}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="2">
+                        <Alert
+                          severity="warning"
+                          sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                        >
+                          Above product doesn't have any orders yet!
+                        </Alert>
+                      </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               )}
             </Table>
