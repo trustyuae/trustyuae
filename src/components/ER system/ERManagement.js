@@ -21,8 +21,7 @@ import { GetErManagementData } from "../../redux/actions/ErManagementActions";
 function ERManagement() {
   const dispatch = useDispatch();
   const [dueDate, setDueDate] = useState("");
-  const [selectedDueType, setSelectedDueType] = useState("");
-  const [erDate, setErDate] = useState(dayjs());
+  const [selectedDueType, setSelectedDueType] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [factories, setFactories] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState("");
@@ -64,11 +63,10 @@ function ERManagement() {
   }
 
   const handleReset = () => {
-    setSelectedDate("");
+    setSelectedDate(null);
     setSelectedDueType("");
     setSelectedFactory("");
     setDueDate("");
-    // setErDate("");
     setTotalPages(1);
   };
 
@@ -148,7 +146,7 @@ function ERManagement() {
       );
       console.log(isoDate, "isodate");
       setSelectedDate(isoDate);
-      setErDate(isoDate);
+      // setErDate(isoDate);
     } else {
       console.error("Invalid date range");
     }
@@ -186,8 +184,8 @@ function ERManagement() {
                 <Form.Label>Date filter:</Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
-                    value={erDate}
                     format="YYYY-MM-DD"
+                    value={dayjs(selectedDate)} 
                     onChange={(e) => handleDateChange(e)}
                     sx={{
                       display: "block",
