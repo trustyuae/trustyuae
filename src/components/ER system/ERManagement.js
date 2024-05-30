@@ -138,6 +138,7 @@ function ERManagement() {
   };
 
   const handleDateChange = async (newDateRange) => {
+    setSelectedDueType("");
     setDueDate("");
     if (newDateRange?.$d) {
       console.log(dayjs(newDateRange.$d.toDateString()).format("YYYY-MM-DD"));
@@ -146,7 +147,6 @@ function ERManagement() {
       );
       console.log(isoDate, "isodate");
       setSelectedDate(isoDate);
-      // setErDate(isoDate);
     } else {
       console.error("Invalid date range");
     }
