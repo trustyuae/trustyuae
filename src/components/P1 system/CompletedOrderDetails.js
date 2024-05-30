@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,9 +8,7 @@ import { Avatar, Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  CompletedOrderDetailsGet,
-} from "../../redux/actions/OrderSystemActions";
+import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 
@@ -145,7 +143,7 @@ function CompletedOrderDetails() {
       type: "string",
     },
     {
-      field: "view_item",
+      field: "dispatch_image",
       headerName: "Attachment",
       flex: 1.5,
       className: "order-details",
@@ -156,7 +154,7 @@ function CompletedOrderDetails() {
         >
           <Avatar
             src={params.value || require("../../assets/default.png")}
-            alt="Product Image"
+            alt="dispatch image"
             sx={{
               height: "45px",
               width: "45px",
@@ -170,7 +168,7 @@ function CompletedOrderDetails() {
             }}
           />
         </Box>
-      )
+      ),
     },
   ];
 
@@ -202,16 +200,31 @@ function CompletedOrderDetails() {
               {loader ? (
                 <Loader />
               ) : (
-                <Box>
-                  <Typography className="fw-bold">Order# {params.id}</Typography>
-                  <Typography
-                    className=""
-                    sx={{
-                      fontSize: 14,
-                    }}
-                  >
-                    <Badge bg="success">{orderDetails?.order_status}</Badge>
-                  </Typography>
+                <Box className='d-flex justify-content-between'>
+                  <Box>
+                    <Typography className="fw-bold">
+                      Order# {params.id}
+                    </Typography>
+                    <Typography
+                      className=""
+                      sx={{
+                        fontSize: 14,
+                      }}
+                    >
+                      <Badge bg="success">{orderDetails?.order_status}</Badge>
+                    </Typography>
+                  </Box>
+                  <Box sx={{marginLeft:'20px'}}>
+                    <Typography className="fw-bold"># Enter User name ...</Typography>
+                    <Typography
+                      className=""
+                      sx={{
+                        fontSize: 14,
+                      }}
+                    >
+                      <Badge bg="success">Order Completed by</Badge>
+                    </Typography>
+                  </Box>
                 </Box>
               )}
             </Box>
