@@ -43,6 +43,7 @@ const ERDetails = () => {
                 setStatus(response.data.er_status)
                 setFactoryName(response.data.factory_id)
                 let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
+                setNote(response.data.er_note)
                 console.log(data, 'data');
                 data = data.map(d => {
                     if (d.returned_qty == d.received_qty) {
@@ -373,6 +374,7 @@ const ERDetails = () => {
                             <Form.Control
                                 as="textarea"
                                 rows={2}
+                                value={addNote}
                                 onChange={(e) => setNote(e.target.value)}
                             />
                         </Form.Group>
