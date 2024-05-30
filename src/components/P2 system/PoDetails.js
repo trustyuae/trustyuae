@@ -8,7 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
 import { Badge, Card, Col } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Box, MenuItem, Select, Typography } from "@mui/material";
+import { Alert, Box, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
@@ -26,7 +26,6 @@ const PoDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
-  const [data, setData] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState("Paid");
   const paymentS = ["Paid", "Unpaid", "Hold", "Cancelled"];
   const POStatusFilter = ["Open", "Checking with factory", "Closed"];
@@ -36,6 +35,7 @@ const PoDetails = () => {
   const [printModal, setPrintModal] = useState(false);
   const [poDetailsModal, setPoDetailsModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [erId, setERId] = useState(null);
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -68,7 +68,7 @@ const PoDetails = () => {
           },
         ];
         setPO_OrderList(row);
-        setData(response.data.line_items);
+        setERId(response.data.er_no);
         setFactorieName(response.data.factory_id);
       });
     } catch {
@@ -230,12 +230,6 @@ const PoDetails = () => {
           </Box>
         );
       },
-      // valueGetter: (value, row) => {
-      //   if (row.id === "TAX") {
-      //     return row.taxRate;
-      //   }
-      //   // return 0;
-      // },
     },
     {
       field: "",
@@ -260,12 +254,7 @@ const PoDetails = () => {
       },
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
-          return (
-            `${row.totals}`
-            // <Box onClick={() => handlePoModal(row.product_id)}>
-            //   `${row.totals}`;
-            // </Box>
-          );
+          return `${row.totals}`;
         }
         return value;
       },
@@ -376,19 +365,45 @@ const PoDetails = () => {
             <Typography variant="h6" className="fw-bold mb-3">
               PO Details
             </Typography>
-            <Box>
-              <Typography className="fw-bold">
-                {/* PO Number */}# {id}
-              </Typography>
+            <Box className="d-flex justify-content-between">
+              <Box>
+                <Box>
+                  <Typography className="fw-bold"># {id}</Typography>
+                </Box>
+                <Typography
+                  className=""
+                  sx={{
+                    fontSize: 14,
+                  }}
+                >
+                  <Badge bg="success">{POTypes(id)}</Badge>
+                </Typography>
+              </Box>
+              <Box style={{ marginLeft: "20px" }}>
+                <Box>
+                  {erId ? (
+                    <div>
+                      <Typography className="fw-bold"># {erId}</Typography>
+                      <Typography
+                        className=""
+                        sx={{
+                          fontSize: 14,
+                        }}
+                      >
+                        <Badge bg="success">Exchange & Return ID</Badge>
+                      </Typography>
+                    </div>
+                  ) : (
+                    <Alert
+                      severity="warning"
+                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                    >
+                      There are no exchanges or returns for this PO!
+                    </Alert>
+                  )}
+                </Box>
+              </Box>
             </Box>
-            <Typography
-              className=""
-              sx={{
-                fontSize: 14,
-              }}
-            >
-              <Badge bg="success">{POTypes(id)}</Badge>
-            </Typography>
           </Box>
           <Box>
             <Typography variant="h6" className="fw-bold mb-3">
