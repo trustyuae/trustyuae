@@ -220,12 +220,22 @@ const PoDetails = () => {
           handlePoModal(params.row.product_id);
         };
 
+        if (params.row.id === "TAX") {
+          return params.row.taxRate;
+        }
+
         return (
           <Box variant="outline-primary" onClick={handleClick}>
             {params.value}
           </Box>
         );
       },
+      // valueGetter: (value, row) => {
+      //   if (row.id === "TAX") {
+      //     return row.taxRate;
+      //   }
+      //   // return 0;
+      // },
     },
     {
       field: "",
@@ -251,12 +261,12 @@ const PoDetails = () => {
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
           return (
-            <Box onClick={() => handlePoModal(row.product_id)}>
-              `${row.totals}`;
-            </Box>
+            `${row.totals}`
+            // <Box onClick={() => handlePoModal(row.product_id)}>
+            //   `${row.totals}`;
+            // </Box>
           );
         }
-        console.log(row, "valuesssssss");
         return value;
       },
     },

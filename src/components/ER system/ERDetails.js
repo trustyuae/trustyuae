@@ -44,7 +44,6 @@ const ERDetails = () => {
                 setFactoryName(response.data.factory_id)
                 let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
                 setNote(response.data.er_note)
-                console.log(data, 'data');
                 data = data.map(d => {
                     if (d.returned_qty == d.received_qty) {
                         return { ...d, received_qty: d.received_qty, received_status: 'Received' }
@@ -58,7 +57,6 @@ const ERDetails = () => {
                     return d
                 })
                 setERviewList(data)
-                console.log(data, 'data');
 
             });
         } catch {
@@ -197,7 +195,6 @@ const ERDetails = () => {
     };
 
     const handleAvailableQtyChange = (index, event) => {
-        console.log(index.target.value, event, '======');
         if (index.target.value >= 0 && event.returned_qty >= index.target.value) {
             const updatedData = ERviewList.map((item) => {
                 if (item.id === event.id) {
@@ -221,7 +218,6 @@ const ERDetails = () => {
                 return item;
             });
             setERviewList(updatedData);
-            console.log(updatedData, 'updatedData');
         }
     };
 
@@ -265,13 +261,12 @@ const ERDetails = () => {
             "er_no": params.er_no,
             "er_note": addNote,
             "er_status": status,
-            "product_id": ERviewList.map(d => d.product_id),
-            "received_qty": ERviewList.map(d => d.received_qty),
+            "product_id": ERviewList.map(d => Number(d.product_id)),
+            "received_qty": ERviewList.map(d => Number(d.received_qty)),
             "received_status": ERviewList.map(d => d.received_status),
             "expected_date": ERviewList.map(d => d.expected_delivery_date),
             "variation_id":ERviewList.map(d=>d.variation_id)
         }
-        console.log(payload, 'payload');
         try {
             const response = await axios.post(`${API_URL}wp-json/custom-er-update/v1/update-er-item/`, payload)
             if (response.data.message) {
@@ -283,7 +278,6 @@ const ERDetails = () => {
         }
     }
     const handleStatusFilter = (e) => {
-        console.log(e.target.value);
         setStatus(e.target.value)
     }
 

@@ -254,8 +254,8 @@ function OrderDetails() {
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
-        if (params.row.variations && params.row.variations !== "") {
-          return variant(params.row.variations);
+        if (params.row.variation_value && params.row.variation_value !== "") {
+          return variant(params.row.variation_value);
         } else {
           return "No variations available";
         }

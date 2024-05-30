@@ -38,7 +38,6 @@ function AllProductList() {
     setFactories(allFactoryDatas);
   }, [dispatch, allFactoryDatas]);
 
-  console.log(selectedProduct, "selectedProduct from modal");
   const fetchProducts = async () => {
     let apiUrl = `${API_URL}wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
     if (searchId) apiUrl += `&product_id=${searchId}`;
@@ -71,10 +70,8 @@ function AllProductList() {
   };
 
   const handleSaveEdit = async () => {
-    console.log(selectedProduct, "selectedProduct from modal");
     try {
       const id = selectedProduct?.product_id;
-      console.log(id, "selected product id from modal");
       const formData = new FormData();
       formData.append("factory_id", selectedProduct.factory_id);
       formData.append("id", selectedProduct.id);
@@ -111,8 +108,8 @@ function AllProductList() {
   };
 
   const columns = [
-    { field: "product_id", headerName: "product id", flex: 1 },
-    { field: "product_name", headerName: "product name", flex: 1 },
+    { field: "product_id", headerName: "Product id", flex: 1 },
+    { field: "product_name", headerName: "Product name", flex: 1 },
     {
       field: "factory_image",
       headerName: "Factory Image",
@@ -142,10 +139,9 @@ function AllProductList() {
     },
     {
       field: "factory_id",
-      headerName: "factory",
+      headerName: "Factory",
       flex: 1,
       renderCell: (params) => {
-        console.log(factories, "fact");
         return factories.find((factory) => factory.id === params.row.factory_id)
           ?.factory_name;
       },
@@ -175,7 +171,6 @@ function AllProductList() {
 
   const handleChange = (event, value) => {
     setCurrentPage(value);
-    console.log(value, "value of pagination");
   };
 
   return (

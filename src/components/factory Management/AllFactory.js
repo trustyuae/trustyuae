@@ -33,7 +33,6 @@ function AllFactory() {
 
   useEffect(() => {
     if (Array.isArray(allFactoryDatas)) {
-      console.log(allFactoryDatas, 'allFactoryDatas=====');
       let data = allFactoryDatas.map((v, i) => ({ ...v, id: i }));
       setFactories(data);
     }
@@ -92,12 +91,12 @@ function AllFactory() {
   );
 
   const columns = [
-    { field: "factory_name", headerName: "factory name", flex: 1 },
-    { field: "address", headerName: "address", flex: 1 },
-    { field: "contact_person", headerName: "contact person", flex: 1 },
-    { field: "contact_number", headerName: "contact Number", flex: 1 },
-    { field: "contact_email", headerName: "contact email", flex: 1 },
-    { field: "bank_account_details", headerName: "bank account details", flex: 1 },
+    { field: "factory_name", headerName: "Factory Name", flex: 1 },
+    { field: "address", headerName: "Address", flex: 1 },
+    { field: "contact_person", headerName: "Contact Person", flex: 1 },
+    { field: "contact_number", headerName: "Contact Number", flex: 1 },
+    { field: "contact_email", headerName: "Contact email", flex: 1 },
+    { field: "bank_account_details", headerName: "Bank Account Details", flex: 1 },
     {
       field: "view_item",
       headerName: "View Item",
@@ -105,7 +104,6 @@ function AllFactory() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value, 'value');
         return (
           <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
             onClick={() => handleEdit(value.row.id)}
@@ -128,7 +126,7 @@ function AllFactory() {
           <Form.Label className="me-2 fw-semibold">Factory Name:</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Search by Product ID"
+            placeholder="Search Factory Name"
             value={factoryName}
             onChange={(e) => setFactoryName(e.target.value)}
           />
@@ -137,7 +135,7 @@ function AllFactory() {
           <Form.Label className="me-2 fw-semibold">Address</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Search by Product Name"
+            placeholder="Search Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
@@ -146,7 +144,7 @@ function AllFactory() {
           <Form.Label className="me-2 fw-semibold">Contact person</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Search by Product Name"
+            placeholder="Search Contact Person"
             value={contactPerson}
             onChange={(e) => setContactPerson(e.target.value)}
           />
@@ -155,7 +153,7 @@ function AllFactory() {
           <Form.Label className="me-2 fw-semibold">Contact Number</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Search by Product Name"
+            placeholder="Search Contact Number"
             value={contactNumber}
             onChange={(e) => setContactNumber(e.target.value)}
           />
@@ -164,7 +162,7 @@ function AllFactory() {
           <Form.Label className="me-2 fw-semibold">Contact email</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Search by Product Name"
+            placeholder="Search Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
