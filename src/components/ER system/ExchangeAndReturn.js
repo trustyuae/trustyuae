@@ -281,7 +281,8 @@ function ExchangeAndReturn() {
             product_id: selectedOrders.map(d => d.product_id),
             return_qty: selectedOrders.map(d => d.return_qty),
             return_type: selectedOrders.map(d => d.return_type),
-            expected_date: selectedOrders.map(d => d.expected_delivery_date)
+            expected_date: selectedOrders.map(d => d.expected_delivery_date),
+            variation_id:selectedOrders.map(d=>d.variation_id)
         }
         console.log(payload, 'payload');
         try {
