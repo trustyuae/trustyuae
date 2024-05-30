@@ -2,21 +2,18 @@ import React, { useEffect, useState } from 'react'
 import { Button, Card, Col, Container, Form, Modal, Row } from 'react-bootstrap'
 import DataTable from '../DataTable'
 import { MDBCol, MDBRow } from 'mdb-react-ui-kit'
-import { Avatar, Box, Checkbox, FormControlLabel, FormGroup, MenuItem, Select, Typography } from '@mui/material'
+import { Avatar, Box, Typography } from '@mui/material'
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { API_URL } from '../../redux/constants/Constants'
 import { PerticularPoDetails } from '../../redux/actions/P2SystemActions'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { GridActionsCellItem } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Close';
 import { AllFactoryActions } from '../../redux/actions/AllFactoryActions'
 import axios from 'axios'
-import Swal from 'sweetalert2'
+import ShowAlert from '../../utils/ShowAlert'
 
 const ERDetails = () => {
     const params = useParams();
@@ -276,12 +273,8 @@ const ERDetails = () => {
         try {
             const response = await axios.post(`${API_URL}wp-json/custom-er-update/v1/update-er-item/`, payload)
             if (response.data.message) {
-                Swal.fire({
-                    icon: "success",
-                    title: response.data.message
-                }).then(
-                    navigate("/ER_Management_System")
-                );
+                const result = await ShowAlert(response.data.message, '', "success", true, false, 'OK');
+                if (result.isConfirmed) navigate("/ER_Management_System")
             }
         } catch (error) {
             console.error(error);

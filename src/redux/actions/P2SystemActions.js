@@ -1,4 +1,3 @@
-import Swal from "sweetalert2";
 import {
   API_URL,
   GET_ORDER_NOT_AVAILABLE_REQUEST,
@@ -42,6 +41,7 @@ import {
   GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS,
 } from "../constants/Constants";
 import axios from "axios";
+import ShowAlert from "../../utils/ShowAlert";
 
 export const PoDetailsData =
   ({ apiUrl }) =>
@@ -116,12 +116,11 @@ export const AddPO = (payload, navigate) => async (dispatch) => {
       payload
     );
     if (response.data) {
-      await Swal.fire({
-        text: response.data,
-        icon: "success",
-        confirmButtonText: "OK",
-      });
-      navigate("/PO_ManagementSystem");
+      console.log(response, 'response addPO')
+      const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
+      if (result.isConfirmed) {
+        navigate("/PO_ManagementSystem");
+      }
     }
     dispatch({
       type: ADD_PO_SUCCESS,
@@ -141,12 +140,8 @@ export const AddManualPO = (payload, navigate) => async (dispatch) => {
       payload
     );
     if (response.data) {
-      await Swal.fire({
-        text: response.data,
-        icon: "success",
-        confirmButtonText: "OK",
-      });
-      navigate("/PO_ManagementSystem");
+      const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
+      if (result.isConfirmed) navigate("/PO_ManagementSystem");
     }
     dispatch({
       type: ADD_MANUAL_PO_SUCCESS,
@@ -166,12 +161,8 @@ export const AddSchedulePO = (payload, navigate) => async (dispatch) => {
       payload
     );
     if (response.data) {
-      await Swal.fire({
-        text: response.data,
-        icon: "success",
-        confirmButtonText: "OK",
-      });
-      navigate("/PO_ManagementSystem");
+      const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
+      if (result.isConfirmed) navigate("/PO_ManagementSystem");
     }
     dispatch({
       type: ADD_SCHEDULE_PO_SUCCESS,
@@ -189,16 +180,8 @@ export const UpdatePODetails =
       try {
         dispatch({ type: UPDATE_PO_DETAILS_REQUEST });
         const response = await axios.post(apiUrl, payload);
-
-        Swal.fire({
-          icon: "success",
-          title: response.data.message,
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/PO_ManagementSystem");
-          }
-        });
+        const result = await ShowAlert(response.data.message, '', "success", true, false, 'OK');
+        if (result.isConfirmed) navigate("/PO_ManagementSystem");
 
         dispatch({
           type: UPDATE_PO_DETAILS_SUCCESS,
@@ -251,10 +234,7 @@ export const OrderNotAvailableData =
 export const OrderNotAvailableDataPo = (requestData) => async (dispatch) => {
   try {
     if (!requestData?.reminder_date) {
-      Swal.fire({
-        icon: "error",
-        title: "Please select a reminder date!",
-      });
+      await ShowAlert("Please select a reminder date!", '', "error");
     } else {
       dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REQUEST });
       const response = await axios.post(
@@ -281,11 +261,8 @@ export const OrderNotAvailableDataStatus =
           `${API_URL}wp-json/order-not-update/v1/order-not-btn/`,
           requestedDataS
         )
-        .then((response) => {
-          Swal.fire({
-            icon: "success",
-            title: "Status Updated Successfully!",
-          });
+        .then(async (response) => {
+          await ShowAlert("Status Updated Successfully!", '', "success", false, false, '', '', 1500);
         })
         .catch((error) => {
           console.error(error);
@@ -360,12 +337,7 @@ export const OrderNotAvailableRefund =
       });
 
       const refunds = await Promise.all(refundPromises);
-
-      Swal.fire({
-        icon: "success",
-        title: "Refund process completed successfully!",
-      });
-
+      await ShowAlert("Refund process completed successfully!", '', "success", false, false, '', '', 1500);
       dispatch({
         type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
         payload: refunds,
@@ -374,10 +346,7 @@ export const OrderNotAvailableRefund =
       return refunds;
     } catch (error) {
       console.error(error);
-      Swal.fire({
-        icon: "error",
-        title: "Error in refund process!",
-      });
+      await ShowAlert("Error in refund process!", '', "error");
       dispatch({
         type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
         error: error.message,

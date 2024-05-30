@@ -17,7 +17,6 @@ import { API_URL } from "../../redux/constants/Constants";
 import { Link } from "react-router-dom";
 import { Card, Tab, Tabs } from "react-bootstrap";
 import DataTable from "../DataTable";
-import Swal from "sweetalert2";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +24,7 @@ import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import { PomSystemProductsDetails } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
+import ShowAlert from "../../utils/ShowAlert";
 
 function POManagementSystem() {
   const dispatch = useDispatch();
@@ -83,11 +83,7 @@ function POManagementSystem() {
       });
     } catch (error) {
       console.error("Error Products:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: 'Records not available with this filter',
-      });
+      await ShowAlert('Error', 'Records not available with this filter', "error");
     }
   };
 
@@ -172,13 +168,8 @@ function POManagementSystem() {
   ];
 
   const handleDeletePO = async (id) => {
-    Swal.fire({
-      icon: "error",
-      title: "Are you sure you want to delete this order?",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-    }).then(async (result) => {
+    const result = await ShowAlert("Are you sure you want to delete this order?", '', 'error', true, true, "Yes", "No");
+    if (result.isConfirmed) {
       try {
         if (result.isConfirmed) {
           const response = await axios.post(
@@ -191,7 +182,7 @@ function POManagementSystem() {
       } catch (error) {
         console.error(error);
       }
-    });
+    }
   };
 
   const handleTabChange = (e) => {

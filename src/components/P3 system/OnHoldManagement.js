@@ -22,8 +22,8 @@ import {
   GetProductDetails,
   GetProductOrderDetails,
 } from "../../redux/actions/P3SystemActions";
-import Swal from "sweetalert2";
 import Loader from "../../utils/Loader";
+import ShowAlert from "../../utils/ShowAlert";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -114,10 +114,7 @@ function OnHoldManagement() {
     const quantity = selectedOrders.map((order) => order.quantity);
 
     if (selectedOrders.length === 0) {
-      Swal.fire({
-        icon: "error",
-        title: "please select products for generating schedule po",
-      });
+      await ShowAlert("please select products for generating schedule po", '', "error");
     } else {
       const requestedDataP = {
         product_id: params.id,
@@ -126,12 +123,9 @@ function OnHoldManagement() {
         grn_no: params.grn_no,
       };
 
-      await dispatch(AddProductOrderForPre(requestedDataP)).then((response) => {
+      await dispatch(AddProductOrderForPre(requestedDataP)).then(async (response) => {
         if (response) {
-          Swal.fire({
-            icon: "success",
-            title: "Uploaded Successfully!",
-          });
+          await ShowAlert("Uploaded Successfully!", '', "success", false, false, '', '', 1500);
         }
         selectedOrders.forEach((order) => {
           order.isSelected = false;
@@ -154,12 +148,9 @@ function OnHoldManagement() {
       grn_no: grn_no,
     };
     await dispatch(AddProductOrderForStock(requestedData))
-      .then((response) => {
+      .then(async (response) => {
         if (response) {
-          Swal.fire({
-            icon: "success",
-            title: "product added in InStock Successfully!",
-          });
+          await ShowAlert("product added in InStock Successfully!", '', "success", false, false, 'OK', '', 1500);
         }
         handleUpdatedValues();
       })
