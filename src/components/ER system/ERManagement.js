@@ -158,7 +158,7 @@ function ERManagement() {
   };
 
   const searchDueByFilter = (value) => {
-    setSelectedDate("");
+    setSelectedDate(null);
     setSelectedDueType(value);
     value === "today"
       ? setDueDate(dayjs().format("YYYY-MM-DD"))
