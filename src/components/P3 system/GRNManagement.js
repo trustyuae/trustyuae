@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -102,7 +102,8 @@ function GRNManagement() {
         setTotalPages(response.data.total_pages);
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      setGrnList([]);
     }
   };
 
@@ -179,16 +180,29 @@ function GRNManagement() {
           {loader ? (
             <Loader />
           ) : (
-            <div className="mt-2">
-              <DataTable
-                columns={columns}
-                rows={grnList}
-                page={page}
-                pageSize={pageSize}
-                totalPages={totalPages}
-                handleChange={handleChange}
-              />
-            </div>
+            <>
+              {
+                grnList && grnList.length !== 0 ? (
+                  <div className="mt-2">
+                    <DataTable
+                      columns={columns}
+                      rows={grnList}
+                      page={page}
+                      pageSize={pageSize}
+                      totalPages={totalPages}
+                      handleChange={handleChange}
+                    />
+                  </div>
+                ) : (
+                  <Alert
+                    severity="warning"
+                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                  >
+                    Records is not Available for above filter
+                  </Alert>
+                )
+              }
+            </>
           )}
         </Card>
       </MDBRow>

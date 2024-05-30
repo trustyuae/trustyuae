@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import {
   DateRangePicker,
   LocalizationProvider,
@@ -83,6 +83,8 @@ function POManagementSystem() {
     } catch (error) {
       console.error("Error Products:", error);
       await ShowAlert('Error', 'Records not available with this filter', "error");
+      setOrderList([]);
+
     }
   };
 
@@ -175,14 +177,14 @@ function POManagementSystem() {
             // `${API_URL}wp-json/delete-record/v1/delete-po-record/`,
             `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`
           );
-          console.log(response,'response');
-          if(response){
+          console.log(response, 'response');
+          if (response) {
             POM_system_products()
           }
         }
       } catch (error) {
         console.error(error);
-        if(error){
+        if (error) {
           POM_system_products()
         }
       }
@@ -200,7 +202,7 @@ function POManagementSystem() {
   };
 
   const handleChange = (event, value) => {
-    console.log(value,'value');
+    console.log(value, 'value');
     setPage(value);
   };
 
@@ -313,14 +315,27 @@ function POManagementSystem() {
                 {pomSystemProductDetailsLoader ? (
                   <Loader />
                 ) : (
-                  <DataTable
-                    columns={columns}
-                    rows={orderList}
-                    page={page}
-                    pageSize={pageSize}
-                    totalPages={totalPages}
-                    handleChange={handleChange}
-                  />
+                  <>
+                    {
+                      orderList && orderList.length !== 0 ? (
+                        <DataTable
+                          columns={columns}
+                          rows={orderList}
+                          page={page}
+                          pageSize={pageSize}
+                          totalPages={totalPages}
+                          handleChange={handleChange}
+                        />
+                      ) : (
+                        <Alert
+                          severity="warning"
+                          sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                        >
+                          Records is not Available for above filter
+                        </Alert>
+                      )
+                    }
+                  </>
                 )}
               </Tab>
               {/* MPO */}
@@ -342,14 +357,27 @@ function POManagementSystem() {
                 {pomSystemProductDetailsLoader ? (
                   <Loader />
                 ) : (
-                  <DataTable
-                    columns={columns}
-                    rows={orderList}
-                    page={page}
-                    pageSize={pageSize}
-                    totalPages={totalPages}
-                    handleChange={handleChange}
-                  />
+                  <>
+                  {
+                    orderList && orderList.length !== 0 ? (
+                      <DataTable
+                        columns={columns}
+                        rows={orderList}
+                        page={page}
+                        pageSize={pageSize}
+                        totalPages={totalPages}
+                        handleChange={handleChange}
+                      />
+                    ) : (
+                      <Alert
+                        severity="warning"
+                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                      >
+                        Records is not Available for above filter
+                      </Alert>
+                    )
+                  }
+                </>
                 )}
               </Tab>
               {/* SPO */}
@@ -371,14 +399,27 @@ function POManagementSystem() {
                 {pomSystemProductDetailsLoader ? (
                   <Loader />
                 ) : (
-                  <DataTable
-                    columns={columns}
-                    rows={orderList}
-                    page={page}
-                    pageSize={pageSize}
-                    totalPages={totalPages}
-                    handleChange={handleChange}
-                  />
+                  <>
+                    {
+                      orderList && orderList.length !== 0 ? (
+                        <DataTable
+                          columns={columns}
+                          rows={orderList}
+                          page={page}
+                          pageSize={pageSize}
+                          totalPages={totalPages}
+                          handleChange={handleChange}
+                        />
+                      ) : (
+                        <Alert
+                          severity="warning"
+                          sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                        >
+                          Records is not Available for above filter
+                        </Alert>
+                      )
+                    }
+                  </>
                 )}
               </Tab>
             </Tabs>
