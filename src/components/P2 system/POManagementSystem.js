@@ -208,7 +208,6 @@ function POManagementSystem() {
     <Container
       fluid
       className="p-5"
-      style={{ height: "98vh", maxHeight: "100%", minHeight: "100vh" }}
     >
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
