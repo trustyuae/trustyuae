@@ -144,7 +144,6 @@ function OrderManagementSystem() {
       headerName: "Total quantity",
       flex: 1,
       renderCell: (params) => {
-        console.log(params,'params');
         return (
           <Box onClick={() => handlePoModal(params.row.item_id)}>
             {params.row.total_quantity}
@@ -221,11 +220,7 @@ function OrderManagementSystem() {
       headerName: "Variation values",
       flex: 1,
       renderCell: (params) => {
-        if (params.row.variation_value == "") {
-          return variant(params.row.variation_value);
-        } else {
-          return "";
-        }
+        return variant2(params.row.variation_values);
       },
     },
     {
@@ -307,11 +302,7 @@ function OrderManagementSystem() {
       headerName: "Variation values",
       flex: 1,
       renderCell: (params) => {
-        if (params.row.variation_value == "") {
-          return variant(params.row.variation_value);
-        } else {
-          return "";
-        }
+        return variant2(params.row.variation_values);
       },
     },
     {
@@ -675,6 +666,25 @@ function OrderManagementSystem() {
       return "Variant data not available";
     }
   };
+
+  const variant2=(e)=>{
+    if(e.length === 0) {
+      return "Variant data not available";
+    } else {
+      const { color, size } = e;
+      if (size.length > 0 && color.length > 0) {
+        return `Size: ${size.join(", ")}, Color: ${color.join(", ")}`;
+      }
+      if (size.length > 0) {
+        return `Size: ${size.join(", ")}`;
+      }
+      if (color.length > 0) {
+        return `Color: ${color.join(", ")}`;
+      } else {
+        return "Variant data not available";
+      }
+    }
+  }
 
   const handleChange = (event, value) => {
     setPage(value);
