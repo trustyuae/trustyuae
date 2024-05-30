@@ -10,13 +10,17 @@ import { Badge, Card, Col } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { PerticularPoDetails, UpdatePODetails } from "../../redux/actions/P2SystemActions";
+import {
+  PerticularPoDetails,
+  UpdatePODetails,
+} from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import ShowAlert from "../../utils/ShowAlert";
+import PoDetailsModal from "./PoDetailsModal";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -30,6 +34,9 @@ const PoDetails = () => {
   const [factories, setFactories] = useState([]);
   const [factorieName, setFactorieName] = useState("");
   const [printModal, setPrintModal] = useState(false);
+  const [poDetailsModal, setPoDetailsModal] = useState(false);
+  const [productId, setProductId] = useState(null);
+
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -120,7 +127,11 @@ const PoDetails = () => {
     const flattenedStatuses = availabilityStatuses.flat();
     const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
     if (validationMessage == "Availability status is empty.") {
-      await ShowAlert(validationMessage, '', "error", true, false, 'OK');
+      Swal.fire({
+        icon: "error",
+        title: validationMessage,
+        showConfirmButton: true,
+      });
     }
 
     const updatedData = {
@@ -133,7 +144,7 @@ const PoDetails = () => {
     };
     if (validationMessage == "Successful") {
       let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
-      await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate))
+      await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
     }
   };
 
@@ -157,6 +168,11 @@ const PoDetails = () => {
 
   const handlePrint = () => {
     setPrintModal(true);
+  };
+
+  const handlePoModal = (itemId) => {
+    setProductId(itemId);
+    setPoDetailsModal(true);
   };
 
   const columns = [
@@ -199,11 +215,16 @@ const PoDetails = () => {
       field: "quantity",
       headerName: "Qty Ordered",
       flex: 2,
-      valueGetter: (value, row) => {
-        if (row.id === "TAX") {
-          return `${row.taxRate}`;
-        }
-        return value;
+      renderCell: (params) => {
+        const handleClick = () => {
+          handlePoModal(params.row.product_id);
+        };
+
+        return (
+          <Box variant="outline-primary" onClick={handleClick}>
+            {params.value}
+          </Box>
+        );
       },
     },
     {
@@ -229,8 +250,13 @@ const PoDetails = () => {
       },
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
-          return `${row.totals}`;
+          return (
+            <Box onClick={() => handlePoModal(row.product_id)}>
+              `${row.totals}`;
+            </Box>
+          );
         }
+        console.log(row, "valuesssssss");
         return value;
       },
     },
@@ -415,9 +441,9 @@ const PoDetails = () => {
                 // pageSize={pageSizeSO}
                 // totalPages={totalPagesSO}
                 rowHeight={100}
-              // handleChange={handleChangeSO}
-              // // onCellEditStart={handleCellEditStart}
-              // processRowUpdate={processRowUpdateSPO}
+                // handleChange={handleChangeSO}
+                // // onCellEditStart={handleCellEditStart}
+                // processRowUpdate={processRowUpdateSPO}
               />
             </div>
           )}
@@ -437,8 +463,16 @@ const PoDetails = () => {
         }
         PO_OrderList={PO_OrderList}
         handleClosePrintModal={() => setPrintModal(false)}
-      // showModal={printModal}
+        // showModal={printModal}
       />
+      {poDetailsModal && (
+        <PoDetailsModal
+          show={poDetailsModal}
+          poDetailsModal={poDetailsModal}
+          productId={productId}
+          handleClosePoDetailsModal={() => setPoDetailsModal(false)}
+        />
+      )}
     </Container>
   );
 };
