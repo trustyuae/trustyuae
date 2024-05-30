@@ -143,11 +143,14 @@ function OrderManagementSystem() {
       field: "total_quantity",
       headerName: "Total quantity",
       flex: 1,
-      renderCell: (params) => (
-        <Box onClick={() => handlePoModal(params.row.item_id)}>
-          {params.row.total_quantity}
-        </Box>
-      ),
+      renderCell: (params) => {
+        console.log(params,'params');
+        return (
+          <Box onClick={() => handlePoModal(params.row.item_id)}>
+            {params.row.total_quantity}
+          </Box>
+        );
+      },
     },
     {
       field: "factory_id",
@@ -357,13 +360,7 @@ function OrderManagementSystem() {
     fetchOrders();
     manualPO();
     scheduledPO();
-  }, [
-    page,
-    pageSize,
-    endDate,
-    selectedFactory,
-    manualProductF,
-  ]);
+  }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -371,7 +368,7 @@ function OrderManagementSystem() {
 
   useEffect(() => {
     setFactories(allFactoryDatas);
-  }, [allFactoryDatas])
+  }, [allFactoryDatas]);
 
   const fetchOrders = async () => {
     try {
@@ -391,11 +388,15 @@ function OrderManagementSystem() {
   const manualPO = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
-      if (selectedFactory)
-        apiUrl += `&factory_id=${selectedFactory}`;
+      if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
-      let data = await getManualOrScheduledPO(apiUrl, ManualOrScheduledPoDetailsData, setManualPoOrders, setTotalPages);
+      let data = await getManualOrScheduledPO(
+        apiUrl,
+        ManualOrScheduledPoDetailsData,
+        setManualPoOrders,
+        setTotalPages
+      );
       setManualPoOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -405,36 +406,55 @@ function OrderManagementSystem() {
   const scheduledPO = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
-      if (selectedFactory)
-        apiUrl += `&factory_id=${selectedFactory}`;
+      if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
-      let data = await getManualOrScheduledPO(apiUrl, ManualOrScheduledPoDetailsData, setManualPoOrders, setTotalPages);
+      let data = await getManualOrScheduledPO(
+        apiUrl,
+        ManualOrScheduledPoDetailsData,
+        setManualPoOrders,
+        setTotalPages
+      );
       setScheduleOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const getManualOrScheduledPO = async (apiUrl, dispatchFunction, setDataFunction, setTotalPagesFunction) => {
-    let data
-    await dispatch(ManualOrScheduledPoDetailsData({ apiUrl })).then((response) => {
-      data = response.data.products.map((v, i) => ({ ...v, id: i }));
-      if (response.data.products) {
-        setTotalPages(response.data.total_pages);
-        return data
+  const getManualOrScheduledPO = async (
+    apiUrl,
+    dispatchFunction,
+    setDataFunction,
+    setTotalPagesFunction
+  ) => {
+    let data;
+    await dispatch(ManualOrScheduledPoDetailsData({ apiUrl })).then(
+      (response) => {
+        data = response.data.products.map((v, i) => ({ ...v, id: i }));
+        if (response.data.products) {
+          setTotalPages(response.data.total_pages);
+          return data;
+        }
       }
-    });
-    return data
-  }
+    );
+    return data;
+  };
 
   const handleOrderSelection = (orderId) => {
-    const filteredOrders = orders.filter((order) => order.product_name === orderId);
+    const filteredOrders = orders.filter(
+      (order) => order.product_name === orderId
+    );
     const orderIds = filteredOrders.map((order) => order.order_ids);
 
     const isSelected = selectedOrderIds.includes(orderId);
-    const newSelected = isSelected ? selectedOrderIds.filter(id => id !== orderId) : [...selectedOrderIds, orderId];
-    const newSelected2 = isSelected ? selectedOrderIdss.filter(id => id !== orderId).flatMap(id => id.split(",")) : [...selectedOrderIdss, ...orderIds.flatMap(str => str.split(","))];
+    const newSelected = isSelected
+      ? selectedOrderIds.filter((id) => id !== orderId)
+      : [...selectedOrderIds, orderId];
+    const newSelected2 = isSelected
+      ? selectedOrderIdss
+          .filter((id) => id !== orderId)
+          .flatMap((id) => id.split(","))
+      : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
     setSelectedOrderIdss(newSelected2);
@@ -442,34 +462,40 @@ function OrderManagementSystem() {
 
   const handleOrderManualSelection = (orderId) => {
     const selectedIndex = selectedManualOrderIds.indexOf(orderId);
-    const newSelected = selectedIndex === -1 ?
-      [...selectedManualOrderIds, orderId] :
-      selectedManualOrderIds.filter(id => id !== orderId);
+    const newSelected =
+      selectedIndex === -1
+        ? [...selectedManualOrderIds, orderId]
+        : selectedManualOrderIds.filter((id) => id !== orderId);
 
     setSelectedManualOrderIds(newSelected);
   };
 
   const handleOrderScheduleSelection = (orderId) => {
     const selectedIndex = selectedScheduleOrderIds.indexOf(orderId);
-    const newSelected = selectedIndex === -1 ?
-      [...selectedScheduleOrderIds, orderId] :
-      selectedScheduleOrderIds.filter(id => id !== orderId);
+    const newSelected =
+      selectedIndex === -1
+        ? [...selectedScheduleOrderIds, orderId]
+        : selectedScheduleOrderIds.filter((id) => id !== orderId);
 
     setSelectedScheduleOrderIds(newSelected);
   };
 
   const handleSelectAll = () => {
-    if (activeKey === 'against_PO') handleSelectAllAgainst()
-    else if (activeKey === 'manual_PO') handleSelectAllManual()
-    else if (activeKey === 'scheduled_PO') handleSelectAllSchedule()
-  }
+    if (activeKey === "against_PO") handleSelectAllAgainst();
+    else if (activeKey === "manual_PO") handleSelectAllManual();
+    else if (activeKey === "scheduled_PO") handleSelectAllSchedule();
+  };
 
   const handleSelectAllAgainst = () => {
-    const allOrderIds = orders.map(order => order.product_name);
-    const allOrderIdss = orders.flatMap(order => order.order_ids);
-    const flattenedData = allOrderIdss.flatMap(str => str.split(","));
-    setSelectedOrderIds(selectedOrderIds.length === allOrderIds.length ? [] : allOrderIds);
-    setSelectedOrderIdss(selectedOrderIdss.length === flattenedData.length ? [] : flattenedData);
+    const allOrderIds = orders.map((order) => order.product_name);
+    const allOrderIdss = orders.flatMap((order) => order.order_ids);
+    const flattenedData = allOrderIdss.flatMap((str) => str.split(","));
+    setSelectedOrderIds(
+      selectedOrderIds.length === allOrderIds.length ? [] : allOrderIds
+    );
+    setSelectedOrderIdss(
+      selectedOrderIdss.length === flattenedData.length ? [] : flattenedData
+    );
   };
 
   const handleSelectAllManual = () => {
@@ -510,10 +536,10 @@ function OrderManagementSystem() {
 
   // PO Generate
   const handleGeneratePO = () => {
-    if (activeKey === 'against_PO') handleGenerateAgainstPO()
-    else if (activeKey === 'manual_PO') handleGenerateManualPO()
-    else if (activeKey === 'scheduled_PO') handleGenerateScheduledPO()
-  }
+    if (activeKey === "against_PO") handleGenerateAgainstPO();
+    else if (activeKey === "manual_PO") handleGenerateManualPO();
+    else if (activeKey === "scheduled_PO") handleGenerateScheduledPO();
+  };
 
   const handleGenerateAgainstPO = async () => {
     const selectedOrders = orders.filter((order) =>
@@ -541,8 +567,9 @@ function OrderManagementSystem() {
         console.error("Error generating PO IDs:", error);
       }
     } else {
-      let errMessage = "Selected orders belong to different factories. Please select orders from the same factory."
-      ShowAlert('', errMessage, "error");
+      let errMessage =
+        "Selected orders belong to different factories. Please select orders from the same factory.";
+      ShowAlert("", errMessage, "error");
     }
   };
   const handleGenerateManualPO = async () => {
@@ -569,7 +596,11 @@ function OrderManagementSystem() {
         console.error("Error generating PO IDs:", error);
       }
     } else {
-      await ShowAlert('', "Selected orders belong to different factories. Please select orders from the same factory.", "error");
+      await ShowAlert(
+        "",
+        "Selected orders belong to different factories. Please select orders from the same factory.",
+        "error"
+      );
     }
   };
 
@@ -599,7 +630,11 @@ function OrderManagementSystem() {
         console.error("Error generating PO IDs:", error);
       }
     } else {
-      await ShowAlert('', "Selected orders belong to different factories. Please select orders from the same factory.", "error");
+      await ShowAlert(
+        "",
+        "Selected orders belong to different factories. Please select orders from the same factory.",
+        "error"
+      );
     }
   };
 
@@ -649,10 +684,10 @@ function OrderManagementSystem() {
 
   const handleTabSelect = (key) => {
     setActiveKey(key);
-    if (key === 'manual_PO') {
+    if (key === "manual_PO") {
       manualPO();
-    } else if (key === 'scheduled_PO') {
-      scheduledPO()
+    } else if (key === "scheduled_PO") {
+      scheduledPO();
     } else {
       fetchOrders();
     }
