@@ -67,7 +67,7 @@ function App() {
               <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
               <Route exact path='/ER_details/:er_no' element={<ERDetails />} />
               <Route exact path='/completed_order_system' element={<CompletedOrderSystem />} />
-              <Route exact path='/completed_order_details' element={<CompletedOrderDetails />} />
+              <Route exact path='/completed_order_details/:id' element={<CompletedOrderDetails />} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
             </Route>
           </Route>
