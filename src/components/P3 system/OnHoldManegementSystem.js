@@ -3,7 +3,7 @@ import { MDBRow } from 'mdb-react-ui-kit';
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
 import {Button, Card, Col, Modal, Row } from 'react-bootstrap';
-import { Box, InputLabel, MenuItem, Select as MuiSelect, Typography } from '@mui/material';
+import { Avatar, Box, InputLabel, MenuItem, Select as MuiSelect, Typography } from '@mui/material';
 import DataTable from '../DataTable';
 import { API_URL } from '../../redux/constants/Constants';
 import { useDispatch } from 'react-redux';
@@ -73,14 +73,14 @@ function OnHoldManegementSystem() {
                 ) : (
                     <>
                         {colorAvailable && (
-                            <Box className='w-100 me-3 d-flex flex-column'>
-                                <InputLabel id={`customer-color-${params.row.id}-label`}>Color</InputLabel>
+                            <Box className=' d-flex align-items-center' >
+                                <InputLabel style={{width:'87px'}} id={`customer-color-${params.row.id}-label`}>Color</InputLabel>
                                 <MuiSelect
                                     labelId={`customer-color-${params.row.id}-label`}
                                     id={`customer-color-${params.row.id}`}
                                     onChange={(event) => handleColorChange(event, params.row)}
                                     fullWidth
-                                    style={{ height: "40%", width: "100%" }}
+                                    style={{ height: "40px", width: "100%" }}
                                 >
                                     {color?.map((status) => (
                                         <MenuItem key={status} value={status}>{status}</MenuItem>
@@ -88,16 +88,19 @@ function OnHoldManegementSystem() {
                                 </MuiSelect>
                             </Box>
                         )}
+                        {attribute_color && (
+                            <Box >Color:{attribute_color}</Box>
+                        )}
 
                         {sizeAvailable && (
-                            <Box className='w-100 d-flex flex-column'>
-                                <InputLabel id={`customer-size-${params.row.id}-label`}>Size</InputLabel>
+                            <Box className=' d-flex align-items-center'>
+                                <InputLabel style={{width:'200px'}} id={`customer-size-${params.row.id}-label`}>Size</InputLabel>
                                 <MuiSelect
                                     labelId={`customer-size-${params.row.id}-label`}
                                     id={`customer-size-${params.row.id}`}
                                     onChange={(event) => handleSizeChange(event, params.row)}
                                     fullWidth
-                                    style={{ height: "40%", width: "100%" }}
+                                    style={{ height: "40px", width: "100%" }}
                                 >
                                     {size.map((status) => (
                                         <MenuItem key={status} value={status}>{status}</MenuItem>
@@ -106,11 +109,9 @@ function OnHoldManegementSystem() {
                             </Box>
                         )}
 
-                        {attribute_color && (
-                            <Box className="fw-bold fs-5">Color:{attribute_color}</Box>
-                        )}
+                        
                         {attribute_size && (
-                            <Box className="fw-bold fs-5">Size:{attribute_size}</Box>
+                            <Box >Size:{attribute_size}</Box> //className="fw-bold fs-5"
                         )}
                     </>
                 )}
@@ -123,14 +124,36 @@ function OnHoldManegementSystem() {
         {
             field: "product_image", headerName: "product image", flex: 1,
             type: "html",
-            renderCell: (value, row) =>
-                <img
-                    src={value.row.product_image || `${require("../../assets/default.png")}`}
-                    alt={value.row.product_name}
-                    onClick={() => ImageModule(value.row.product_image)}
-                    className="img-fluid"
-                    width={100}
-                />
+            // renderCell: (value, row) =>
+            //     <img
+            //         src={value.row.product_image || `${require("../../assets/default.png")}`}
+            //         alt={value.row.product_name}
+            //         onClick={() => ImageModule(value.row.product_image)}
+            //         className="img-fluid"
+            //         width={100}
+            //     />
+            renderCell: (params) => (
+                <Box
+                  className="h-100 w-100 d-flex align-items-center"
+                  onClick={() => ImageModule(params.value)}
+                >
+                  <Avatar 
+                    src={params.value || require("../../assets/default.png")}
+                    alt="Product Image"
+                    sx={{
+                      height: "45px",
+                      width: "45px",
+                      borderRadius: "2px",
+                      margin: "0 auto",
+                      "& .MuiAvatar-img": {
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: "2px",
+                      },
+                    }}
+                  />
+                </Box>
+              ),
         },
         {
             field: "Quantity", headerName: "Quantity", flex: 1,
@@ -450,7 +473,7 @@ function OnHoldManegementSystem() {
                                     <DataTable
                                         columns={columns}
                                         rows={tableData}
-                                        rowHeight={100}
+                                        // rowHeight={100}
                                     // page={page}
                                     // pageSize={pageSize}
                                     // totalPages={totalPages}

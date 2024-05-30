@@ -64,8 +64,7 @@ function POManagementSystem() {
     try {
       let apiUrl;
       if (poType == "po") {
-        apiUrl = `${API_URL}wp-json/custom-po-management/v1/po-generated-order/?&per_page=${pageSize}&page=${page}
-                `;
+        apiUrl = `${API_URL}wp-json/custom-po-management/v1/po-generated-order/?&per_page=${pageSize}&page=${page}`;
       } else if (poType == "mpo") {
         apiUrl = `${API_URL}wp-json/custom-mo-management/v1/generated-mo-order/?&per_page=${pageSize}&page=${page}`;
       } else if (poType == "spo") {
@@ -172,15 +171,20 @@ function POManagementSystem() {
     if (result.isConfirmed) {
       try {
         if (result.isConfirmed) {
-          const response = await axios.post(
-            `${API_URL}wp-json/delete-record/v1/delete-po-record/`,
-            {
-              po_id: id,
-            }
+          const response = await axios.get(
+            // `${API_URL}wp-json/delete-record/v1/delete-po-record/`,
+            `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`
           );
+          console.log(response,'response');
+          if(response){
+            POM_system_products()
+          }
         }
       } catch (error) {
         console.error(error);
+        if(error){
+          POM_system_products()
+        }
       }
     }
   };
@@ -196,6 +200,7 @@ function POManagementSystem() {
   };
 
   const handleChange = (event, value) => {
+    console.log(value,'value');
     setPage(value);
   };
 
