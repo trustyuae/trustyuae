@@ -12,6 +12,7 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import DataTable from "../DataTable";
 import {
+  Alert,
   Avatar,
   Box,
   Checkbox,
@@ -388,9 +389,11 @@ function OrderManagementSystem() {
         setManualPoOrders,
         setTotalPages
       );
+      console.log(data, 'data======');
       setManualPoOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setManualPoOrders([])
     }
   };
 
@@ -409,6 +412,7 @@ function OrderManagementSystem() {
       setScheduleOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setScheduleOrders([])
     }
   };
 
@@ -443,8 +447,8 @@ function OrderManagementSystem() {
       : [...selectedOrderIds, orderId];
     const newSelected2 = isSelected
       ? selectedOrderIdss
-          .filter((id) => id !== orderId)
-          .flatMap((id) => id.split(","))
+        .filter((id) => id !== orderId)
+        .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
@@ -667,8 +671,8 @@ function OrderManagementSystem() {
     }
   };
 
-  const variant2=(e)=>{
-    if(e.length === 0) {
+  const variant2 = (e) => {
+    if (e.length === 0) {
       return "Variant data not available";
     } else {
       const { color, size } = e;
@@ -870,40 +874,80 @@ function OrderManagementSystem() {
               (poLoader ? (
                 <Loader />
               ) : (
-                <DataTable
-                  columns={columns1}
-                  rows={orders}
-                  page={page}
-                  pageSize={pageSize}
-                  totalPages={totalPages}
-                  handleChange={handleChange}
-                />
+                <>
+                  {
+                    orders && orders.length !== 0 ? (
+                      <DataTable
+                        columns={columns1}
+                        rows={orders}
+                        page={page}
+                        pageSize={pageSize}
+                        totalPages={totalPages}
+                        handleChange={handleChange}
+                      />
+                    ) : (
+                      <Alert
+                        severity="warning"
+                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                      >
+                        Records is not Available for above filter
+                      </Alert>
+                    )
+                  }
+                </>
               ))}
             {activeKey === "manual_PO" &&
               (manualOrScheduledPoLoader ? (
                 <Loader />
               ) : (
-                <DataTable
-                  columns={columnsMPO}
-                  rows={manualPOorders}
-                  page={page}
-                  pageSize={pageSize}
-                  totalPages={totalPages}
-                  handleChange={handleChange}
-                />
+
+                <>
+                  {
+                    manualPOorders && manualPOorders.length !== 0 ? (
+                      <DataTable
+                        columns={columnsMPO}
+                        rows={manualPOorders}
+                        page={page}
+                        pageSize={pageSize}
+                        totalPages={totalPages}
+                        handleChange={handleChange}
+                      />
+                    ) : (
+                      <Alert
+                        severity="warning"
+                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                      >
+                        Records is not Available for above filter
+                      </Alert>
+                    )
+                  }
+                </>
               ))}
             {activeKey === "scheduled_PO" &&
               (manualOrScheduledPoLoader ? (
                 <Loader />
               ) : (
-                <DataTable
-                  columns={columnsSPO}
-                  rows={scheduledPOorders}
-                  page={page}
-                  pageSize={pageSize}
-                  totalPages={totalPages}
-                  handleChange={handleChange}
-                />
+                <>
+                  {
+                    scheduledPOorders && scheduledPOorders.length !== 0 ? (
+                      <DataTable
+                        columns={columnsSPO}
+                        rows={scheduledPOorders}
+                        page={page}
+                        pageSize={pageSize}
+                        totalPages={totalPages}
+                        handleChange={handleChange}
+                      />
+                    ) : (
+                      <Alert
+                        severity="warning"
+                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                      >
+                        Records is not Available for above filter
+                      </Alert>
+                    )
+                  }
+                </>
               ))}
           </Box>
           {activeKey === "manual_PO" || activeKey === "scheduled_PO" ? (

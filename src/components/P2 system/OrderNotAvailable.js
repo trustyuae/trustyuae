@@ -10,6 +10,7 @@ import {
 import DataTable from "../DataTable";
 import ReleaseSchedulePoModal from "./ReleaseSchedulePoModal";
 import {
+  Alert,
   Avatar,
   Box,
   Checkbox,
@@ -381,16 +382,29 @@ function OrderNotAvailable() {
       {orderNotAvailableLoader ? (
         <Loader />
       ) : (
-        <div className="mt-2">
-          <DataTable
-            columns={columns}
-            rows={ordersNotAvailableData}
-            page={page}
-            pageSize={pageSize}
-            totalPages={totalPages}
-            handleChange={handleChange}
-          />
-        </div>
+        <>
+          {
+            ordersNotAvailableData && ordersNotAvailableData.length !== 0 ? (
+              <div className="mt-2">
+                <DataTable
+                  columns={columns}
+                  rows={ordersNotAvailableData}
+                  page={page}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  handleChange={handleChange}
+                />
+              </div>
+            ) : (
+              <Alert
+                severity="warning"
+                sx={{ fontFamily: "monospace", fontSize: "18px" }}
+              >
+                Records is not Available for above filter
+              </Alert>
+            )
+          }
+        </>
       )}
       <ReleaseSchedulePoModal
         show={showModal}

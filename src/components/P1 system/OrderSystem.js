@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -273,17 +273,31 @@ function OrderSystem() {
       {loader ? (
         <Loader />
       ) : (
-        <div className="mt-2">
-          <DataTable
-            columns={columns}
-            rows={orders}
-            page={page}
-            pageSize={pageSize}
-            totalPages={totalPages}
-            handleChange={handleChange}
-          />
-        </div>
+        <>
+          {orders && orders.length !== 0 ? (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={orders}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
+              />
+            </div>
+          ) : (
+            <Alert
+              severity="warning"
+              sx={{ fontFamily: "monospace", fontSize: "18px" }}
+            >
+              Records is not Available for above filter
+            </Alert>
+          )}
+        </>
       )}
+
+
+
     </Container>
   );
 }

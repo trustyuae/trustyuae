@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Card, Col, Container, Form, Modal, Row } from 'react-bootstrap'
 import DataTable from '../DataTable'
 import { MDBCol, MDBRow } from 'mdb-react-ui-kit'
-import { Avatar, Box, Typography } from '@mui/material'
+import { Alert, Avatar, Box, Typography } from '@mui/material'
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { API_URL } from '../../redux/constants/Constants'
 import { PerticularPoDetails } from '../../redux/actions/P2SystemActions'
@@ -265,7 +265,7 @@ const ERDetails = () => {
             "received_qty": ERviewList.map(d => Number(d.received_qty)),
             "received_status": ERviewList.map(d => d.received_status),
             "expected_date": ERviewList.map(d => d.expected_delivery_date),
-            "variation_id":ERviewList.map(d=>d.variation_id)
+            "variation_id": ERviewList.map(d => d.variation_id)
         }
         try {
             const response = await axios.post(`${API_URL}wp-json/custom-er-update/v1/update-er-item/`, payload)
@@ -346,20 +346,28 @@ const ERDetails = () => {
                 </Row>
                 <MDBRow className="d-flex justify-content-center align-items-center">
                     <MDBCol col="10" md="12" sm="12"></MDBCol>
-
-                    <div className="mt-2">
-                        <DataTable
-                            columns={columns}
-                            rows={ERviewList}
-                        // page={pageSO}
-                        // pageSize={pageSizeSO}
-                        // totalPages={totalPagesSO}
-                        // rowHeight={100}
-                        // handleChange={handleChangeSO}
-                        // // onCellEditStart={handleCellEditStart}
-                        // processRowUpdate={handleSOQtyChange}
-                        />
-                    </div>
+                    {ERviewList && ERviewList.length ? (
+                        <div className="mt-2">
+                            <DataTable
+                                columns={columns}
+                                rows={ERviewList}
+                            // page={pageSO}
+                            // pageSize={pageSizeSO}
+                            // totalPages={totalPagesSO}
+                            // rowHeight={100}
+                            // handleChange={handleChangeSO}
+                            // // onCellEditStart={handleCellEditStart}
+                            // processRowUpdate={handleSOQtyChange}
+                            />
+                        </div>
+                    ) : (
+                        <Alert
+                            severity="warning"
+                            sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                        >
+                            No Exachange and Return Management Data Available!
+                        </Alert>
+                    )}
                     <Row>
                         <Form.Group
                             className="mb-3"
