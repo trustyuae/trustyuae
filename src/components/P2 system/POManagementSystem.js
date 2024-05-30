@@ -82,7 +82,7 @@ function POManagementSystem() {
       });
     } catch (error) {
       console.error("Error Products:", error);
-      await ShowAlert('Error', 'Records not available with this filter', "error");
+      // await ShowAlert('Error', 'Records not available with this filter', "error");
       setOrderList([]);
 
     }
