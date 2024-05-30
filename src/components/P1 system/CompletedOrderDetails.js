@@ -195,7 +195,7 @@ function CompletedOrderDetails() {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                Order Details
+               Completed Order Details
               </Typography>
               {loader ? (
                 <Loader />

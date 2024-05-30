@@ -42,13 +42,13 @@ function CompletedOrderSystem() {
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?`;
+    let apiUrl = `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?&page=${page}&per_page=${pageSize}`;
     if (searchOrderID)
-      apiUrl += `&orderid=${searchOrderID}&page=${page}&per_page=${pageSize}`;
+      apiUrl += `&orderid=${searchOrderID}`;
     if (endDate)
-      apiUrl += `&start_date=${startDate}&end_date=${endDate}&page=${page}&per_page=${pageSize}`;
+      apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
-      apiUrl += `&start_date=${completedStartDate}&end_date=${completedEndDate}&page=${page}&per_page=${pageSize}`;
+      apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
     await dispatch(
       CompletedOrderSystemGet({
         apiUrl: `${apiUrl}`,
@@ -179,13 +179,13 @@ function CompletedOrderSystem() {
 
   useEffect(() => {
     fetchOrders();
-  }, [pageSize, page, isReset]);
+  }, [pageSize, page, isReset,selectedDateRange,selectedCompletedDateRange]);
 
   return (
     <Container fluid className="py-3">
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
-          Order Fulfillment System
+          Completed Order System
         </Typography>
       </Box>
       <Row className="mb-4 mt-4">
