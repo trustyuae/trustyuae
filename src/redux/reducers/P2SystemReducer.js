@@ -39,6 +39,9 @@ import {
   GET_MANUAL_OR_SCHEDULED_PO_DETAILS_REQUEST,
   GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS,
   GET_MANUAL_OR_SCHEDULED_PO_DETAILS_FAIL,
+  GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST,
+  GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS,
+  GET_QUANTITY_DETAILS_ON_PO_DETAILS_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -54,6 +57,8 @@ const initialState = {
   isPerticularPoDetailsData: false,
   quantityDetailsData: [],
   isQuantityDetailsData: false,
+  quantityDetailsDataOnPoDetails: [],
+  isQuantityDetailsDataOnPoDetails: false,
   addedPoData: [],
   isAddedPoData: false,
   addedManualPoData: [],
@@ -97,7 +102,11 @@ const OrderNotAvailableReducer = (state = initialState, action) => {
         manualOrScheduledPoDetailsData: action.payload,
       };
     case GET_MANUAL_OR_SCHEDULED_PO_DETAILS_FAIL:
-      return { ...state, isManualOrScheduledPoDetailsData: false, error: action.payload };
+      return {
+        ...state,
+        isManualOrScheduledPoDetailsData: false,
+        error: action.payload,
+      };
 
     case GET_PERTICULAR_PO_DETAILS_REQUEST:
       return { ...state, isPerticularPoDetailsData: true };
@@ -114,7 +123,7 @@ const OrderNotAvailableReducer = (state = initialState, action) => {
         error: action.payload,
       };
 
-      case GET_QUANTITY_DETAILS_REQUEST:
+    case GET_QUANTITY_DETAILS_REQUEST:
       return { ...state, isQuantityDetailsData: true };
     case GET_QUANTITY_DETAILS_SUCCESS:
       return {
@@ -126,6 +135,21 @@ const OrderNotAvailableReducer = (state = initialState, action) => {
       return {
         ...state,
         isQuantityDetailsData: false,
+        error: action.payload,
+      };
+
+    case GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST:
+      return { ...state, isQuantityDetailsDataOnPoDetails: true };
+    case GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isQuantityDetailsDataOnPoDetails: false,
+        quantityDetailsDataOnPoDetails: action.payload,
+      };
+    case GET_QUANTITY_DETAILS_ON_PO_DETAILS_FAIL:
+      return {
+        ...state,
+        isQuantityDetailsDataOnPoDetails: false,
         error: action.payload,
       };
 

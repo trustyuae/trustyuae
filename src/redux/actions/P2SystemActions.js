@@ -39,6 +39,9 @@ import {
   GET_MANUAL_OR_SCHEDULED_PO_DETAILS_REQUEST,
   GET_MANUAL_OR_SCHEDULED_PO_DETAILS_FAIL,
   GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS,
+  GET_QUANTITY_DETAILS_ON_PO_DETAILS_FAIL,
+  GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS,
+  GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST,
 } from "../constants/Constants";
 import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
@@ -105,6 +108,23 @@ export const QuantityPoDetails =
         return response;
       } catch (error) {
         dispatch({ type: GET_QUANTITY_DETAILS_FAIL, error: error.message });
+      }
+    };
+
+    export const QuantityPoDetailsForModalInView =
+  (productId,poId) =>
+    async (dispatch) => {
+      try {
+        dispatch({ type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST });
+        const response = await axios.get(`${API_URL}wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}`);
+        console.log(response, 'rsponse of quntity details')
+        dispatch({
+          type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS,
+          payload: response?.data,
+        });
+        return response;
+      } catch (error) {
+        dispatch({ type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_FAIL, error: error.message });
       }
     };
 

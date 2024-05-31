@@ -1,31 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Alert, Button, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { QuantityPoDetails } from "../../redux/actions/P2SystemActions";
+import { QuantityPoDetailsForModalInView } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 
-const PoDetailsModal = ({
+const PoDetailsModalInView = ({
   show,
   handleClosePoDetailsModal,
   productId,
+  poId,
   poDetailsModal,
 }) => {
   const dispatch = useDispatch();
   const [productData, setProductData] = useState([]);
-  const [overAllData, setOverAllData] = useState("");
   const loader = useSelector(
-    (state) => state?.orderNotAvailable?.isQuantityDetailsData
+    (state) => state?.orderNotAvailable?.isQuantityDetailsDataOnPoDetails
   );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await dispatch(QuantityPoDetails(productId));
+        const response = await dispatch(QuantityPoDetailsForModalInView(productId,poId));
         const data = response?.data?.orders.map((v, id) => ({
           ...v,
           id,
         }));
-        setOverAllData(response?.data);
         setProductData(data);
       } catch (error) {
         console.error(error);
@@ -35,14 +34,14 @@ const PoDetailsModal = ({
     if (show) {
       fetchData();
     }
-  }, [show, dispatch, productId]);
+  }, [show, dispatch, productId,poId]);
 
   return (
     <div>
       <Modal show={poDetailsModal} onHide={handleClosePoDetailsModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            Product ID: {overAllData?.item_id}
+            Product ID: {productId}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -92,4 +91,4 @@ const PoDetailsModal = ({
   );
 };
 
-export default PoDetailsModal;
+export default PoDetailsModalInView;

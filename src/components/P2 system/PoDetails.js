@@ -20,7 +20,7 @@ import {
 } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import PoDetailsModal from "./PoDetailsModal";
+import PoDetailsModalInView from "./PoDetailsModalInView";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -491,11 +491,12 @@ const PoDetails = () => {
         // showModal={printModal}
       />
       {poDetailsModal && (
-        <PoDetailsModal
+        <PoDetailsModalInView
           show={poDetailsModal}
           poDetailsModal={poDetailsModal}
           productId={productId}
           handleClosePoDetailsModal={() => setPoDetailsModal(false)}
+          poId={id}
         />
       )}
     </Container>
