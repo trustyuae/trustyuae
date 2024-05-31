@@ -2,11 +2,6 @@ import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  OrderNotAvailableData,
-  OrderNotAvailableDataStatus,
-  OrderNotAvailableRefund,
-} from "../../redux/actions/P2SystemActions";
 import DataTable from "../DataTable";
 import ReleaseSchedulePoModal from "./ReleaseSchedulePoModal";
 import {
@@ -25,6 +20,11 @@ import { Card, Modal } from "react-bootstrap";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import ShowAlert from "../../utils/ShowAlert";
+import Form from "react-bootstrap/Form";
+import {
+  OrderNotAvailableData,
+  OrderNotAvailableDataStatus,
+} from "../../redux/actions/P2SystemActions";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -33,6 +33,7 @@ function OrderNotAvailable() {
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
   const [selectedOrderNotAvailable, setSelectedOrderNotAvailable] = useState(
     []
   );
@@ -53,8 +54,11 @@ function OrderNotAvailable() {
 
   useEffect(() => {
     dispatch(AllFactoryActions());
+  }, [dispatch]);
+
+  useEffect(() => {
     setFactories(allFactoryDatas);
-  }, [dispatch, allFactoryDatas]);
+  }, [allFactoryDatas]);
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
@@ -66,7 +70,12 @@ function OrderNotAvailable() {
 
   const handleCheckboxChange = async (e, rowData) => {
     if (!rowData.customer_status) {
-      await ShowAlert("please confirm your customer status first!", '', "error", false, false, '', '', 1000);
+      await ShowAlert(
+        "please confirm your customer status first!",
+        "",
+        "error",
+        false, false, '', '', 1000
+      );
     } else {
       rowData.isSelected = true;
       setCheckBox(true);
@@ -94,7 +103,7 @@ function OrderNotAvailable() {
 
     await dispatch(
       OrderNotAvailableData({
-        apiUrl: `${apiUrl}&per_page=${pageSize}&page=${page}`,
+        apiUrl: `${apiUrl}per_page=${pageSize}&page=${page}`,
       })
     )
       .then((response) => {
@@ -135,19 +144,65 @@ function OrderNotAvailable() {
     );
 
     if (selectedOrderNotAvailable.length === 0) {
-      await ShowAlert("please select products for generating schedule po", '', "error", false, false, '', '', 1000);
+      await ShowAlert(
+        "please select products for generating schedule po",
+        "",
+        "error",
+        false, false, '', '', 1000
+      );
     } else if (customerStatus.length < selectedOrderNotAvailable.length) {
-      await ShowAlert("Only for confirmed items we can raise the scheduled PO!", '', "error", false, false, '', '', 1000);
+      await ShowAlert(
+        "Only for confirmed items we can raise the scheduled PO!",
+        "",
+        "error", false, false, '', '', 1000
+      );
     } else if (new Set(estimatedTime).size !== 1) {
-      await ShowAlert("Purchase order items are on separate schedules. Do you want to proceed with the action?!", '', "error", false, false, '', '', 1000);
+      await ShowAlert(
+        "Purchase order items are on separate schedules. Do you want to proceed with the action?!",
+        "",
+        "error", false, false, '', '', 1000
+      );
     } else if (new Set(factoryNames).size !== 1) {
-      await ShowAlert("Factory name should be the same for all selected items!", '', "error", false, false, '', '', 1000);
+      await ShowAlert(
+        "Factory name should be the same for all selected items!",
+        "",
+        "error", false, false, '', '', 1000
+      );
     } else {
       setShowModal(true);
     }
   };
 
   const handleUpdateStatus = async () => {
+    if (selectedOrderNotAvailable.length === 0) {
+      await ShowAlert(
+        "Please select products you want to update status for!",
+        "",
+        "error", false, false, '', '', 1000
+      );
+      return;
+    }
+
+    const hasRefund = selectedOrderNotAvailable.some(
+      (order) => order.customer_status === "Refund"
+    );
+
+    if (hasRefund) {
+      const result = await ShowAlert(
+        "Are you sure you want to refund this order?",
+        "",
+        "question",
+        true,
+        true,
+        "Yes, refund it!",
+        "Cancel"
+      );
+
+      if (!result.isConfirmed) {
+        return;
+      }
+    }
+
     const poIds = selectedOrderNotAvailable.map((order) => order.po_id);
     const orderIds = selectedOrderNotAvailable.map((order) => order.order_id);
     const productIds = selectedOrderNotAvailable.map(
@@ -157,57 +212,21 @@ function OrderNotAvailable() {
       (order) => order.customer_status
     );
 
-    if (selectedOrderNotAvailable.length === 0) {
-      await ShowAlert("Please select products you want to update status for!", '', "error", false, false, '', '', 1000);
-      return;
-    }
+    const requestedDataS = {
+      po_id: poIds,
+      order_id: orderIds,
+      product_id: productIds,
+      customer_status: customerStatuses,
+    };
 
-    const hasRefund = customerStatuses.some((status) => status === "Refund");
-    // const unitPrice = selectedOrderNotAvailable.map(
-    //   (order) => order.unit_price
-    // );
-    // const totalPrice = selectedOrderNotAvailable.map(
-    //   (order) => order.total_price
-    // );
-    if (hasRefund) {
-      const result = await ShowAlert("Are you sure you want to refund this order?", '', 'question', true, true, "Yes, refund it!", "Cancel");
-      if (result.isConfirmed) {
-        try {
-          const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
-          const password = "cs_8dcdba11377e29282bd2b898d4a517cddd6726fe";
-          const requestedInfo = {
-            amount: selectedOrderNotAvailable.reduce(
-              (acc, order) => acc + order.total_price,
-              0
-            ),
-          };
-          const response = await dispatch(
-            OrderNotAvailableRefund(
-              requestedInfo,
-              orderIds,
-              username,
-              password
-            )
-          );
-          await ShowAlert('', "Refund process completed successfully!", "success", false, false, '', '', 1000);
-        } catch (error) {
-          console.error("Error in refund process:", error);
-          ShowAlert('', "Error in refund process!", "error", false, false, '', '', 1000);
-        }
-      } else {
-        console.error("Refund cancelled");
-      }
-    } else {
-      const requestedDataS = {
-        po_id: poIds,
-        order_id: orderIds,
-        product_id: productIds,
-        customer_status: customerStatuses,
-      };
-      await dispatch(OrderNotAvailableDataStatus(requestedDataS)).then(() => {
-        setSelectedOrderNotAvailable([]);
+    await dispatch(OrderNotAvailableDataStatus(requestedDataS)).then(() => {
+      selectedOrderNotAvailable.forEach((order) => {
+        order.isSelected = false;
       });
-    }
+      handleUpdatedValues();
+      fetchOrdersNotAvailableData()
+      setSelectedOrderNotAvailable([]);
+    });
   };
 
   const handleModalClose = async () => {
@@ -224,13 +243,13 @@ function OrderNotAvailable() {
       field: "id",
       headerName: "ID",
       className: "order-not-available",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "order_id",
       headerName: "Order ID",
       className: "order-not-available",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "factory_id",
@@ -279,19 +298,19 @@ function OrderNotAvailable() {
     {
       field: "quantity",
       headerName: "QTY",
-      flex: 1,
+      flex: 0.5,
       className: "order-not-available",
     },
     {
       field: "custom_number",
-      headerName: "Customer Contact Number",
+      headerName: "Customer Number",
       flex: 1,
       className: "order-not-available",
     },
     {
       field: "estimated_production_time",
       headerName: "Estimated Production Timing",
-      flex: 1,
+      flex: 1.5,
       className: "order-not-available",
     },
     {
@@ -318,7 +337,7 @@ function OrderNotAvailable() {
     {
       field: "select",
       headerName: "Select",
-      flex: 1,
+      flex: 0.5,
       className: "order-not-available",
       renderCell: (params) => {
         return (
@@ -349,11 +368,18 @@ function OrderNotAvailable() {
 
   useEffect(() => {
     fetchOrdersNotAvailableData();
-  }, [currentStartIndex, selectedOrderNotAvailable, setSelectedStatus]);
+  }, [currentStartIndex]);
+
+  useEffect(() => { }, [setSelectedStatus]);
 
   const ImageModule = (url) => {
     setImageURL(url);
     setShowEditModal(true);
+  };
+
+  const handlePageSizeChange = (pageNO) => {
+    setPageSize(pageNO);
+    setPage(pageNO);
   };
 
   return (
@@ -364,6 +390,21 @@ function OrderNotAvailable() {
         </Typography>
       </Box>
       <Box className="d-flex justify-content-end my-3">
+        <Form.Group className="d-flex mx-1 align-items-center">
+          <Form.Label className="fw-semibold mb-0 me-2">Page Size:</Form.Label>
+          <Form.Control
+            as="select"
+            className="w-auto"
+            value={pageSize}
+            onChange={(e) => handlePageSizeChange(e.target.value)}
+          >
+            {pageSizeOptions.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </Form.Control>
+        </Form.Group>
         <Button
           variant="outline-success w-20 h4"
           className="fw-semibold me-3"
@@ -383,27 +424,25 @@ function OrderNotAvailable() {
         <Loader />
       ) : (
         <>
-          {
-            ordersNotAvailableData && ordersNotAvailableData.length !== 0 ? (
-              <div className="mt-2">
-                <DataTable
-                  columns={columns}
-                  rows={ordersNotAvailableData}
-                  page={page}
-                  pageSize={pageSize}
-                  totalPages={totalPages}
-                  handleChange={handleChange}
-                />
-              </div>
-            ) : (
-              <Alert
-                severity="warning"
-                sx={{ fontFamily: "monospace", fontSize: "18px" }}
-              >
-                Records is not Available for above filter
-              </Alert>
-            )
-          }
+          {ordersNotAvailableData && ordersNotAvailableData.length !== 0 ? (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={ordersNotAvailableData}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
+              />
+            </div>
+          ) : (
+            <Alert
+              severity="warning"
+              sx={{ fontFamily: "monospace", fontSize: "18px" }}
+            >
+              Records is not Available for above filter
+            </Alert>
+          )}
         </>
       )}
       <ReleaseSchedulePoModal
