@@ -282,7 +282,7 @@ export const OrderNotAvailableDataStatus =
           requestedDataS
         )
         .then(async (response) => {
-          await ShowAlert("Status Updated Successfully!", '', "success", false, false, '', '', 1500);
+          await ShowAlert("Status Updated Successfully!", '', "success", false, false, '', '', 1000);
         })
         .catch((error) => {
           console.error(error);
