@@ -169,14 +169,16 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
 };
 
 export const CustomOrderFinish =
-  ({ user_id, id }) =>
+  ( user_id, id,navigate) =>
   async (dispatch) => {
     try {
       dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
 
       const response = await axios.post(
         `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
-      );
+      ).then((response)=>{
+        navigate("/ordersystem")
+      })
       dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response?.data });
       return response;
     } catch (error) {
