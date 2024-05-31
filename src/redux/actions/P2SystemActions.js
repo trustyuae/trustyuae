@@ -300,43 +300,6 @@ export const OrderNotAvailableDataStatus =
     }
   };
 
-// export const OrderNotAvailableRefund = (requestedInfo,id,username,password) => async (dispatch) => {
-//   try {
-//     dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST });
-//     const basicAuth = {
-//       username: username,
-//       password: password
-//     };
-//     const response = await axios
-//       .post(
-//         `${API_URL}/wp-json/wc/v3/orders/${id}/refunds`,
-//         requestedInfo,
-//         {
-//           auth: basicAuth
-//         }
-//       )
-//       .then((response) => {
-//         Swal.fire({
-//           icon: "success",
-//           title: "refund process completed Successfully!",
-//         });
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//       });
-//     dispatch({
-//       type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
-//       payload: response?.data,
-//     });
-//     return response;
-//   } catch (error) {
-//     dispatch({
-//       type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
-//       error: error.message,
-//     });
-//   }
-// };
-
 export const OrderNotAvailableRefund =
   (requestedInfo, orderIds, username, password) => async (dispatch) => {
     try {
