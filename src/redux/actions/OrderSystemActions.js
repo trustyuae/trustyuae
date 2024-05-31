@@ -1,3 +1,4 @@
+import ShowAlert from "../../utils/ShowAlert";
 import {
   GET_ORDER_SYSTEM_REQUEST,
   GET_ORDER_SYSTEM_SUCCESS,
@@ -45,8 +46,7 @@ export const OrderSystemGet =
     }
   };
 
-
-  export const CompletedOrderSystemGet =
+export const CompletedOrderSystemGet =
   ({ apiUrl }) =>
   async (dispatch) => {
     console.log(apiUrl, "apiUrl");
@@ -54,31 +54,36 @@ export const OrderSystemGet =
       dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_REQUEST });
 
       const response = await axios.get(apiUrl);
-      dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_SUCCESS, payload: response?.data });
+      dispatch({
+        type: GET_COMPLETED_ORDER_SYSTEM_SUCCESS,
+        payload: response?.data,
+      });
       return response;
     } catch (error) {
       dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_FAIL, error: error.message });
     }
   };
 
+export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
+  console.log(id, "idueeeeeeee");
+  try {
+    dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
 
-  export const CompletedOrderDetailsGet =
-  (id) =>
-  async (dispatch) => {
-    console.log(id,'idueeeeeeee')
-    try {
-      dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
-
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`
-      );
-      dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS, payload: response?.data });
-      return response;
-    } catch (error) {
-      dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL, error: error.message });
-    }
-  };
-
+    const response = await axios.get(
+      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`
+    );
+    dispatch({
+      type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({
+      type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL,
+      error: error.message,
+    });
+  }
+};
 
 export const OrderDetailsGet =
   ({ id }) =>
@@ -89,7 +94,7 @@ export const OrderDetailsGet =
       const response = await axios.get(
         `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`
       );
-      console.log(response,'response of OrderDetailsGet Api')
+      console.log(response, "response of OrderDetailsGet Api");
       dispatch({ type: GET_ORDER_DETAILS_SUCCESS, payload: response?.data });
       return response;
     } catch (error) {
@@ -97,10 +102,12 @@ export const OrderDetailsGet =
     }
   };
 
-  export const AttachmentFileUpload = ({ user_id, order_id, item_id, selectedFile }) => async (dispatch) => {
+export const AttachmentFileUpload =
+  ({ user_id, order_id, item_id, selectedFile }) =>
+  async (dispatch) => {
     try {
       dispatch({ type: UPLOAD_ATTACH_FILE_REQUEST });
-  
+
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
@@ -119,19 +126,19 @@ export const OrderDetailsGet =
     }
   };
 
-  export const AddMessage = (requestData) => async (dispatch) => {
-    try {
-      dispatch({ type: ADD_MESSAGE_REQUEST });
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-message-note/v1/order-note/`,
-        requestData,);
-      dispatch({ type: ADD_MESSAGE_SUCCESS, payload: response?.data });
-      return response;
-    } catch (error) {
-      dispatch({ type: ADD_MESSAGE_FAIL, error: error.message });
-    }
-  }; 
-  
+export const AddMessage = (requestData) => async (dispatch) => {
+  try {
+    dispatch({ type: ADD_MESSAGE_REQUEST });
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-message-note/v1/order-note/`,
+      requestData
+    );
+    dispatch({ type: ADD_MESSAGE_SUCCESS, payload: response?.data });
+    return response;
+  } catch (error) {
+    dispatch({ type: ADD_MESSAGE_FAIL, error: error.message });
+  }
+};
 
 export const InsertOrderPickup = (requestData) => async (dispatch) => {
   // console.log(requestData, "requestData");
@@ -142,14 +149,13 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
       `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
       requestData
     );
-    console.log(response,'InsertOrderPickup')
+    console.log(response, "InsertOrderPickup");
     dispatch({ type: INSERT_ORDER_PICKUP_SUCCESS, payload: response?.data });
     return response;
   } catch (error) {
     dispatch({ type: INSERT_ORDER_PICKUP_FAIL, error: error.message });
   }
 };
-
 
 export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
   // console.log(requestData, "requestData");
@@ -160,8 +166,11 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
       `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/`,
       requestData
     );
-    console.log(response,'InsertOrderPickup')
-    dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_SUCCESS, payload: response?.data });
+    console.log(response, "InsertOrderPickup");
+    dispatch({
+      type: INSERT_ORDER_PICKUP_CANCEL_SUCCESS,
+      payload: response?.data,
+    });
     return response;
   } catch (error) {
     dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_FAIL, error: error.message });
@@ -169,21 +178,19 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
 };
 
 export const CustomOrderFinish =
-  ( user_id, id,navigate) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
+  (user_id, id, navigate) => async (dispatch) => {
+    dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
 
+    try {
       const response = await axios.post(
         `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
-      ).then((response)=>{
-        navigate("/ordersystem")
-      })
-      dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response?.data });
+      );
+      dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
+      ShowAlert("Success","success", true, false, "OK", () => {
+        navigate("/ordersystem");
+      });
       return response;
     } catch (error) {
       dispatch({ type: CUSTOM_ORDER_FINISH_FAIL, error: error.message });
     }
   };
-
-  

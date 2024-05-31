@@ -41,7 +41,6 @@ function OrderDetails() {
   const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
-  // const fileInputRef = useRef(null);
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
@@ -165,7 +164,7 @@ function OrderDetails() {
         if (response.data.success) {
           setShowAttachmentModal(false);
           setSelectedFile(null);
-          const result = await ShowAlert('', 'Uploaded Successfully!', "success");
+          const result = await ShowAlert('', 'Uploaded Successfully!', "success",null, null, null, null, 2000);
           if (result.isConfirmed) handleCancel();
         }
       })
@@ -209,15 +208,7 @@ function OrderDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      await dispatch(CustomOrderFinish({ user_id, id }))
-        .then(async (response) => {
-          await ShowAlert(`${response.data.status}!`, response.data?.message,
-            response.data.status === "Completed" ? "success" : 'error', false, false, '', '', 1000);
-          if (response.data.status === "Completed") navigate("/ordersystem");
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      await dispatch(CustomOrderFinish(user_id,id,navigate))
     } catch (error) {
       console.error("Error while attaching file:", error);
     }
