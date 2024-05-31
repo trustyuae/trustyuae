@@ -157,13 +157,15 @@ const PoDetails = () => {
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    const updatedData = PO_OrderList.map((item) => {
-      if (item.product_id === event.product_id) {
-        return { ...item, available_quantity: index.target.value };
-      }
-      return item;
-    });
-    setPO_OrderList(updatedData);
+    if(index.target.value>=0){
+      const updatedData = PO_OrderList.map((item) => {
+        if (item.product_id === event.product_id) {
+          return { ...item, available_quantity: index.target.value };
+        }
+        return item;
+      });
+      setPO_OrderList(updatedData);
+    }
   };
 
   const handlePrint = () => {

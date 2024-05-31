@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MDBRow } from 'mdb-react-ui-kit';
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
@@ -16,6 +16,8 @@ import axios from 'axios';
 import Select from 'react-select';
 
 function OnHoldManegementSystem() {
+const inputRef = useRef(null);
+
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const getTodayDate = () => {
@@ -29,6 +31,7 @@ function OnHoldManegementSystem() {
     const [receivedBoxes, setReceivedBoxes] = useState(0);
     const [productNameF, setProductName] = useState('')
     const [productIDF, setProductID] = useState('')
+    const [productIDF2, setProductID2] = useState('')
     const [singleProductD, setSingleProductD] = useState([])
     const [tableData, setTableData] = useState([])
     const [date, setDate] = useState(getTodayDate())
@@ -235,7 +238,7 @@ function OnHoldManegementSystem() {
             apiUrl += `product_id=${productIDF}`;
         }
         try {
-            if (productIDF.length > 3) {
+            if (productIDF) {
                 setSelectedOption(null)
                 const response = await dispatch(GetProductManual({ apiUrl }));
                 const data = response.data.products.map((v, i) => ({ ...v, id: i }));
@@ -245,6 +248,7 @@ function OnHoldManegementSystem() {
                     variationSize: item.variation_values.length === 0 ? '' : ''
                 }));
                 setSingleProductD(modifiedData);
+                inputRef.current.value = ''; 
             } else if (productNameF && productIDF) {
                 const response = await dispatch(GetProductManual({ apiUrl }));
                 if (response.data.products) {
@@ -256,8 +260,8 @@ function OnHoldManegementSystem() {
                     variationColor: item.variation_values.length === 0 ? '' : '',
                     variationSize: item.variation_values.length === 0 ? '' : ''
                 }));
-                console.log(modifiedData,'modifiedData');
                 setSingleProductD(modifiedData);
+                inputRef.current.value = ''; 
             }
         } catch (error) {
             console.error(error);
@@ -332,8 +336,11 @@ function OnHoldManegementSystem() {
     }
 
     const handalonChangeProductId = (e) => {
-        setProductName('')
-        setProductID(e)
+        if(e.key === 'Enter') {
+            console.log(e,'e.target.value');
+            setProductName('')
+            setProductID(e.target.value)
+        }
 
     }
    
@@ -462,7 +469,8 @@ function OnHoldManegementSystem() {
                         <Col xs="auto" lg="4">
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product ID:</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Product ID" value={productIDF} onChange={(e) => handalonChangeProductId(e.target.value)} />
+                                <Form.Control type="text" placeholder="Enter Product ID"  ref={inputRef} onKeyDown={(e) => handalonChangeProductId(e)} />
+                                {/* <Form.Control type="text" placeholder="Enter Product ID" onKeyDown={(e) => handalonChangeProductId2(e)} /> */}
                             </Form.Group>
                         </Col>
                     </Row>
