@@ -107,11 +107,11 @@ function OrderDetails() {
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {
-        const result = await ShowAlert('', response.data, "success");
-        if (result.isConfirmed) {
-          setMessage("");
-          setshowMessageModal(false)
-        }
+        await ShowAlert('', response.data, "success", false, false, '', '', 1000);
+        // if (result.isConfirmed) {
+        setMessage("");
+        setshowMessageModal(false)
+        // }
       }
     });
   };
@@ -163,8 +163,8 @@ function OrderDetails() {
         if (response.data.success) {
           setShowAttachmentModal(false);
           setSelectedFile(null);
-          const result = await ShowAlert('', 'Uploaded Successfully!', "success");
-          if (result.isConfirmed) handleCancel();
+          await ShowAlert('', 'Uploaded Successfully!', "success", false, false, '', '', 1000);
+          handleCancel();
         }
 
       })
@@ -210,9 +210,9 @@ function OrderDetails() {
       const { user_id } = userData ?? {};
       await dispatch(CustomOrderFinish({ user_id, id }))
         .then(async (response) => {
-          const result = await ShowAlert(`${response.data.status}!`, response.data?.message,
-            response.data.status === "Completed" ? "success" : 'error');
-          if (result.isConfirmed && response.data.status === "Completed") navigate("/ordersystem");
+          await ShowAlert(`${response.data.status}!`, response.data?.message,
+            response.data.status === "Completed" ? "success" : 'error', false, false, '', '', 1000);
+          if (response.data.status === "Completed") navigate("/ordersystem");
         })
         .catch((error) => {
           console.error(error);
