@@ -165,11 +165,7 @@ function OrderDetails() {
         if (response.data.success) {
           setShowAttachmentModal(false);
           setSelectedFile(null);
-          const result = await ShowAlert(
-            "",
-            "Uploaded Successfully!",
-            "success"
-          );
+          const result = await ShowAlert('', 'Uploaded Successfully!', "success");
           if (result.isConfirmed) handleCancel();
         }
       })
@@ -213,7 +209,15 @@ function OrderDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      await dispatch(CustomOrderFinish(user_id, id,navigate));
+      await dispatch(CustomOrderFinish({ user_id, id }))
+        .then(async (response) => {
+          await ShowAlert(`${response.data.status}!`, response.data?.message,
+            response.data.status === "Completed" ? "success" : 'error', false, false, '', '', 1000);
+          if (response.data.status === "Completed") navigate("/ordersystem");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     } catch (error) {
       console.error("Error while attaching file:", error);
     }

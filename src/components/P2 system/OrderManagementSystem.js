@@ -349,14 +349,14 @@ function OrderManagementSystem() {
   };
 
   useEffect(() => {
-    console.log(activeKey,'activeKey');
-    if(activeKey == 'against_PO'){
+    console.log(activeKey, 'activeKey');
+    if (activeKey == 'against_PO') {
       fetchOrders();
     }
-    if(activeKey == 'manual_PO'){
+    if (activeKey == 'manual_PO') {
       manualPO();
     }
-    if(activeKey == 'scheduled_PO'){
+    if (activeKey == 'scheduled_PO') {
       scheduledPO();
     }
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
@@ -571,7 +571,7 @@ function OrderManagementSystem() {
     } else {
       let errMessage =
         "Selected orders belong to different factories. Please select orders from the same factory.";
-      ShowAlert("", errMessage, "error");
+      ShowAlert("", errMessage, "error", false, false, '', '', 1000);
     }
   };
   const handleGenerateManualPO = async () => {
@@ -601,7 +601,7 @@ function OrderManagementSystem() {
       await ShowAlert(
         "",
         "Selected orders belong to different factories. Please select orders from the same factory.",
-        "error"
+        "error", false, false, '', '', 1000
       );
     }
   };
@@ -635,7 +635,7 @@ function OrderManagementSystem() {
       await ShowAlert(
         "",
         "Selected orders belong to different factories. Please select orders from the same factory.",
-        "error"
+        "error", false, false, '', '', 1000
       );
     }
   };

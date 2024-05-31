@@ -73,7 +73,8 @@ function OrderNotAvailable() {
       await ShowAlert(
         "please confirm your customer status first!",
         "",
-        "error"
+        "error",
+        false, false, '', '', 1000
       );
     } else {
       rowData.isSelected = true;
@@ -146,25 +147,26 @@ function OrderNotAvailable() {
       await ShowAlert(
         "please select products for generating schedule po",
         "",
-        "error"
+        "error",
+        false, false, '', '', 1000
       );
     } else if (customerStatus.length < selectedOrderNotAvailable.length) {
       await ShowAlert(
         "Only for confirmed items we can raise the scheduled PO!",
         "",
-        "error"
+        "error", false, false, '', '', 1000
       );
     } else if (new Set(estimatedTime).size !== 1) {
       await ShowAlert(
         "Purchase order items are on separate schedules. Do you want to proceed with the action?!",
         "",
-        "error"
+        "error", false, false, '', '', 1000
       );
     } else if (new Set(factoryNames).size !== 1) {
       await ShowAlert(
         "Factory name should be the same for all selected items!",
         "",
-        "error"
+        "error", false, false, '', '', 1000
       );
     } else {
       setShowModal(true);
@@ -176,7 +178,7 @@ function OrderNotAvailable() {
       await ShowAlert(
         "Please select products you want to update status for!",
         "",
-        "error"
+        "error", false, false, '', '', 1000
       );
       return;
     }
@@ -368,7 +370,7 @@ function OrderNotAvailable() {
     fetchOrdersNotAvailableData();
   }, [currentStartIndex]);
 
-  useEffect(() => {}, [setSelectedStatus]);
+  useEffect(() => { }, [setSelectedStatus]);
 
   const ImageModule = (url) => {
     setImageURL(url);
