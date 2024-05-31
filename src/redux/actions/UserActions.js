@@ -27,7 +27,7 @@ export const loginUser = (data, navigate) => async (dispatch) => {
       console.log("error while login");
     }
   } catch (error) {
-    await ShowAlert('Error', error?.response?.data?.message, "error");
+    await ShowAlert('Error', error?.response?.data?.message, "error", false, false, '', '', 1000);
     dispatch({ type: USER_LOGIN_FAIL });
   }
 };
@@ -41,7 +41,7 @@ export const logoutUser = (navigate) => async (dispatch) => {
     localStorage.clear();
     const result = await ShowAlert("Do You Want Logged Out?", '', 'question', true, true, "Confirm", "Cancel");
     if (result.isConfirmed) {
-      await ShowAlert("Success", res?.data?.message, 'success', false, false, 'OK', '', 1500)
+      await ShowAlert("Success", res?.data?.message, 'success', false, false, 'OK', '', 1000)
       navigate("/");
     }
     dispatch({ type: CLEAR_STORE });

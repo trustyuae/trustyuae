@@ -114,7 +114,7 @@ function OnHoldManagement() {
     const quantity = selectedOrders.map((order) => order.quantity);
 
     if (selectedOrders.length === 0) {
-      await ShowAlert("please select products for generating schedule po", '', "error");
+      await ShowAlert("please select products for generating schedule po", '', "error", false, false, '', '', 1000);
     } else {
       const requestedDataP = {
         product_id: params.id,
@@ -125,7 +125,7 @@ function OnHoldManagement() {
 
       await dispatch(AddProductOrderForPre(requestedDataP)).then(async (response) => {
         if (response) {
-          await ShowAlert("Uploaded Successfully!", '', "success", false, false, '', '', 1500);
+          await ShowAlert("Uploaded Successfully!", '', "success", false, false, '', '', 1000);
         }
         selectedOrders.forEach((order) => {
           order.isSelected = false;
@@ -150,7 +150,7 @@ function OnHoldManagement() {
     await dispatch(AddProductOrderForStock(requestedData))
       .then(async (response) => {
         if (response) {
-          await ShowAlert("product added in InStock Successfully!", '', "success", false, false, 'OK', '', 1500);
+          await ShowAlert("product added in InStock Successfully!", '', "success", false, false, 'OK', '', 1000);
         }
         handleUpdatedValues();
       })

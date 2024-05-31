@@ -111,8 +111,8 @@ export const QuantityPoDetails =
       }
     };
 
-    export const QuantityPoDetailsForModalInView =
-  (productId,poId) =>
+export const QuantityPoDetailsForModalInView =
+  (productId, poId) =>
     async (dispatch) => {
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST });
@@ -254,7 +254,7 @@ export const OrderNotAvailableData =
 export const OrderNotAvailableDataPo = (requestData) => async (dispatch) => {
   try {
     if (!requestData?.reminder_date) {
-      await ShowAlert("Please select a reminder date!", '', "error");
+      await ShowAlert("Please select a reminder date!", '', "error", false, false, '', '', 1000);
     } else {
       dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REQUEST });
       const response = await axios.post(
@@ -282,7 +282,7 @@ export const OrderNotAvailableDataStatus =
           requestedDataS
         )
         .then(async (response) => {
-          await ShowAlert("Status Updated Successfully!", '', "success", false, false, '', '', 1500);
+          await ShowAlert("Status Updated Successfully!", '', "success", false, false, '', '', 1000);
         })
         .catch((error) => {
           console.error(error);
@@ -357,7 +357,7 @@ export const OrderNotAvailableRefund =
       });
 
       const refunds = await Promise.all(refundPromises);
-      await ShowAlert("Refund process completed successfully!", '', "success", false, false, '', '', 1500);
+      await ShowAlert("Refund process completed successfully!", '', "success", false, false, '', '', 1000);
       dispatch({
         type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
         payload: refunds,
@@ -366,7 +366,7 @@ export const OrderNotAvailableRefund =
       return refunds;
     } catch (error) {
       console.error(error);
-      await ShowAlert("Error in refund process!", '', "error");
+      await ShowAlert("Error in refund process!", '', "error", false, false, '', '', 1000);
       dispatch({
         type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
         error: error.message,

@@ -66,7 +66,7 @@ function OrderNotAvailable() {
 
   const handleCheckboxChange = async (e, rowData) => {
     if (!rowData.customer_status) {
-      await ShowAlert("please confirm your customer status first!", '', "error");
+      await ShowAlert("please confirm your customer status first!", '', "error", false, false, '', '', 1000);
     } else {
       rowData.isSelected = true;
       setCheckBox(true);
@@ -135,13 +135,13 @@ function OrderNotAvailable() {
     );
 
     if (selectedOrderNotAvailable.length === 0) {
-      await ShowAlert("please select products for generating schedule po", '', "error");
+      await ShowAlert("please select products for generating schedule po", '', "error", false, false, '', '', 1000);
     } else if (customerStatus.length < selectedOrderNotAvailable.length) {
-      await ShowAlert("Only for confirmed items we can raise the scheduled PO!", '', "error");
+      await ShowAlert("Only for confirmed items we can raise the scheduled PO!", '', "error", false, false, '', '', 1000);
     } else if (new Set(estimatedTime).size !== 1) {
-      await ShowAlert("Purchase order items are on separate schedules. Do you want to proceed with the action?!", '', "error");
+      await ShowAlert("Purchase order items are on separate schedules. Do you want to proceed with the action?!", '', "error", false, false, '', '', 1000);
     } else if (new Set(factoryNames).size !== 1) {
-      await ShowAlert("Factory name should be the same for all selected items!", '', "error");
+      await ShowAlert("Factory name should be the same for all selected items!", '', "error", false, false, '', '', 1000);
     } else {
       setShowModal(true);
     }
@@ -158,7 +158,7 @@ function OrderNotAvailable() {
     );
 
     if (selectedOrderNotAvailable.length === 0) {
-      await ShowAlert("Please select products you want to update status for!", '', "error");
+      await ShowAlert("Please select products you want to update status for!", '', "error", false, false, '', '', 1000);
       return;
     }
 
@@ -189,10 +189,10 @@ function OrderNotAvailable() {
               password
             )
           );
-          await ShowAlert('', "Refund process completed successfully!", "success");
+          await ShowAlert('', "Refund process completed successfully!", "success", false, false, '', '', 1000);
         } catch (error) {
           console.error("Error in refund process:", error);
-          ShowAlert('', "Error in refund process!", "error");
+          ShowAlert('', "Error in refund process!", "error", false, false, '', '', 1000);
         }
       } else {
         console.error("Refund cancelled");
