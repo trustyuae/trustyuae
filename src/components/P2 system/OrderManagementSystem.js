@@ -349,9 +349,16 @@ function OrderManagementSystem() {
   };
 
   useEffect(() => {
-    fetchOrders();
-    manualPO();
-    scheduledPO();
+    console.log(activeKey,'activeKey');
+    if(activeKey == 'against_PO'){
+      fetchOrders();
+    }
+    if(activeKey == 'manual_PO'){
+      manualPO();
+    }
+    if(activeKey == 'scheduled_PO'){
+      scheduledPO();
+    }
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
   useEffect(() => {
