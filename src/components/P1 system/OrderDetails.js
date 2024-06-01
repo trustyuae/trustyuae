@@ -164,7 +164,16 @@ function OrderDetails() {
         if (response.data.success) {
           setShowAttachmentModal(false);
           setSelectedFile(null);
-          const result = await ShowAlert('', 'Uploaded Successfully!', "success",null, null, null, null, 2000);
+          const result = await ShowAlert(
+            "",
+            "Uploaded Successfully!",
+            "success",
+            null,
+            null,
+            null,
+            null,
+            2000
+          );
           if (result.isConfirmed) handleCancel();
         }
       })
@@ -208,7 +217,7 @@ function OrderDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      await dispatch(CustomOrderFinish(user_id,id,navigate))
+      await dispatch(CustomOrderFinish(user_id, id, navigate));
     } catch (error) {
       console.error("Error while attaching file:", error);
     }
@@ -403,12 +412,13 @@ function OrderDetails() {
     //   },
     // },
     {
-      field: "view_item",
+      field: "dispatch_image",
       headerName: "Attachment",
       flex: 1.5,
       className: "order-details",
       type: "html",
       renderCell: (value, row) => {
+        console.log(value.row.dispatch_imag, "value.....................");
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const handleFileInputChangeForRow = (e) => {
           handleFileInputChange(e, itemId);
@@ -417,82 +427,123 @@ function OrderDetails() {
         if (!fileInputRef.current) {
           fileInputRef.current = {};
         }
-        return (
-          <Row className={`${"justify-content-center"} h-100`}>
-            <Col
-              md={12}
-              className={`d-flex align-items-center justify-content-center my-1`}
-            >
-              <Card className="factory-card me-1 shadow-sm mb-0">
-                {userData?.user_id == orderDetails?.operation_user_id &&
-                orderProcess == "started" ? (
-                  <Button
-                    className="bg-transparent border-0  text-black"
-                    onClick={() => fileInputRef.current[itemId]?.click()}
-                  >
-                    <CloudUploadIcon />
-                    <Typography style={{ fontSize: "14px" }}>Device</Typography>
-                    <input
-                      type="file"
-                      ref={(input) => (fileInputRef.current[itemId] = input)}
-                      style={{ display: "none" }}
-                      onChange={handleFileInputChangeForRow}
-                    />
-                  </Button>
-                ) : orderProcess == "started" &&
-                  userData?.user_id != orderDetails?.operation_user_id ? (
-                  <Button
-                    className="bg-transparent border-0  text-black"
-                    disabled
-                  >
-                    <CloudUploadIcon />
-                    <Typography style={{ fontSize: "14px" }}>Device</Typography>
-                  </Button>
-                ) : (
-                  <Button
-                    className="bg-transparent border-0  text-black"
-                    disabled
-                  >
-                    <CloudUploadIcon />
-                    <Typography style={{ fontSize: "14px" }}>Device</Typography>
-                  </Button>
-                )}
-              </Card>
-              <Card className="factory-card ms-1 shadow-sm mb-0">
-                {userData?.user_id == orderDetails?.operation_user_id &&
-                orderProcess == "started" ? (
-                  <Button
-                    className="bg-transparent border-0 text-black"
-                    onClick={() => {
-                      setShowAttachModal(true);
-                      setSelectedItemId(itemId);
-                    }}
-                  >
-                    <CameraAltIcon />
-                    <Typography style={{ fontSize: "14px" }}>Camera</Typography>
-                  </Button>
-                ) : orderProcess == "started" &&
-                  userData?.user_id != orderDetails?.operation_user_id ? (
-                  <Button
-                    className="bg-transparent border-0 text-black"
-                    disabled
-                  >
-                    <CameraAltIcon />
-                    <Typography style={{ fontSize: "14px" }}>Camera</Typography>
-                  </Button>
-                ) : (
-                  <Button
-                    className="bg-transparent border-0 text-black"
-                    disabled
-                  >
-                    <CameraAltIcon />
-                    <Typography style={{ fontSize: "14px" }}>Camera</Typography>
-                  </Button>
-                )}
-              </Card>
-            </Col>
-          </Row>
-        );
+        if (value && value.row.dispatch_image) {
+          return (
+            <Row className={`${"justify-content-center"} h-100`}>
+              <Col
+                md={12}
+                className={`d-flex align-items-center justify-content-center my-1`}
+              >
+                <Avatar
+                  src={
+                    value.row.dispatch_image || require("../../assets/default.png")
+                  }
+                  alt="Product Image"
+                  sx={{
+                    height: "45px",
+                    width: "45px",
+                    borderRadius: "2px",
+                    margin: "0 auto",
+                    "& .MuiAvatar-img": {
+                      height: "100%",
+                      width: "100%",
+                      borderRadius: "2px",
+                    },
+                  }}
+                />
+              </Col>
+            </Row>
+          );
+        } else {
+          return (
+            <Row className={`${"justify-content-center"} h-100`}>
+              <Col
+                md={12}
+                className={`d-flex align-items-center justify-content-center my-1`}
+              >
+                <Card className="factory-card me-1 shadow-sm mb-0">
+                  {userData?.user_id == orderDetails?.operation_user_id &&
+                  orderProcess == "started" ? (
+                    <Button
+                      className="bg-transparent border-0  text-black"
+                      onClick={() => fileInputRef.current[itemId]?.click()}
+                    >
+                      <CloudUploadIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Device
+                      </Typography>
+                      <input
+                        type="file"
+                        ref={(input) => (fileInputRef.current[itemId] = input)}
+                        style={{ display: "none" }}
+                        onChange={handleFileInputChangeForRow}
+                      />
+                    </Button>
+                  ) : orderProcess == "started" &&
+                    userData?.user_id != orderDetails?.operation_user_id ? (
+                    <Button
+                      className="bg-transparent border-0  text-black"
+                      disabled
+                    >
+                      <CloudUploadIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Device
+                      </Typography>
+                    </Button>
+                  ) : (
+                    <Button
+                      className="bg-transparent border-0  text-black"
+                      disabled
+                    >
+                      <CloudUploadIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Device
+                      </Typography>
+                    </Button>
+                  )}
+                </Card>
+                <Card className="factory-card ms-1 shadow-sm mb-0">
+                  {userData?.user_id == orderDetails?.operation_user_id &&
+                  orderProcess == "started" ? (
+                    <Button
+                      className="bg-transparent border-0 text-black"
+                      onClick={() => {
+                        setShowAttachModal(true);
+                        setSelectedItemId(itemId);
+                      }}
+                    >
+                      <CameraAltIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Camera
+                      </Typography>
+                    </Button>
+                  ) : orderProcess == "started" &&
+                    userData?.user_id != orderDetails?.operation_user_id ? (
+                    <Button
+                      className="bg-transparent border-0 text-black"
+                      disabled
+                    >
+                      <CameraAltIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Camera
+                      </Typography>
+                    </Button>
+                  ) : (
+                    <Button
+                      className="bg-transparent border-0 text-black"
+                      disabled
+                    >
+                      <CameraAltIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Camera
+                      </Typography>
+                    </Button>
+                  )}
+                </Card>
+              </Col>
+            </Row>
+          );
+        }
       },
     },
   ];
