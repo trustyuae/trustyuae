@@ -177,7 +177,6 @@ function POManagementSystem() {
             // `${API_URL}wp-json/delete-record/v1/delete-po-record/`,
             `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`
           );
-          console.log(response, 'response');
           if (response) {
             POM_system_products()
           }
@@ -202,7 +201,6 @@ function POManagementSystem() {
   };
 
   const handleChange = (event, value) => {
-    console.log(value, 'value');
     setPage(value);
   };
 

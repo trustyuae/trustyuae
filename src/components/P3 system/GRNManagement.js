@@ -31,7 +31,6 @@ function GRNManagement() {
   const loader = useSelector((state) => state?.managementSystem?.isGrnList);
 
   const handleStatusChange = (e) => {
-    console.log(e.target.value, "e.target.value");
     setStatusFilter(e.target.value);
   };
 

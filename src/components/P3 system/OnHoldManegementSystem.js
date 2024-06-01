@@ -178,7 +178,6 @@ const inputRef = useRef(null);
     ];
 
     const handleFieldChange = (id, field, value) => {
-        console.log(id, field, value,'id, field, value');
         const updatedData = tableData.map(item => {
             if (item.id === value.id) {
                 return { ...item, [field]: id ,
@@ -202,7 +201,6 @@ const inputRef = useRef(null);
             }
             return item;
         });
-        console.log(updatedData, 'updatedData');
         setTableData(updatedData);
         validateForm(updatedData);
 
@@ -286,9 +284,7 @@ const inputRef = useRef(null);
         let data = [...tableData,...singleProductD ]
         let Updatedata = data.map((v, i) => ({ ...v, id: i, Quantity: v.Quantity !== "" ? v.Quantity : 1, variationColor: v.variation_values.attribute_color !== undefined ? v.variation_values.attribute_color : '', variationSize: v.variation_values.attribute_size !== undefined ? v.variation_values.attribute_size : '' }));
         validateForm(Updatedata);
-        console.log(Updatedata,'Updatedata');
         const newData = Updatedata.reduce((acc, obj) => {
-            console.log(acc, obj,'acc, obj');
             const existingIndex = acc.findIndex(item =>
                 item.product_name === obj.product_name &&
                 (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
@@ -309,7 +305,6 @@ const inputRef = useRef(null);
                 const outputArray = [...originalArray, ...filteredComparedArray];
                 acc = outputArray
             } else {
-                console.log(obj,acc,'obj,acc');
                 // acc.push(obj);
                 // acc.unshift(obj);
                 const originalArray = [obj];
@@ -323,13 +318,11 @@ const inputRef = useRef(null);
                     });
                 });
                 const outputArray = [...originalArray, ...filteredComparedArray];
-                console.log(outputArray,'outputArray');
                 // acc.push(obj);
                 acc = outputArray
             }
             return acc;
         }, []);
-        console.log(newData,'newData');
         setTableData(newData)
         setProductName('')
         setProductID('')
@@ -337,7 +330,6 @@ const inputRef = useRef(null);
 
     const handalonChangeProductId = (e) => {
         if(e.key === 'Enter') {
-            console.log(e,'e.target.value');
             setProductName('')
             setProductID(e.target.value)
         }
@@ -381,7 +373,6 @@ const inputRef = useRef(null);
             products: convertedData
         };
         try {
-            console.log(payload,'payload');
             dispatch(AddGrn(payload, navigate))
         } catch (error) {
             console.error(error);
