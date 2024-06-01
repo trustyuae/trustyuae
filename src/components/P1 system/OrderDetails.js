@@ -436,8 +436,7 @@ function OrderDetails() {
               >
                 <Avatar
                   src={
-                    value.row.dispatch_image ||
-                    require("../../assets/default.png")
+                    value.row.dispatch_image
                   }
                   alt="Product Image"
                   sx={{
