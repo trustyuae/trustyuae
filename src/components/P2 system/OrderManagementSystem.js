@@ -349,7 +349,6 @@ function OrderManagementSystem() {
   };
 
   useEffect(() => {
-    console.log(activeKey, 'activeKey');
     if (activeKey == 'against_PO') {
       fetchOrders();
     }
@@ -396,7 +395,6 @@ function OrderManagementSystem() {
         setManualPoOrders,
         setTotalPages
       );
-      console.log(data, 'data======');
       setManualPoOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);

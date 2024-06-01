@@ -52,7 +52,6 @@ function ERManagement() {
     if (selectedDate) apiUrl += `&date=${selectedDate}`;
     await dispatch(GetErManagementData({ apiUrl }))
       .then((response) => {
-        console.log(response, "response");
         let data = response.data.er_details.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
         setTotalPages(response.data.total_pages);
@@ -115,7 +114,6 @@ function ERManagement() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value, "row from button");
         return (
           <Link
             to={`/ER_details/${value.row.er_no}`}
@@ -141,11 +139,9 @@ function ERManagement() {
     setSelectedDueType("");
     setDueDate("");
     if (newDateRange?.$d) {
-      console.log(dayjs(newDateRange.$d.toDateString()).format("YYYY-MM-DD"));
       const isoDate = dayjs(newDateRange.$d.toDateString()).format(
         "YYYY-MM-DD"
       );
-      console.log(isoDate, "isodate");
       setSelectedDate(isoDate);
     } else {
       console.error("Invalid date range");

@@ -23,7 +23,6 @@ const GRNView = () => {
   const fetchOrder = async () => {
     let apiUrl = `${API_URL}wp-json/custom-api/v1/view-grn-details/${id}`;
     await dispatch(GetGRNView({ apiUrl })).then((response) => {
-      console.log(response, "response og grn view");
       let data = response?.data?.map((v, i) => ({ ...v, id: i }));
       setPO_OrderList(data);
     });
@@ -77,7 +76,6 @@ const GRNView = () => {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
-        console.log(value, "value details of grn edite page");
         return (
           <Link
             to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}`}
@@ -99,8 +97,6 @@ const GRNView = () => {
 
   const formatVariations = (variations) => {
     const data = JSON.parse(variations);
-    console.log(data, "data");
-
     if (Object.keys(data).length === 0) {
       return "No variations";
     } else {
