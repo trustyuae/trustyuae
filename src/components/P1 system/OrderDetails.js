@@ -119,7 +119,7 @@ function OrderDetails() {
 
   useEffect(() => {
     fetchOrder();
-  }, [message]);
+  }, [message,setTableData,setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);

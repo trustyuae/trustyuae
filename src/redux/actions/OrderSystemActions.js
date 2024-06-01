@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import ShowAlert from "../../utils/ShowAlert";
 import {
   GET_ORDER_SYSTEM_REQUEST,
@@ -185,10 +186,14 @@ export const CustomOrderFinish =
       const response = await axios.post(
         `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
       );
-      dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
-      ShowAlert("Success","success", true, false, "OK", () => {
-        navigate("/ordersystem");
+      await Swal.fire({
+        title: "Order Finished successfully",
+        text: "success",
+        icon: "success",
+        showConfirmButton: true,
       });
+      navigate("/ordersystem");
+      dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
       return response;
     } catch (error) {
       dispatch({ type: CUSTOM_ORDER_FINISH_FAIL, error: error.message });
