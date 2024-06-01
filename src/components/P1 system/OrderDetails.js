@@ -27,6 +27,7 @@ import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
+import Swal from "sweetalert2";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -217,11 +218,26 @@ function OrderDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      await dispatch(CustomOrderFinish(user_id, id, navigate));
+      const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
+      if (response.data.status === 'Completed') {
+        Swal.fire({
+          title: response.data.message,
+          icon: "success",
+          showConfirmButton: true,
+        });
+        navigate("/ordersystem");
+      } else {
+        Swal.fire({
+          title: response.data.message,
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
     } catch (error) {
-      console.error("Error while attaching file:", error);
+      console.error("Error while finishing order:", error);
     }
   };
+  
 
   const variant = (variations) => {
     const matches = variations.match(
