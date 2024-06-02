@@ -28,6 +28,8 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
+import axios from "axios";
+import { API_URL } from "../../redux/constants/Constants";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -149,6 +151,30 @@ function OrderDetails() {
     setSelectedFileUrl(null);
     setSelectedFile(null);
     setShowAttachmentModal(false);
+  };
+  const handleCancelImg =async (e) => {
+    console.log(e,'e======');
+    Swal.fire({
+      title: 'Are you sure you want to delete this image?',
+      icon: "success",
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // Redirect only if "OK" is clicked
+        console.log('hiii');
+        const response = await axios.post(`${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,{
+          "variation_id": e.variation_id,
+          "image_url": e.dispatch_image
+        })
+        console.log(response,'response');
+      }
+    });
+    // setSelectedFileUrl(null);
+    // setSelectedFile(null);
+    // setShowAttachmentModal(false);
   };
 
   const handleSubmitAttachment = async () => {
@@ -450,6 +476,15 @@ function OrderDetails() {
                 md={12}
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
+                <CancelIcon
+                    sx={{
+                      position: "relative",
+                      top: "-9px",
+                      right: "9px",
+                      cursor: "pointer",
+                    }}
+                    onClick={e=>handleCancelImg(value.row)}
+                  />
                 <Avatar
                   src={
                     value.row.dispatch_image
