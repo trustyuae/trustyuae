@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MDBRow } from 'mdb-react-ui-kit';
 import Container from 'react-bootstrap/Container';
 import Form from "react-bootstrap/Form";
-import {Button, Card, Col, Modal, Row } from 'react-bootstrap';
+import { Button, Card, Col, Modal, Row } from 'react-bootstrap';
 import { Avatar, Box, InputLabel, MenuItem, Select as MuiSelect, Typography } from '@mui/material';
 import DataTable from '../DataTable';
 import { API_URL } from '../../redux/constants/Constants';
@@ -16,7 +16,7 @@ import axios from 'axios';
 import Select from 'react-select';
 
 function OnHoldManegementSystem() {
-const inputRef = useRef(null);
+    const inputRef = useRef(null);
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -63,6 +63,10 @@ const inputRef = useRef(null);
 
 
     const renderVariationValues = (params) => {
+        console.log(params.row, 'params======');
+        const variationArray = Object.entries(params.row.variation_values).map(([key, value]) => ({ [key]: value }));
+        // const variationArray = params.row.variation_values
+        console.log(variationArray, 'variationArray');
         const { color, size } = params.row.variation_values;
         const { attribute_color, attribute_size } = params.row.variation_values;
         const noVariation = params.row.variation_values.length === 0;
@@ -75,7 +79,42 @@ const inputRef = useRef(null);
                     <Box>No any variation</Box>
                 ) : (
                     <>
-                        {colorAvailable && (
+                        {
+                            variationArray && (
+                                <Box className='d-flex  align-items-center'>
+                                    {variationArray.map((item, index) => {
+                                        const attributeName = Object.keys(item)[0];
+                                        const attributeValue = Object.values(item)[0];
+                                        console.log(attributeValue, 'attributeValue');
+                                        console.log(typeof (attributeValue), 'attributeValue===');
+                                        return (
+                                            <React.Fragment key={index}>
+                                                <InputLabel style={{ width: '500px' }} id={`customer-color-${params.row.id}-label`}>{attributeName}</InputLabel>
+                                                {typeof (attributeValue) === "string" ? (
+                                                    <div style={{ width: '100%' }}>{attributeValue}</div>
+                                                ) : (
+                                                    <MuiSelect
+                                                        labelId={`customer-color-${params.row.id}-label`}
+                                                        id={`customer-color-${params.row.id}`}
+                                                        onChange={(event) => handleAttributeChange(event, params.row, attributeName)}
+                                                        fullWidth
+                                                        style={{ height: "40px", width: "100%" }}
+                                                        value={params.row[attributeName]} // Assuming the value of each attribute is stored in params.row
+                                                    >
+                                                        {attributeValue?.map((value) => (
+                                                            <MenuItem key={value} value={value}>{value}</MenuItem>
+                                                        ))}
+                                                    </MuiSelect>
+                                                )}
+                                            </React.Fragment>
+                                        );
+                                    })}
+                                </Box>
+                            )
+
+
+                        }
+                        {/* {colorAvailable && (
                             <Box className=' d-flex align-items-center' >
                                 <InputLabel style={{width:'87px'}} id={`customer-color-${params.row.id}-label`}>Color</InputLabel>
                                 <MuiSelect
@@ -115,7 +154,7 @@ const inputRef = useRef(null);
                         
                         {attribute_size && (
                             <Box >Size:{attribute_size}</Box> //className="fw-bold fs-5"
-                        )}
+                        )} */}
                     </>
                 )}
             </Box>
@@ -137,26 +176,26 @@ const inputRef = useRef(null);
             //     />
             renderCell: (params) => (
                 <Box
-                  className="h-100 w-100 d-flex align-items-center"
-                  onClick={() => ImageModule(params.value)}
+                    className="h-100 w-100 d-flex align-items-center"
+                    onClick={() => ImageModule(params.value)}
                 >
-                  <Avatar 
-                    src={params.value || require("../../assets/default.png")}
-                    alt="Product Image"
-                    sx={{
-                      height: "45px",
-                      width: "45px",
-                      borderRadius: "2px",
-                      margin: "0 auto",
-                      "& .MuiAvatar-img": {
-                        height: "100%",
-                        width: "100%",
-                        borderRadius: "2px",
-                      },
-                    }}
-                  />
+                    <Avatar
+                        src={params.value || require("../../assets/default.png")}
+                        alt="Product Image"
+                        sx={{
+                            height: "45px",
+                            width: "45px",
+                            borderRadius: "2px",
+                            margin: "0 auto",
+                            "& .MuiAvatar-img": {
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: "2px",
+                            },
+                        }}
+                    />
                 </Box>
-              ),
+            ),
         },
         {
             field: "Quantity", headerName: "Quantity", flex: 1,
@@ -177,26 +216,68 @@ const inputRef = useRef(null);
         }
     ];
 
+    // function handleAttributeChange(event, rowIndex, attributeName) {
+    //     const newValue = event.target.value;
+    // console.log(rowIndex,'rowIndex====');
+    // console.log(attributeName,'attributeName====');
+    // console.log(rowIndex.variation_values,'rowIndex.variation_values====');
+    //     // Create a new array with updated attribute value
+    //     const updatedVariationArray = rowIndex.variation_values?.map((item, index) => 
+    //         // {
+    //         console.log(item,'item')
+    //         // console.log(index,'index');
+    //         // if (index === rowIndex) {
+    //         //     return { [attributeName]: newValue };
+    //         // }
+    //         // return item;
+    //     // }
+    // );
+    // console.log(updatedVariationArray,'updatedVariationArray');
+    //     // Update the state with the updated variationArray
+    //     // setVariationArray(updatedVariationArray);
+    // }
+    function handleAttributeChange(event, rowIndex, attributeName) {
+        const newValue = event.target.value;
+        // const attributeNames = attributeName
+        // console.log(attributeName,'attributeName');
+        console.log(rowIndex, 'rowIndex');
+        console.log(tableData, 'tableData');
+        console.log(rowIndex.variation_values[attributeName] = newValue, 'rowIndex');
+        console.log(rowIndex, 'rowIndex');
+        const updatedData = tableData.map(item =>
+            item.id === rowIndex.id ? { ...item, ...rowIndex } : item
+        );
+        console.log(updatedData, 'updatedData');
+        setTableData(updatedData);
+
+    }
+
+
+
     const handleFieldChange = (id, field, value) => {
         const updatedData = tableData.map(item => {
             if (item.id === value.id) {
-                return { ...item, [field]: id ,
-                    ...(field === 'variationColor' && 
-                    { variation_values:{attribute_color :id,
-                        ...(value.variation_values.size === undefined
-                            ?{attribute_size:value.variationSize}
-                        :{size:value.variation_values.size}
-                        ),
-                        } }
-                ),
-                ...(field === 'variationSize' && {
-                    variation_values: {
-                        attribute_size: id,
-                        ...(value.variation_values.color === undefined 
-                            ? { attribute_color: value.variationColor } 
-                            : { color: value.variation_values.color })
+                return {
+                    ...item, [field]: id,
+                    ...(field === 'variationColor' &&
+                    {
+                        variation_values: {
+                            attribute_color: id,
+                            ...(value.variation_values.size === undefined
+                                ? { attribute_size: value.variationSize }
+                                : { size: value.variation_values.size }
+                            ),
+                        }
                     }
-                })
+                    ),
+                    ...(field === 'variationSize' && {
+                        variation_values: {
+                            attribute_size: id,
+                            ...(value.variation_values.color === undefined
+                                ? { attribute_color: value.variationColor }
+                                : { color: value.variation_values.color })
+                        }
+                    })
                 };
             }
             return item;
@@ -216,7 +297,7 @@ const inputRef = useRef(null);
 
     const handleQtyChange = (id, event) => {
         const value = id.target.value
-        if(value>=0){
+        if (value >= 0) {
             handleFieldChange(id.target.value, 'Quantity', event);
         }
     };
@@ -240,26 +321,46 @@ const inputRef = useRef(null);
                 setSelectedOption(null)
                 const response = await dispatch(GetProductManual({ apiUrl }));
                 const data = response.data.products.map((v, i) => ({ ...v, id: i }));
+                // const data = response.data.products.map((product, index) => {
+                //     const variationArray = Object.entries(product.variation_values).map(([key, value]) => ({ [key]: value }));
+
+                //     return {
+                //         ...product,
+                //         id: index,
+                //         variationArray
+                //     };
+                // });
+                console.log(data, 'data====');
                 const modifiedData = data.map(item => ({
                     ...item,
                     variationColor: item.variation_values.length === 0 ? '' : '',
                     variationSize: item.variation_values.length === 0 ? '' : ''
                 }));
+                console.log(modifiedData, 'modifiedData');
                 setSingleProductD(modifiedData);
-                inputRef.current.value = ''; 
+                inputRef.current.value = '';
             } else if (productNameF && productIDF) {
                 const response = await dispatch(GetProductManual({ apiUrl }));
                 if (response.data.products) {
                     setSelectedOption(null)
                 }
                 const data = response.data.products.map((v, i) => ({ ...v, id: i }));
+                // const data = response.data.products.map((product, index) => {
+                //     const variationArray = Object.entries(product.variation_values).map(([key, value]) => ({ [key]: value }));
+
+                //     return {
+                //         ...product,
+                //         id: index,
+                //         variationArray
+                //     };
+                // });
                 const modifiedData = data.map(item => ({
                     ...item,
                     variationColor: item.variation_values.length === 0 ? '' : '',
                     variationSize: item.variation_values.length === 0 ? '' : ''
                 }));
                 setSingleProductD(modifiedData);
-                inputRef.current.value = ''; 
+                inputRef.current.value = '';
             }
         } catch (error) {
             console.error(error);
@@ -281,61 +382,111 @@ const inputRef = useRef(null);
     }, [])
 
     const handalADDProduct = () => {
-        let data = [...tableData,...singleProductD ]
+        let data = [...tableData, ...singleProductD]
         let Updatedata = data.map((v, i) => ({ ...v, id: i, Quantity: v.Quantity !== "" ? v.Quantity : 1, variationColor: v.variation_values.attribute_color !== undefined ? v.variation_values.attribute_color : '', variationSize: v.variation_values.attribute_size !== undefined ? v.variation_values.attribute_size : '' }));
+        console.log(Updatedata, 'Updatedata');
         validateForm(Updatedata);
-        const newData = Updatedata.reduce((acc, obj) => {
-            const existingIndex = acc.findIndex(item =>
-                item.product_name === obj.product_name &&
-                (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
-                (item.variationSize === obj.variationSize || (!item.variationSize && !obj.variationSize))
-            );
-            if (existingIndex !== -1) {
-                acc[existingIndex].Quantity = String(Number(acc[existingIndex].Quantity) + 1);
-                const originalArray = [acc[existingIndex]];
-                const filteredComparedArray = acc.filter(comparedItem => {
-                    return !originalArray.some(originalItem => {
-                        return (
-                            originalItem.product_name === comparedItem.product_name &&
-                            (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
-                            (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
-                        );
-                    });
-                });
-                const outputArray = [...originalArray, ...filteredComparedArray];
-                acc = outputArray
+        // const newData = Updatedata.reduce((acc, obj) => {
+        //     const existingIndex = acc.findIndex(item =>
+        //         item.product_name === obj.product_name &&
+        //         (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
+        //         (item.variationSize === obj.variationSize || (!item.variationSize && !obj.variationSize))
+        //     );
+        //     if (existingIndex !== -1) {
+        //         acc[existingIndex].Quantity = String(Number(acc[existingIndex].Quantity) + 1);
+        //         const originalArray = [acc[existingIndex]];
+        //         const filteredComparedArray = acc.filter(comparedItem => {
+        //             return !originalArray.some(originalItem => {
+        //                 return (
+        //                     originalItem.product_name === comparedItem.product_name &&
+        //                     (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
+        //                     (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
+        //                 );
+        //             });
+        //         });
+        //         const outputArray = [...originalArray, ...filteredComparedArray];
+        //         acc = outputArray
+        //     } else {
+        //         // acc.push(obj);
+        //         // acc.unshift(obj);
+        //         const originalArray = [obj];
+        //         const filteredComparedArray = acc.filter(comparedItem => {
+        //             return !originalArray.some(originalItem => {
+        //                 return (
+        //                     originalItem.product_name === comparedItem.product_name &&
+        //                     (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
+        //                     (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
+        //                 );
+        //             });
+        //         });
+        //         const outputArray = [...originalArray, ...filteredComparedArray];
+        //         // acc.push(obj);
+        //         acc = outputArray
+        //     }
+        //     return acc;
+        // }, []);
+
+        // const mergedData = Object.values(Updatedata.reduce((acc, item) => {
+        //     // Create a unique key based on name and data
+        //     const key = JSON.stringify({ product_name: item.product_name, variation_values: item.variation_values });
+
+        //     // If the key is not in the accumulator, add it
+        //     if (!acc[key]) {
+        //         acc[key] = { ...item, Quantity: item.Quantity };
+        //     } else {
+        //         // If the key exists, increase the marks by 1
+        //         acc[key].Quantity = String(Number(acc[key].Quantity) + 1);
+        //     }
+
+        //     return acc;
+        // }, {}));
+
+        // // Sort the merged data to place the updated object at the top
+        // mergedData.sort((a, b) => {
+        //     // You can customize the sorting logic here
+        //     // For example, placing items with higher Quantity at the top
+        //     return b.Quantity - a.Quantity;
+        // });
+
+        // console.log(mergedData);
+
+
+        const mergedData = Updatedata.reduce((acc, item) => {
+            // Create a unique key based on product_name and variation_values
+            const key = JSON.stringify({ product_name: item.product_name, variation_values: item.variation_values });
+        
+            // Check if the key is in the accumulator
+            const existingIndex = acc.findIndex(entry => JSON.stringify({ product_name: entry.product_name, variation_values: entry.variation_values }) === key);
+        
+            if (existingIndex === -1) {
+                // If the key is not in the accumulator, add it to the start of the array
+                acc.unshift({ ...item, Quantity: item.Quantity });
             } else {
-                // acc.push(obj);
-                // acc.unshift(obj);
-                const originalArray = [obj];
-                const filteredComparedArray = acc.filter(comparedItem => {
-                    return !originalArray.some(originalItem => {
-                        return (
-                            originalItem.product_name === comparedItem.product_name &&
-                            (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
-                            (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
-                        );
-                    });
-                });
-                const outputArray = [...originalArray, ...filteredComparedArray];
-                // acc.push(obj);
-                acc = outputArray
+                // If the key exists, increase the Quantity by 1 and move the item to the start of the array
+                acc[existingIndex].Quantity = String(Number(acc[existingIndex].Quantity) + 1);
+                const updatedItem = acc.splice(existingIndex, 1)[0];
+                acc.unshift(updatedItem);
             }
+        
             return acc;
         }, []);
-        setTableData(newData)
+        
+        console.log(mergedData);
+
+
+        setTableData(mergedData)
         setProductName('')
         setProductID('')
     }
 
     const handalonChangeProductId = (e) => {
-        if(e.key === 'Enter') {
+        if (e.key === 'Enter') {
             setProductName('')
             setProductID(e.target.value)
         }
 
     }
-   
+
     const handleFileChange = async (e) => {
         if (e.target.files[0]) {
             const file = await CompressImage(e?.target?.files[0])
@@ -358,12 +509,13 @@ const inputRef = useRef(null);
             product_name: item.product_name,
             product_image: item.product_image,
             variation_id: 1,
-            variations: item.variationColor !== "" && item.variationSize !== "" ? { color: item.variationColor, size: item.variationSize } : [],
+            // variations: item.variationColor !== "" && item.variationSize !== "" ? { color: item.variationColor, size: item.variationSize } : [],
+            variations: item.variation_values,
             qty_received: parseInt(item.Quantity),
             qty_remain: parseInt(item.Quantity),
             updated_date: currentDate,
         }));
-
+        // const convertedData = tableData
         const payload = {
             "created_date": date,
             "verified_by": userName,
@@ -372,6 +524,7 @@ const inputRef = useRef(null);
             "status": "Pending for process",
             products: convertedData
         };
+        console.log(payload, 'payload=====');
         try {
             dispatch(AddGrn(payload, navigate))
         } catch (error) {
@@ -423,7 +576,7 @@ const inputRef = useRef(null);
                                 value={receivedBoxes}
                                 onChange={(e) => {
                                     const value = e.target.value
-                                    if(value>=0){
+                                    if (value >= 0) {
                                         setReceivedBoxes(e.target.value)
                                     }
                                 }}
@@ -460,7 +613,7 @@ const inputRef = useRef(null);
                         <Col xs="auto" lg="4">
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product ID:</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Product ID"  ref={inputRef} onKeyDown={(e) => handalonChangeProductId(e)} />
+                                <Form.Control type="text" placeholder="Enter Product ID" ref={inputRef} onKeyDown={(e) => handalonChangeProductId(e)} />
                                 {/* <Form.Control type="text" placeholder="Enter Product ID" onKeyDown={(e) => handalonChangeProductId2(e)} /> */}
                             </Form.Group>
                         </Col>
@@ -472,7 +625,7 @@ const inputRef = useRef(null);
                                     <DataTable
                                         columns={columns}
                                         rows={tableData}
-                                        // rowHeight={100}
+                                    // rowHeight={100}
                                     // page={page}
                                     // pageSize={pageSize}
                                     // totalPages={totalPages}
@@ -480,7 +633,10 @@ const inputRef = useRef(null);
                                     />
                                 </div>
                                 <MDBRow className='justify-content-end px-3'>
-                                    <Button variant="primary" disabled={!isValid} style={{ width: '100px' }} onClick={handleSubmit}>
+                                    {/* <Button variant="primary" disabled={!isValid} style={{ width: '100px' }} onClick={handleSubmit}>
+                                        submit
+                                    </Button> */}
+                                    <Button variant="primary"  style={{ width: '100px' }} onClick={handleSubmit}>
                                         submit
                                     </Button>
                                 </MDBRow>
