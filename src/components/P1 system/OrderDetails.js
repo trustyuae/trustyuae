@@ -523,7 +523,7 @@ function OrderDetails() {
 
               </Col>
             </Row>
-          );
+          ); 
         } else {
           return (
             <Row className={`${"justify-content-center"} h-100`}>
