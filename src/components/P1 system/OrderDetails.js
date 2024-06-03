@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import {Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
 import { Alert, Avatar, Box, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -59,7 +59,10 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
-  console.log(orderDetailsDataOrderId,'orderDetailsDataOrderIdbbbbbbbbbbbbbbbbbbbbbbb')
+  console.log(
+    orderDetailsDataOrderId,
+    "orderDetailsDataOrderIdbbbbbbbbbbbbbbbbbbbbbbb"
+  );
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -400,7 +403,7 @@ function OrderDetails() {
                       top: "-30px",
                       right: "90px",
                       cursor: "pointer",
-                      color:'red',
+                      color: "red",
                       zIndex: 1,
                       // disabled=isDisabled
                       opacity: isDisabled ? 0.5 : 1,
@@ -746,39 +749,48 @@ function OrderDetails() {
                             Please upload attachment for all the products in
                             below order table!
                           </Alert>
-                        ) : (orderDetailsDataOrderId?.overall_order_dis_image == "") ? (
+                        ) : orderDetailsDataOrderId?.overall_order_dis_image !=
+                          "" ? (
+                          <Avatar
+                            src={
+                              orderDetailsDataOrderId?.overall_order_dis_image
+                            }
+                            alt="Product Image"
+                            sx={{
+                              height: "150px",
+                              width: "100%",
+                              borderRadius: "2px",
+                              margin: "0 auto",
+                              "& .MuiAvatar-img": {
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: "2px",
+                              },
+                            }}
+                          />
+                        ) : (
                           <>
                             <Card className="factory-card me-1 shadow-sm mb-0">
-                              {userData?.user_id ===
-                                orderDetails?.operation_user_id &&
-                              orderProcess === "started" ? (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  onClick={() => fileInputRef?.current?.click()}
-                                >
-                                  <CloudUploadIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Device
-                                  </Typography>
+                              {userData?.user_id == orderDetailsDataOrderId?.operation_user_id && orderProcess == "started" ? (
+                                <>
+                                  <Button
+                                    className="bg-transparent border-0 text-black"
+                                    onClick={() =>
+                                      fileInputRef?.current?.click()
+                                    }
+                                  >
+                                    <CloudUploadIcon />
+                                    <Typography style={{ fontSize: "14px" }}>
+                                      Device
+                                    </Typography>
+                                  </Button>
                                   <input
                                     type="file"
                                     ref={fileInputRef}
                                     style={{ display: "none" }}
                                     onChange={handleFileInputChange}
                                   />
-                                </Button>
-                              ) : orderProcess === "started" &&
-                                userData?.user_id !==
-                                  orderDetails?.operation_user_id ? (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  disabled
-                                >
-                                  <CloudUploadIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Device
-                                  </Typography>
-                                </Button>
+                                </>
                               ) : (
                                 <Button
                                   className="bg-transparent border-0 text-black"
@@ -791,25 +803,12 @@ function OrderDetails() {
                                 </Button>
                               )}
                             </Card>
+
                             <Card className="factory-card ms-1 shadow-sm mb-0">
-                              {userData?.user_id ===
-                                orderDetails?.operation_user_id &&
-                              orderProcess === "started" ? (
+                              {userData?.user_id == orderDetailsDataOrderId?.operation_user_id && orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
-                                >
-                                  <CameraAltIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Camera
-                                  </Typography>
-                                </Button>
-                              ) : orderProcess === "started" &&
-                                userData?.user_id !==
-                                  orderDetails?.operation_user_id ? (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  disabled
                                 >
                                   <CameraAltIcon />
                                   <Typography style={{ fontSize: "14px" }}>
@@ -829,24 +828,6 @@ function OrderDetails() {
                               )}
                             </Card>
                           </>
-                        ) : (
-                          <Avatar
-                            src={
-                              orderDetailsDataOrderId?.overall_order_dis_image
-                            }
-                            alt="Product Image"
-                            sx={{
-                              height: "150px",
-                              width: "100%",
-                              borderRadius: "2px",
-                              margin: "0 auto",
-                              "& .MuiAvatar-img": {
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: "2px",
-                              },
-                            }}
-                          />
                         )}
                       </Col>
                     </Row>
