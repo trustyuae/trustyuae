@@ -463,6 +463,7 @@ function OrderDetails() {
       type: "html",
       renderCell: (value, row) => {
         console.log(value.row.dispatch_imag, "value.....................");
+        console.log(value, "value.....................");
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const handleFileInputChangeForRow = (e) => {
           handleFileInputChange(e, itemId);
@@ -472,6 +473,7 @@ function OrderDetails() {
           fileInputRef.current = {};
         }
         if (value && value.row.dispatch_image) {
+          const isDisabled = orderDetails.order_process !=="started"
           return (
             <Row className={`${"justify-content-center"} h-100`}>
               <Col
@@ -484,9 +486,17 @@ function OrderDetails() {
                     top: "-21px",
                     right: "-87px",
                     cursor: "pointer",
-                    zIndex: 1
+                    zIndex: 1,
+                    // disabled=isDisabled
+                    opacity: isDisabled ? 0.5 : 1,
+                    pointerEvents: isDisabled ? "none" : "auto",
+                    cursor: isDisabled ? "not-allowed" : "pointer",
+
                   }}
-                  onClick={e => handleCancelImg(value.row)}
+                  onClick={e =>{
+                     if(!isDisabled) {
+                    handleCancelImg(value.row);
+                  }}}
                 />
                 <Box
                   className="h-100 w-100 d-flex align-items-center"
