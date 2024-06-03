@@ -947,7 +947,7 @@ function OrderDetails() {
                         ) : (
                           <Avatar
                             src={
-                              orderDetailsDataOrderId.overall_order_dis_image
+                              orderDetailsDataOrderId?.overall_order_dis_image
                             }
                             alt="Product Image"
                             sx={{

@@ -244,7 +244,7 @@ function CompletedOrderDetails() {
         <Row className="mb-3">
           <Col
             sm={12}
-            md={orderDetailsDataOrderId.overall_order_dis_image ? 6 : 12}
+            md={(orderDetailsDataOrderId?.overall_order_dis_image)? 6 : 12}
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
@@ -359,7 +359,7 @@ function CompletedOrderDetails() {
               )}
             </Card>
           </Col>
-          {orderDetailsDataOrderId.overall_order_dis_image ? (
+          {(orderDetailsDataOrderId?.overall_order_dis_image) ? (
             <Col sm={12} md={6}>
               <Card className="p-3 h-100">
                 <Typography variant="h6" className="fw-bold mb-3">
