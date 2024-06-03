@@ -59,6 +59,8 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
+  console.log(orderDetailsDataOrderId,'orderDetailsDataOrderIdbbbbbbbbbbbbbbbbbbbbbbb')
+
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedFileUrl(imageSrc);

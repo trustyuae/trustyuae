@@ -26,7 +26,7 @@ function CompletedOrderDetails() {
     (state) => state?.orderSystemData?.isCompletedOrderDetails
   );
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystemData?.completedOrderDetails?.orders?.[0]
   );
 
   async function fetchOrder() {
@@ -195,12 +195,12 @@ function CompletedOrderDetails() {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-               Completed Order Details
+                Completed Order Details
               </Typography>
               {loader ? (
                 <Loader />
               ) : (
-                <Box className='d-flex justify-content-between'>
+                <Box className="d-flex justify-content-between">
                   <Box>
                     <Typography className="fw-bold">
                       Order# {params.id}
@@ -214,8 +214,10 @@ function CompletedOrderDetails() {
                       <Badge bg="success">{orderDetails?.order_status}</Badge>
                     </Typography>
                   </Box>
-                  <Box sx={{marginLeft:'20px'}}>
-                    <Typography className="fw-bold"># Enter User name ...</Typography>
+                  <Box sx={{ marginLeft: "20px" }}>
+                    <Typography className="fw-bold">
+                      # Enter User name ...
+                    </Typography>
                     <Typography
                       className=""
                       sx={{
@@ -240,7 +242,10 @@ function CompletedOrderDetails() {
           </Box>
         </Card>
         <Row className="mb-3">
-          <Col sm={12} md={12}>
+          <Col
+            sm={12}
+            md={orderDetailsDataOrderId.overall_order_dis_image ? 6 : 12}
+          >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
                 Customer & Order
@@ -354,6 +359,43 @@ function CompletedOrderDetails() {
               )}
             </Card>
           </Col>
+          {orderDetailsDataOrderId.overall_order_dis_image ? (
+            <Col sm={12} md={6}>
+              <Card className="p-3 h-100">
+                <Typography variant="h6" className="fw-bold mb-3">
+                  Attachment
+                </Typography>
+                {loader ? (
+                  <Loader />
+                ) : (
+                  <>
+                    <Row className={`${"justify-content-center"} h-100`}>
+                      <Col
+                        md={12}
+                        className={`d-flex align-items-center justify-content-center my-1`}
+                      >
+                        <Avatar
+                          src={orderDetailsDataOrderId.overall_order_dis_image}
+                          alt="Product Image"
+                          sx={{
+                            height: "150px",
+                            width: "100%",
+                            borderRadius: "2px",
+                            margin: "0 auto",
+                            "& .MuiAvatar-img": {
+                              height: "100%",
+                              width: "100%",
+                              borderRadius: "2px",
+                            },
+                          }}
+                        />
+                      </Col>
+                    </Row>
+                  </>
+                )}
+              </Card>
+            </Col>
+          ) : null}
         </Row>
 
         <Card className="p-3 mb-3">
