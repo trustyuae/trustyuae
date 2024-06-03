@@ -4,22 +4,23 @@ const ShowAlert = async (
   title,
   text,
   icons,
-  showCancelButton = false,
   showConfirmButton,
-  cancelButtonText,
+  showCancelButton = false,
   confirmButtonText,
+  cancelButtonText,
   timer
 ) => {
   const result = await Swal.fire({
     title: title,
     text: text,
     icon: icons,
-    showCancelButton: showCancelButton,
     showConfirmButton: showConfirmButton,
-    cancelButtonText: cancelButtonText,
+    showCancelButton: showCancelButton,
     confirmButtonText: confirmButtonText,
+    cancelButtonText: cancelButtonText,
     timer: timer,
   });
+  console.log(result, 'result')
   return result;
 };
 

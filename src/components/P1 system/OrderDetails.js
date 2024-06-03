@@ -122,7 +122,7 @@ function OrderDetails() {
 
   useEffect(() => {
     fetchOrder();
-  }, [message,setTableData,setOrderData]);
+  }, [message, setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -152,24 +152,24 @@ function OrderDetails() {
     setSelectedFile(null);
     setShowAttachmentModal(false);
   };
-  const handleCancelImg =async (e) => {
-    console.log(e,'e======');
+  const handleCancelImg = async (e) => {
+    console.log(e, 'e======');
     Swal.fire({
       title: 'Are you sure you want to delete this image?',
-      icon: "success",
+      icon: "question",
       showConfirmButton: true,
       showCancelButton: true,
-      confirmButtonText: 'OK',
-      cancelButtonText: 'Cancel'
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No'
     }).then(async (result) => {
       if (result.isConfirmed) {
         // Redirect only if "OK" is clicked
-        console.log('hiii');
-        const response = await axios.post(`${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,{
+        const response = await axios.post(`${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`, {
           "variation_id": e.variation_id,
           "image_url": e.dispatch_image
         })
-        console.log(response,'response');
+        fetchOrder()
+        console.log(response, 'response');
       }
     });
     // setSelectedFileUrl(null);
@@ -201,7 +201,9 @@ function OrderDetails() {
             null,
             2000
           );
+          console.log(result, 'result=======img');
           if (result.isConfirmed) handleCancel();
+          if (result) fetchOrder();
         }
       })
       .catch((error) => {
@@ -263,7 +265,7 @@ function OrderDetails() {
       console.error("Error while finishing order:", error);
     }
   };
-  
+
 
   const variant = (variations) => {
     const matches = variations.match(
@@ -477,31 +479,38 @@ function OrderDetails() {
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
                 <CancelIcon
-                    sx={{
-                      position: "relative",
-                      top: "-9px",
-                      right: "9px",
-                      cursor: "pointer",
-                    }}
-                    onClick={e=>handleCancelImg(value.row)}
-                  />
-                <Avatar
-                  src={
-                    value.row.dispatch_image
-                  }
-                  alt="Product Image"
                   sx={{
-                    height: "45px",
-                    width: "45px",
-                    borderRadius: "2px",
-                    margin: "0 auto",
-                    "& .MuiAvatar-img": {
-                      height: "100%",
-                      width: "100%",
-                      borderRadius: "2px",
-                    },
+                    position: "relative",
+                    top: "-21px",
+                    right: "-87px",
+                    cursor: "pointer",
+                    zIndex: 1
                   }}
+                  onClick={e => handleCancelImg(value.row)}
                 />
+                <Box
+                  className="h-100 w-100 d-flex align-items-center"
+                  onClick={() => ImageModule(value.row.dispatch_image)}
+                >
+                  <Avatar
+                    src={
+                      value.row.dispatch_image
+                    }
+                    alt="Product Image"
+                    sx={{
+                      height: "45px",
+                      width: "45px",
+                      borderRadius: "2px",
+                      margin: "0 auto",
+                      "& .MuiAvatar-img": {
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: "2px",
+                      },
+                    }}
+                  />
+                </Box>
+
               </Col>
             </Row>
           );
@@ -514,7 +523,7 @@ function OrderDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" ? (
+                    orderProcess == "started" ? (
                     <Button
                       className="bg-transparent border-0  text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -555,7 +564,7 @@ function OrderDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" ? (
+                    orderProcess == "started" ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -664,7 +673,7 @@ function OrderDetails() {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+                orderProcess == "started" ? (
                 <Button
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
@@ -826,10 +835,10 @@ function OrderDetails() {
                       >
                         <Card className="factory-card me-1 shadow-sm mb-0">
                           {userData?.user_id == orderDetails?.operation_user_id &&
-                          orderProcess == "started" ? (
+                            orderProcess == "started" ? (
                             <Button
                               className="bg-transparent border-0  text-black"
-                              // onClick={() => fileInputRef.current[selectedItemId]?.click()}
+                            // onClick={() => fileInputRef.current[selectedItemId]?.click()}
                             >
                               <CloudUploadIcon />
                               <Typography style={{ fontSize: "14px" }}>
@@ -839,12 +848,12 @@ function OrderDetails() {
                                 type="file"
                                 // ref={(input) => (fileInputRef.current[selectedItemId] = input)}
                                 style={{ display: "none" }}
-                                // onChange={handleFileInputChangeForRow}
+                              // onChange={handleFileInputChangeForRow}
                               />
                             </Button>
                           ) : orderProcess == "started" &&
                             userData?.user_id !=
-                              orderDetails?.operation_user_id ? (
+                            orderDetails?.operation_user_id ? (
                             <Button
                               className="bg-transparent border-0  text-black"
                               disabled
@@ -868,7 +877,7 @@ function OrderDetails() {
                         </Card>
                         <Card className="factory-card ms-1 shadow-sm mb-0">
                           {userData?.user_id == orderDetails?.operation_user_id &&
-                          orderProcess == "started" ? (
+                            orderProcess == "started" ? (
                             <Button
                               className="bg-transparent border-0 text-black"
                               onClick={() => {
@@ -883,7 +892,7 @@ function OrderDetails() {
                             </Button>
                           ) : orderProcess == "started" &&
                             userData?.user_id !=
-                              orderDetails?.operation_user_id ? (
+                            orderDetails?.operation_user_id ? (
                             <Button
                               className="bg-transparent border-0 text-black"
                               disabled
@@ -944,7 +953,7 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" ? (
+              orderProcess == "started" ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
