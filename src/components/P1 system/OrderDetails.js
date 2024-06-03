@@ -861,7 +861,7 @@ function OrderDetails() {
                             Please upload attachment for all the products in
                             below order table!
                           </Alert>
-                        ) : !orderDetailsDataOrderId?.overall_order_dis_image ? (
+                        ) : (orderDetailsDataOrderId?.overall_order_dis_image == "") ? (
                           <>
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ===
