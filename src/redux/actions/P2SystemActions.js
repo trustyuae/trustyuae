@@ -135,6 +135,7 @@ export const AddPO = (payload, navigate) => async (dispatch) => {
       `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
       payload
     );
+
     if (response.data) {
       console.log(response, 'response addPO')
       const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
@@ -149,6 +150,9 @@ export const AddPO = (payload, navigate) => async (dispatch) => {
     return response;
   } catch (error) {
     dispatch({ type: ADD_PO_FAIL, error: error.message });
+    // return error
+    const result = await ShowAlert('Error', error.response.data.message, "error", true, false, 'OK');
+
   }
 };
 
