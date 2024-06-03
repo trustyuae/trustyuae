@@ -513,9 +513,10 @@ function OrderDetails() {
                   <CancelIcon
                     sx={{
                       position: "relative",
-                      top: "-23px",
-                      right: "60px",
+                      top: "-30px",
+                      right: "90px",
                       cursor: "pointer",
+                      color:'red',
                       zIndex: 1,
                       // disabled=isDisabled
                       opacity: isDisabled ? 0.5 : 1,
