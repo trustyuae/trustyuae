@@ -156,7 +156,6 @@ function OrderDetails() {
     setShowAttachmentModal(false);
   };
   const handleCancelImg = async (e) => {
-    console.log(e, "e======");
     Swal.fire({
       title: "Are you sure you want to delete this image?",
       icon: "question",
@@ -166,7 +165,6 @@ function OrderDetails() {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        // Redirect only if "OK" is clicked
         const response = await axios.post(
           `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
@@ -175,12 +173,8 @@ function OrderDetails() {
           }
         );
         fetchOrder();
-        console.log(response, "response");
       }
     });
-    // setSelectedFileUrl(null);
-    // setSelectedFile(null);
-    // setShowAttachmentModal(false);
   };
 
   const handleSubmitAttachment = async () => {
@@ -222,8 +216,6 @@ function OrderDetails() {
       console.error(error);
     }
   };
-
-  const handleSubmitAttachmentOverAll = async () => {};
 
   const handleStartOrderProcess = async () => {
     const requestData = {
@@ -360,114 +352,6 @@ function OrderDetails() {
       className: "order-details",
       type: "string",
     },
-    // {
-    //   field: "view_item",
-    //   headerName: "Attachment",
-    //   flex: 1.5,
-    //   className: "order-details",
-    //   type: "html",
-    //   renderCell: (value, row) => {
-    //     const itemId = value && value.row.item_id ? value.row.item_id : null;
-    //     return (
-    //       <Row className={`${"justify-content-center"} h-100`}>
-    //         <Col
-    //           md={12}
-    //           className={`d-flex align-items-center justify-content-center my-1`}
-    //         >
-    //           <Card className="factory-card me-1 shadow-sm mb-0">
-    //             {userData?.user_id == orderDetails?.operation_user_id &&
-    //               orderProcess == "started" ? (
-    //               <Button
-    //                 className="bg-transparent border-0  text-black"
-    //                 onClick={() => fileInputRef.current.click()}
-    //               >
-    //                 <CloudUploadIcon />
-    //                 <Typography style={{ fontSize: "14px" }}>Device</Typography>
-    //                 <input
-    //                   type="file"
-    //                   ref={fileInputRef}
-    //                   style={{ display: "none" }}
-    //                   onChange={(e) => handleFileInputChange(e, itemId)}
-    //                 />
-    //               </Button>
-    //             ) : orderProcess == "started" &&
-    //               userData?.user_id != orderDetails?.operation_user_id ? (
-    //               <Button
-    //                 className="bg-transparent border-0  text-black"
-    //                 disabled
-    //                 onClick={() => fileInputRef.current.click()}
-    //               >
-    //                 <CloudUploadIcon />
-    //                 <Typography style={{ fontSize: "14px" }}>Device</Typography>
-    //                 <input
-    //                   type="file"
-    //                   ref={fileInputRef}
-    //                   style={{ display: "none" }}
-    //                   onChange={(e) => handleFileInputChange(e, itemId)}
-    //                 />
-    //               </Button>
-    //             ) : (
-    //               <Button
-    //                 className="bg-transparent border-0  text-black"
-    //                 disabled
-    //                 onClick={() => fileInputRef.current.click()}
-    //               >
-    //                 <CloudUploadIcon />
-    //                 <Typography style={{ fontSize: "14px" }}>Device</Typography>
-    //                 <input
-    //                   type="file"
-    //                   ref={fileInputRef}
-    //                   style={{ display: "none" }}
-    //                   onChange={(e) => handleFileInputChange(e, itemId)}
-    //                 />
-    //               </Button>
-    //             )}
-    //           </Card>
-    //           <Card className="factory-card ms-1 shadow-sm mb-0">
-    //             {userData?.user_id == orderDetails?.operation_user_id &&
-    //               orderProcess == "started" ? (
-    //               <Button
-    //                 className="bg-transparent border-0 text-black"
-    //                 onClick={() => {
-    //                   setShowAttachModal(true);
-    //                   setSelectedItemId(itemId);
-    //                 }}
-    //               >
-    //                 <CameraAltIcon />
-    //                 <Typography style={{ fontSize: "14px" }}>Camera</Typography>
-    //               </Button>
-    //             ) : orderProcess == "started" &&
-    //               userData?.user_id != orderDetails?.operation_user_id ? (
-    //               <Button
-    //                 className="bg-transparent border-0 text-black"
-    //                 disabled
-    //                 onClick={() => {
-    //                   setShowAttachModal(true);
-    //                   setSelectedItemId(itemId);
-    //                 }}
-    //               >
-    //                 <CameraAltIcon />
-    //                 <Typography style={{ fontSize: "14px" }}>Camera</Typography>
-    //               </Button>
-    //             ) : (
-    //               <Button
-    //                 className="bg-transparent border-0 text-black"
-    //                 disabled
-    //                 onClick={() => {
-    //                   setShowAttachModal(true);
-    //                   setSelectedItemId(itemId);
-    //                 }}
-    //               >
-    //                 <CameraAltIcon />
-    //                 <Typography style={{ fontSize: "14px" }}>Camera</Typography>
-    //               </Button>
-    //             )}
-    //           </Card>
-    //         </Col>
-    //       </Row>
-    //     );
-    //   },
-    // },
     {
       field: "dispatch_image",
       headerName: "Attachment",
