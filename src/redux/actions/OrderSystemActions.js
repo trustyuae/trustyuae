@@ -29,6 +29,9 @@ import {
   GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL,
   GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
   GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST,
+  UPLOAD_OVERALL_ATTACH_FILE_SUCCESS,
+  UPLOAD_OVERALL_ATTACH_FILE_FAIL,
+  UPLOAD_OVERALL_ATTACH_FILE_REQUEST,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -124,6 +127,30 @@ export const AttachmentFileUpload =
       return response;
     } catch (error) {
       dispatch({ type: UPLOAD_ATTACH_FILE_FAIL, error: error.message });
+    }
+  };
+
+
+  export const OverAllAttachmentFileUpload =
+  ({ order_id, order_dispatch_image }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: UPLOAD_OVERALL_ATTACH_FILE_REQUEST });
+      const requestData = new FormData();
+      requestData.append("order_dispatch_image", order_dispatch_image);
+      const response = await axios.post(
+        `${API_URL}wp-json/order-complete-attachment/v1/order-attachment/${order_id}`,
+        requestData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      dispatch({ type: UPLOAD_OVERALL_ATTACH_FILE_SUCCESS, payload: response?.data });
+      return response;
+    } catch (error) {
+      dispatch({ type: UPLOAD_OVERALL_ATTACH_FILE_FAIL, error: error.message });
     }
   };
 
