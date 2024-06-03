@@ -27,6 +27,9 @@ import {
   GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL,
   GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
   GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST,
+  UPLOAD_OVERALL_ATTACH_FILE_REQUEST,
+  UPLOAD_OVERALL_ATTACH_FILE_SUCCESS,
+  UPLOAD_OVERALL_ATTACH_FILE_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -40,6 +43,8 @@ const initialState = {
   isCompletedOrderDetails: false,
   uploadAttachFile: [],
   isUploadAttachFile: false,
+  uploadOverAllAttachFile: [],
+  isUploadOverAllAttachFile: false,
   Message: [],
   isMessage: false,
   orderPickUp: [],
@@ -94,15 +99,26 @@ const OrderSystemReducer = (state = initialState, action) => {
       return { ...state, isOrderDetails: false, error: action.payload };
 
     case UPLOAD_ATTACH_FILE_REQUEST:
-      return { ...state, isOrderPickUp: true };
+      return { ...state, isUploadAttachFile: true };
     case UPLOAD_ATTACH_FILE_SUCCESS:
       return {
         ...state,
-        isOrderPickUp: false,
+        isUploadAttachFile: false,
         uploadAttachFile: action.payload,
       };
     case UPLOAD_ATTACH_FILE_FAIL:
-      return { ...state, isOrderPickUp: false, error: action.payload };
+      return { ...state, isUploadAttachFile: false, error: action.payload };
+
+      case UPLOAD_OVERALL_ATTACH_FILE_REQUEST:
+      return { ...state, isUploadOverAllAttachFile: true };
+    case UPLOAD_OVERALL_ATTACH_FILE_SUCCESS:
+      return {
+        ...state,
+        isUploadOverAllAttachFile: false,
+        uploadOverAllAttachFile: action.payload,
+      };
+    case UPLOAD_OVERALL_ATTACH_FILE_FAIL:
+      return { ...state, isUploadOverAllAttachFile: false, error: action.payload };
 
     case ADD_MESSAGE_REQUEST:
       return { ...state, isMessage: true };

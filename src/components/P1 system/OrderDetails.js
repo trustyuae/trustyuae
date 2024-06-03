@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { Alert, Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
+import {Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
-import { Avatar, Box, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -20,6 +20,7 @@ import {
   InsertOrderPickup,
   InsertOrderPickupCancel,
   OrderDetailsGet,
+  OverAllAttachmentFileUpload,
 } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
@@ -153,23 +154,26 @@ function OrderDetails() {
     setShowAttachmentModal(false);
   };
   const handleCancelImg = async (e) => {
-    console.log(e, 'e======');
+    console.log(e, "e======");
     Swal.fire({
-      title: 'Are you sure you want to delete this image?',
+      title: "Are you sure you want to delete this image?",
       icon: "question",
       showConfirmButton: true,
       showCancelButton: true,
-      confirmButtonText: 'Yes',
-      cancelButtonText: 'No'
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
         // Redirect only if "OK" is clicked
-        const response = await axios.post(`${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`, {
-          "variation_id": e.variation_id,
-          "image_url": e.dispatch_image
-        })
-        fetchOrder()
-        console.log(response, 'response');
+        const response = await axios.post(
+          `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
+          {
+            variation_id: e.variation_id,
+            image_url: e.dispatch_image,
+          }
+        );
+        fetchOrder();
+        console.log(response, "response");
       }
     });
     // setSelectedFileUrl(null);
@@ -178,38 +182,46 @@ function OrderDetails() {
   };
 
   const handleSubmitAttachment = async () => {
-    const { user_id } = userData ?? {};
-    dispatch(
-      AttachmentFileUpload({
-        user_id: user_id,
-        order_id: orderDetailsDataOrderId?.order_id,
-        item_id: selectedItemId,
-        selectedFile: selectedFile,
-      })
-    )
-      .then(async (response) => {
-        if (response.data.success) {
-          setShowAttachmentModal(false);
-          setSelectedFile(null);
-          const result = await ShowAlert(
-            "",
-            "Uploaded Successfully!",
-            "success",
-            null,
-            null,
-            null,
-            null,
-            2000
-          );
-          console.log(result, 'result=======img');
-          if (result.isConfirmed) handleCancel();
-          if (result) fetchOrder();
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    try {
+      const { user_id } = userData ?? {};
+      if (selectedItemId) {
+        await dispatch(
+          AttachmentFileUpload({
+            user_id: user_id,
+            order_id: orderDetailsDataOrderId?.order_id,
+            item_id: selectedItemId,
+            selectedFile: selectedFile,
+          })
+        );
+      } else {
+        await dispatch(
+          OverAllAttachmentFileUpload({
+            order_id: orderDetailsDataOrderId?.order_id,
+            order_dispatch_image: selectedFile,
+          })
+        );
+      }
+      setShowAttachmentModal(false);
+      setSelectedFile(null);
+      const result = await ShowAlert(
+        "",
+        "Uploaded Successfully!",
+        "success",
+        null,
+        null,
+        null,
+        null,
+        2000
+      );
+      console.log(result, "result=======img");
+      if (result.isConfirmed) handleCancel();
+      fetchOrder();
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  const handleSubmitAttachmentOverAll = async () => {};
 
   const handleStartOrderProcess = async () => {
     const requestData = {
@@ -247,7 +259,7 @@ function OrderDetails() {
     try {
       const { user_id } = userData ?? {};
       const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
-      if (response.data.status === 'Completed') {
+      if (response.data.status === "Completed") {
         Swal.fire({
           title: response.data.message,
           icon: "success",
@@ -265,7 +277,6 @@ function OrderDetails() {
       console.error("Error while finishing order:", error);
     }
   };
-
 
   const variant = (variations) => {
     const matches = variations.match(
@@ -473,22 +484,16 @@ function OrderDetails() {
           fileInputRef.current = {};
         }
         if (value && value.row.dispatch_image) {
-          const isDisabled = orderDetails.order_process !== "started"
+          const isDisabled = orderDetails.order_process !== "started";
           return (
             <Row className={`${"justify-content-center"} h-100`}>
               <Col
                 md={12}
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
-
-                <Box
-                  className="h-100 w-100 d-flex align-items-center position-relative"
-                  
-                >
+                <Box className="h-100 w-100 d-flex align-items-center position-relative">
                   <Avatar
-                    src={
-                      value.row.dispatch_image
-                    }
+                    src={value.row.dispatch_image}
                     alt="Product Image"
                     sx={{
                       height: "45px",
@@ -514,16 +519,14 @@ function OrderDetails() {
                       opacity: isDisabled ? 0.5 : 1,
                       pointerEvents: isDisabled ? "none" : "auto",
                       cursor: isDisabled ? "not-allowed" : "pointer",
-
                     }}
-                    onClick={e => {
+                    onClick={(e) => {
                       if (!isDisabled) {
                         handleCancelImg(value.row);
                       }
                     }}
                   />
                 </Box>
-
               </Col>
             </Row>
           );
@@ -536,7 +539,7 @@ function OrderDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" ? (
+                  orderProcess == "started" ? (
                     <Button
                       className="bg-transparent border-0  text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -577,7 +580,7 @@ function OrderDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" ? (
+                  orderProcess == "started" ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -686,7 +689,7 @@ function OrderDetails() {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-                orderProcess == "started" ? (
+              orderProcess == "started" ? (
                 <Button
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
@@ -831,8 +834,8 @@ function OrderDetails() {
               )}
             </Card>
           </Col>
-          {
-            tableData.some((data) => data.status_change === "1") ? (<Col sm={12} md={6}>
+          {tableData.some((data) => data.status_change === "1") ? (
+            <Col sm={12} md={6}>
               <Card className="p-3 h-100">
                 <Typography variant="h6" className="fw-bold mb-3">
                   Attachment
@@ -846,94 +849,125 @@ function OrderDetails() {
                         md={12}
                         className={`d-flex align-items-center justify-content-center my-1`}
                       >
-                        <Card className="factory-card me-1 shadow-sm mb-0">
-                          {userData?.user_id == orderDetails?.operation_user_id &&
-                            orderProcess == "started" ? (
-                            <Button
-                              className="bg-transparent border-0  text-black"
-                            // onClick={() => fileInputRef.current[selectedItemId]?.click()}
-                            >
-                              <CloudUploadIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Device
-                              </Typography>
-                              <input
-                                type="file"
-                                // ref={(input) => (fileInputRef.current[selectedItemId] = input)}
-                                style={{ display: "none" }}
-                              // onChange={handleFileInputChangeForRow}
-                              />
-                            </Button>
-                          ) : orderProcess == "started" &&
-                            userData?.user_id !=
-                            orderDetails?.operation_user_id ? (
-                            <Button
-                              className="bg-transparent border-0  text-black"
-                              disabled
-                            >
-                              <CloudUploadIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Device
-                              </Typography>
-                            </Button>
-                          ) : (
-                            <Button
-                              className="bg-transparent border-0  text-black"
-                              disabled
-                            >
-                              <CloudUploadIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Device
-                              </Typography>
-                            </Button>
-                          )}
-                        </Card>
-                        <Card className="factory-card ms-1 shadow-sm mb-0">
-                          {userData?.user_id == orderDetails?.operation_user_id &&
-                            orderProcess == "started" ? (
-                            <Button
-                              className="bg-transparent border-0 text-black"
-                              onClick={() => {
-                                setShowAttachModal(true);
-                                // setSelectedItemId(itemId);
-                              }}
-                            >
-                              <CameraAltIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Camera
-                              </Typography>
-                            </Button>
-                          ) : orderProcess == "started" &&
-                            userData?.user_id !=
-                            orderDetails?.operation_user_id ? (
-                            <Button
-                              className="bg-transparent border-0 text-black"
-                              disabled
-                            >
-                              <CameraAltIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Camera
-                              </Typography>
-                            </Button>
-                          ) : (
-                            <Button
-                              className="bg-transparent border-0 text-black"
-                              disabled
-                            >
-                              <CameraAltIcon />
-                              <Typography style={{ fontSize: "14px" }}>
-                                Camera
-                              </Typography>
-                            </Button>
-                          )}
-                        </Card>
+                        {tableData.some(
+                          (data) => data.dispatch_image === ""
+                        ) ? (
+                          <Alert
+                            severity="warning"
+                            sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                          >
+                            Please upload attachment for all the products in
+                            below order table!
+                          </Alert>
+                        ) : !orderDetailsDataOrderId?.overall_order_dis_image ? (
+                          <>
+                            <Card className="factory-card me-1 shadow-sm mb-0">
+                              {userData?.user_id ===
+                                orderDetails?.operation_user_id &&
+                              orderProcess === "started" ? (
+                                <Button
+                                  className="bg-transparent border-0 text-black"
+                                  onClick={() => fileInputRef?.current?.click()}
+                                >
+                                  <CloudUploadIcon />
+                                  <Typography style={{ fontSize: "14px" }}>
+                                    Device
+                                  </Typography>
+                                  <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    style={{ display: "none" }}
+                                    onChange={handleFileInputChange}
+                                  />
+                                </Button>
+                              ) : orderProcess === "started" &&
+                                userData?.user_id !==
+                                  orderDetails?.operation_user_id ? (
+                                <Button
+                                  className="bg-transparent border-0 text-black"
+                                  disabled
+                                >
+                                  <CloudUploadIcon />
+                                  <Typography style={{ fontSize: "14px" }}>
+                                    Device
+                                  </Typography>
+                                </Button>
+                              ) : (
+                                <Button
+                                  className="bg-transparent border-0 text-black"
+                                  disabled
+                                >
+                                  <CloudUploadIcon />
+                                  <Typography style={{ fontSize: "14px" }}>
+                                    Device
+                                  </Typography>
+                                </Button>
+                              )}
+                            </Card>
+                            <Card className="factory-card ms-1 shadow-sm mb-0">
+                              {userData?.user_id ===
+                                orderDetails?.operation_user_id &&
+                              orderProcess === "started" ? (
+                                <Button
+                                  className="bg-transparent border-0 text-black"
+                                  onClick={() => setShowAttachModal(true)}
+                                >
+                                  <CameraAltIcon />
+                                  <Typography style={{ fontSize: "14px" }}>
+                                    Camera
+                                  </Typography>
+                                </Button>
+                              ) : orderProcess === "started" &&
+                                userData?.user_id !==
+                                  orderDetails?.operation_user_id ? (
+                                <Button
+                                  className="bg-transparent border-0 text-black"
+                                  disabled
+                                >
+                                  <CameraAltIcon />
+                                  <Typography style={{ fontSize: "14px" }}>
+                                    Camera
+                                  </Typography>
+                                </Button>
+                              ) : (
+                                <Button
+                                  className="bg-transparent border-0 text-black"
+                                  disabled
+                                >
+                                  <CameraAltIcon />
+                                  <Typography style={{ fontSize: "14px" }}>
+                                    Camera
+                                  </Typography>
+                                </Button>
+                              )}
+                            </Card>
+                          </>
+                        ) : (
+                          <Avatar
+                            src={
+                              orderDetailsDataOrderId.overall_order_dis_image
+                            }
+                            alt="Product Image"
+                            sx={{
+                              height: "150px",
+                              width: "100%",
+                              borderRadius: "2px",
+                              margin: "0 auto",
+                              "& .MuiAvatar-img": {
+                                height: "100%",
+                                width: "100%",
+                                borderRadius: "2px",
+                              },
+                            }}
+                          />
+                        )}
                       </Col>
                     </Row>
                   </>
                 )}
               </Card>
-            </Col>) : null
-          }
+            </Col>
+          ) : null}
         </Row>
 
         <Card className="p-3 mb-3">
@@ -966,7 +1000,7 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+            orderProcess == "started" ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
@@ -1107,13 +1141,23 @@ function OrderDetails() {
                   />
                 </Box>
                 <Box className="text-end">
-                  <Button
-                    variant="primary"
-                    className=""
-                    onClick={handleSubmitAttachment}
-                  >
-                    Submit
-                  </Button>
+                  {selectedItemId ? (
+                    <Button
+                      variant="primary"
+                      className=""
+                      onClick={handleSubmitAttachment}
+                    >
+                      Submit
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      className=""
+                      onClick={handleSubmitAttachment}
+                    >
+                      Submitt
+                    </Button>
+                  )}
                 </Box>
               </Col>
             </Row>
