@@ -473,34 +473,17 @@ function OrderDetails() {
           fileInputRef.current = {};
         }
         if (value && value.row.dispatch_image) {
-          const isDisabled = orderDetails.order_process !=="started"
+          const isDisabled = orderDetails.order_process !== "started"
           return (
             <Row className={`${"justify-content-center"} h-100`}>
               <Col
                 md={12}
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
-                <CancelIcon
-                  sx={{
-                    position: "relative",
-                    top: "-21px",
-                    right: "-87px",
-                    cursor: "pointer",
-                    zIndex: 1,
-                    // disabled=isDisabled
-                    opacity: isDisabled ? 0.5 : 1,
-                    pointerEvents: isDisabled ? "none" : "auto",
-                    cursor: isDisabled ? "not-allowed" : "pointer",
 
-                  }}
-                  onClick={e =>{
-                     if(!isDisabled) {
-                    handleCancelImg(value.row);
-                  }}}
-                />
                 <Box
-                  className="h-100 w-100 d-flex align-items-center"
-                  onClick={() => ImageModule(value.row.dispatch_image)}
+                  className="h-100 w-100 d-flex align-items-center position-relative"
+                  
                 >
                   <Avatar
                     src={
@@ -518,12 +501,32 @@ function OrderDetails() {
                         borderRadius: "2px",
                       },
                     }}
+                    onClick={() => ImageModule(value.row.dispatch_image)}
+                  />
+                  <CancelIcon
+                    sx={{
+                      position: "relative",
+                      top: "-23px",
+                      right: "60px",
+                      cursor: "pointer",
+                      zIndex: 1,
+                      // disabled=isDisabled
+                      opacity: isDisabled ? 0.5 : 1,
+                      pointerEvents: isDisabled ? "none" : "auto",
+                      cursor: isDisabled ? "not-allowed" : "pointer",
+
+                    }}
+                    onClick={e => {
+                      if (!isDisabled) {
+                        handleCancelImg(value.row);
+                      }
+                    }}
                   />
                 </Box>
 
               </Col>
             </Row>
-          ); 
+          );
         } else {
           return (
             <Row className={`${"justify-content-center"} h-100`}>
