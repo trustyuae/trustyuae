@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
+import axios from "axios";
+import { API_URL } from "../../redux/constants/Constants";
 
 function CompletedOrderDetails() {
   const params = useParams();
@@ -22,6 +24,25 @@ function CompletedOrderDetails() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [userName, setUserName] = useState(null);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const name = await axios.get(`${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`);
+        setUserName(name.data);
+      } catch (error) {
+        console.error("Error fetching name:", error);
+        setUserName("Error fetching name");
+      }
+    };
+  
+    if (orderDetails) {
+      fetchUserName();
+    }
+  }, [orderDetails]);
+
+
   const loader = useSelector(
     (state) => state?.orderSystemData?.isCompletedOrderDetails
   );
@@ -215,9 +236,7 @@ function CompletedOrderDetails() {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold">
-                      # Enter User name ...
-                    </Typography>
+                    <Typography className="fw-bold"># {userName}</Typography>
                     <Typography
                       className=""
                       sx={{
@@ -244,7 +263,7 @@ function CompletedOrderDetails() {
         <Row className="mb-3">
           <Col
             sm={12}
-            md={(orderDetailsDataOrderId?.overall_order_dis_image)? 6 : 12}
+            md={orderDetailsDataOrderId?.overall_order_dis_image ? 6 : 12}
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
@@ -359,7 +378,7 @@ function CompletedOrderDetails() {
               )}
             </Card>
           </Col>
-          {(orderDetailsDataOrderId?.overall_order_dis_image) ? (
+          {orderDetailsDataOrderId?.overall_order_dis_image ? (
             <Col sm={12} md={6}>
               <Card className="p-3 h-100">
                 <Typography variant="h6" className="fw-bold mb-3">
