@@ -63,15 +63,15 @@ function OnHoldManegementSystem() {
 
 
     const renderVariationValues = (params) => {
-        console.log(params.row, 'params======');
+        // console.log(params.row, 'params======');
         const variationArray = Object.entries(params.row.variation_values).map(([key, value]) => ({ [key]: value }));
         // const variationArray = params.row.variation_values
-        console.log(variationArray, 'variationArray');
-        const { color, size } = params.row.variation_values;
-        const { attribute_color, attribute_size } = params.row.variation_values;
+        // console.log(variationArray, 'variationArray');
+        // const { color, size } = params.row.variation_values;
+        // const { attribute_color, attribute_size } = params.row.variation_values;
         const noVariation = params.row.variation_values.length === 0;
-        const colorAvailable = color?.length > 0;
-        const sizeAvailable = size?.length > 0;
+        // const colorAvailable = color?.length > 0;
+        // const sizeAvailable = size?.length > 0;
 
         return (
             <Box className='d-flex justify-content-around align-items-center'>
@@ -81,15 +81,15 @@ function OnHoldManegementSystem() {
                     <>
                         {
                             variationArray && (
-                                <Box className='d-flex  align-items-center'>
+                                <Box className='d-flex flex-column align-items-center w-50'>
                                     {variationArray.map((item, index) => {
                                         const attributeName = Object.keys(item)[0];
                                         const attributeValue = Object.values(item)[0];
                                         console.log(attributeValue, 'attributeValue');
                                         console.log(typeof (attributeValue), 'attributeValue===');
                                         return (
-                                            <React.Fragment key={index}>
-                                                <InputLabel style={{width:'20%'}} id={`customer-color-${params.row.id}-label`}>{attributeName}</InputLabel>
+                                            <React.Fragment key={index} >
+                                                <InputLabel id={`customer-color-${params.row.id}-label`}>{attributeName}</InputLabel>
                                                 {typeof (attributeValue) === "string" ? (
                                                     <div style={{ width: '100%' }}>{attributeValue}</div>
                                                 ) : (
@@ -166,14 +166,6 @@ function OnHoldManegementSystem() {
         {
             field: "product_image", headerName: "product image", flex: 1,
             type: "html",
-            // renderCell: (value, row) =>
-            //     <img
-            //         src={value.row.product_image || `${require("../../assets/default.png")}`}
-            //         alt={value.row.product_name}
-            //         onClick={() => ImageModule(value.row.product_image)}
-            //         className="img-fluid"
-            //         width={100}
-            //     />
             renderCell: (params) => (
                 <Box
                     className="h-100 w-100 d-flex align-items-center"
@@ -216,26 +208,6 @@ function OnHoldManegementSystem() {
         }
     ];
 
-    // function handleAttributeChange(event, rowIndex, attributeName) {
-    //     const newValue = event.target.value;
-    // console.log(rowIndex,'rowIndex====');
-    // console.log(attributeName,'attributeName====');
-    // console.log(rowIndex.variation_values,'rowIndex.variation_values====');
-    //     // Create a new array with updated attribute value
-    //     const updatedVariationArray = rowIndex.variation_values?.map((item, index) => 
-    //         // {
-    //         console.log(item,'item')
-    //         // console.log(index,'index');
-    //         // if (index === rowIndex) {
-    //         //     return { [attributeName]: newValue };
-    //         // }
-    //         // return item;
-    //     // }
-    // );
-    // console.log(updatedVariationArray,'updatedVariationArray');
-    //     // Update the state with the updated variationArray
-    //     // setVariationArray(updatedVariationArray);
-    // }
     function handleAttributeChange(event, rowIndex, attributeName) {
         const newValue = event.target.value;
         // const attributeNames = attributeName
@@ -321,22 +293,11 @@ function OnHoldManegementSystem() {
                 setSelectedOption(null)
                 const response = await dispatch(GetProductManual({ apiUrl }));
                 const data = response.data.products.map((v, i) => ({ ...v, id: i }));
-                // const data = response.data.products.map((product, index) => {
-                //     const variationArray = Object.entries(product.variation_values).map(([key, value]) => ({ [key]: value }));
-
-                //     return {
-                //         ...product,
-                //         id: index,
-                //         variationArray
-                //     };
-                // });
-                console.log(data, 'data====');
                 const modifiedData = data.map(item => ({
                     ...item,
                     variationColor: item.variation_values.length === 0 ? '' : '',
                     variationSize: item.variation_values.length === 0 ? '' : ''
                 }));
-                console.log(modifiedData, 'modifiedData');
                 setSingleProductD(modifiedData);
                 inputRef.current.value = '';
             } else if (productNameF && productIDF) {
@@ -345,15 +306,6 @@ function OnHoldManegementSystem() {
                     setSelectedOption(null)
                 }
                 const data = response.data.products.map((v, i) => ({ ...v, id: i }));
-                // const data = response.data.products.map((product, index) => {
-                //     const variationArray = Object.entries(product.variation_values).map(([key, value]) => ({ [key]: value }));
-
-                //     return {
-                //         ...product,
-                //         id: index,
-                //         variationArray
-                //     };
-                // });
                 const modifiedData = data.map(item => ({
                     ...item,
                     variationColor: item.variation_values.length === 0 ? '' : '',
@@ -513,11 +465,24 @@ function OnHoldManegementSystem() {
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
         console.log(tableData,'tableData');
+        // let dataa = tableData.filter(o => (Object.keys(o.variation_values).length > 0))
+    //    const variationArray= dataa.map(d=>
+    //         // Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
+    //         Object.entries(d.variation_values).map(([key, value]) => ( value ))
+    //     )
+    //     console.log(variationArray,'variationArray');
+    //    const value= variationArray.map(([key,value])=>(
+    //         // typeof(Object.values(key)[0]) !== 'object',
+    //         // typeof(Object.values(value)[0]) !== 'object'
+    //         console.log(Object.values(value)[0],'Object.values(value)[0]'),
+    //         console.log(Object.values(key)[0],'Object.values(value)[0]')
+    //     ))
+
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
             product_image: item.product_image,
-            variation_id: 1,
+            variation_id: item.variation_id?item.variation_id:0,
             // variations: item.variationColor !== "" && item.variationSize !== "" ? { color: item.variationColor, size: item.variationSize } : [],
             variations: item.variation_values,
             qty_received: parseInt(item.Quantity),
