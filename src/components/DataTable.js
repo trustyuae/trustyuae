@@ -13,6 +13,7 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
     }}>
       <DataGrid
         rows={rows}
+        getRowHeight={() => 'auto'}
         columns={columns}
         rowLength={totalPages}
         rowHeight={rowHeight}
