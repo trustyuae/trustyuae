@@ -63,10 +63,10 @@ function OnHoldManegementSystem() {
 
 
     const renderVariationValues = (params) => {
-        // console.log(params.row, 'params======');
+        console.log(params.row, 'params======');
         const variationArray = Object.entries(params.row.variation_values).map(([key, value]) => ({ [key]: value }));
         // const variationArray = params.row.variation_values
-        // console.log(variationArray, 'variationArray');
+        console.log(variationArray, 'variationArray');
         // const { color, size } = params.row.variation_values;
         // const { attribute_color, attribute_size } = params.row.variation_values;
         const noVariation = params.row.variation_values.length === 0;
@@ -162,7 +162,7 @@ function OnHoldManegementSystem() {
     };
 
     const columns = [
-        { field: "product_name", headerName: "product name", flex: 1 },
+        { field: "product_name", headerName: "product name", flex: 1,className:" d-flex justify-content-center align-items-center" },
         {
             field: "product_image", headerName: "product image", flex: 1,
             type: "html",
@@ -406,10 +406,10 @@ function OnHoldManegementSystem() {
         const mergedData = Updatedata.reduce((acc, item) => {
             // Create a unique key based on product_name and variation_values
             const key = JSON.stringify({ product_name: item.product_name, variation_values: item.variation_values });
-        
+
             // Check if the key is in the accumulator
             const existingIndex = acc.findIndex(entry => JSON.stringify({ product_name: entry.product_name, variation_values: entry.variation_values }) === key);
-        
+
             if (existingIndex === -1) {
                 // If the key is not in the accumulator, add it to the start of the array
                 acc.unshift({ ...item, Quantity: item.Quantity });
@@ -419,10 +419,10 @@ function OnHoldManegementSystem() {
                 const updatedItem = acc.splice(existingIndex, 1)[0];
                 acc.unshift(updatedItem);
             }
-        
+
             return acc;
         }, []);
-        
+
         console.log(mergedData);
 
 
@@ -447,14 +447,30 @@ function OnHoldManegementSystem() {
     };
 
     const validateForm = (data) => {
-        let dataa = data.filter(o => (Object.keys(o.variation_values).length > 0))
-       const variationArray= dataa.map(d=>
+        //     let dataa = data.filter(o => (Object.keys(o.variation_values).length > 0))
+        //     console.log(dataa,'dataa=====');
+        //    const variationArray= dataa.map(d=>
+        //         Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
+        //     )
+        //     console.log(variationArray,'variationArray');
+        //    const value= variationArray?.every(([key,value])=>(
+        //         typeof(Object.values(key)[0]) !== 'object',
+        //         typeof(Object.values(value)[0]) !== 'object'
+        //     ))
+
+        let dataa = data.filter(o => o.variation_values && Object.keys(o.variation_values).length > 0);
+        console.log(dataa, 'dataa=====');
+
+        const variationArray = dataa.map(d =>
             Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
-        )
-       const value= variationArray.every(([key,value])=>(
-            typeof(Object.values(key)[0]) !== 'object',
-            typeof(Object.values(value)[0]) !== 'object'
-        ))
+        );
+        console.log(variationArray, 'variationArray');
+
+        const value = variationArray?.every(variation => (
+            typeof Object.values(variation)[0] !== 'object'
+        ));
+
+
         const isQuantityAvailable = data.every(item => item.Quantity !== '')
         setIsValid(value && isQuantityAvailable);
         // const isValid = dataa.every(item => item.variationColor !== '');
@@ -464,25 +480,25 @@ function OnHoldManegementSystem() {
 
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
-        console.log(tableData,'tableData');
+        console.log(tableData, 'tableData');
         // let dataa = tableData.filter(o => (Object.keys(o.variation_values).length > 0))
-    //    const variationArray= dataa.map(d=>
-    //         // Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
-    //         Object.entries(d.variation_values).map(([key, value]) => ( value ))
-    //     )
-    //     console.log(variationArray,'variationArray');
-    //    const value= variationArray.map(([key,value])=>(
-    //         // typeof(Object.values(key)[0]) !== 'object',
-    //         // typeof(Object.values(value)[0]) !== 'object'
-    //         console.log(Object.values(value)[0],'Object.values(value)[0]'),
-    //         console.log(Object.values(key)[0],'Object.values(value)[0]')
-    //     ))
+        //    const variationArray= dataa.map(d=>
+        //         // Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
+        //         Object.entries(d.variation_values).map(([key, value]) => ( value ))
+        //     )
+        //     console.log(variationArray,'variationArray');
+        //    const value= variationArray.map(([key,value])=>(
+        //         // typeof(Object.values(key)[0]) !== 'object',
+        //         // typeof(Object.values(value)[0]) !== 'object'
+        //         console.log(Object.values(value)[0],'Object.values(value)[0]'),
+        //         console.log(Object.values(key)[0],'Object.values(value)[0]')
+        //     ))
 
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
             product_image: item.product_image,
-            variation_id: item.variation_id?item.variation_id:0,
+            variation_id: item.variation_id ? item.variation_id : 0,
             // variations: item.variationColor !== "" && item.variationSize !== "" ? { color: item.variationColor, size: item.variationSize } : [],
             variations: item.variation_values,
             qty_received: parseInt(item.Quantity),
@@ -599,18 +615,19 @@ function OnHoldManegementSystem() {
                                     <DataTable
                                         columns={columns}
                                         rows={tableData}
-                                    // rowHeight={100}
+                                    // rowHeight={'auto'}
                                     // page={page}
                                     // pageSize={pageSize}
                                     // totalPages={totalPages}
                                     // handleChange={handleChange}
+                                    getRowHeight={'auto'}
                                     />
                                 </div>
                                 <MDBRow className='justify-content-end px-3'>
                                     <Button variant="primary" disabled={!isValid} style={{ width: '100px' }} onClick={handleSubmit}>
                                         submit
                                     </Button>
-                                    
+
                                 </MDBRow>
                             </>
                         )}
