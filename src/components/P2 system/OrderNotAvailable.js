@@ -74,7 +74,11 @@ function OrderNotAvailable() {
         "please confirm your customer status first!",
         "",
         "error",
-        false, false, '', '', 1000
+        false,
+        false,
+        "",
+        "",
+        1000
       );
     } else {
       rowData.isSelected = true;
@@ -148,25 +152,44 @@ function OrderNotAvailable() {
         "please select products for generating schedule po",
         "",
         "error",
-        false, false, '', '', 1000
+        false,
+        false,
+        "",
+        "",
+        1000
       );
     } else if (customerStatus.length < selectedOrderNotAvailable.length) {
       await ShowAlert(
         "Only for confirmed items we can raise the scheduled PO!",
         "",
-        "error", false, false, '', '', 1000
+        "error",
+        false,
+        false,
+        "",
+        "",
+        1000
       );
     } else if (new Set(estimatedTime).size !== 1) {
       await ShowAlert(
         "Purchase order items are on separate schedules. Do you want to proceed with the action?!",
         "",
-        "error", false, false, '', '', 1000
+        "error",
+        false,
+        false,
+        "",
+        "",
+        1000
       );
     } else if (new Set(factoryNames).size !== 1) {
       await ShowAlert(
         "Factory name should be the same for all selected items!",
         "",
-        "error", false, false, '', '', 1000
+        "error",
+        false,
+        false,
+        "",
+        "",
+        1000
       );
     } else {
       setShowModal(true);
@@ -178,7 +201,12 @@ function OrderNotAvailable() {
       await ShowAlert(
         "Please select products you want to update status for!",
         "",
-        "error", false, false, '', '', 1000
+        "error",
+        false,
+        false,
+        "",
+        "",
+        1000
       );
       return;
     }
@@ -220,19 +248,29 @@ function OrderNotAvailable() {
     };
 
     await dispatch(OrderNotAvailableDataStatus(requestedDataS)).then(() => {
-      selectedOrderNotAvailable.forEach((order) => {
-        order.isSelected = false;
+      setOrdersNotAvailableData((prevData) => {
+        const newData = prevData.map((order) => {
+          if (
+            selectedOrderNotAvailable.some(
+              (selectedOrder) => selectedOrder.id === order.id
+            )
+          ) {
+            return { ...order, isSelected: false };
+          }
+          return order;
+        });
+        return newData;
       });
-      handleUpdatedValues();
-      fetchOrdersNotAvailableData()
       setSelectedOrderNotAvailable([]);
     });
+    handleUpdatedValues();
+    // fetchOrdersNotAvailableData()
   };
 
   const handleModalClose = async () => {
     ordersNotAvailableData.forEach((order) => {
       order.isSelected = false;
-      order.customer_status = "";
+      // order.customer_status = "";
     });
     setSelectedOrderNotAvailable([]);
     setShowModal(false);
@@ -361,6 +399,9 @@ function OrderNotAvailable() {
     setCurrentStartIndex(currIndex, "currIndex");
   };
   const handleUpdatedValues = () => {
+    ordersNotAvailableData.forEach((order) => {
+      order.isSelected = false;
+    });
     setSelectedOrderNotAvailable([]);
     setSelectedStatus({ id: 0, status: "" });
     fetchOrdersNotAvailableData();
@@ -370,7 +411,7 @@ function OrderNotAvailable() {
     fetchOrdersNotAvailableData();
   }, [currentStartIndex]);
 
-  useEffect(() => { }, [setSelectedStatus]);
+  useEffect(() => {}, [setSelectedStatus]);
 
   const ImageModule = (url) => {
     setImageURL(url);

@@ -253,7 +253,7 @@ function OrderDetails() {
       const { user_id } = userData ?? {};
       const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
       if (response.data.status === "Completed") {
-        Swal.fire({
+        await Swal.fire({
           title: response.data.message,
           icon: "success",
           showConfirmButton: true,
@@ -935,7 +935,9 @@ function OrderDetails() {
           centered
         >
           <Modal.Header closeButton>
-            <Modal.Title>{attachmentZoom ? "Attached Image" : "Product Image"}</Modal.Title>
+            <Modal.Title>
+              {attachmentZoom ? "Attached Image" : "Product Image"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Card className="factory-card">
