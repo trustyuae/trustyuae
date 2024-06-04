@@ -109,3 +109,9 @@
     border: none;
   }
 }
+
+.MuiDataGrid-row {
+display: flex;
+align-items: center;
+justify-content: center;
+}

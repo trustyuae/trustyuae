@@ -60,11 +60,6 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
-  console.log(
-    orderDetailsDataOrderId,
-    "orderDetailsDataOrderIdbbbbbbbbbbbbbbbbbbbbbbb"
-  );
-
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedFileUrl(imageSrc);
@@ -382,7 +377,7 @@ function OrderDetails() {
                 md={12}
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
-                <Box className="h-100 w-100 d-flex align-items-center position-relative">
+                <Box className="h-100 w-100 d-flex align-items-center justify-content-center position-relative">
                   <Avatar
                     src={value.row.dispatch_image}
                     alt="Product Image"
@@ -406,7 +401,7 @@ function OrderDetails() {
                     sx={{
                       position: "relative",
                       top: "-30px",
-                      right: "90px",
+                      right: "55px",
                       cursor: "pointer",
                       color: "red",
                       zIndex: 1,
@@ -862,7 +857,7 @@ function OrderDetails() {
                 // pageSize={pageSize}
                 // totalPages={totalPages}
                 // handleChange={handleChange}
-                rowHeight={100}
+                rowHeight={85}
               />
             </div>
           )}

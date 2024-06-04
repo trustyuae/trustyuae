@@ -440,7 +440,7 @@ function CompletedOrderDetails() {
                 // pageSize={pageSize}
                 // totalPages={totalPages}
                 // handleChange={handleChange}
-                rowHeight={100}
+                rowHeight={85}
               />
             </div>
           )}
