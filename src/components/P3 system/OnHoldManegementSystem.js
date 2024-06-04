@@ -89,7 +89,7 @@ function OnHoldManegementSystem() {
                                         console.log(typeof (attributeValue), 'attributeValue===');
                                         return (
                                             <React.Fragment key={index}>
-                                                <InputLabel style={{ width: '500px' }} id={`customer-color-${params.row.id}-label`}>{attributeName}</InputLabel>
+                                                <InputLabel style={{width:'20%'}} id={`customer-color-${params.row.id}-label`}>{attributeName}</InputLabel>
                                                 {typeof (attributeValue) === "string" ? (
                                                     <div style={{ width: '100%' }}>{attributeValue}</div>
                                                 ) : (
@@ -249,7 +249,7 @@ function OnHoldManegementSystem() {
         );
         console.log(updatedData, 'updatedData');
         setTableData(updatedData);
-
+        validateForm(updatedData)
     }
 
 
@@ -496,14 +496,23 @@ function OnHoldManegementSystem() {
 
     const validateForm = (data) => {
         let dataa = data.filter(o => (Object.keys(o.variation_values).length > 0))
-        const isValid = dataa.every(item => item.variationColor !== '');
-        const isValidSize = dataa.every(item => item.variationSize !== '');
+       const variationArray= dataa.map(d=>
+            Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
+        )
+       const value= variationArray.every(([key,value])=>(
+            typeof(Object.values(key)[0]) !== 'object',
+            typeof(Object.values(value)[0]) !== 'object'
+        ))
         const isQuantityAvailable = data.every(item => item.Quantity !== '')
-        setIsValid((isValid || isValidSize) && isQuantityAvailable);
+        setIsValid(value && isQuantityAvailable);
+        // const isValid = dataa.every(item => item.variationColor !== '');
+        // const isValidSize = dataa.every(item => item.variationSize !== '');
+        // setIsValid((isValid || isValidSize) && isQuantityAvailable);
     };
 
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
+        console.log(tableData,'tableData');
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
@@ -633,12 +642,10 @@ function OnHoldManegementSystem() {
                                     />
                                 </div>
                                 <MDBRow className='justify-content-end px-3'>
-                                    {/* <Button variant="primary" disabled={!isValid} style={{ width: '100px' }} onClick={handleSubmit}>
-                                        submit
-                                    </Button> */}
-                                    <Button variant="primary"  style={{ width: '100px' }} onClick={handleSubmit}>
+                                    <Button variant="primary" disabled={!isValid} style={{ width: '100px' }} onClick={handleSubmit}>
                                         submit
                                     </Button>
+                                    
                                 </MDBRow>
                             </>
                         )}
