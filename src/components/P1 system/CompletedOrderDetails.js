@@ -25,23 +25,25 @@ function CompletedOrderDetails() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [userName, setUserName] = useState(null);
+  const [attachmentZoom, setAttachmentZoom] = useState(false);
 
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const name = await axios.get(`${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`);
+        const name = await axios.get(
+          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`
+        );
         setUserName(name.data);
       } catch (error) {
         console.error("Error fetching name:", error);
         setUserName("Error fetching name");
       }
     };
-  
+
     if (orderDetails) {
       fetchUserName();
     }
   }, [orderDetails]);
-
 
   const loader = useSelector(
     (state) => state?.orderSystemData?.isCompletedOrderDetails
@@ -124,13 +126,16 @@ function CompletedOrderDetails() {
     },
     {
       field: "product_image",
-      headerName: "Image",
+      headerName: "Product Image",
       flex: 1,
       className: "order-details",
       renderCell: (params) => (
         <Box
           className="h-100 w-100 d-flex align-items-center"
-          onClick={() => ImageModule(params?.value)}
+          onClick={() => {
+            ImageModule(params?.value);
+            setAttachmentZoom(false);
+          }}
         >
           <Avatar
             src={params.value || require("../../assets/default.png")}
@@ -171,7 +176,10 @@ function CompletedOrderDetails() {
       renderCell: (params) => (
         <Box
           className="h-100 w-100 d-flex align-items-center"
-          onClick={() => ImageModule(params?.value)}
+          onClick={() => {
+            ImageModule(params?.value);
+            setAttachmentZoom(true);
+          }}
         >
           <Avatar
             src={params.value || require("../../assets/default.png")}
@@ -450,7 +458,9 @@ function CompletedOrderDetails() {
           centered
         >
           <Modal.Header closeButton>
-            <Modal.Title>Product Image</Modal.Title>
+            <Modal.Title>
+              {attachmentZoom ? "Attached Image" : "Product Image"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Card className="factory-card">

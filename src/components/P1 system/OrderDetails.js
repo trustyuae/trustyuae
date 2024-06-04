@@ -53,6 +53,7 @@ function OrderDetails() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [attachmentZoom, setAttachmentZoom] = useState(false);
   const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
   fileInputRef.current[selectedItemId] = useRef(null);
   const orderDetailsDataOrderId = useSelector(
@@ -322,7 +323,10 @@ function OrderDetails() {
       renderCell: (params) => (
         <Box
           className="h-100 w-100 d-flex align-items-center"
-          onClick={() => ImageModule(params?.value)}
+          onClick={() => {
+            ImageModule(params?.value);
+            setAttachmentZoom(false);
+          }}
         >
           <Avatar
             src={params.value || require("../../assets/default.png")}
@@ -362,8 +366,6 @@ function OrderDetails() {
       className: "order-details",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value.row.dispatch_imag, "value.....................");
-        console.log(value, "value.....................");
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const handleFileInputChangeForRow = (e) => {
           handleFileInputChange(e, itemId);
@@ -395,7 +397,10 @@ function OrderDetails() {
                         borderRadius: "2px",
                       },
                     }}
-                    onClick={() => ImageModule(value.row.dispatch_image)}
+                    onClick={() => {
+                      ImageModule(value.row.dispatch_image);
+                      setAttachmentZoom(true);
+                    }}
                   />
                   <CancelIcon
                     sx={{
@@ -771,7 +776,9 @@ function OrderDetails() {
                         ) : (
                           <>
                             <Card className="factory-card me-1 shadow-sm mb-0">
-                              {userData?.user_id == orderDetailsDataOrderId?.operation_user_id && orderProcess == "started" ? (
+                              {userData?.user_id ==
+                                orderDetailsDataOrderId?.operation_user_id &&
+                              orderProcess == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -805,7 +812,9 @@ function OrderDetails() {
                             </Card>
 
                             <Card className="factory-card ms-1 shadow-sm mb-0">
-                              {userData?.user_id == orderDetailsDataOrderId?.operation_user_id && orderProcess == "started" ? (
+                              {userData?.user_id ==
+                                orderDetailsDataOrderId?.operation_user_id &&
+                              orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -931,7 +940,7 @@ function OrderDetails() {
           centered
         >
           <Modal.Header closeButton>
-            <Modal.Title>Product Image</Modal.Title>
+            <Modal.Title>{attachmentZoom ? "Attached Image" : "Product Image"}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Card className="factory-card">
