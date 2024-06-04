@@ -406,7 +406,7 @@ function OrderDetails() {
                     sx={{
                       position: "relative",
                       top: "-30px",
-                      right: "80px",
+                      right: "90px",
                       cursor: "pointer",
                       color: "red",
                       zIndex: 1,
