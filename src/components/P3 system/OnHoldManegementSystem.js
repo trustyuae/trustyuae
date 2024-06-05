@@ -81,80 +81,43 @@ function OnHoldManegementSystem() {
                     <>
                         {
                             variationArray && (
-                                <Box className='d-flex flex-column align-items-center w-50'>
+                                <div className='container mt-4 mb-4'>
                                     {variationArray.map((item, index) => {
                                         const attributeName = Object.keys(item)[0];
                                         const attributeValue = Object.values(item)[0];
                                         console.log(attributeValue, 'attributeValue');
                                         console.log(typeof (attributeValue), 'attributeValue===');
                                         return (
-                                            <React.Fragment key={index} >
-                                                <InputLabel id={`customer-color-${params.row.id}-label`}>{attributeName}</InputLabel>
-                                                {typeof (attributeValue) === "string" ? (
-                                                    <div style={{ width: '100%' }}>{attributeValue}</div>
-                                                ) : (
-                                                    <MuiSelect
-                                                        labelId={`customer-color-${params.row.id}-label`}
-                                                        id={`customer-color-${params.row.id}`}
-                                                        onChange={(event) => handleAttributeChange(event, params.row, attributeName)}
-                                                        fullWidth
-                                                        style={{ height: "40px", width: "100%" }}
-                                                        value={params.row[attributeName]} // Assuming the value of each attribute is stored in params.row
-                                                    >
-                                                        {attributeValue?.map((value) => (
-                                                            <MenuItem key={value} value={value}>{value}</MenuItem>
-                                                        ))}
-                                                    </MuiSelect>
-                                                )}
+                                            <React.Fragment key={index}>
+                                                <div className={`row mb-${typeof (attributeValue) === 'string' ? '3' : '4'}`}>
+                                                    <div className='col-6 d-flex  justify-content-end align-items-center'>
+                                                        <InputLabel id={`customer-color-${params.row.id}-label`} className=' d-flex ' style={{ marginRight: '10px', width: '100px' }}>{attributeName}:</InputLabel>
+                                                    </div>
+                                                    <div className='col-6 d-flex justify-content-start align-items-center'>
+                                                        {typeof (attributeValue) === "string" ? (
+                                                            <div className='d-flex' style={{ flex: 1 }}>{attributeValue}</div>
+                                                        ) : (
+                                                            <MuiSelect
+                                                                labelId={`customer-color-${params.row.id}-label`}
+                                                                id={`customer-color-${params.row.id}`}
+                                                                onChange={(event) => handleAttributeChange(event, params.row, attributeName)}
+                                                                fullWidth
+                                                                style={{ height: "40px", width: "279px", marginLeft: '10px' }}
+                                                                value={params.row[attributeName]} // Assuming the value of each attribute is stored in params.row
+                                                            >
+                                                                {attributeValue?.map((value) => (
+                                                                    <MenuItem key={value} value={value}>{value}</MenuItem>
+                                                                ))}
+                                                            </MuiSelect>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </React.Fragment>
                                         );
                                     })}
-                                </Box>
+                                </div>
                             )
-
-
                         }
-                        {/* {colorAvailable && (
-                            <Box className=' d-flex align-items-center' >
-                                <InputLabel style={{width:'87px'}} id={`customer-color-${params.row.id}-label`}>Color</InputLabel>
-                                <MuiSelect
-                                    labelId={`customer-color-${params.row.id}-label`}
-                                    id={`customer-color-${params.row.id}`}
-                                    onChange={(event) => handleColorChange(event, params.row)}
-                                    fullWidth
-                                    style={{ height: "40px", width: "100%" }}
-                                >
-                                    {color?.map((status) => (
-                                        <MenuItem key={status} value={status}>{status}</MenuItem>
-                                    ))}
-                                </MuiSelect>
-                            </Box>
-                        )}
-                        {attribute_color && (
-                            <Box >Color:{attribute_color}</Box>
-                        )}
-
-                        {sizeAvailable && (
-                            <Box className=' d-flex align-items-center'>
-                                <InputLabel style={{width:'200px'}} id={`customer-size-${params.row.id}-label`}>Size</InputLabel>
-                                <MuiSelect
-                                    labelId={`customer-size-${params.row.id}-label`}
-                                    id={`customer-size-${params.row.id}`}
-                                    onChange={(event) => handleSizeChange(event, params.row)}
-                                    fullWidth
-                                    style={{ height: "40px", width: "100%" }}
-                                >
-                                    {size.map((status) => (
-                                        <MenuItem key={status} value={status}>{status}</MenuItem>
-                                    ))}
-                                </MuiSelect>
-                            </Box>
-                        )}
-
-                        
-                        {attribute_size && (
-                            <Box >Size:{attribute_size}</Box> //className="fw-bold fs-5"
-                        )} */}
                     </>
                 )}
             </Box>
@@ -339,70 +302,6 @@ function OnHoldManegementSystem() {
         let Updatedata = data.map((v, i) => ({ ...v, id: i, Quantity: v.Quantity !== "" ? v.Quantity : 1, variationColor: v.variation_values.attribute_color !== undefined ? v.variation_values.attribute_color : '', variationSize: v.variation_values.attribute_size !== undefined ? v.variation_values.attribute_size : '' }));
         console.log(Updatedata, 'Updatedata');
         validateForm(Updatedata);
-        // const newData = Updatedata.reduce((acc, obj) => {
-        //     const existingIndex = acc.findIndex(item =>
-        //         item.product_name === obj.product_name &&
-        //         (item.variationColor === obj.variationColor || (!item.variationColor && !obj.variationColor)) &&
-        //         (item.variationSize === obj.variationSize || (!item.variationSize && !obj.variationSize))
-        //     );
-        //     if (existingIndex !== -1) {
-        //         acc[existingIndex].Quantity = String(Number(acc[existingIndex].Quantity) + 1);
-        //         const originalArray = [acc[existingIndex]];
-        //         const filteredComparedArray = acc.filter(comparedItem => {
-        //             return !originalArray.some(originalItem => {
-        //                 return (
-        //                     originalItem.product_name === comparedItem.product_name &&
-        //                     (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
-        //                     (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
-        //                 );
-        //             });
-        //         });
-        //         const outputArray = [...originalArray, ...filteredComparedArray];
-        //         acc = outputArray
-        //     } else {
-        //         // acc.push(obj);
-        //         // acc.unshift(obj);
-        //         const originalArray = [obj];
-        //         const filteredComparedArray = acc.filter(comparedItem => {
-        //             return !originalArray.some(originalItem => {
-        //                 return (
-        //                     originalItem.product_name === comparedItem.product_name &&
-        //                     (originalItem.variationColor === comparedItem.variationColor || (!originalItem.variationColor && !comparedItem.variationColor)) &&
-        //                     (originalItem.variationSize === comparedItem.variationSize || (!originalItem.variationSize && !comparedItem.variationSize))
-        //                 );
-        //             });
-        //         });
-        //         const outputArray = [...originalArray, ...filteredComparedArray];
-        //         // acc.push(obj);
-        //         acc = outputArray
-        //     }
-        //     return acc;
-        // }, []);
-
-        // const mergedData = Object.values(Updatedata.reduce((acc, item) => {
-        //     // Create a unique key based on name and data
-        //     const key = JSON.stringify({ product_name: item.product_name, variation_values: item.variation_values });
-
-        //     // If the key is not in the accumulator, add it
-        //     if (!acc[key]) {
-        //         acc[key] = { ...item, Quantity: item.Quantity };
-        //     } else {
-        //         // If the key exists, increase the marks by 1
-        //         acc[key].Quantity = String(Number(acc[key].Quantity) + 1);
-        //     }
-
-        //     return acc;
-        // }, {}));
-
-        // // Sort the merged data to place the updated object at the top
-        // mergedData.sort((a, b) => {
-        //     // You can customize the sorting logic here
-        //     // For example, placing items with higher Quantity at the top
-        //     return b.Quantity - a.Quantity;
-        // });
-
-        // console.log(mergedData);
-
 
         const mergedData = Updatedata.reduce((acc, item) => {
             // Create a unique key based on product_name and variation_values
@@ -523,30 +422,8 @@ function OnHoldManegementSystem() {
         // setIsValid((isValid || isValidSize) && isQuantityAvailable);
     };
 
-    // Function to transform data
-    // const transformData = (data) => {
-    //     console.log(data, 'data');
-    //     if (!data || !data.variation_details || !data.variation_values) {
-    //         return [];
-    //     }
-
-    //     const { variation_details, variation_values } = data;
-    //     console.log(variation_details);
-    //     console.log(variation_values);
-    //     const matchingKey = Object.keys(variation_details).find(key => {
-    //         const detail = variation_details[key];
-    //         return detail.color === variation_values.color && detail.size === variation_values.size;
-    //     });
-    //     console.log(parseInt(matchingKey, 10), 'parseInt(matchingKey, 10)')
-    //     data.variation_details = [parseInt(matchingKey, 10)]
-
-    //     return matchingKey ? data : [];
-    // };
-
-
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
-         
         tableData.forEach(data => {
             if (data.variation_details && data.variation_values) {
                 const { variation_details, variation_values } = data;
@@ -562,10 +439,7 @@ function OnHoldManegementSystem() {
                 }
             }
         });
-        
         console.log(tableData, 'tableData')
-
-
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
             product_name: item.product_name,
@@ -586,7 +460,6 @@ function OnHoldManegementSystem() {
             "status": "Pending for process",
             products: convertedData
         };
-        console.log(payload, 'payload=====');
         try {
             dispatch(AddGrn(payload, navigate))
         } catch (error) {
@@ -676,7 +549,6 @@ function OnHoldManegementSystem() {
                             <Form.Group className="fw-semibold mb-0">
                                 <Form.Label>Product ID:</Form.Label>
                                 <Form.Control type="text" placeholder="Enter Product ID" ref={inputRef} onKeyDown={(e) => handalonChangeProductId(e)} />
-                                {/* <Form.Control type="text" placeholder="Enter Product ID" onKeyDown={(e) => handalonChangeProductId2(e)} /> */}
                             </Form.Group>
                         </Col>
                     </Row>
