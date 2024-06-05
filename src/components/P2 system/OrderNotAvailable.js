@@ -270,12 +270,9 @@ function OrderNotAvailable() {
   };
 
   const handleModalClose = async () => {
-    ordersNotAvailableData.forEach((order) => {
-      order.isSelected = false;
-      // order.customer_status = "";
-    });
     setSelectedOrderNotAvailable([]);
     setShowModal(false);
+    fetchOrdersNotAvailableData();
   };
 
   const columns = [
@@ -494,6 +491,9 @@ function OrderNotAvailable() {
         showModal={showModal}
         OrderNotAvailable={selectedOrderNotAvailable}
         handleUpdatedValues={handleUpdatedValues}
+        setSelectedOrderNotAvailable={setSelectedOrderNotAvailable}
+        setOrdersNotAvailableData={setOrdersNotAvailableData}
+        selectedOrderNotAvailable={selectedOrderNotAvailable}
       />
       <Modal
         show={showEditModal}

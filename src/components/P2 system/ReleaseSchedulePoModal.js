@@ -10,6 +10,9 @@ const ReleaseSchedulePoModal = ({
   showModal,
   OrderNotAvailable,
   handleUpdatedValues,
+  setSelectedOrderNotAvailable,
+  setOrdersNotAvailableData,
+  selectedOrderNotAvailable
 }) => {
   const [dateFilter, setDateFilter] = useState("");
   const dispatch = useDispatch();
@@ -42,10 +45,22 @@ const ReleaseSchedulePoModal = ({
         if (response.data.message) {
           const result = await ShowAlert("Uploaded Successfully!", '', "success", true, false, 'OK');
           if (result.isConfirmed) {
-            handleUpdatedValues();
-            setDateFilter('');
-            handleCloseReleaseSchedulePoModal();
+            setOrdersNotAvailableData((prevData) => {
+              const newData = prevData.map((order) => {
+                const isSelected = selectedOrderNotAvailable.some((selectedOrder) => {
+                  return selectedOrder?.id === order?.id;
+                });
+                if (isSelected) {
+                  return { ...order, isSelected: false };
+                }
+                return order;
+              });
+              return newData;
+            });
+            setSelectedOrderNotAvailable([]);
           }
+            setDateFilter('');
+            handleCloseReleaseSchedulePoModal()
         }
       })
       .catch((error) => {
