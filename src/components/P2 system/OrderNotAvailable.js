@@ -43,6 +43,7 @@ function OrderNotAvailable() {
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
   const [imageURL, setImageURL] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedData, setSelectedData] = useState([]);
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -248,31 +249,49 @@ function OrderNotAvailable() {
     };
 
     dispatch(OrderNotAvailableDataStatus(requestedDataS))
-    .then((response) => {
-      console.log(response, 'response<<<<<<<<<<<<<<<<<<<<<');
-      setOrdersNotAvailableData((prevData) => {
-        const newData = prevData.map((order) => {
-          const isSelected = selectedOrderNotAvailable.some((selectedOrder) => {
-            return selectedOrder?.id === order?.id;
+      .then((response) => {
+        setOrdersNotAvailableData((prevData) => {
+          const newData = prevData.map((order) => {
+            const isSelected = selectedOrderNotAvailable.some(
+              (selectedOrder) => {
+                return selectedOrder?.id === order?.id;
+              }
+            );
+            if (isSelected) {
+              return { ...order, isSelected: false };
+            }
+            return order;
           });
-          if (isSelected) {
-            return { ...order, isSelected: false };
-          }
-          return order;
+          return newData;
         });
-        return newData;
+        setSelectedOrderNotAvailable([]);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
-      setSelectedOrderNotAvailable([]);
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
   };
 
   const handleModalClose = async () => {
+    setOrdersNotAvailableData((prevData) => {
+      const newData = prevData.map((order) => {
+        const isSelected = selectedOrderNotAvailable.some((selectedOrder) => {
+          return selectedOrder?.id === order?.id;
+        });
+        setSelectedData(isSelected);
+        if (isSelected) {
+          return {
+            ...order,
+            isSelected: false,
+            customer_status: selectedData.customer_status,
+          };
+        }
+        return order;
+      });
+      return newData;
+    });
+    setSelectedStatus({ id: 0, status: "" });
     setSelectedOrderNotAvailable([]);
     setShowModal(false);
-    fetchOrdersNotAvailableData();
   };
 
   const columns = [
@@ -397,20 +416,19 @@ function OrderNotAvailable() {
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
   };
+
   const handleUpdatedValues = () => {
-    ordersNotAvailableData.forEach((order) => {
-      order.isSelected = false;
+    const updatedOrders = ordersNotAvailableData.map((order) => {
+      return { ...order, isSelected: false }; // Set isSelected to false for each order
     });
-    setSelectedOrderNotAvailable([]);
-    setSelectedStatus({ id: 0, status: "" });
-    fetchOrdersNotAvailableData();
+    setOrdersNotAvailableData(updatedOrders);
+    setSelectedOrderNotAvailable([]); // Clear the selected orders array
+    setSelectedStatus({ id: 0, status: "" }); //
   };
 
   useEffect(() => {
     fetchOrdersNotAvailableData();
-  }, [currentStartIndex]);
-
-  useEffect(() => {}, [setSelectedStatus]);
+  }, [currentStartIndex, setSelectedOrderNotAvailable, setSelectedStatus]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -491,9 +509,7 @@ function OrderNotAvailable() {
         showModal={showModal}
         OrderNotAvailable={selectedOrderNotAvailable}
         handleUpdatedValues={handleUpdatedValues}
-        setSelectedOrderNotAvailable={setSelectedOrderNotAvailable}
-        setOrdersNotAvailableData={setOrdersNotAvailableData}
-        selectedOrderNotAvailable={selectedOrderNotAvailable}
+        fetchOrdersNotAvailableData={fetchOrdersNotAvailableData}
       />
       <Modal
         show={showEditModal}

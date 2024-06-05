@@ -10,9 +10,7 @@ const ReleaseSchedulePoModal = ({
   showModal,
   OrderNotAvailable,
   handleUpdatedValues,
-  setSelectedOrderNotAvailable,
-  setOrdersNotAvailableData,
-  selectedOrderNotAvailable
+  fetchOrdersNotAvailableData,
 }) => {
   const [dateFilter, setDateFilter] = useState("");
   const dispatch = useDispatch();
@@ -43,25 +41,23 @@ const ReleaseSchedulePoModal = ({
     await dispatch(OrderNotAvailableDataPo(requestData))
       .then(async (response) => {
         if (response.data.message) {
-          const result = await ShowAlert("Uploaded Successfully!", '', "success", true, false, 'OK');
+          const result = await ShowAlert(
+            "Uploaded Successfully!",
+            "",
+            "success",
+            true,
+            false,
+            "OK"
+          );
           if (result.isConfirmed) {
-            setOrdersNotAvailableData((prevData) => {
-              const newData = prevData.map((order) => {
-                const isSelected = selectedOrderNotAvailable.some((selectedOrder) => {
-                  return selectedOrder?.id === order?.id;
-                });
-                if (isSelected) {
-                  return { ...order, isSelected: false };
-                }
-                return order;
-              });
-              return newData;
-            });
-            setSelectedOrderNotAvailable([]);
+            setDateFilter("");
+            handleCloseReleaseSchedulePoModal();
+            handleUpdatedValues();
           }
-            setDateFilter('');
-            handleCloseReleaseSchedulePoModal()
         }
+      })
+      .then(() => {
+        fetchOrdersNotAvailableData();
       })
       .catch((error) => {
         console.error(error);
