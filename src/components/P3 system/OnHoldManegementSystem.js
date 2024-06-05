@@ -74,7 +74,7 @@ function OnHoldManegementSystem() {
         // const sizeAvailable = size?.length > 0;
 
         return (
-            <Box className='d-flex justify-content-around align-items-center'>
+            <Box className='d-flex justify-content-around align-items-center w-100'>
                 {noVariation ? (
                     <Box>No any variation</Box>
                 ) : (
@@ -162,7 +162,7 @@ function OnHoldManegementSystem() {
     };
 
     const columns = [
-        { field: "product_name", headerName: "product name", flex: 1,className:" d-flex justify-content-center align-items-center" },
+        { field: "product_name", headerName: "product name", flex: 1, className: " d-flex justify-content-center align-items-center" },
         {
             field: "product_image", headerName: "product image", flex: 1,
             type: "html",
@@ -292,6 +292,7 @@ function OnHoldManegementSystem() {
             if (productIDF) {
                 setSelectedOption(null)
                 const response = await dispatch(GetProductManual({ apiUrl }));
+                console.log(response, 'response');
                 const data = response.data.products.map((v, i) => ({ ...v, id: i }));
                 const modifiedData = data.map(item => ({
                     ...item,
@@ -461,18 +462,62 @@ function OnHoldManegementSystem() {
         let dataa = data.filter(o => o.variation_values && Object.keys(o.variation_values).length > 0);
         console.log(dataa, 'dataa=====');
 
-        const variationArray = dataa.map(d =>
-            Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
-        );
-        console.log(variationArray, 'variationArray');
+        // const result = dataa.map(item => {
+        //     const keys = Object.keys(item.variation_values);
+        //     const values = Object.values(item.variation_values);
+        //     const isAllString = values.every(value => typeof value === 'string');
+        
+        //     return {
+        //         ...item,
+        //         isVariationStringOnly: isAllString && keys.every(key => typeof key === 'string')
+        //     };
+        // });
+        
+        // console.log(result);
+        const isAllVariationsString = data.every(item => {
+            const values = Object.values(item.variation_values);
+            return values.every(value => typeof value === 'string');
+        });
+        console.log(isAllVariationsString);
 
-        const value = variationArray?.every(variation => (
-            typeof Object.values(variation)[0] !== 'object'
-        ));
+        // const variationArray = dataa.map(d =>
+        //     Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
+        // );
+        // console.log(variationArray, 'variationArray');
 
+        // const value = variationArray?.every(variation => (
+        //     typeof Object.values(variation)[0] !== 'object',
+        //     console.log(variation, 'variation'),
+        //     variation.map((item, index) => {
+        //         const attributeName = Object.keys(item)[0];
+        //         const attributeValue = Object.values(item)[0];
+        //         console.log(attributeValue, 'attributeValue');
+        //         typeof (attributeValue) !== 'object'
+        //     })
+        //     // console.log(typeof Object.values(variation)[0] !== 'object'),
+        //     // console.log(typeof Object.values(variation)[0]),
+        //     // console.log( Object.values(variation)[0]),
+        //     // console.log( Object.keys(variation))
+
+        // ));
+
+        // const value = variationArray?.every(variation => {
+        //     console.log(variation, 'variation');
+            
+        //     // Iterate over each item in the variation array
+        //  let a=   variation.map((item, index) => {
+        //         const attributeName = Object.keys(item)[0];
+        //         const attributeValue = Object.values(item)[0];
+        //         console.log(attributeValue, 'attributeValue');
+        //         return typeof attributeValue !== 'object'; // Check if the attributeValue is not an object
+        //     });
+        
+        //     return typeof Object.values(variation)[0] !== 'object';
+        // });
+        // console.log(value, 'value=======');
 
         const isQuantityAvailable = data.every(item => item.Quantity !== '')
-        setIsValid(value && isQuantityAvailable);
+        setIsValid(isAllVariationsString && isQuantityAvailable);
         // const isValid = dataa.every(item => item.variationColor !== '');
         // const isValidSize = dataa.every(item => item.variationSize !== '');
         // setIsValid((isValid || isValidSize) && isQuantityAvailable);
@@ -516,7 +561,7 @@ function OnHoldManegementSystem() {
         };
         console.log(payload, 'payload=====');
         try {
-            dispatch(AddGrn(payload, navigate))
+            // dispatch(AddGrn(payload, navigate))
         } catch (error) {
             console.error(error);
         }
@@ -615,12 +660,12 @@ function OnHoldManegementSystem() {
                                     <DataTable
                                         columns={columns}
                                         rows={tableData}
-                                    // rowHeight={'auto'}
-                                    // page={page}
-                                    // pageSize={pageSize}
-                                    // totalPages={totalPages}
-                                    // handleChange={handleChange}
-                                    getRowHeight={'auto'}
+                                        // rowHeight={'auto'}
+                                        // page={page}
+                                        // pageSize={pageSize}
+                                        // totalPages={totalPages}
+                                        // handleChange={handleChange}
+                                        rowHeight='auto'
                                     />
                                 </div>
                                 <MDBRow className='justify-content-end px-3'>
