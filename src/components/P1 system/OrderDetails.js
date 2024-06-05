@@ -295,7 +295,7 @@ function OrderDetails() {
       field: "product_name",
       headerName: "Name",
       className: "order-details",
-      flex: 1,
+      flex: 2,
     },
     {
       field: "variant_details",
@@ -344,7 +344,7 @@ function OrderDetails() {
     {
       field: "quantity",
       headerName: "QTY",
-      flex: 1,
+      flex: 0.5,
       className: "order-details",
     },
     {
@@ -401,7 +401,7 @@ function OrderDetails() {
                     sx={{
                       position: "relative",
                       top: "-30px",
-                      right: "55px",
+                      right: "8px",
                       cursor: "pointer",
                       color: "red",
                       zIndex: 1,
@@ -872,23 +872,18 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" && tableData.some((data) => data.dispatch_image === "") ? (
+            orderProcess == "started" ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
-                Finish
-              </Button>
-            ) : orderProcess == "started" &&
-              userData?.user_id != orderDetails?.operation_user_id ? (
-              <Button
-                variant="danger"
-                disabled
-                onClick={handleFinishButtonClick}
-              >
                 Finish
               </Button>
             ) : (
               <Button
                 variant="danger"
-                disabled
+                disabled={
+                  orderProcess != "started" ||
+                  userData?.user_id != orderDetails?.operation_user_id ||
+                  tableData?.some((data) => data.dispatch_image == "")
+                }
                 onClick={handleFinishButtonClick}
               >
                 Finish
