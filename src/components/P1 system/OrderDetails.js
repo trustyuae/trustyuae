@@ -248,7 +248,7 @@ function OrderDetails() {
       });
   };
 
-  const   handleFinishButtonClick = async () => {
+  const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
       const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
@@ -397,25 +397,28 @@ function OrderDetails() {
                       setAttachmentZoom(true);
                     }}
                   />
-                  <CancelIcon
-                    sx={{
-                      position: "relative",
-                      top: "-30px",
-                      right: "8px",
-                      cursor: "pointer",
-                      color: "red",
-                      zIndex: 1,
-                      // disabled=isDisabled
-                      opacity: isDisabled ? 0.5 : 1,
-                      pointerEvents: isDisabled ? "none" : "auto",
-                      cursor: isDisabled ? "not-allowed" : "pointer",
-                    }}
-                    onClick={(e) => {
-                      if (!isDisabled) {
-                        handleCancelImg(value.row);
-                      }
-                    }}
-                  />
+                  {userData?.user_id == orderDetails?.operation_user_id &&
+                    orderProcess == "started" && (
+                      <CancelIcon
+                        sx={{
+                          position: "relative",
+                          top: "-30px",
+                          right: "8px",
+                          cursor: "pointer",
+                          color: "red",
+                          zIndex: 1,
+                          // disabled=isDisabled
+                          opacity: isDisabled ? 0.5 : 1,
+                          pointerEvents: isDisabled ? "none" : "auto",
+                          cursor: isDisabled ? "not-allowed" : "pointer",
+                        }}
+                        onClick={(e) => {
+                          if (!isDisabled) {
+                            handleCancelImg(value.row);
+                          }
+                        }}
+                      />
+                    )}
                 </Box>
               </Col>
             </Row>
@@ -431,7 +434,7 @@ function OrderDetails() {
                   {userData?.user_id == orderDetails?.operation_user_id &&
                   orderProcess == "started" ? (
                     <Button
-                      className="bg-transparent border-0  text-black"
+                      className="bg-transparent border-0 text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
                     >
                       <CloudUploadIcon />
@@ -445,20 +448,9 @@ function OrderDetails() {
                         onChange={handleFileInputChangeForRow}
                       />
                     </Button>
-                  ) : orderProcess == "started" &&
-                    userData?.user_id != orderDetails?.operation_user_id ? (
-                    <Button
-                      className="bg-transparent border-0  text-black"
-                      disabled
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                    </Button>
                   ) : (
                     <Button
-                      className="bg-transparent border-0  text-black"
+                      className="bg-transparent border-0 text-black"
                       disabled
                     >
                       <CloudUploadIcon />
@@ -477,17 +469,6 @@ function OrderDetails() {
                         setShowAttachModal(true);
                         setSelectedItemId(itemId);
                       }}
-                    >
-                      <CameraAltIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Camera
-                      </Typography>
-                    </Button>
-                  ) : orderProcess == "started" &&
-                    userData?.user_id != orderDetails?.operation_user_id ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
                     >
                       <CameraAltIcon />
                       <Typography style={{ fontSize: "14px" }}>
