@@ -109,7 +109,7 @@ function CompletedOrderDetails() {
       field: "product_name",
       headerName: "Name",
       className: "order-details",
-      flex: 1,
+      flex: 2,
     },
     {
       field: "variant_details",
@@ -158,7 +158,7 @@ function CompletedOrderDetails() {
     {
       field: "quantity",
       headerName: "QTY",
-      flex: 1,
+      flex: 0.5,
       className: "order-details",
     },
     {
@@ -171,7 +171,7 @@ function CompletedOrderDetails() {
     {
       field: "dispatch_image",
       headerName: "Attachment",
-      flex: 1.5,
+      flex: 1,
       className: "order-details",
       renderCell: (params) => (
         <Box
