@@ -247,14 +247,15 @@ function OrderNotAvailable() {
       customer_status: customerStatuses,
     };
 
-    await dispatch(OrderNotAvailableDataStatus(requestedDataS)).then(() => {
+    dispatch(OrderNotAvailableDataStatus(requestedDataS))
+    .then((response) => {
+      console.log(response, 'response<<<<<<<<<<<<<<<<<<<<<');
       setOrdersNotAvailableData((prevData) => {
         const newData = prevData.map((order) => {
-          if (
-            selectedOrderNotAvailable.some(
-              (selectedOrder) => selectedOrder.id === order.id
-            )
-          ) {
+          const isSelected = selectedOrderNotAvailable.some((selectedOrder) => {
+            return selectedOrder?.id === order?.id;
+          });
+          if (isSelected) {
             return { ...order, isSelected: false };
           }
           return order;
@@ -262,9 +263,10 @@ function OrderNotAvailable() {
         return newData;
       });
       setSelectedOrderNotAvailable([]);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
     });
-    handleUpdatedValues();
-    // fetchOrdersNotAvailableData()
   };
 
   const handleModalClose = async () => {

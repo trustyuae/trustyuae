@@ -164,7 +164,7 @@ function OrderDetails() {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const response = await axios.post(
+        await axios.post(
           `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
             variation_id: e.variation_id,
