@@ -853,7 +853,7 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" ? (
+            orderProcess == "started" && tableData?.some((data) => data.dispatch_image != "") ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
