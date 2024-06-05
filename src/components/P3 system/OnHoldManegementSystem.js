@@ -466,13 +466,13 @@ function OnHoldManegementSystem() {
         //     const keys = Object.keys(item.variation_values);
         //     const values = Object.values(item.variation_values);
         //     const isAllString = values.every(value => typeof value === 'string');
-        
+
         //     return {
         //         ...item,
         //         isVariationStringOnly: isAllString && keys.every(key => typeof key === 'string')
         //     };
         // });
-        
+
         // console.log(result);
         const isAllVariationsString = data.every(item => {
             const values = Object.values(item.variation_values);
@@ -503,7 +503,7 @@ function OnHoldManegementSystem() {
 
         // const value = variationArray?.every(variation => {
         //     console.log(variation, 'variation');
-            
+
         //     // Iterate over each item in the variation array
         //  let a=   variation.map((item, index) => {
         //         const attributeName = Object.keys(item)[0];
@@ -511,7 +511,7 @@ function OnHoldManegementSystem() {
         //         console.log(attributeValue, 'attributeValue');
         //         return typeof attributeValue !== 'object'; // Check if the attributeValue is not an object
         //     });
-        
+
         //     return typeof Object.values(variation)[0] !== 'object';
         // });
         // console.log(value, 'value=======');
@@ -523,21 +523,48 @@ function OnHoldManegementSystem() {
         // setIsValid((isValid || isValidSize) && isQuantityAvailable);
     };
 
+    // Function to transform data
+    // const transformData = (data) => {
+    //     console.log(data, 'data');
+    //     if (!data || !data.variation_details || !data.variation_values) {
+    //         return [];
+    //     }
+
+    //     const { variation_details, variation_values } = data;
+    //     console.log(variation_details);
+    //     console.log(variation_values);
+    //     const matchingKey = Object.keys(variation_details).find(key => {
+    //         const detail = variation_details[key];
+    //         return detail.color === variation_values.color && detail.size === variation_values.size;
+    //     });
+    //     console.log(parseInt(matchingKey, 10), 'parseInt(matchingKey, 10)')
+    //     data.variation_details = [parseInt(matchingKey, 10)]
+
+    //     return matchingKey ? data : [];
+    // };
+
+
     const handleSubmit = async () => {
         const currentDate = new Date().toISOString().split('T')[0];
-        console.log(tableData, 'tableData');
-        // let dataa = tableData.filter(o => (Object.keys(o.variation_values).length > 0))
-        //    const variationArray= dataa.map(d=>
-        //         // Object.entries(d.variation_values).map(([key, value]) => ({ [key]: value }))
-        //         Object.entries(d.variation_values).map(([key, value]) => ( value ))
-        //     )
-        //     console.log(variationArray,'variationArray');
-        //    const value= variationArray.map(([key,value])=>(
-        //         // typeof(Object.values(key)[0]) !== 'object',
-        //         // typeof(Object.values(value)[0]) !== 'object'
-        //         console.log(Object.values(value)[0],'Object.values(value)[0]'),
-        //         console.log(Object.values(key)[0],'Object.values(value)[0]')
-        //     ))
+         
+        tableData.forEach(data => {
+            if (data.variation_details && data.variation_values) {
+                const { variation_details, variation_values } = data;
+                const matchingKeys = Object.keys(variation_details).filter(key => {
+                    const detail = variation_details[key];
+                    // Check if all properties in variation_values match with detail
+                    return Object.keys(variation_values).every(prop => {
+                        return detail[prop] === variation_values[prop];
+                    });
+                });
+                if (matchingKeys.length > 0) {
+                    data.variation_id = Number(matchingKeys[0]);
+                }
+            }
+        });
+        
+        console.log(tableData, 'tableData')
+
 
         const convertedData = tableData.map(item => ({
             product_id: parseInt(item.product_id),
@@ -561,7 +588,7 @@ function OnHoldManegementSystem() {
         };
         console.log(payload, 'payload=====');
         try {
-            // dispatch(AddGrn(payload, navigate))
+            dispatch(AddGrn(payload, navigate))
         } catch (error) {
             console.error(error);
         }
