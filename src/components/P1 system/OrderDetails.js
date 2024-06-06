@@ -284,6 +284,27 @@ function OrderDetails() {
     }
   };
 
+  const variant2 = (variations) => {
+    const { Color, Size } = variations;
+  
+    if (!Color && !Size) {
+      return "Variant data not available";
+    }
+  
+    let details = [];
+  
+    if (Size) {
+      details.push(`Size: ${Size}`);
+    }
+  
+    if (Color) {
+      details.push(`Color: ${Color}`);
+    }
+  
+    return details.join(", ");
+  };
+
+
   const columns = [
     {
       field: "item_id",
@@ -305,6 +326,8 @@ function OrderDetails() {
       renderCell: (params) => {
         if (params.row.variation_value && params.row.variation_value !== "") {
           return variant(params.row.variation_value);
+        } else if (params.row.variations && Object.keys(params.row.variations).length !== 0) {
+          return variant2(params.row.variations);
         } else {
           return "No variations available";
         }
