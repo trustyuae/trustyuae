@@ -645,7 +645,6 @@ function OrderManagementSystem() {
     );
     let size = null;
     let color = null;
-
     if (matches) {
       matches.forEach((match) => {
         const keyValueMatches = match.match(
@@ -654,9 +653,9 @@ function OrderManagementSystem() {
         if (keyValueMatches) {
           const key = keyValueMatches[1];
           const value = keyValueMatches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
-          if (key === "size") {
+          if (key.toLocaleLowerCase() === "size") {
             size = value;
-          } else if (key === "color") {
+          } else if (key.toLocaleLowerCase() === "color") {
             color = value;
           }
         }
