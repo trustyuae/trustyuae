@@ -33,8 +33,11 @@ const ERDetails = () => {
     );
     useEffect(() => {
         dispatch(AllFactoryActions());
+    }, [dispatch]);
+
+    useEffect(() => {
         setFactories(allFactoryDatas);
-    }, [dispatch, allFactoryDatas]);
+    }, [allFactoryDatas]);
 
     const fetchER = async () => {
         try {
