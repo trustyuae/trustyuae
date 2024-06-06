@@ -121,7 +121,21 @@ function OrderManagementSystem() {
       field: "variation_value",
       headerName: "Variation values",
       flex: 1,
-      renderCell: (params) => variant(params.row.variation_value),
+      renderCell: (params) => {
+          if (
+            params.row.variations &&
+            Object.keys(params.row.variations).length !== 0
+          ) {
+            return variant2(params.row.variations);
+          } else if (
+            params.row.variation_value &&
+            params.row.variation_value !== ""
+          ) {
+            return variant(params.row.variation_value);
+          } else {
+            return "No variations available";
+          }
+        },
     },
     {
       field: "product_images",
@@ -657,59 +671,38 @@ function OrderManagementSystem() {
   };
 
   // variant
-  const variant = (e) => {
-    const matches = e.match(
-      /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/g
+  const variant = (variations) => {
+    const matches = variations.match(
+      /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
     );
-    let size = null;
-    let color = null;
     if (matches) {
-      matches.forEach((match) => {
-        const keyValueMatches = match.match(
-          /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
-        );
-        if (keyValueMatches) {
-          const key = keyValueMatches[1];
-          const value = keyValueMatches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
-          if (key.toLocaleLowerCase() === "size") {
-            size = value;
-          } else if (key.toLocaleLowerCase() === "color") {
-            color = value;
-          }
-        }
-      });
-    }
-
-    if (size && color) {
-      return `Size: ${size}, Color: ${color}`;
-    }
-    if (size) {
-      return `Size:${size}`;
-    }
-    if (color) {
-      return `Color:${color}`;
+      const key = matches[1];
+      const value = matches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
+      return `${key}: ${value}`;
     } else {
       return "Variant data not available";
     }
   };
 
-  const variant2 = (e) => {
-    if (e.length === 0) {
+  const variant2 = (variations) => {
+    console.log(variations,'variations');
+    const { Color, Size } = variations;
+
+    if (!Color && !Size) {
       return "Variant data not available";
-    } else {
-      const { color, size } = e;
-      if (size.length > 0 && color.length > 0) {
-        return `Size: ${size.join(", ")}, Color: ${color.join(", ")}`;
-      }
-      if (size.length > 0) {
-        return `Size: ${size.join(", ")}`;
-      }
-      if (color.length > 0) {
-        return `Color: ${color.join(", ")}`;
-      } else {
-        return "Variant data not available";
-      }
     }
+
+    let details = [];
+
+    if (Size) {
+      details.push(`Size: ${Size}`);
+    }
+
+    if (Color) {
+      details.push(`Color: ${Color}`);
+    }
+
+    return details.join(", ");
   };
 
   const handleChange = (event, value) => {
