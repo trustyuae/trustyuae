@@ -99,9 +99,17 @@ function OrderManagementSystem() {
               className="mx-auto"
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
-              checked={selectedOrderIds.includes(params.row.product_name)}
+              checked={selectedOrderIds.includes(
+                params.row.variation_id
+                  ? params.row.variation_id
+                  : params.row.item_id
+              )}
               onChange={(event) =>
-                handleOrderSelection(params.row.product_name)
+                handleOrderSelection(
+                  params.row.variation_id
+                    ? params.row.variation_id
+                    : params.row.item_id
+                )
               }
             />
           </FormGroup>
@@ -363,13 +371,13 @@ function OrderManagementSystem() {
   };
 
   useEffect(() => {
-    if (activeKey == 'against_PO') {
+    if (activeKey == "against_PO") {
       fetchOrders();
     }
-    if (activeKey == 'manual_PO') {
+    if (activeKey == "manual_PO") {
       manualPO();
     }
-    if (activeKey == 'scheduled_PO') {
+    if (activeKey == "scheduled_PO") {
       scheduledPO();
     }
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
@@ -412,7 +420,7 @@ function OrderManagementSystem() {
       setManualPoOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setManualPoOrders([])
+      setManualPoOrders([]);
     }
   };
 
@@ -431,7 +439,7 @@ function OrderManagementSystem() {
       setScheduleOrders(data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setScheduleOrders([])
+      setScheduleOrders([]);
     }
   };
 
@@ -454,20 +462,20 @@ function OrderManagementSystem() {
     return data;
   };
 
-  const handleOrderSelection = (orderId) => {
+  const handleOrderSelection = (variationId) => {
     const filteredOrders = orders.filter(
-      (order) => order.product_name === orderId
+      (order) => order.variation_id === variationId
     );
     const orderIds = filteredOrders.map((order) => order.order_ids);
 
-    const isSelected = selectedOrderIds.includes(orderId);
+    const isSelected = selectedOrderIds.includes(variationId);
     const newSelected = isSelected
-      ? selectedOrderIds.filter((id) => id !== orderId)
-      : [...selectedOrderIds, orderId];
+      ? selectedOrderIds.filter((id) => id !== variationId)
+      : [...selectedOrderIds, variationId];
     const newSelected2 = isSelected
       ? selectedOrderIdss
-        .filter((id) => id !== orderId)
-        .flatMap((id) => id.split(","))
+          .filter((id) => id !== variationId)
+          .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
@@ -583,7 +591,7 @@ function OrderManagementSystem() {
     } else {
       let errMessage =
         "Selected orders belong to different factories. Please select orders from the same factory.";
-      ShowAlert("", errMessage, "error", false, false, '', '', 1000);
+      ShowAlert("", errMessage, "error", false, false, "", "", 1000);
     }
   };
   const handleGenerateManualPO = async () => {
@@ -613,7 +621,12 @@ function OrderManagementSystem() {
       await ShowAlert(
         "",
         "Selected orders belong to different factories. Please select orders from the same factory.",
-        "error", false, false, '', '', 1000
+        "error",
+        false,
+        false,
+        "",
+        "",
+        1000
       );
     }
   };
@@ -647,7 +660,12 @@ function OrderManagementSystem() {
       await ShowAlert(
         "",
         "Selected orders belong to different factories. Please select orders from the same factory.",
-        "error", false, false, '', '', 1000
+        "error",
+        false,
+        false,
+        "",
+        "",
+        1000
       );
     }
   };
@@ -872,52 +890,47 @@ function OrderManagementSystem() {
                 <Loader />
               ) : (
                 <>
-                  {
-                    orders && orders.length !== 0 ? (
-                      <DataTable
-                        columns={columns1}
-                        rows={orders}
-                        page={page}
-                        pageSize={pageSize}
-                        totalPages={totalPages}
-                        handleChange={handleChange}
-                      />
-                    ) : (
-                      <Alert
-                        severity="warning"
-                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                      >
-                        Records is not Available for above filter
-                      </Alert>
-                    )
-                  }
+                  {orders && orders.length !== 0 ? (
+                    <DataTable
+                      columns={columns1}
+                      rows={orders}
+                      page={page}
+                      pageSize={pageSize}
+                      totalPages={totalPages}
+                      handleChange={handleChange}
+                    />
+                  ) : (
+                    <Alert
+                      severity="warning"
+                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                    >
+                      Records is not Available for above filter
+                    </Alert>
+                  )}
                 </>
               ))}
             {activeKey === "manual_PO" &&
               (manualOrScheduledPoLoader ? (
                 <Loader />
               ) : (
-
                 <>
-                  {
-                    manualPOorders && manualPOorders.length !== 0 ? (
-                      <DataTable
-                        columns={columnsMPO}
-                        rows={manualPOorders}
-                        page={page}
-                        pageSize={pageSize}
-                        totalPages={totalPages}
-                        handleChange={handleChange}
-                      />
-                    ) : (
-                      <Alert
-                        severity="warning"
-                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                      >
-                        Records is not Available for above filter
-                      </Alert>
-                    )
-                  }
+                  {manualPOorders && manualPOorders.length !== 0 ? (
+                    <DataTable
+                      columns={columnsMPO}
+                      rows={manualPOorders}
+                      page={page}
+                      pageSize={pageSize}
+                      totalPages={totalPages}
+                      handleChange={handleChange}
+                    />
+                  ) : (
+                    <Alert
+                      severity="warning"
+                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                    >
+                      Records is not Available for above filter
+                    </Alert>
+                  )}
                 </>
               ))}
             {activeKey === "scheduled_PO" &&
@@ -925,25 +938,23 @@ function OrderManagementSystem() {
                 <Loader />
               ) : (
                 <>
-                  {
-                    scheduledPOorders && scheduledPOorders.length !== 0 ? (
-                      <DataTable
-                        columns={columnsSPO}
-                        rows={scheduledPOorders}
-                        page={page}
-                        pageSize={pageSize}
-                        totalPages={totalPages}
-                        handleChange={handleChange}
-                      />
-                    ) : (
-                      <Alert
-                        severity="warning"
-                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                      >
-                        Records is not Available for above filter
-                      </Alert>
-                    )
-                  }
+                  {scheduledPOorders && scheduledPOorders.length !== 0 ? (
+                    <DataTable
+                      columns={columnsSPO}
+                      rows={scheduledPOorders}
+                      page={page}
+                      pageSize={pageSize}
+                      totalPages={totalPages}
+                      handleChange={handleChange}
+                    />
+                  ) : (
+                    <Alert
+                      severity="warning"
+                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                    >
+                      Records is not Available for above filter
+                    </Alert>
+                  )}
                 </>
               ))}
           </Box>
