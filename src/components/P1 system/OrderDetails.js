@@ -286,24 +286,23 @@ function OrderDetails() {
 
   const variant2 = (variations) => {
     const { Color, Size } = variations;
-  
+
     if (!Color && !Size) {
       return "Variant data not available";
     }
-  
+
     let details = [];
-  
+
     if (Size) {
       details.push(`Size: ${Size}`);
     }
-  
+
     if (Color) {
       details.push(`Color: ${Color}`);
     }
-  
+
     return details.join(", ");
   };
-
 
   const columns = [
     {
@@ -324,10 +323,16 @@ function OrderDetails() {
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
-        if (params.row.variation_value && params.row.variation_value !== "") {
-          return variant(params.row.variation_value);
-        } else if (params.row.variations && Object.keys(params.row.variations).length !== 0) {
+        if (
+          params.row.variations &&
+          Object.keys(params.row.variations).length !== 0
+        ) {
           return variant2(params.row.variations);
+        } else if (
+          params.row.variation_value &&
+          params.row.variation_value !== ""
+        ) {
+          return variant(params.row.variation_value);
         } else {
           return "No variations available";
         }
@@ -876,7 +881,8 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" && tableData?.some((data) => data.dispatch_image != "") ? (
+            orderProcess == "started" &&
+            tableData?.some((data) => data.dispatch_image != "") ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
