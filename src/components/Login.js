@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MDBContainer,
   MDBCol,
@@ -8,11 +8,13 @@ import {
   MDBCardImage,
 } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
-import { useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import { loginUser, loginUserWithToken } from "../redux/actions/UserActions";
 import { useNavigate } from "react-router-dom";
 import { isValidEmail } from "../utils/validation";
 import styled from 'styled-components';
+import { Box, CardContent } from "@mui/material";
+import { Card, Col, Row } from "react-bootstrap";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ const Login = () => {
 
   const handleSubmit = () => {
     let isValid = true;
-  
+
     if (!username) {
       setUserNameError("Username is required");
       isValid = false;
@@ -40,21 +42,21 @@ const Login = () => {
       setUserNameError("Please enter a valid Username");
       isValid = false;
     } else {
-      setUserNameError(""); 
+      setUserNameError("");
     }
-  
+
     if (!password) {
       setPasswordError("Please enter valid password");
       isValid = false;
     } else {
-      setPasswordError(""); 
+      setPasswordError("");
     }
-  
+
     if (isValid) {
       dispatch(loginUser({ username, password }, navigate));
     }
   };
-  
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -62,57 +64,77 @@ const Login = () => {
   }, []);
 
   return (
-    <MDBContainer fluid className="p-3 my-5">
-      <MDBRow className="d-flex justify-content-center align-items-center">
-        <MDBCol col="10" md="6">
-          <MDBCardImage
-            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-            className="img-fluid"
-            alt="Phone image"
-          />
-        </MDBCol>
-        <MDBCol col="4" md="4" className="align-items-center">
-          <MDBInput
-            // wrapperClass="mb-4"
-            placeholder="Enter username..."
-            value={username}
-            id="formControlLg"
-            type="text"
-            size="lg"
-            style={{ fontSize: "15px" }}
-            onChange={handleUsername}
-          />
-          {usernameError && <Error>{usernameError}</Error>}
-          <MDBInput
-            wrapperClass="mt-4"
-            placeholder="Enter password..."
-            value={password}
-            id="formControlLg"
-            type="password"
-            size="lg"
-            style={{ fontSize: "15px"}}
-            onChange={handlePassword}
-          />
-          {passwordError && <Error>{passwordError}</Error>}
-          <div className="d-flex justify-content-between mx-4 mt-3 mb-4">
-            <MDBCheckbox
-              name="flexCheck"
-              value={""}
-              id="flexCheckDefault"
-              label="Remember me"
-              labelClass="custom-label-style1"
-            />
-          </div>
-          <Button
-            className="w-100"
-            variant="primary"
-            type="submit"
-            onClick={handleSubmit}
-          >
-            <strong>Sign In</strong>
-          </Button>
-        </MDBCol>
-      </MDBRow>
+    <MDBContainer style={{ height: '100vh' }} className="p-3">
+      <Row className="d-flex justify-content-center align-items-center h-100">
+        <Col md={10}>
+          <Card className="mb-0 px-3">
+            <CardContent>
+              <Row className="justify-content-center align-items-center">
+                <Col md={7}>
+                  <Box sx={{ height: '350px', width: '100%' }}>
+                    {/* <img
+                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
+                      className="h-100 w-100"
+                      alt="Phone"
+                    /> */}
+                    <img
+                      src={require('../assets/access-control-system.webp')}
+                      className="h-100 w-100"
+                      alt="Phone"
+                    />
+                  </Box>
+                </Col>
+                <Col md={5}>
+                  <Box className="mb-3" sx={{
+                    width: '150px'
+                  }}>
+                    <img className="h-100 w-100" style={{ objectFit: 'contain' }} src={require('../assets/logo-large-main.webp')} alt="logo" />
+                  </Box>
+                  <MDBInput
+                    // wrapperClass="mb-4"
+                    placeholder="Enter username..."
+                    value={username}
+                    id="formControlLg"
+                    type="text"
+                    size="lg"
+                    style={{ fontSize: "15px" }}
+                    onChange={handleUsername}
+                  />
+                  {usernameError && <Error>{usernameError}</Error>}
+                  <MDBInput
+                    wrapperClass="mt-4"
+                    placeholder="Enter password..."
+                    value={password}
+                    id="formControlLg"
+                    type="password"
+                    size="lg"
+                    style={{ fontSize: "15px" }}
+                    onChange={handlePassword}
+                  />
+                  {passwordError && <Error>{passwordError}</Error>}
+                  <div className="d-flex justify-content-between mx-4 mt-3 mb-4">
+                    <MDBCheckbox
+                      name="flexCheck"
+                      value={""}
+                      id="flexCheckDefault"
+                      label="Remember me"
+                      labelClass="custom-label-style1"
+                    />
+                  </div>
+                  <Button
+                    className="w-100"
+                    variant="primary"
+                    type="submit"
+                    onClick={handleSubmit}
+                  >
+                    <strong>Sign In</strong>
+                  </Button>
+                </Col>
+              </Row>
+            </CardContent>
+          </Card>
+        </Col>
+      </Row>
     </MDBContainer>
   );
 };
