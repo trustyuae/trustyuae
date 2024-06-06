@@ -274,16 +274,13 @@ function OrderNotAvailable() {
   const handleModalClose = async () => {
     setOrdersNotAvailableData((prevData) => {
       const newData = prevData.map((order) => {
-        const isSelected = selectedOrderNotAvailable.some((selectedOrder) => {
-          return selectedOrder?.id === order?.id;
-        });
-        setSelectedData(isSelected);
+        const isSelected = selectedOrderNotAvailable.some(
+          (selectedOrder) => {
+            return selectedOrder?.id === order?.id;
+          }
+        );
         if (isSelected) {
-          return {
-            ...order,
-            isSelected: false,
-            customer_status: selectedData.customer_status,
-          };
+          return { ...order, isSelected: false };
         }
         return order;
       });
