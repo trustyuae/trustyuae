@@ -507,7 +507,7 @@ function OrderManagementSystem() {
   };
 
   const handleSelectAllAgainst = () => {
-    const allOrderIds = orders.map((order) => order.product_name);
+    const allOrderIds = orders.map((order) => order.id);
     const allOrderIdss = orders.flatMap((order) => order.order_ids);
     const flattenedData = allOrderIdss.flatMap((str) => str.split(","));
     setSelectedOrderIds(
@@ -563,7 +563,7 @@ function OrderManagementSystem() {
 
   const handleGenerateAgainstPO = async () => {
     const selectedOrders = orders.filter((order) =>
-      selectedOrderIds.includes(order.product_name)
+      selectedOrderIds.includes(order.id)
     );
     const factoryIds = [
       ...new Set(selectedOrders.map((order) => order.factory_id)),
