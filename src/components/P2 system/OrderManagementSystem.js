@@ -1083,7 +1083,22 @@ function OrderManagementSystem() {
                 </>
               ))}
           </Box>
-          {activeKey === "manual_PO" || activeKey === "scheduled_PO" ? (
+          {activeKey === "manual_PO" ? (
+            <Row>
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlTextarea1"
+              >
+                <Form.Label>Add Note</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  onChange={(e) => setManualNote(e.target.value)}
+                />
+              </Form.Group>
+            </Row>
+          ) : null}
+          {activeKey === "scheduled_PO" ? (
             <Row>
               <Form.Group
                 className="mb-3"
