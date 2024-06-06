@@ -48,8 +48,11 @@ const PoDetails = () => {
 
   useEffect(() => {
     dispatch(AllFactoryActions());
+  }, [dispatch]);
+
+  useEffect(() => {
     setFactories(allFactoryDatas);
-  }, [dispatch, allFactoryDatas]);
+  }, [allFactoryDatas]);
 
   const fetchPO = async () => {
     try {
@@ -157,7 +160,7 @@ const PoDetails = () => {
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    if(index.target.value>=0){
+    if (index.target.value >= 0) {
       const updatedData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
           return { ...item, available_quantity: index.target.value };

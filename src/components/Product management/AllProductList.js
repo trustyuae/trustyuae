@@ -35,8 +35,11 @@ function AllProductList() {
 
   useEffect(() => {
     dispatch(AllFactoryActions());
+  }, [dispatch]);
+  
+  useEffect(() => {
     setFactories(allFactoryDatas);
-  }, [dispatch, allFactoryDatas]);
+  }, [allFactoryDatas]);
 
   const fetchProducts = async () => {
     let apiUrl = `${API_URL}wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
