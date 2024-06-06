@@ -73,6 +73,7 @@ function OrderManagementSystem() {
   const [remainderDate, setRemainderDate] = useState("");
   const [poDetailsModal, setPoDetailsModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -93,6 +94,7 @@ function OrderManagementSystem() {
       headerName: "Select",
       flex: 1,
       renderCell: (params) => {
+        console.log(params,'xyz')
         return (
           <FormGroup>
             <FormControlLabel
@@ -100,15 +102,11 @@ function OrderManagementSystem() {
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               checked={selectedOrderIds.includes(
-                params.row.variation_id
-                  ? params.row.variation_id
-                  : params.row.item_id
+                params.id
               )}
               onChange={(event) =>
                 handleOrderSelection(
-                  params.row.variation_id
-                    ? params.row.variation_id
-                    : params.row.item_id
+                  params.id
                 )
               }
             />
@@ -396,7 +394,7 @@ function OrderManagementSystem() {
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       await dispatch(PoDetailsData({ apiUrl })).then((response) => {
-        let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
+        let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i + currentStartIndex }));
         setOrders(data);
         setTotalPages(response.data.total_pages);
       });
@@ -462,19 +460,19 @@ function OrderManagementSystem() {
     return data;
   };
 
-  const handleOrderSelection = (variationId) => {
+  const handleOrderSelection = (selectedId) => {
     const filteredOrders = orders.filter(
-      (order) => order.variation_id === variationId
+      (order) => order.id === selectedId
     );
     const orderIds = filteredOrders.map((order) => order.order_ids);
 
-    const isSelected = selectedOrderIds.includes(variationId);
+    const isSelected = selectedOrderIds.includes(selectedId);
     const newSelected = isSelected
-      ? selectedOrderIds.filter((id) => id !== variationId)
-      : [...selectedOrderIds, variationId];
+      ? selectedOrderIds.filter((id) => id !== selectedId)
+      : [...selectedOrderIds, selectedId];
     const newSelected2 = isSelected
       ? selectedOrderIdss
-          .filter((id) => id !== variationId)
+          .filter((id) => id !== selectedId)
           .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
@@ -707,6 +705,8 @@ function OrderManagementSystem() {
 
   const handleChange = (event, value) => {
     setPage(value);
+    let currIndex = value * pageSize - pageSize + 1;
+    setCurrentStartIndex(currIndex, "currIndex");
   };
 
   const [activeKey, setActiveKey] = useState("against_PO");
