@@ -292,7 +292,12 @@ const PoDetails = () => {
           <Select
             labelId={`customer-status-${params.row.id}-label`}
             id={`customer-status-${params.row.id}`}
-            value={params.row.availability_status}
+            value={
+              params.row.availability_status !== "" &&
+              params.row.availability_status !== "0"
+                ? params.row.availability_status
+                : params.row.estimated_production_time
+            }
             onChange={(event) => handleStatusChange(event, params.row)}
             fullWidth
             style={{ height: "40%", width: "100%" }}
