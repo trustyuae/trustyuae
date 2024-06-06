@@ -714,21 +714,22 @@ function OrderManagementSystem() {
     console.log(filteredOrders, 'filteredOrders manual PO')
 
     const factoryIds = [
-      ...new Set(selectedOrders.map((order) => order.factory_id)),
+      ...new Set(filteredOrders.map((order) => order.factory_id)),
     ];
 
     if (factoryIds.length === 1) {
-      const selectedquantities = selectedOrders.map((order) => order.Quantity);
+      const selectedquantities = filteredOrders.map((order) => order.Quantity);
       const selectedOrderIdsStr = selectedManualOrderIds;
 
       const payload = {
         quantities: selectedquantities,
         product_ids: selectedOrderIdsStr,
+        variation_id:filteredOrders.map(d=>d.variation_id),
         note: manualNote,
       };
-
+      console.log(payload,'payload');
       try {
-        // await dispatch(AddManualPO(payload, navigate));
+        await dispatch(AddManualPO(payload, navigate));
       } catch (error) {
         console.error("Error generating PO IDs:", error);
       }
@@ -756,20 +757,21 @@ function OrderManagementSystem() {
     console.log(filteredOrders, 'filteredOrders Scheduled PO')
 
     const factoryIds = [
-      ...new Set(selectedOrders.map((order) => order.factory_id)),
+      ...new Set(filteredOrders.map((order) => order.factory_id)),
     ];
     if (factoryIds.length === 1) {
-      const selectedquantities = selectedOrders.map((order) => order.Quantity);
+      const selectedquantities = filteredOrders.map((order) => order.Quantity);
       const selectedOrderIdsStr = selectedScheduleOrderIds;
 
       const payload = {
         quantities: selectedquantities,
         product_ids: selectedOrderIdsStr,
+        variation_id:filteredOrders.map(d=>d.variation_id),
         note: scheduledNote,
         estimated_time: estimatedTime,
         reminder_date: remainderDate,
       };
-
+      console.log(payload,'payload');
       try {
         await dispatch(AddSchedulePO(payload, navigate));
       } catch (error) {
