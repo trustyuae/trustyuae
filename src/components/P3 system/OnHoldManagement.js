@@ -106,7 +106,7 @@ function OnHoldManagement() {
   };
 
   useEffect(() => {
-    handleUpdatedValues()
+    handleUpdatedValues();
   }, []);
 
   const handleOrderPerp = async () => {
@@ -114,7 +114,16 @@ function OnHoldManagement() {
     const quantity = selectedOrders.map((order) => order.quantity);
 
     if (selectedOrders.length === 0) {
-      await ShowAlert("please select products for generating schedule po", '', "error", false, false, '', '', 1000);
+      await ShowAlert(
+        "please select products for generating schedule po",
+        "",
+        "error",
+        false,
+        false,
+        "",
+        "",
+        1000
+      );
     } else {
       const requestedDataP = {
         product_id: params.id,
@@ -123,20 +132,32 @@ function OnHoldManagement() {
         grn_no: params.grn_no,
       };
 
-      await dispatch(AddProductOrderForPre(requestedDataP)).then(async (response) => {
-        if (response) {
-          await ShowAlert("Uploaded Successfully!", '', "success", false, false, '', '', 1000);
+      await dispatch(AddProductOrderForPre(requestedDataP)).then(
+        async (response) => {
+          if (response) {
+            await ShowAlert(
+              "Uploaded Successfully!",
+              "",
+              "success",
+              false,
+              false,
+              "",
+              "",
+              1000
+            );
+          }
+          selectedOrders.forEach((order) => {
+            order.isSelected = false;
+          });
+          const updatedProductData = productData.filter(
+            (order) =>
+              !selectedOrders.some((selected) => selected.id === order.id)
+          );
+          setSelectedOrders([]);
+          handleUpdatedValues();
+          setProductData(updatedProductData);
         }
-        selectedOrders.forEach((order) => {
-          order.isSelected = false;
-        });
-        const updatedProductData = productData.filter(
-          (order) => !selectedOrders.some((selected) => selected.id === order.id)
-        );
-        setSelectedOrders([]);
-        handleUpdatedValues();
-        setProductData(updatedProductData);
-      });
+      );
     }
   };
 
@@ -150,7 +171,16 @@ function OnHoldManagement() {
     await dispatch(AddProductOrderForStock(requestedData))
       .then(async (response) => {
         if (response) {
-          await ShowAlert("product added in InStock Successfully!", '', "success", false, false, 'OK', '', 1000);
+          await ShowAlert(
+            "product added in InStock Successfully!",
+            "",
+            "success",
+            false,
+            false,
+            "OK",
+            "",
+            1000
+          );
         }
         handleUpdatedValues();
       })
@@ -235,7 +265,9 @@ function OnHoldManagement() {
                         <Box>
                           <span>Product Id:</span>{" "}
                           <Badge bg="success">
-                            {productDetailsData?.product_details?.product_id}
+                            {params.variation_id !="0" && params.variation_id
+                              ? params.variation_id
+                              : productDetailsData?.product_details?.product_id}
                           </Badge>
                         </Box>
                         <Box>

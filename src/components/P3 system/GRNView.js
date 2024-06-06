@@ -76,9 +76,10 @@ const GRNView = () => {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
+        console.log(value,'valueeeable')
         return (
           <Link
-            to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}`}
+            to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}/${value.row.variation_id}`}
           >
             <Button
               type="button"
