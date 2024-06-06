@@ -18,7 +18,10 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  InputLabel,
+  MenuItem,
   Typography,
+  Select as MuiSelect
 } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import { Card, Tab, Tabs } from "react-bootstrap";
@@ -86,6 +89,93 @@ function OrderManagementSystem() {
     (state) => state?.orderNotAvailable?.isManualOrScheduledPoDetailsData
   );
 
+  function handleAttributeChange(event, rowIndex, attributeName) {
+    console.log(event, 'handleAtribute')
+    const newValue = event.target.value;
+    // const attributeNames = attributeName
+    // console.log(attributeName,'attributeName');
+    console.log(rowIndex, 'rowIndex');
+    console.log(orders, 'orders');
+    console.log(rowIndex.variation_values[attributeName] = newValue, 'rowIndex');
+    console.log(rowIndex, 'rowIndex');
+    if (activeKey === "scheduled_PO") {
+      const updatedData = manualPOorders.map(item =>
+        item.id === rowIndex.id ? { ...item, ...rowIndex } : item
+      );
+      console.log(updatedData, 'updatedData');
+      setManualPoOrders(updatedData);
+    }
+    if (activeKey === "manual_PO") {
+      const updatedData = scheduledPOorders.map(item =>
+        item.id === rowIndex.id ? { ...item, ...rowIndex } : item
+      );
+      console.log(updatedData, 'updatedData');
+      setScheduleOrders(updatedData);
+    }
+  }
+
+  const renderVariationValues = (params) => {
+    console.log(params.row, 'params======');
+    const variationArray = Object.entries(params?.row?.variation_values).map(([key, value]) => ({ [key]: value }));
+    // const variationArray = params.row.variation_values
+    console.log(variationArray, 'variationArray');
+    // const { color, size } = params.row.variation_values;
+    // const { attribute_color, attribute_size } = params.row.variation_values;
+    const noVariation = params.row.variation_values.length === 0;
+    // const colorAvailable = color?.length > 0;
+    // const sizeAvailable = size?.length > 0;
+
+    return (
+      <Box className='d-flex justify-content-around align-items-center w-100'>
+        {noVariation ? (
+          <Box>No any variation</Box>
+        ) : (
+          <>
+            {
+              variationArray && (
+                <div className='container mt-4 mb-4'>
+                  {variationArray.map((item, index) => {
+                    const attributeName = Object.keys(item)[0];
+                    const attributeValue = Object.values(item)[0];
+                    console.log(attributeValue, 'attributeValue');
+                    console.log(typeof (attributeValue), 'attributeValue===');
+                    return (
+                      <React.Fragment key={index}>
+                        <div className={`row mb-${typeof (attributeValue) === 'string' ? '3' : '4'}`}>
+                          <div className='col-6 d-flex  justify-content-end align-items-center'>
+                            <InputLabel id={`customer-color-${params.row.id}-label`} className=' d-flex ' style={{ marginRight: '10px', width: '100px' }}>{attributeName}:</InputLabel>
+                          </div>
+                          <div className='col-6 d-flex justify-content-start align-items-center'>
+                            {typeof (attributeValue) === "string" ? (
+                              <div className='d-flex' style={{ flex: 1 }}>{attributeValue}</div>
+                            ) : (
+                              <MuiSelect
+                                labelId={`customer-color-${params.row.id}-label`}
+                                id={`customer-color-${params.row.id}`}
+                                onChange={(event) => handleAttributeChange(event, params.row, attributeName)}
+                                fullWidth
+                                style={{ height: "40px", width: "279px", marginLeft: '10px' }}
+                                value={params.row[attributeName]} // Assuming the value of each attribute is stored in params.row
+                              >
+                                {attributeValue?.map((value) => (
+                                  <MenuItem key={value} value={value}>{value}</MenuItem>
+                                ))}
+                              </MuiSelect>
+                            )}
+                          </div>
+                        </div>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              )
+            }
+          </>
+        )}
+      </Box>
+    );
+  };
+
   // po ogainst order colum
   const columns1 = [
     {
@@ -122,20 +212,20 @@ function OrderManagementSystem() {
       headerName: "Variation values",
       flex: 1,
       renderCell: (params) => {
-          if (
-            params.row.variations &&
-            Object.keys(params.row.variations).length !== 0
-          ) {
-            return variant2(params.row.variations);
-          } else if (
-            params.row.variation_value &&
-            params.row.variation_value !== ""
-          ) {
-            return variant(params.row.variation_value);
-          } else {
-            return "No variations available";
-          }
-        },
+        if (
+          params.row.variations &&
+          Object.keys(params.row.variations).length !== 0
+        ) {
+          return variant2(params.row.variations);
+        } else if (
+          params.row.variation_value &&
+          params.row.variation_value !== ""
+        ) {
+          return variant(params.row.variation_value);
+        } else {
+          return "No variations available";
+        }
+      },
     },
     {
       field: "product_images",
@@ -242,9 +332,10 @@ function OrderManagementSystem() {
       field: "variation_values",
       headerName: "Variation values",
       flex: 1,
-      renderCell: (params) => {
-        return variant2(params.row.variation_values);
-      },
+      // renderCell: (params) => {
+      //   return variant2(params.row.variation_values);
+      // },
+      renderCell: renderVariationValues
     },
     {
       field: "Quantity",
@@ -324,9 +415,10 @@ function OrderManagementSystem() {
       field: "variation_values",
       headerName: "Variation values",
       flex: 1,
-      renderCell: (params) => {
-        return variant2(params.row.variation_values);
-      },
+      // renderCell: (params) => {
+      //   return variant2(params.row.variation_values);
+      // },
+      renderCell: renderVariationValues
     },
     {
       field: "Quantity",
@@ -474,8 +566,8 @@ function OrderManagementSystem() {
       : [...selectedOrderIds, variationId];
     const newSelected2 = isSelected
       ? selectedOrderIdss
-          .filter((id) => id !== variationId)
-          .flatMap((id) => id.split(","))
+        .filter((id) => id !== variationId)
+        .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
@@ -563,6 +655,27 @@ function OrderManagementSystem() {
     else if (activeKey === "scheduled_PO") handleGenerateScheduledPO();
   };
 
+  const getFilteredData = (poData) => {
+    poData.forEach(data => {
+      if (data.variation_details && data.variation_values) {
+        const { variation_details, variation_values } = data;
+        const matchingKeys = Object.keys(variation_details).filter(key => {
+          const detail = variation_details[key];
+          // Check if all properties in variation_values match with detail
+          return Object.keys(variation_values).every(prop => {
+            return detail[prop] === variation_values[prop];
+          });
+        });
+        if (matchingKeys.length > 0) {
+          data.variation_id = Number(matchingKeys[0]);
+        } else {
+          data.variation_id = 0;
+        }
+      }
+    });
+    return poData
+  }
+
   const handleGenerateAgainstPO = async () => {
     const selectedOrders = orders.filter((order) =>
       selectedOrderIds.includes(order.product_name)
@@ -598,6 +711,10 @@ function OrderManagementSystem() {
     const selectedOrders = manualPOorders.filter((order) =>
       selectedManualOrderIds.includes(order.product_id)
     );
+    const filteredOrders = getFilteredData(selectedOrders)
+
+    console.log(filteredOrders, 'filteredOrders manual PO')
+
     const factoryIds = [
       ...new Set(selectedOrders.map((order) => order.factory_id)),
     ];
@@ -613,7 +730,7 @@ function OrderManagementSystem() {
       };
 
       try {
-        await dispatch(AddManualPO(payload, navigate));
+        // await dispatch(AddManualPO(payload, navigate));
       } catch (error) {
         console.error("Error generating PO IDs:", error);
       }
@@ -635,6 +752,10 @@ function OrderManagementSystem() {
     const selectedOrders = scheduledPOorders.filter((order) =>
       selectedScheduleOrderIds.includes(order.product_id)
     );
+
+    const filteredOrders = getFilteredData(selectedOrders)
+
+    console.log(filteredOrders, 'filteredOrders Scheduled PO')
 
     const factoryIds = [
       ...new Set(selectedOrders.map((order) => order.factory_id)),
@@ -685,7 +806,7 @@ function OrderManagementSystem() {
   };
 
   const variant2 = (variations) => {
-    console.log(variations,'variations');
+    console.log(variations, 'variations');
     const { Color, Size } = variations;
 
     if (!Color && !Size) {
@@ -922,6 +1043,7 @@ function OrderManagementSystem() {
                       pageSize={pageSize}
                       totalPages={totalPages}
                       handleChange={handleChange}
+                      rowHeight='auto'
                     />
                   ) : (
                     <Alert
@@ -946,6 +1068,7 @@ function OrderManagementSystem() {
                       pageSize={pageSize}
                       totalPages={totalPages}
                       handleChange={handleChange}
+                      rowHeight='auto'
                     />
                   ) : (
                     <Alert
