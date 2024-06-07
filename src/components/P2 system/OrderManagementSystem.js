@@ -355,7 +355,10 @@ function OrderManagementSystem() {
               type="number"
               value={params.row.Quantity}
               placeholder="0"
-              onChange={(e) => handleMOQtyChange(e, params.row)}
+              onChange={(e) => {
+                if(e.target.value>=0){
+                  handleMOQtyChange(e, params.row)}}
+                }
             />
           </Form.Group>
         );
@@ -437,7 +440,10 @@ function OrderManagementSystem() {
             type="number"
             value={params.row.Quantity}
             placeholder="0"
-            onChange={(e) => handleSOQtyChange(e, params.row)}
+            onChange={(e) =>{ 
+              if(e.target.value>=0){
+                handleSOQtyChange(e, params.row)}}
+              }
           />
         </Form.Group>
       ),
@@ -828,38 +834,51 @@ function OrderManagementSystem() {
   };
 
   const handleGenerateScheduledPO = async () => {
-    const selectedOrders = scheduledPOorders.filter((order) =>
-      selectedScheduleOrderIds.includes(order.id)
-    );
-
-    const filteredOrders = getFilteredData(selectedOrders);
-
-    const factoryIds = [
-      ...new Set(filteredOrders.map((order) => order.factory_id)),
-    ];
-    if (factoryIds.length === 1) {
-      const selectedquantities = filteredOrders.map((order) => order.Quantity);
-      const selectedOrderIdsStr = filteredOrders.map(
-        (order) => order.product_id
+    if(remainderDate&&estimatedTime){
+      const selectedOrders = scheduledPOorders.filter((order) =>
+        selectedScheduleOrderIds.includes(order.id)
       );
-
-      const payload = {
-        quantities: selectedquantities,
-        product_ids: selectedOrderIdsStr,
-        variation_id: filteredOrders.map((d) => d.variation_id),
-        note: scheduledNote,
-        estimated_time: estimatedTime,
-        reminder_date: remainderDate,
-      };
-      try {
-        await dispatch(AddSchedulePO(payload, navigate));
-      } catch (error) {
-        console.error("Error generating PO IDs:", error);
+  
+      const filteredOrders = getFilteredData(selectedOrders);
+  
+      const factoryIds = [
+        ...new Set(filteredOrders.map((order) => order.factory_id)),
+      ];
+      if (factoryIds.length === 1) {
+        const selectedquantities = filteredOrders.map((order) => order.Quantity);
+        const selectedOrderIdsStr = filteredOrders.map(
+          (order) => order.product_id
+        );
+  
+        const payload = {
+          quantities: selectedquantities,
+          product_ids: selectedOrderIdsStr,
+          variation_id: filteredOrders.map((d) => d.variation_id),
+          note: scheduledNote,
+          estimated_time: estimatedTime,
+          reminder_date: remainderDate,
+        };
+        try {
+          await dispatch(AddSchedulePO(payload, navigate));
+        } catch (error) {
+          console.error("Error generating PO IDs:", error);
+        }
+      } else {
+        await ShowAlert(
+          "",
+          "Selected orders belong to different factories. Please select orders from the same factory.",
+          "error",
+          false,
+          false,
+          "",
+          "",
+          1000
+        );
       }
-    } else {
+    }else{
       await ShowAlert(
         "",
-        "Selected orders belong to different factories. Please select orders from the same factory.",
+        "Please select remainder Date and Estimated Time",
         "error",
         false,
         false,
@@ -868,6 +887,7 @@ function OrderManagementSystem() {
         1000
       );
     }
+    
   };
 
   // variant
