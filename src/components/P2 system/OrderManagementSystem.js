@@ -716,7 +716,7 @@ function OrderManagementSystem() {
     const factoryIds = [
       ...new Set(filteredOrders.map((order) => order.factory_id)),
     ];
-
+    console.log(factoryIds,'factoryIds');
     if (factoryIds.length === 1) {
       const selectedquantities = filteredOrders.map((order) => order.Quantity);
       const selectedOrderIdsStr = selectedManualOrderIds;
