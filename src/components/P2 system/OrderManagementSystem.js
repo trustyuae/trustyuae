@@ -79,6 +79,8 @@ function OrderManagementSystem() {
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
   const [selectedMPOquantity, setSelectedMPOquantity] = useState([]);
+  const [selectedSPOquantity, setSelectedSPOquantity] = useState([]);
+
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -94,8 +96,6 @@ function OrderManagementSystem() {
 
   function handleAttributeChange(event, rowIndex, attributeName) {
     const newValue = event.target.value;
-    // const attributeNames = attributeName
-    // console.log(attributeName,'attributeName');
     rowIndex.variation_values[attributeName] = newValue;
     if (activeKey === "manual_PO") {
       const updatedData = manualPOorders.map((item) =>
@@ -287,7 +287,6 @@ function OrderManagementSystem() {
       headerName: "Select",
       flex: 1,
       renderCell: (params) => {
-        console.log(params, "parrrrrrrrrms 289");
         return (
           <FormGroup>
             <FormControlLabel
@@ -375,9 +374,9 @@ function OrderManagementSystem() {
               className="mx-auto"
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
-              checked={selectedScheduleOrderIds.includes(params.row.product_id)}
+              checked={selectedScheduleOrderIds.includes(params.row.id)}
               onChange={() =>
-                handleOrderScheduleSelection(params.row.product_id)
+                handleOrderScheduleSelection(params.row.id)
               }
             />
           </FormGroup>
@@ -466,17 +465,25 @@ function OrderManagementSystem() {
     });
   };
 
-  const handleSOQtyChange = (index, event) => {
-    const value = index.target.value;
-    if (value >= 0) {
-      const updatedData = scheduledPOorders.map((item) => {
-        if (item.product_id === event.product_id) {
-          return { ...item, Quantity: index.target.value };
-        }
-        return item;
-      });
-      setScheduleOrders(updatedData);
+  const handleSOQtyChange = (event, itemData) => {
+    const { value } = event.target;
+    const dataIndex = selectedSPOquantity?.findIndex(
+      (q) => q.id === itemData.id
+    );
+    if (dataIndex !== -1) {
+      const newSelected = [...selectedSPOquantity];
+      newSelected[dataIndex].Quantity = value;
+      setSelectedSPOquantity(newSelected);
+    } else {
+      const newSelected = [
+        ...selectedSPOquantity,
+        { id: itemData.id, Quantity: value },
+      ];
+      setSelectedSPOquantity(newSelected);
     }
+    scheduledPOorders.forEach((order) => {
+      if (order.id === itemData.id) order.Quantity = value;
+    });
   };
 
   useEffect(() => {
@@ -571,8 +578,22 @@ function OrderManagementSystem() {
         const filteredMPOquantity = selectedMPOquantity.filter((order) =>
           selectedManualOrderIds.some((id) => id === order.id)
         );
+
+        const filteredSPOquantity = selectedSPOquantity.filter((order) =>
+          selectedScheduleOrderIds.some((id) => id === order.id)
+        );
         if (filteredMPOquantity.length > 0) {
           filteredMPOquantity.forEach((order) => {
+            data.forEach((o) => {
+              if (o.id === order.id) {
+                o.Quantity = order.Quantity;
+              }
+            });
+          });
+        }
+
+        if (filteredSPOquantity.length > 0) {
+          filteredSPOquantity.forEach((order) => {
             data.forEach((o) => {
               if (o.id === order.id) {
                 o.Quantity = order.Quantity;
@@ -632,12 +653,25 @@ function OrderManagementSystem() {
     setSelectedManualOrderIds(newSelected);
   };
 
-  const handleOrderScheduleSelection = (orderId) => {
-    const selectedIndex = selectedScheduleOrderIds.indexOf(orderId);
+  const handleOrderScheduleSelection = (selectedId) => {
+    const selectedIndex = selectedScheduleOrderIds.indexOf(selectedId);
+    const selectedQtyIndex = selectedSPOquantity?.findIndex(
+      (qty) => qty.id === selectedId
+    );
+
     const newSelected =
       selectedIndex === -1
-        ? [...selectedScheduleOrderIds, orderId]
-        : selectedScheduleOrderIds.filter((id) => id !== orderId);
+        ? [...selectedScheduleOrderIds, selectedId]
+        : selectedScheduleOrderIds.filter((id) => id !== selectedId);
+
+    if (selectedQtyIndex === -1)
+      setSelectedSPOquantity((prevData) =>
+        prevData.filter((v) => v.id !== selectedId)
+      );
+
+    if (selectedIndex !== -1) {
+      scheduledPOorders.find((o) => o.id === selectedId).Quantity = 0;
+    }
 
     setSelectedScheduleOrderIds(newSelected);
   };
@@ -667,7 +701,7 @@ function OrderManagementSystem() {
     );
   };
   const handleSelectAllSchedule = () => {
-    const allOrderIds = scheduledPOorders.map((order) => order.product_id);
+    const allOrderIds = scheduledPOorders.map((order) => order.id);
     setSelectedScheduleOrderIds(
       selectedScheduleOrderIds.length === allOrderIds.length ? [] : allOrderIds
     );
@@ -795,7 +829,7 @@ function OrderManagementSystem() {
 
   const handleGenerateScheduledPO = async () => {
     const selectedOrders = scheduledPOorders.filter((order) =>
-      selectedScheduleOrderIds.includes(order.product_id)
+      selectedScheduleOrderIds.includes(order.id)
     );
 
     const filteredOrders = getFilteredData(selectedOrders);
@@ -805,7 +839,9 @@ function OrderManagementSystem() {
     ];
     if (factoryIds.length === 1) {
       const selectedquantities = filteredOrders.map((order) => order.Quantity);
-      const selectedOrderIdsStr = selectedScheduleOrderIds;
+      const selectedOrderIdsStr = filteredOrders.map(
+        (order) => order.product_id
+      );
 
       const payload = {
         quantities: selectedquantities,
