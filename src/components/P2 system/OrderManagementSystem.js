@@ -96,14 +96,15 @@ function OrderManagementSystem() {
     const newValue = event.target.value;
     // const attributeNames = attributeName
     // console.log(attributeName,'attributeName');
-    if (activeKey === "scheduled_PO") {
+    rowIndex.variation_values[attributeName] = newValue;
+    if (activeKey === "manual_PO") {
       const updatedData = manualPOorders.map((item) =>
         item.id === rowIndex.id ? { ...item, ...rowIndex } : item
       );
       console.log(updatedData, "updatedData");
       setManualPoOrders(updatedData);
     }
-    if (activeKey === "manual_PO") {
+    if (activeKey === "scheduled_PO") {
       const updatedData = scheduledPOorders.map((item) =>
         item.id === rowIndex.id ? { ...item, ...rowIndex } : item
       );
@@ -115,13 +116,7 @@ function OrderManagementSystem() {
     const variationArray = Object.entries(params?.row?.variation_values).map(
       ([key, value]) => ({ [key]: value })
     );
-    // const variationArray = params.row.variation_values
-    // const { color, size } = params.row.variation_values;
-    // const { attribute_color, attribute_size } = params.row.variation_values;
     const noVariation = params.row.variation_values.length === 0;
-    // const colorAvailable = color?.length > 0;
-    // const sizeAvailable = size?.length > 0;
-
     return (
       <Box className="d-flex justify-content-around align-items-center w-100">
         {noVariation ? (
@@ -138,8 +133,9 @@ function OrderManagementSystem() {
                   return (
                     <React.Fragment key={index}>
                       <div
-                        className={`row mb-${typeof attributeValue === "string" ? "3" : "4"
-                          }`}
+                        className={`row mb-${
+                          typeof attributeValue === "string" ? "3" : "4"
+                        }`}
                       >
                         <div className="col-6 d-flex  justify-content-end align-items-center">
                           <InputLabel
@@ -207,8 +203,8 @@ function OrderManagementSystem() {
               className="mx-auto"
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
-              checked={selectedOrderIds.includes(params.id)}
-              onChange={(event) => handleOrderSelection(params.id)}
+              checked={selectedOrderIds.includes(params.row.id)}
+              onChange={(event) => handleOrderSelection(params.row.id)}
             />
           </FormGroup>
         );
@@ -290,17 +286,20 @@ function OrderManagementSystem() {
       field: "select",
       headerName: "Select",
       flex: 1,
-      renderCell: (params) => (
-        <FormGroup>
-          <FormControlLabel
-            className="mx-auto"
-            control={<Checkbox />}
-            style={{ justifyContent: "center" }}
-            checked={selectedManualOrderIds.includes(params.id)}
-            onChange={() => handleOrderManualSelection(params.id)}
-          />
-        </FormGroup>
-      ),
+      renderCell: (params) => {
+        console.log(params, "parrrrrrrrrms 289");
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={<Checkbox />}
+              style={{ justifyContent: "center" }}
+              checked={selectedManualOrderIds.includes(params.row.id)}
+              onChange={() => handleOrderManualSelection(params.row.id)}
+            />
+          </FormGroup>
+        );
+      },
     },
     {
       field: "factory_id",
@@ -569,8 +568,8 @@ function OrderManagementSystem() {
           ...v,
           id: i + currentStartIndex,
         }));
-        const filteredMPOquantity = selectedMPOquantity.filter(order =>
-          selectedManualOrderIds.some(id => id === order.id)
+        const filteredMPOquantity = selectedMPOquantity.filter((order) =>
+          selectedManualOrderIds.some((id) => id === order.id)
         );
         if (filteredMPOquantity.length > 0) {
           filteredMPOquantity.forEach((order) => {
@@ -601,8 +600,8 @@ function OrderManagementSystem() {
       : [...selectedOrderIds, selectedId];
     const newSelected2 = isSelected
       ? selectedOrderIdss
-        .filter((id) => id !== selectedId)
-        .flatMap((id) => id.split(","))
+          .filter((id) => id !== selectedId)
+          .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
@@ -744,7 +743,6 @@ function OrderManagementSystem() {
         factory_ids: factoryIds.join(","),
         order_ids: selectedOrderIdsStr,
       };
-
       try {
         await dispatch(AddPO(payload, navigate));
       } catch (error) {
@@ -758,16 +756,17 @@ function OrderManagementSystem() {
   };
   const handleGenerateManualPO = async () => {
     const selectedOrders = manualPOorders.filter((order) =>
-      selectedManualOrderIds.includes(order.product_id)
+      selectedManualOrderIds.includes(order.id)
     );
     const filteredOrders = getFilteredData(selectedOrders);
-
     const factoryIds = [
       ...new Set(filteredOrders.map((order) => order.factory_id)),
     ];
     if (factoryIds.length === 1) {
       const selectedquantities = filteredOrders.map((order) => order.Quantity);
-      const selectedOrderIdsStr = selectedManualOrderIds;
+      const selectedOrderIdsStr = filteredOrders.map(
+        (order) => order.product_id
+      );
 
       const payload = {
         quantities: selectedquantities,
