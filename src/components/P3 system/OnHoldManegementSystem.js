@@ -177,8 +177,9 @@ function OnHoldManegementSystem() {
         // console.log(attributeName,'attributeName');
         console.log(rowIndex, 'rowIndex');
         console.log(tableData, 'tableData');
-        console.log(rowIndex.variation_values[attributeName] = newValue, 'rowIndex');
+        // console.log(rowIndex.variation_values[attributeName] = newValue, 'rowIndex');
         console.log(rowIndex, 'rowIndex');
+        rowIndex.variation_values[attributeName] = newValue
         const updatedData = tableData.map(item =>
             item.id === rowIndex.id ? { ...item, ...rowIndex } : item
         );
