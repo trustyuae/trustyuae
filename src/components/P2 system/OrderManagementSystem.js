@@ -21,7 +21,7 @@ import {
   InputLabel,
   MenuItem,
   Typography,
-  Select as MuiSelect
+  Select as MuiSelect,
 } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import { Card, Tab, Tabs } from "react-bootstrap";
@@ -78,6 +78,8 @@ function OrderManagementSystem() {
   const [productId, setProductId] = useState(null);
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
+  const [selectedMPOquantity, setSelectedMPOquantity] = useState([]);
+
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
   );
@@ -91,35 +93,29 @@ function OrderManagementSystem() {
   );
 
   function handleAttributeChange(event, rowIndex, attributeName) {
-    console.log(event, 'handleAtribute')
     const newValue = event.target.value;
     // const attributeNames = attributeName
     // console.log(attributeName,'attributeName');
-    console.log(rowIndex, 'rowIndex');
-    console.log(orders, 'orders');
-    console.log(rowIndex.variation_values[attributeName] = newValue, 'rowIndex');
-    console.log(rowIndex, 'rowIndex');
     if (activeKey === "scheduled_PO") {
-      const updatedData = manualPOorders.map(item =>
+      const updatedData = manualPOorders.map((item) =>
         item.id === rowIndex.id ? { ...item, ...rowIndex } : item
       );
-      console.log(updatedData, 'updatedData');
+      console.log(updatedData, "updatedData");
       setManualPoOrders(updatedData);
     }
     if (activeKey === "manual_PO") {
-      const updatedData = scheduledPOorders.map(item =>
+      const updatedData = scheduledPOorders.map((item) =>
         item.id === rowIndex.id ? { ...item, ...rowIndex } : item
       );
-      console.log(updatedData, 'updatedData');
       setScheduleOrders(updatedData);
     }
   }
 
   const renderVariationValues = (params) => {
-    console.log(params.row, 'params======');
-    const variationArray = Object.entries(params?.row?.variation_values).map(([key, value]) => ({ [key]: value }));
+    const variationArray = Object.entries(params?.row?.variation_values).map(
+      ([key, value]) => ({ [key]: value })
+    );
     // const variationArray = params.row.variation_values
-    console.log(variationArray, 'variationArray');
     // const { color, size } = params.row.variation_values;
     // const { attribute_color, attribute_size } = params.row.variation_values;
     const noVariation = params.row.variation_values.length === 0;
@@ -127,50 +123,71 @@ function OrderManagementSystem() {
     // const sizeAvailable = size?.length > 0;
 
     return (
-      <Box className='d-flex justify-content-around align-items-center w-100'>
+      <Box className="d-flex justify-content-around align-items-center w-100">
         {noVariation ? (
           <Box>No any variation</Box>
         ) : (
           <>
-            {
-              variationArray && (
-                <div className='container mt-4 mb-4'>
-                  {variationArray.map((item, index) => {
-                    const attributeName = Object.keys(item)[0];
-                    const attributeValue = Object.values(item)[0];
-                    console.log(attributeValue, 'attributeValue');
-                    console.log(typeof (attributeValue), 'attributeValue===');
-                    return (
-                      <React.Fragment key={index}>
-                        <div className={`row mb-${typeof (attributeValue) === 'string' ? '3' : '4'}`}>
-                          <div className='col-6 d-flex  justify-content-end align-items-center'>
-                            <InputLabel id={`customer-color-${params.row.id}-label`} className=' d-flex ' style={{ marginRight: '10px', width: '100px' }}>{attributeName}:</InputLabel>
-                          </div>
-                          <div className='col-6 d-flex justify-content-start align-items-center'>
-                            {typeof (attributeValue) === "string" ? (
-                              <div className='d-flex' style={{ flex: 1 }}>{attributeValue}</div>
-                            ) : (
-                              <MuiSelect
-                                labelId={`customer-color-${params.row.id}-label`}
-                                id={`customer-color-${params.row.id}`}
-                                onChange={(event) => handleAttributeChange(event, params.row, attributeName)}
-                                fullWidth
-                                style={{ height: "40px", width: "279px", marginLeft: '10px' }}
-                                value={params.row[attributeName]} // Assuming the value of each attribute is stored in params.row
-                              >
-                                {attributeValue?.map((value) => (
-                                  <MenuItem key={value} value={value}>{value}</MenuItem>
-                                ))}
-                              </MuiSelect>
-                            )}
-                          </div>
+            {variationArray && (
+              <div className="container mt-4 mb-4">
+                {variationArray.map((item, index) => {
+                  const attributeName = Object.keys(item)[0];
+                  const attributeValue = Object.values(item)[0];
+                  console.log(attributeValue, "attributeValue");
+                  console.log(typeof attributeValue, "attributeValue===");
+                  return (
+                    <React.Fragment key={index}>
+                      <div
+                        className={`row mb-${typeof attributeValue === "string" ? "3" : "4"
+                          }`}
+                      >
+                        <div className="col-6 d-flex  justify-content-end align-items-center">
+                          <InputLabel
+                            id={`customer-color-${params.row.id}-label`}
+                            className=" d-flex "
+                            style={{ marginRight: "10px", width: "100px" }}
+                          >
+                            {attributeName}:
+                          </InputLabel>
                         </div>
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              )
-            }
+                        <div className="col-6 d-flex justify-content-start align-items-center">
+                          {typeof attributeValue === "string" ? (
+                            <div className="d-flex" style={{ flex: 1 }}>
+                              {attributeValue}
+                            </div>
+                          ) : (
+                            <MuiSelect
+                              labelId={`customer-color-${params.row.id}-label`}
+                              id={`customer-color-${params.row.id}`}
+                              onChange={(event) =>
+                                handleAttributeChange(
+                                  event,
+                                  params.row,
+                                  attributeName
+                                )
+                              }
+                              fullWidth
+                              style={{
+                                height: "40px",
+                                width: "279px",
+                                marginLeft: "10px",
+                              }}
+                              value={params.row[attributeName]} // Assuming the value of each attribute is stored in params.row
+                            >
+                              {attributeValue?.map((value) => (
+                                <MenuItem key={value} value={value}>
+                                  {value}
+                                </MenuItem>
+                              ))}
+                            </MuiSelect>
+                          )}
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
       </Box>
@@ -184,21 +201,14 @@ function OrderManagementSystem() {
       headerName: "Select",
       flex: 1,
       renderCell: (params) => {
-        console.log(params,'xyz')
         return (
           <FormGroup>
             <FormControlLabel
               className="mx-auto"
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
-              checked={selectedOrderIds.includes(
-                params.id
-              )}
-              onChange={(event) =>
-                handleOrderSelection(
-                  params.id
-                )
-              }
+              checked={selectedOrderIds.includes(params.id)}
+              onChange={(event) => handleOrderSelection(params.id)}
             />
           </FormGroup>
         );
@@ -286,8 +296,8 @@ function OrderManagementSystem() {
             className="mx-auto"
             control={<Checkbox />}
             style={{ justifyContent: "center" }}
-            checked={selectedManualOrderIds.includes(params.row.product_id)}
-            onChange={() => handleOrderManualSelection(params.row.product_id)}
+            checked={selectedManualOrderIds.includes(params.id)}
+            onChange={() => handleOrderManualSelection(params.id)}
           />
         </FormGroup>
       ),
@@ -333,7 +343,7 @@ function OrderManagementSystem() {
       // renderCell: (params) => {
       //   return variant2(params.row.variation_values);
       // },
-      renderCell: renderVariationValues
+      renderCell: renderVariationValues,
     },
     {
       field: "Quantity",
@@ -416,7 +426,7 @@ function OrderManagementSystem() {
       // renderCell: (params) => {
       //   return variant2(params.row.variation_values);
       // },
-      renderCell: renderVariationValues
+      renderCell: renderVariationValues,
     },
     {
       field: "Quantity",
@@ -435,18 +445,28 @@ function OrderManagementSystem() {
       ),
     },
   ];
-  const handleMOQtyChange = (index, event) => {
-    const value = index.target.value;
-    if (value >= 0) {
-      const updatedData = manualPOorders.map((item) => {
-        if (item.product_id === event.product_id) {
-          return { ...item, Quantity: index.target.value };
-        }
-        return item;
-      });
-      setManualPoOrders(updatedData);
+
+  const handleMOQtyChange = (event, itemData) => {
+    const { value } = event.target;
+    const dataIndex = selectedMPOquantity?.findIndex(
+      (q) => q.id === itemData.id
+    );
+    if (dataIndex !== -1) {
+      const newSelected = [...selectedMPOquantity];
+      newSelected[dataIndex].Quantity = value;
+      setSelectedMPOquantity(newSelected);
+    } else {
+      const newSelected = [
+        ...selectedMPOquantity,
+        { id: itemData.id, Quantity: value },
+      ];
+      setSelectedMPOquantity(newSelected);
     }
+    manualPOorders.forEach((order) => {
+      if (order.id === itemData.id) order.Quantity = value;
+    });
   };
+
   const handleSOQtyChange = (index, event) => {
     const value = index.target.value;
     if (value >= 0) {
@@ -461,13 +481,13 @@ function OrderManagementSystem() {
   };
 
   useEffect(() => {
-    if (activeKey == "against_PO") {
+    if (activeKey === "against_PO") {
       fetchOrders();
     }
-    if (activeKey == "manual_PO") {
+    if (activeKey === "manual_PO") {
       manualPO();
     }
-    if (activeKey == "scheduled_PO") {
+    if (activeKey === "scheduled_PO") {
       scheduledPO();
     }
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
@@ -486,7 +506,10 @@ function OrderManagementSystem() {
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       await dispatch(PoDetailsData({ apiUrl })).then((response) => {
-        let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i + currentStartIndex }));
+        let data = response.data.pre_orders.map((v, i) => ({
+          ...v,
+          id: i + currentStartIndex,
+        }));
         setOrders(data);
         setTotalPages(response.data.total_pages);
       });
@@ -542,7 +565,23 @@ function OrderManagementSystem() {
     let data;
     await dispatch(ManualOrScheduledPoDetailsData({ apiUrl })).then(
       (response) => {
-        data = response.data.products.map((v, i) => ({ ...v, id: i }));
+        data = response.data.products.map((v, i) => ({
+          ...v,
+          id: i + currentStartIndex,
+        }));
+        const filteredMPOquantity = selectedMPOquantity.filter(order =>
+          selectedManualOrderIds.some(id => id === order.id)
+        );
+        if (filteredMPOquantity.length > 0) {
+          filteredMPOquantity.forEach((order) => {
+            data.forEach((o) => {
+              if (o.id === order.id) {
+                o.Quantity = order.Quantity;
+              }
+            });
+          });
+        }
+
         if (response.data.products) {
           setTotalPages(response.data.total_pages);
           return data;
@@ -553,9 +592,7 @@ function OrderManagementSystem() {
   };
 
   const handleOrderSelection = (selectedId) => {
-    const filteredOrders = orders.filter(
-      (order) => order.id === selectedId
-    );
+    const filteredOrders = orders.filter((order) => order.id === selectedId);
     const orderIds = filteredOrders.map((order) => order.order_ids);
 
     const isSelected = selectedOrderIds.includes(selectedId);
@@ -564,21 +601,35 @@ function OrderManagementSystem() {
       : [...selectedOrderIds, selectedId];
     const newSelected2 = isSelected
       ? selectedOrderIdss
-          .filter((id) => id !== selectedId)
-          .flatMap((id) => id.split(","))
+        .filter((id) => id !== selectedId)
+        .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
     setSelectedOrderIdss(newSelected2);
   };
 
-  const handleOrderManualSelection = (orderId) => {
-    const selectedIndex = selectedManualOrderIds.indexOf(orderId);
+  const handleOrderManualSelection = (selectedId) => {
+    const selectedIndex = selectedManualOrderIds.indexOf(selectedId);
+    const selectedQtyIndex = selectedMPOquantity?.findIndex(
+      (qty) => qty.id === selectedId
+    );
+
     const newSelected =
       selectedIndex === -1
-        ? [...selectedManualOrderIds, orderId]
-        : selectedManualOrderIds.filter((id) => id !== orderId);
+        ? [...selectedManualOrderIds, selectedId]
+        : selectedManualOrderIds.filter((id) => id !== selectedId);
 
+    if (selectedQtyIndex === -1)
+      setSelectedMPOquantity((prevData) =>
+        prevData.filter((v) => v.id !== selectedId)
+      );
+
+    if (selectedIndex !== -1) {
+      manualPOorders.find((o) => o.id === selectedId).Quantity = 0;
+    }
+
+    // setSelectedMPOquantity(newSelectedQty);
     setSelectedManualOrderIds(newSelected);
   };
 
@@ -611,7 +662,7 @@ function OrderManagementSystem() {
   };
 
   const handleSelectAllManual = () => {
-    const allOrderIds = manualPOorders.map((order) => order.product_id);
+    const allOrderIds = manualPOorders.map((order) => order.id);
     setSelectedManualOrderIds(
       selectedManualOrderIds.length === allOrderIds.length ? [] : allOrderIds
     );
@@ -654,13 +705,13 @@ function OrderManagementSystem() {
   };
 
   const getFilteredData = (poData) => {
-    poData.forEach(data => {
+    poData.forEach((data) => {
       if (data.variation_details && data.variation_values) {
         const { variation_details, variation_values } = data;
-        const matchingKeys = Object.keys(variation_details).filter(key => {
+        const matchingKeys = Object.keys(variation_details).filter((key) => {
           const detail = variation_details[key];
           // Check if all properties in variation_values match with detail
-          return Object.keys(variation_values).every(prop => {
+          return Object.keys(variation_values).every((prop) => {
             return detail[prop] === variation_values[prop];
           });
         });
@@ -671,8 +722,8 @@ function OrderManagementSystem() {
         }
       }
     });
-    return poData
-  }
+    return poData;
+  };
 
   const handleGenerateAgainstPO = async () => {
     const selectedOrders = orders.filter((order) =>
@@ -709,14 +760,11 @@ function OrderManagementSystem() {
     const selectedOrders = manualPOorders.filter((order) =>
       selectedManualOrderIds.includes(order.product_id)
     );
-    const filteredOrders = getFilteredData(selectedOrders)
-
-    console.log(filteredOrders, 'filteredOrders manual PO')
+    const filteredOrders = getFilteredData(selectedOrders);
 
     const factoryIds = [
       ...new Set(filteredOrders.map((order) => order.factory_id)),
     ];
-    console.log(factoryIds,'factoryIds');
     if (factoryIds.length === 1) {
       const selectedquantities = filteredOrders.map((order) => order.Quantity);
       const selectedOrderIdsStr = selectedManualOrderIds;
@@ -724,10 +772,9 @@ function OrderManagementSystem() {
       const payload = {
         quantities: selectedquantities,
         product_ids: selectedOrderIdsStr,
-        variation_id:filteredOrders.map(d=>d.variation_id),
+        variation_id: filteredOrders.map((d) => d.variation_id),
         note: manualNote,
       };
-      console.log(payload,'payload');
       try {
         await dispatch(AddManualPO(payload, navigate));
       } catch (error) {
@@ -752,9 +799,7 @@ function OrderManagementSystem() {
       selectedScheduleOrderIds.includes(order.product_id)
     );
 
-    const filteredOrders = getFilteredData(selectedOrders)
-
-    console.log(filteredOrders, 'filteredOrders Scheduled PO')
+    const filteredOrders = getFilteredData(selectedOrders);
 
     const factoryIds = [
       ...new Set(filteredOrders.map((order) => order.factory_id)),
@@ -766,12 +811,11 @@ function OrderManagementSystem() {
       const payload = {
         quantities: selectedquantities,
         product_ids: selectedOrderIdsStr,
-        variation_id:filteredOrders.map(d=>d.variation_id),
+        variation_id: filteredOrders.map((d) => d.variation_id),
         note: scheduledNote,
         estimated_time: estimatedTime,
         reminder_date: remainderDate,
       };
-      console.log(payload,'payload');
       try {
         await dispatch(AddSchedulePO(payload, navigate));
       } catch (error) {
@@ -806,7 +850,6 @@ function OrderManagementSystem() {
   };
 
   const variant2 = (variations) => {
-    console.log(variations, 'variations');
     const { Color, Size } = variations;
 
     if (!Color && !Size) {
@@ -1045,7 +1088,7 @@ function OrderManagementSystem() {
                       pageSize={pageSize}
                       totalPages={totalPages}
                       handleChange={handleChange}
-                      rowHeight='auto'
+                      rowHeight="auto"
                     />
                   ) : (
                     <Alert
@@ -1070,7 +1113,7 @@ function OrderManagementSystem() {
                       pageSize={pageSize}
                       totalPages={totalPages}
                       handleChange={handleChange}
-                      rowHeight='auto'
+                      rowHeight="auto"
                     />
                   ) : (
                     <Alert
