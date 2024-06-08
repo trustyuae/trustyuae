@@ -8,6 +8,9 @@ const PoDetailsModal = ({
   show,
   handleClosePoDetailsModal,
   productId,
+  productName,
+  variationId,
+  factoryId,
   poDetailsModal,
 }) => {
   const dispatch = useDispatch();
@@ -19,8 +22,13 @@ const PoDetailsModal = ({
 
   useEffect(() => {
     const fetchData = async () => {
+      const payload={
+        "factory_id": Number(factoryId),
+        "variation_id": Number(variationId),
+        "product_name": productName
+      }
       try {
-        const response = await dispatch(QuantityPoDetails(productId));
+        const response = await dispatch(QuantityPoDetails(productId,{payload}));
         const data = response?.data?.orders.map((v, id) => ({
           ...v,
           id,
