@@ -127,6 +127,7 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
+    console.log(updatelist,'updatelist');
     const availabilityStatuses =
       updatelist?.map((item) => item.availability_status) || [];
     const flattenedStatuses = availabilityStatuses.flat();
@@ -241,7 +242,7 @@ const PoDetails = () => {
     },
     {
       field: "variation_value",
-      headerName: "Variation values",
+      headerName: "Variation",
       flex: 4,
       renderCell: (params) => {
         console.log(params.row.variation_value, 'params');
@@ -267,7 +268,7 @@ const PoDetails = () => {
     },
     {
       field: "image",
-      headerName: "product images",
+      headerName: "Image",
       flex: 4,
       type: "html",
       renderCell: (value, row) => {
@@ -286,7 +287,7 @@ const PoDetails = () => {
 
     {
       field: "quantity",
-      headerName: "Qty Ordered",
+      headerName: "Qty Ord.",
       flex: 2.5,
       renderCell: (params) => {
         const handleClick = () => {
@@ -336,7 +337,7 @@ const PoDetails = () => {
 
     {
       field: "available_quantity",
-      headerName: "Available Qty",
+      headerName: "Avl Qty.",
       flex: 2.5,
       renderCell: (params) => {
         return (
@@ -355,7 +356,7 @@ const PoDetails = () => {
 
     {
       field: "availability_status",
-      headerName: "Availability Status",
+      headerName: "Avl Status",
       flex: 3,
       renderCell: (params) => {
         console.log(params.row.variation_value, 'params');
