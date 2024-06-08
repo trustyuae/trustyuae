@@ -280,7 +280,7 @@ function OrderManagementSystem() {
         const factory = factories.find(
           (factory) => factory.id === params.row.factory_id
         );
-        return factory ? factory.factory_name : "Assign to factory";
+        return factory ? factory.factory_name : "Please Assign factory";
       },
     },
   ];
