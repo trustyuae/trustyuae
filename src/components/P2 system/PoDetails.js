@@ -83,7 +83,7 @@ const PoDetails = () => {
 
   useEffect(() => {
     fetchPO();
-  }, [paymentStatus, PoStatus]);
+  }, []);
 
   const availabilityStatus = [
     "Confirmed",
@@ -144,8 +144,8 @@ const PoDetails = () => {
       availability_status: updatelist?.map((item) => item.availability_status),
       request_quantity: updatelist?.map((item) => item.available_quantity),
       product_ids: updatelist?.map((item) => item.product_id),
-      po_status: paymentStatus,
-      payment_status: PoStatus,
+      po_status: PoStatus,
+      payment_status: paymentStatus,
     };
     if (validationMessage == "Successful") {
       let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
@@ -184,11 +184,11 @@ const PoDetails = () => {
 
   // variant
   const variant = (variations) => {
-    console.log(variations,'variations');
+    console.log(variations, 'variations');
     const matches = variations.match(
       /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
     );
-    console.log(matches,'matches');
+    console.log(matches, 'matches');
     if (matches) {
       const key = matches[1];
       const value = matches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
@@ -199,10 +199,11 @@ const PoDetails = () => {
   };
 
   const variant2 = (variations) => {
-    const { Color, Size } = JSON.parse(variations);
-    console.log(typeof(variations),'variations');
+    console.log(variations, 'variations');
+    const { Color, Size } = (variations);
+    console.log(typeof (variations), 'variations');
     // const { Color, Size } = variations;
-    console.log(Color,'Color');
+    console.log(Color, 'Color');
     if (!Color && !Size) {
       return "Variant data not available";
     }
@@ -243,10 +244,10 @@ const PoDetails = () => {
       headerName: "Variation values",
       flex: 4,
       renderCell: (params) => {
-        console.log(params.row.variation_value,'params');
-        if(params.row.variation_value){
+        console.log(params.row.variation_value, 'params');
+        if (params.row.variation_value) {
           return variant2(params.row.variation_value)
-        }else{
+        } else {
           return "Variant data not available"
         }
         // if (
@@ -282,7 +283,7 @@ const PoDetails = () => {
         );
       },
     },
-   
+
     {
       field: "quantity",
       headerName: "Qty Ordered",
@@ -314,7 +315,7 @@ const PoDetails = () => {
         return value;
       },
     },
-    
+
     {
       field: "total_price",
       headerName: "AED Cost",
@@ -332,7 +333,7 @@ const PoDetails = () => {
         return value;
       },
     },
-    
+
     {
       field: "available_quantity",
       headerName: "Available Qty",
@@ -357,14 +358,14 @@ const PoDetails = () => {
       headerName: "Availability Status",
       flex: 3,
       renderCell: (params) => {
-        console.log(params.row.variation_value,'params');
+        console.log(params.row.variation_value, 'params');
         return (
           <Select
             labelId={`customer-status-${params.row.id}-label`}
             id={`customer-status-${params.row.id}`}
             value={
               params.row.availability_status !== "" &&
-              params.row.availability_status !== "0"
+                params.row.availability_status !== "0"
                 ? params.row.availability_status
                 : params.row.estimated_production_time
             }
@@ -381,7 +382,7 @@ const PoDetails = () => {
         );
       },
     },
-   
+
     {
       field: "dispatch_status",
       headerName: "Dispatch Status",
@@ -504,17 +505,24 @@ const PoDetails = () => {
               <Form.Control
                 as="select"
                 className="mr-sm-2"
-                // value={selectedFactory}
                 value={paymentStatus}
                 onChange={(e) => handlepayMentStatus(e)}
               >
-                {paymentS.map((po) => (
-                  <option key={po} value={po}>
-                    {po}
+                {paymentStatus && (
+                  <option key={paymentStatus} value={paymentStatus}>
+                    {paymentStatus}
                   </option>
+                )}
+                {paymentS.map((po) => (
+                  paymentStatus !== po && (
+                    <option key={po} value={po}>
+                      {po}
+                    </option>
+                  )
                 ))}
               </Form.Control>
             </Form.Group>
+
           </Col>
           <Col xs="auto" lg="4">
             <Form.Group className="fw-semibold mb-0">
@@ -523,15 +531,23 @@ const PoDetails = () => {
                 as="select"
                 className="mr-sm-2"
                 value={PoStatus}
-                onChange={(e)=>handlePOStatus}
+                onChange={(e) => handlePOStatus(e)} // Ensure you call the function correctly
               >
-                {POStatusFilter.map((po) => (
-                  <option key={po} value={po}>
-                    {po}
+                {PoStatus && (
+                  <option key={PoStatus} value={PoStatus}>
+                    {PoStatus}
                   </option>
+                )}
+                {POStatusFilter.map((po) => (
+                  PoStatus !== po && (
+                    <option key={po} value={po}>
+                      {po}
+                    </option>
+                  )
                 ))}
               </Form.Control>
             </Form.Group>
+
           </Col>
         </Row>
         <MDBRow className="d-flex justify-content-center align-items-center">
@@ -548,9 +564,9 @@ const PoDetails = () => {
                 // pageSize={pageSizeSO}
                 // totalPages={totalPagesSO}
                 rowHeight={100}
-                // handleChange={handleChangeSO}
-                // // onCellEditStart={handleCellEditStart}
-                // processRowUpdate={processRowUpdateSPO}
+              // handleChange={handleChangeSO}
+              // // onCellEditStart={handleCellEditStart}
+              // processRowUpdate={processRowUpdateSPO}
               />
             </div>
           )}
@@ -570,7 +586,7 @@ const PoDetails = () => {
         }
         PO_OrderList={PO_OrderList}
         handleClosePrintModal={() => setPrintModal(false)}
-        // showModal={printModal}
+      // showModal={printModal}
       />
       {poDetailsModal && (
         <PoDetailsModalInView
