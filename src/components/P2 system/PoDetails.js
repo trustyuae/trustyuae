@@ -26,10 +26,10 @@ const PoDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
-  const [paymentStatus, setPaymentStatus] = useState("Paid");
+  const [paymentStatus, setPaymentStatus] = useState("");
   const paymentS = ["Paid", "Unpaid", "Hold", "Cancelled"];
   const POStatusFilter = ["Open", "Checking with factory", "Closed"];
-  const [PoStatus, setPoStatus] = useState("open");
+  const [PoStatus, setPoStatus] = useState("");
   const [factories, setFactories] = useState([]);
   const [factorieName, setFactorieName] = useState("");
   const [printModal, setPrintModal] = useState(false);
@@ -73,6 +73,8 @@ const PoDetails = () => {
         setPO_OrderList(row);
         setERId(response.data.er_no);
         setFactorieName(response.data.factory_id);
+        setPoStatus(response.data.po_status);
+        setPaymentStatus(response.data.payment_status);
       });
     } catch {
       console.error("Error fetching PO:");
@@ -81,7 +83,7 @@ const PoDetails = () => {
 
   useEffect(() => {
     fetchPO();
-  }, []);
+  }, [paymentStatus, PoStatus]);
 
   const availabilityStatus = [
     "Confirmed",
@@ -503,9 +505,9 @@ const PoDetails = () => {
                 as="select"
                 className="mr-sm-2"
                 // value={selectedFactory}
+                value={paymentStatus}
                 onChange={(e) => handlepayMentStatus(e)}
               >
-                {/* <option value="">All </option> */}
                 {paymentS.map((po) => (
                   <option key={po} value={po}>
                     {po}
@@ -520,7 +522,8 @@ const PoDetails = () => {
               <Form.Control
                 as="select"
                 className="mr-sm-2"
-                onChange={handlePOStatus}
+                value={PoStatus}
+                onChange={(e)=>handlePOStatus}
               >
                 {POStatusFilter.map((po) => (
                   <option key={po} value={po}>
