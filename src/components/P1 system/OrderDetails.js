@@ -309,13 +309,13 @@ function OrderDetails() {
       field: "item_id",
       headerName: "Item Id",
       className: "order-details",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "product_name",
       headerName: "Name",
       className: "order-details",
-      flex: 2,
+      flex: 1.5,
     },
     {
       field: "variant_details",
@@ -376,9 +376,14 @@ function OrderDetails() {
       className: "order-details",
     },
     {
+      field: "avl_quantity",
+      headerName: "Avl QTY",
+      flex: 0.5,
+    },
+    {
       field: "dispatch_type",
       headerName: "Status",
-      flex: 1,
+      flex: 0.5,
       className: "order-details",
       type: "string",
     },
@@ -390,6 +395,8 @@ function OrderDetails() {
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
+        const qty = value.row.quantity;
+        const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
           handleFileInputChange(e, itemId);
         };
@@ -460,7 +467,7 @@ function OrderDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" ? (
+                  orderProcess == "started" && qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -490,7 +497,7 @@ function OrderDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" ? (
+                  orderProcess == "started" && qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
