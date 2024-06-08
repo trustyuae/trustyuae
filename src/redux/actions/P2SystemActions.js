@@ -95,11 +95,11 @@ export const PerticularPoDetails =
     };
 
 export const QuantityPoDetails =
-  (productId) =>
+  (productId,{payload}) =>
     async (dispatch) => {
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_REQUEST });
-        const response = await axios.get(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`);
+        const response = await axios.post(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`,payload);
         console.log(response, 'rsponse of quntity details')
         dispatch({
           type: GET_QUANTITY_DETAILS_SUCCESS,

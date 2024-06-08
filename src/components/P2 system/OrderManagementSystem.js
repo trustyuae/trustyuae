@@ -76,6 +76,9 @@ function OrderManagementSystem() {
   const [remainderDate, setRemainderDate] = useState("");
   const [poDetailsModal, setPoDetailsModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [factoryId, setFactoryId] = useState(null);
+  const [variationId, setVariationId] = useState(null);
+  const [productName, setProductName] = useState("");
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
   const [selectedMPOquantity, setSelectedMPOquantity] = useState([]);
@@ -261,8 +264,9 @@ function OrderManagementSystem() {
       headerName: "Total quantity",
       flex: 1,
       renderCell: (params) => {
+        console.log(params,'paruuussusus')
         return (
-          <Box onClick={() => handlePoModal(params.row.item_id)}>
+          <Box onClick={() => handlePoModal(params.row)}>
             {params.row.total_quantity}
           </Box>
         );
@@ -731,8 +735,11 @@ function OrderManagementSystem() {
     }
   };
 
-  const handlePoModal = (itemId) => {
-    setProductId(itemId);
+  const handlePoModal = (itemData) => {
+    setProductId(itemData.item_id);
+    setFactoryId(itemData.factory_id);
+    setVariationId(itemData.variation_id)
+    setProductName(itemData.product_name)
     setPoDetailsModal(true);
   };
 
@@ -1269,6 +1276,9 @@ function OrderManagementSystem() {
           show={poDetailsModal}
           poDetailsModal={poDetailsModal}
           productId={productId}
+          productName={productName}
+          variationId={variationId}
+          factoryId={factoryId}
           handleClosePoDetailsModal={() => setPoDetailsModal(false)}
         />
       )}

@@ -51,6 +51,7 @@ const PoDetailsModalInView = ({
                 <tr>
                   <th>Order ID</th>
                   <th>Qty</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               {loader ? (
@@ -62,6 +63,7 @@ const PoDetailsModalInView = ({
                       <tr key={item.id}>
                         <td>{item.order_id}</td>
                         <td>{item.quantity}</td>
+                        <td>{item.order_status}</td>
                       </tr>
                     ))
                   ) : (
