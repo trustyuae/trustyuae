@@ -180,14 +180,52 @@ const PoDetails = () => {
     setPoDetailsModal(true);
   };
 
+  // variant
+  const variant = (variations) => {
+    console.log(variations,'variations');
+    const matches = variations.match(
+      /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
+    );
+    console.log(matches,'matches');
+    if (matches) {
+      const key = matches[1];
+      const value = matches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
+      return `${key}: ${value}`;
+    } else {
+      return "Variant data not available";
+    }
+  };
+
+  const variant2 = (variations) => {
+    const { Color, Size } = JSON.parse(variations);
+    console.log(typeof(variations),'variations');
+    // const { Color, Size } = variations;
+    console.log(Color,'Color');
+    if (!Color && !Size) {
+      return "Variant data not available";
+    }
+
+    let details = [];
+
+    if (Size) {
+      details.push(`Size: ${Size}`);
+    }
+
+    if (Color) {
+      details.push(`Color: ${Color}`);
+    }
+
+    return details.join(", ");
+  };
+
   const columns = [
     {
       field: "product_name",
       headerName: "Product Name",
-      flex: 2,
+      flex: 4,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
-          return 2;
+          return 3;
         }
         return undefined;
       },
@@ -199,9 +237,35 @@ const PoDetails = () => {
       },
     },
     {
+      field: "variation_value",
+      headerName: "Variation values",
+      flex: 4,
+      renderCell: (params) => {
+        console.log(params.row.variation_value,'params');
+        if(params.row.variation_value){
+          return variant2(params.row.variation_value)
+        }else{
+          return "Variant data not available"
+        }
+        // if (
+        //   params.row.variation_value &&
+        //   Object.keys(params.row.variation_value).length !== 0
+        // ) {
+        //   return variant2(params.row.variation_value);
+        // } else if (
+        //   params.row.variation_value &&
+        //   params.row.variation_value !== ""
+        // ) {
+        //   return variant(params.row.variation_value);
+        // } else {
+        //   return "No variations available";
+        // }
+      },
+    },
+    {
       field: "image",
       headerName: "product images",
-      flex: 2,
+      flex: 4,
       type: "html",
       renderCell: (value, row) => {
         return (
@@ -216,6 +280,7 @@ const PoDetails = () => {
         );
       },
     },
+   
     {
       field: "quantity",
       headerName: "Qty Ordered",
@@ -247,6 +312,7 @@ const PoDetails = () => {
         return value;
       },
     },
+    
     {
       field: "total_price",
       headerName: "Estimated Cost(AED)",
@@ -264,10 +330,11 @@ const PoDetails = () => {
         return value;
       },
     },
+    
     {
       field: "available_quantity",
       headerName: "Available Qty",
-      flex: 3,
+      flex: 2.5,
       renderCell: (params) => {
         return (
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
@@ -288,6 +355,7 @@ const PoDetails = () => {
       headerName: "Availability Status",
       flex: 3,
       renderCell: (params) => {
+        console.log(params.row.variation_value,'params');
         return (
           <Select
             labelId={`customer-status-${params.row.id}-label`}
@@ -311,6 +379,7 @@ const PoDetails = () => {
         );
       },
     },
+   
     {
       field: "dispatch_status",
       headerName: "Dispatch Status",
