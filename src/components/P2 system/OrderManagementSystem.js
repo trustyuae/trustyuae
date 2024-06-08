@@ -1279,6 +1279,8 @@ function OrderManagementSystem() {
           productName={productName}
           variationId={variationId}
           factoryId={factoryId}
+          startD={startDate}
+          endD={endDate}
           handleClosePoDetailsModal={() => setPoDetailsModal(false)}
         />
       )}
