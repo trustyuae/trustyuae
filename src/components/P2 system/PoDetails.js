@@ -200,7 +200,7 @@ const PoDetails = () => {
 
   const variant2 = (variations) => {
     console.log(variations, 'variations');
-    const { Color, Size } = (variations);
+    const { Color, Size } = JSON.parse(variations);
     console.log(typeof (variations), 'variations');
     // const { Color, Size } = variations;
     console.log(Color, 'Color');
