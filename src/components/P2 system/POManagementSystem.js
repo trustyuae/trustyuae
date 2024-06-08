@@ -127,8 +127,8 @@ function POManagementSystem() {
     { field: "total_quantity", headerName: "Quantity", flex: 1.5 },
     { field: "", headerName: "RMB Price", flex: 1.5 },
     { field: "estimated_cost_aed", headerName: "AED Price", flex: 1.5 },
-    { field: "po_status", headerName: "Status", flex: 1.5 },
-    { field: "payment_status", headerName: "Status", flex: 1.5 },
+    { field: "po_status", headerName: "PO Status", flex: 1.5 },
+    { field: "payment_status", headerName: "Payment Status", flex: 1.5 },
     {
       field: "factory_id",
       headerName: "Factory",
