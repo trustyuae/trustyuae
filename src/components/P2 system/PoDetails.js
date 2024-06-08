@@ -284,7 +284,7 @@ const PoDetails = () => {
     {
       field: "quantity",
       headerName: "Qty Ordered",
-      flex: 2,
+      flex: 2.5,
       renderCell: (params) => {
         const handleClick = () => {
           handlePoModal(params.row.product_id);
@@ -303,7 +303,7 @@ const PoDetails = () => {
     },
     {
       field: "",
-      headerName: "Estimated Cost(RMB)",
+      headerName: "RMB Cost",
       flex: 3,
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
@@ -315,7 +315,7 @@ const PoDetails = () => {
     
     {
       field: "total_price",
-      headerName: "Estimated Cost(AED)",
+      headerName: "AED Cost",
       flex: 3,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
