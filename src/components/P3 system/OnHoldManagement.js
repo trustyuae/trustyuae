@@ -132,32 +132,58 @@ function OnHoldManagement() {
         grn_no: params.grn_no,
       };
 
-      await dispatch(AddProductOrderForPre(requestedDataP)).then(
-        async (response) => {
-          if (response) {
-            await ShowAlert(
-              "Uploaded Successfully!",
-              "",
-              "success",
-              false,
-              false,
-              "",
-              "",
-              1000
-            );
-          }
-          selectedOrders.forEach((order) => {
-            order.isSelected = false;
-          });
-          const updatedProductData = productData.filter(
-            (order) =>
-              !selectedOrders.some((selected) => selected.id === order.id)
+      try {
+        const response = await dispatch(AddProductOrderForPre(requestedDataP));
+        if (response?.data?.status_code === 200) {
+          console.log(
+            response?.data?.status_code,
+            "response?.data?.status_code 200"
           );
-          setSelectedOrders([]);
-          handleUpdatedValues();
-          setProductData(updatedProductData);
+          ShowAlert(
+            "Order fulfilled successfully!",
+            "",
+            "success",
+            false,
+            false,
+            "",
+            "",
+            3500
+          );
+        } else if (response?.data?.status_code === 400) {
+          console.log(
+            response?.data?.status_code,
+            "response?.data?.status_code 400"
+          );
+          const unfilledOrderIdsString = response?.data?.unfilled_order_ids?.join(', ');
+          const message = response.data.message + (unfilledOrderIdsString ? `: ${unfilledOrderIdsString}` : '');
+          ShowAlert(
+            message,
+            "",
+            "error",
+            false,
+            false,
+            "",
+            "",
+            3500
+          );
         }
-      );
+
+        selectedOrders.forEach((order) => {
+          order.isSelected = false;
+        });
+
+        const updatedProductData = productData.filter(
+          (order) =>
+            !selectedOrders.some((selected) => selected.id === order.id)
+        );
+
+        setSelectedOrders([]);
+        handleUpdatedValues();
+        setProductData(updatedProductData);
+      } catch (error) {
+        console.error("Error occurred:", error);
+        // Handle error if necessary
+      }
     }
   };
 
@@ -265,7 +291,7 @@ function OnHoldManagement() {
                         <Box>
                           <span>Product Id:</span>{" "}
                           <Badge bg="success">
-                            {params.variation_id !="0" && params.variation_id
+                            {params.variation_id != "0" && params.variation_id
                               ? params.variation_id
                               : productDetailsData?.product_details?.product_id}
                           </Badge>

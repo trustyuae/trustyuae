@@ -43,18 +43,21 @@ function OrderDetails() {
   const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState('');
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState('');
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
+  if (!fileInputRef.current) {
+    fileInputRef.current = {};
+  }
   fileInputRef.current[selectedItemId] = useRef(null);
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
@@ -208,7 +211,6 @@ function OrderDetails() {
         null,
         2000
       );
-      console.log(result, "result=======img");
       if (result.isConfirmed) handleCancel();
       fetchOrder();
     } catch (error) {

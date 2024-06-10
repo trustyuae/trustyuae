@@ -55,7 +55,14 @@ export const AddGrn = (payload, navigate) => async (dispatch) => {
       }
     );
     if (response) {
-      const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
+      const result = await ShowAlert(
+        "Success",
+        response.data,
+        "success",
+        true,
+        false,
+        "OK"
+      );
       if (result.isConfirmed) navigate("/GRN_Management");
     }
     dispatch({
@@ -68,11 +75,11 @@ export const AddGrn = (payload, navigate) => async (dispatch) => {
   }
 };
 
-  export const GetGRNList =
+export const GetGRNList =
   ({ apiUrl }) =>
   async (dispatch) => {
     try {
-      dispatch({ type: GET_GRN_LIST_REQUEST});
+      dispatch({ type: GET_GRN_LIST_REQUEST });
       const response = await axios.get(apiUrl);
       dispatch({
         type: GET_GRN_LIST_SUCCESS,
@@ -84,11 +91,11 @@ export const AddGrn = (payload, navigate) => async (dispatch) => {
     }
   };
 
-  export const GetGRNView =
+export const GetGRNView =
   ({ apiUrl }) =>
   async (dispatch) => {
     try {
-      dispatch({ type: GET_GRN_VIEW_REQUEST});
+      dispatch({ type: GET_GRN_VIEW_REQUEST });
       const response = await axios.get(apiUrl);
       console.log(response, "response of GetProductOrderDetails");
       dispatch({
@@ -101,11 +108,11 @@ export const AddGrn = (payload, navigate) => async (dispatch) => {
     }
   };
 
-  export const GetProductDetails =
+export const GetProductDetails =
   ({ apiUrl }) =>
   async (dispatch) => {
     try {
-      dispatch({ type: GET_PRODUCT_DETAILS_REQUEST});
+      dispatch({ type: GET_PRODUCT_DETAILS_REQUEST });
       const response = await axios.get(apiUrl);
       console.log(response, "response of GetProductDetails");
       dispatch({
@@ -157,7 +164,7 @@ export const AddProductOrderForStock = (requestedData) => async (dispatch) => {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST });
     const response = await axios.post(
       `${API_URL}wp-json/custom-instock-api/v1/quantity-instock-api/`,
-      requestedData,
+      requestedData
     );
     dispatch({
       type: ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS,
@@ -168,6 +175,3 @@ export const AddProductOrderForStock = (requestedData) => async (dispatch) => {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_FAIL, error: error.message });
   }
 };
-
-
-
