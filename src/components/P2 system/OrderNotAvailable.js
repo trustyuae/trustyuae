@@ -43,7 +43,6 @@ function OrderNotAvailable() {
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
   const [imageURL, setImageURL] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedData, setSelectedData] = useState([]);
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -425,6 +424,7 @@ function OrderNotAvailable() {
 
   useEffect(() => {
     fetchOrdersNotAvailableData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStartIndex, setSelectedOrderNotAvailable, setSelectedStatus]);
 
   const ImageModule = (url) => {

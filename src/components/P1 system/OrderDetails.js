@@ -127,6 +127,7 @@ function OrderDetails() {
 
   useEffect(() => {
     fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message, setTableData, setOrderData]);
 
   const ImageModule = (url) => {

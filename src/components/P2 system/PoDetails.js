@@ -8,7 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
 import { Badge, Card, Col } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Alert, Box, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Alert, Box,MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
@@ -83,6 +83,7 @@ const PoDetails = () => {
 
   useEffect(() => {
     fetchPO();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const availabilityStatus = [
@@ -183,22 +184,6 @@ const PoDetails = () => {
     setPoDetailsModal(true);
   };
 
-  // variant
-  const variant = (variations) => {
-    console.log(variations, 'variations');
-    const matches = variations.match(
-      /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
-    );
-    console.log(matches, 'matches');
-    if (matches) {
-      const key = matches[1];
-      const value = matches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
-      return `${key}: ${value}`;
-    } else {
-      return "Variant data not available";
-    }
-  };
-
   const variant2 = (variations) => {
     console.log(variations.row.variation_value, 'variations');
 
@@ -227,28 +212,6 @@ const PoDetails = () => {
             )}
         </div>
     );
-
-
-
-    // const { Color, Size } = JSON.parse(variations);
-    // console.log(typeof (variations), 'variations');
-    // // const { Color, Size } = variations;
-    // console.log(Color, 'Color');
-    // if (!Color && !Size) {
-    //   return "Variant data not available";
-    // }
-
-    // let details = [];
-
-    // if (Size) {
-    //   details.push(`Size: ${Size}`);
-    // }
-
-    // if (Color) {
-    //   details.push(`Color: ${Color}`);
-    // }
-
-    // return details.join(", ");
   };
 
   const columns = [
@@ -273,27 +236,6 @@ const PoDetails = () => {
       field: "variation_value",
       headerName: "Variation",
       flex: 4,
-      // renderCell: (params) => {
-      //   console.log(params.row.variation_value, 'params');
-      //   if (params.row.variation_value) {
-      //     return variant2(params.row.variation_value)
-      //   } else {
-      //     return "Variant data not available"
-      //   }
-      //   // if (
-      //   //   params.row.variation_value &&
-      //   //   Object.keys(params.row.variation_value).length !== 0
-      //   // ) {
-      //   //   return variant2(params.row.variation_value);
-      //   // } else if (
-      //   //   params.row.variation_value &&
-      //   //   params.row.variation_value !== ""
-      //   // ) {
-      //   //   return variant(params.row.variation_value);
-      //   // } else {
-      //   //   return "No variations available";
-      //   // }
-      // },
       renderCell:variant2
     },
     {

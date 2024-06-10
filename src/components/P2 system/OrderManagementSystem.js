@@ -508,6 +508,7 @@ function OrderManagementSystem() {
     if (activeKey === "scheduled_PO") {
       scheduledPO();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
   useEffect(() => {

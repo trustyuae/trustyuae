@@ -179,6 +179,7 @@ function CompletedOrderSystem() {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, page, isReset,selectedDateRange,selectedCompletedDateRange]);
 
   return (

@@ -112,6 +112,7 @@ function GRNManagement() {
 
   useEffect(() => {
     handlGetGRNList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endDate, selectedDateRange, statusFilter, page]);
 
   return (

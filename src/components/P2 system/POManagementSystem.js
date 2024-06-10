@@ -90,10 +90,12 @@ function POManagementSystem() {
 
   useEffect(() => {
     handleTabChange(poType);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     POM_system_products();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, endDate, selectedFactory, PoStatus, poType]);
 
   const handleDateChange = async (newDateRange) => {

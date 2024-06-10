@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import Pagination from "react-bootstrap/Pagination";
 import { useParams } from "react-router-dom";
 import {
   Alert,
@@ -107,6 +106,7 @@ function OnHoldManagement() {
 
   useEffect(() => {
     handleUpdatedValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOrderPerp = async () => {

@@ -61,6 +61,7 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     dispatch(loginUserWithToken(navigate, token));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
