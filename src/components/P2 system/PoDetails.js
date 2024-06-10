@@ -8,7 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
 import { Badge, Card, Col } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Alert, Box, MenuItem, Select, Typography } from "@mui/material";
+import { Alert, Box, InputLabel, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
@@ -200,26 +200,52 @@ const PoDetails = () => {
   };
 
   const variant2 = (variations) => {
-    console.log(variations, 'variations');
-    const { Color, Size } = JSON.parse(variations);
-    console.log(typeof (variations), 'variations');
-    // const { Color, Size } = variations;
-    console.log(Color, 'Color');
-    if (!Color && !Size) {
-      return "Variant data not available";
-    }
+    console.log(variations.row.variation_value, 'variations');
 
-    let details = [];
+    const variationArray = Object.entries(JSON.parse(variations.row.variation_value)).map(
+        ([key, value]) => ({ [key]: value })
+    );
+    console.log(variationArray, 'variationArray');
+    return (
+        <div className="container mt-4 mb-4">
+            {variationArray && (
+                <div>
+                    {variationArray.map((item, index) => {
+                        const attributeName = Object.keys(item)[0];
+                        const attributeValue = Object.values(item)[0];
+                        return (
+                            <span key={index}>
+                                {`${attributeName}: ${attributeValue}`}
+                                {index < variationArray.length - 1 ? ", " : ""}
+                            </span>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
 
-    if (Size) {
-      details.push(`Size: ${Size}`);
-    }
 
-    if (Color) {
-      details.push(`Color: ${Color}`);
-    }
 
-    return details.join(", ");
+    // const { Color, Size } = JSON.parse(variations);
+    // console.log(typeof (variations), 'variations');
+    // // const { Color, Size } = variations;
+    // console.log(Color, 'Color');
+    // if (!Color && !Size) {
+    //   return "Variant data not available";
+    // }
+
+    // let details = [];
+
+    // if (Size) {
+    //   details.push(`Size: ${Size}`);
+    // }
+
+    // if (Color) {
+    //   details.push(`Color: ${Color}`);
+    // }
+
+    // return details.join(", ");
   };
 
   const columns = [
@@ -244,27 +270,28 @@ const PoDetails = () => {
       field: "variation_value",
       headerName: "Variation",
       flex: 4,
-      renderCell: (params) => {
-        console.log(params.row.variation_value, 'params');
-        if (params.row.variation_value) {
-          return variant2(params.row.variation_value)
-        } else {
-          return "Variant data not available"
-        }
-        // if (
-        //   params.row.variation_value &&
-        //   Object.keys(params.row.variation_value).length !== 0
-        // ) {
-        //   return variant2(params.row.variation_value);
-        // } else if (
-        //   params.row.variation_value &&
-        //   params.row.variation_value !== ""
-        // ) {
-        //   return variant(params.row.variation_value);
-        // } else {
-        //   return "No variations available";
-        // }
-      },
+      // renderCell: (params) => {
+      //   console.log(params.row.variation_value, 'params');
+      //   if (params.row.variation_value) {
+      //     return variant2(params.row.variation_value)
+      //   } else {
+      //     return "Variant data not available"
+      //   }
+      //   // if (
+      //   //   params.row.variation_value &&
+      //   //   Object.keys(params.row.variation_value).length !== 0
+      //   // ) {
+      //   //   return variant2(params.row.variation_value);
+      //   // } else if (
+      //   //   params.row.variation_value &&
+      //   //   params.row.variation_value !== ""
+      //   // ) {
+      //   //   return variant(params.row.variation_value);
+      //   // } else {
+      //   //   return "No variations available";
+      //   // }
+      // },
+      renderCell:variant2
     },
     {
       field: "image",
