@@ -206,9 +206,12 @@ const PoDetails = () => {
         ([key, value]) => ({ [key]: value })
     );
     console.log(variationArray, 'variationArray');
+
     return (
         <div className="container mt-4 mb-4">
-            {variationArray && (
+            {variationArray.length === 0 ? (
+                <div>Variations not available</div>
+            ) : (
                 <div>
                     {variationArray.map((item, index) => {
                         const attributeName = Object.keys(item)[0];
