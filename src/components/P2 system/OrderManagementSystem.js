@@ -52,6 +52,9 @@ function OrderManagementSystem() {
   const [selectedOrderIdss, setSelectedOrderIdss] = useState([]);
   const [selectedManualOrderIds, setSelectedManualOrderIds] = useState([]);
   const [selectedScheduleOrderIds, setSelectedScheduleOrderIds] = useState([]);
+  const [selectedAgainstOrderDetails, setSelectedAgainstOrderDetails] = useState([]);
+  const [selectedManualOrderDetails, setSelectedManualOrderDetails] = useState([]);
+  const [selectedScheduledOrderDetails, setSelectedScheduledOrderDetails] = useState([]);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -104,7 +107,6 @@ function OrderManagementSystem() {
       const updatedData = manualPOorders.map((item) =>
         item.id === rowIndex.id ? { ...item, ...rowIndex } : item
       );
-      console.log(updatedData, "updatedData");
       setManualPoOrders(updatedData);
     }
     if (activeKey === "scheduled_PO") {
@@ -131,14 +133,11 @@ function OrderManagementSystem() {
                 {variationArray.map((item, index) => {
                   const attributeName = Object.keys(item)[0];
                   const attributeValue = Object.values(item)[0];
-                  console.log(attributeValue, "attributeValue");
-                  console.log(typeof attributeValue, "attributeValue===");
                   return (
                     <React.Fragment key={index}>
                       <div
-                        className={`row mb-${
-                          typeof attributeValue === "string" ? "3" : "4"
-                        }`}
+                        className={`row mb-${typeof attributeValue === "string" ? "3" : "4"
+                          }`}
                       >
                         <div className="col-6 d-flex  justify-content-end align-items-center">
                           <InputLabel
@@ -207,7 +206,7 @@ function OrderManagementSystem() {
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               checked={selectedOrderIds.includes(params.row.id)}
-              onChange={(event) => handleOrderSelection(params.row.id)}
+              onChange={(event) => handleOrderSelection(params.row)}
             />
           </FormGroup>
         );
@@ -264,7 +263,6 @@ function OrderManagementSystem() {
       headerName: "Total quantity",
       flex: 1,
       renderCell: (params) => {
-        console.log(params,'paruuussusus')
         return (
           <Box onClick={() => handlePoModal(params.row)}>
             {params.row.total_quantity}
@@ -298,7 +296,7 @@ function OrderManagementSystem() {
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               checked={selectedManualOrderIds.includes(params.row.id)}
-              onChange={() => handleOrderManualSelection(params.row.id)}
+              onChange={() => handleOrderManualSelection(params.row)}
             />
           </FormGroup>
         );
@@ -360,9 +358,11 @@ function OrderManagementSystem() {
               value={params.row.Quantity}
               placeholder="0"
               onChange={(e) => {
-                if(e.target.value>=0){
-                  handleMOQtyChange(e, params.row)}}
+                if (e.target.value >= 0) {
+                  handleMOQtyChange(e, params.row)
                 }
+              }
+              }
             />
           </Form.Group>
         );
@@ -383,7 +383,7 @@ function OrderManagementSystem() {
               style={{ justifyContent: "center" }}
               checked={selectedScheduleOrderIds.includes(params.row.id)}
               onChange={() =>
-                handleOrderScheduleSelection(params.row.id)
+                handleOrderScheduleSelection(params.row)
               }
             />
           </FormGroup>
@@ -444,10 +444,12 @@ function OrderManagementSystem() {
             type="number"
             value={params.row.Quantity}
             placeholder="0"
-            onChange={(e) =>{ 
-              if(e.target.value>=0){
-                handleSOQtyChange(e, params.row)}}
+            onChange={(e) => {
+              if (e.target.value >= 0) {
+                handleSOQtyChange(e, params.row)
               }
+            }
+            }
           />
         </Form.Group>
       ),
@@ -621,66 +623,84 @@ function OrderManagementSystem() {
     return data;
   };
 
-  const handleOrderSelection = (selectedId) => {
-    const filteredOrders = orders.filter((order) => order.id === selectedId);
+  const handleOrderSelection = (rowData) => {
+    const filteredOrders = orders.filter((order) => order.id === rowData.id);
     const orderIds = filteredOrders.map((order) => order.order_ids);
+    const selectedIndex = selectedOrderIds.indexOf(rowData.id);
+    const newSelected = selectedIndex !== -1
+      ? selectedOrderIds.filter((id) => id !== rowData.id)
+      : [...selectedOrderIds, rowData.id];
 
-    const isSelected = selectedOrderIds.includes(selectedId);
-    const newSelected = isSelected
-      ? selectedOrderIds.filter((id) => id !== selectedId)
-      : [...selectedOrderIds, selectedId];
-    const newSelected2 = isSelected
+    if (selectedIndex === -1) {
+      setSelectedAgainstOrderDetails([...selectedAgainstOrderDetails, rowData]);
+    } else {
+      setSelectedAgainstOrderDetails(selectedAgainstOrderDetails.filter(order => order.id !== rowData.id));
+    }
+
+    const newSelected2 = selectedIndex !== -1
       ? selectedOrderIdss
-          .filter((id) => id !== selectedId)
-          .flatMap((id) => id.split(","))
+        .filter((id) => id !== rowData.id)
+        .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
     setSelectedOrderIdss(newSelected2);
   };
 
-  const handleOrderManualSelection = (selectedId) => {
-    const selectedIndex = selectedManualOrderIds.indexOf(selectedId);
+  const handleOrderManualSelection = (rowData) => {
+    const selectedIndex = selectedManualOrderIds.indexOf(rowData.id);
     const selectedQtyIndex = selectedMPOquantity?.findIndex(
-      (qty) => qty.id === selectedId
+      (qty) => qty.id === rowData.id
     );
 
     const newSelected =
       selectedIndex === -1
-        ? [...selectedManualOrderIds, selectedId]
-        : selectedManualOrderIds.filter((id) => id !== selectedId);
+        ? [...selectedManualOrderIds, rowData.id]
+        : selectedManualOrderIds.filter((id) => id !== rowData.id);
 
-    if (selectedQtyIndex === -1)
+    if (selectedIndex === -1) {
+      setSelectedManualOrderDetails([...selectedManualOrderDetails, rowData]);
+    } else {
+      setSelectedManualOrderDetails(selectedManualOrderDetails.filter(order => order.id !== rowData.id));
+    }
+
+    if (selectedQtyIndex !== -1)
       setSelectedMPOquantity((prevData) =>
-        prevData.filter((v) => v.id !== selectedId)
+        prevData.filter((v) => v.id !== rowData.id)
       );
 
     if (selectedIndex !== -1) {
-      manualPOorders.find((o) => o.id === selectedId).Quantity = 0;
+      manualPOorders.find((o) => o.id === rowData.id).Quantity = 0;
     }
 
     // setSelectedMPOquantity(newSelectedQty);
     setSelectedManualOrderIds(newSelected);
   };
 
-  const handleOrderScheduleSelection = (selectedId) => {
-    const selectedIndex = selectedScheduleOrderIds.indexOf(selectedId);
+  const handleOrderScheduleSelection = (rowData) => {
+    const selectedIndex = selectedScheduleOrderIds.indexOf(rowData.id);
     const selectedQtyIndex = selectedSPOquantity?.findIndex(
-      (qty) => qty.id === selectedId
+      (qty) => qty.id === rowData.id
     );
+
+    if (selectedIndex === -1) {
+      setSelectedScheduledOrderDetails([...selectedScheduledOrderDetails, rowData]);
+    } else {
+      setSelectedScheduledOrderDetails(selectedScheduledOrderDetails.filter(order => order.id !== rowData.id));
+    }
 
     const newSelected =
       selectedIndex === -1
-        ? [...selectedScheduleOrderIds, selectedId]
-        : selectedScheduleOrderIds.filter((id) => id !== selectedId);
+        ? [...selectedScheduleOrderIds, rowData.id]
+        : selectedScheduleOrderIds.filter((id) => id !== rowData.id);
 
     if (selectedQtyIndex === -1)
       setSelectedSPOquantity((prevData) =>
-        prevData.filter((v) => v.id !== selectedId)
+        prevData.filter((v) => v.id !== rowData.id)
       );
 
     if (selectedIndex !== -1) {
-      scheduledPOorders.find((o) => o.id === selectedId).Quantity = 0;
+      scheduledPOorders.find((o) => o.id === rowData.id).Quantity = 0;
     }
 
     setSelectedScheduleOrderIds(newSelected);
@@ -772,15 +792,12 @@ function OrderManagementSystem() {
   };
 
   const handleGenerateAgainstPO = async () => {
-    const selectedOrders = orders.filter((order) =>
-      selectedOrderIds.includes(order.id)
-    );
     const factoryIds = [
-      ...new Set(selectedOrders.map((order) => order.factory_id)),
+      ...new Set(selectedAgainstOrderDetails.map((order) => order.factory_id)),
     ];
 
     if (factoryIds.length === 1) {
-      const selectedProductIds = selectedOrders
+      const selectedProductIds = selectedAgainstOrderDetails
         .map((order) => order.item_id)
         .join(",");
       const selectedOrderIdsStr = selectedOrderIdss.join(",");
@@ -802,10 +819,8 @@ function OrderManagementSystem() {
     }
   };
   const handleGenerateManualPO = async () => {
-    const selectedOrders = manualPOorders.filter((order) =>
-      selectedManualOrderIds.includes(order.id)
-    );
-    const filteredOrders = getFilteredData(selectedOrders);
+
+    const filteredOrders = getFilteredData(selectedManualOrderDetails);
     const factoryIds = [
       ...new Set(filteredOrders.map((order) => order.factory_id)),
     ];
@@ -841,13 +856,8 @@ function OrderManagementSystem() {
   };
 
   const handleGenerateScheduledPO = async () => {
-    if(remainderDate&&estimatedTime){
-      const selectedOrders = scheduledPOorders.filter((order) =>
-        selectedScheduleOrderIds.includes(order.id)
-      );
-  
-      const filteredOrders = getFilteredData(selectedOrders);
-  
+    if (remainderDate && estimatedTime) {
+      const filteredOrders = getFilteredData(selectedScheduledOrderDetails);
       const factoryIds = [
         ...new Set(filteredOrders.map((order) => order.factory_id)),
       ];
@@ -856,7 +866,7 @@ function OrderManagementSystem() {
         const selectedOrderIdsStr = filteredOrders.map(
           (order) => order.product_id
         );
-  
+
         const payload = {
           quantities: selectedquantities,
           product_ids: selectedOrderIdsStr,
@@ -882,7 +892,7 @@ function OrderManagementSystem() {
           1000
         );
       }
-    }else{
+    } else {
       await ShowAlert(
         "",
         "Please select remainder Date and Estimated Time",
@@ -894,7 +904,7 @@ function OrderManagementSystem() {
         1000
       );
     }
-    
+
   };
 
   // variant
