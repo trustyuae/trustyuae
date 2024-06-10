@@ -109,13 +109,18 @@ function OnHoldManagement() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    fetchProductOrderDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setSelectedOrders, setProductData]);
+
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
     const quantity = selectedOrders.map((order) => order.quantity);
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
-        "please select products for generating schedule po",
+        "please select products for fullfilling orders",
         "",
         "error",
         false,
@@ -154,35 +159,22 @@ function OnHoldManagement() {
             response?.data?.status_code,
             "response?.data?.status_code 400"
           );
-          const unfilledOrderIdsString = response?.data?.unfilled_order_ids?.join(', ');
-          const message = response.data.message + (unfilledOrderIdsString ? `: ${unfilledOrderIdsString}` : '');
-          ShowAlert(
-            message,
-            "",
-            "error",
-            false,
-            false,
-            "",
-            "",
-            3500
-          );
+          const unfilledOrderIdsString =
+            response?.data?.unfilled_order_ids?.join(", ");
+          const message =
+            response.data.message +
+            (unfilledOrderIdsString ? `: ${unfilledOrderIdsString}` : "");
+          ShowAlert(message, "", "error", false, false, "", "", 3500);
         }
 
-        selectedOrders.forEach((order) => {
+        await selectedOrders.forEach((order) => {
           order.isSelected = false;
         });
 
-        const updatedProductData = productData.filter(
-          (order) =>
-            !selectedOrders.some((selected) => selected.id === order.id)
-        );
-
         setSelectedOrders([]);
         handleUpdatedValues();
-        setProductData(updatedProductData);
       } catch (error) {
         console.error("Error occurred:", error);
-        // Handle error if necessary
       }
     }
   };
@@ -215,10 +207,9 @@ function OnHoldManagement() {
       });
   };
 
-  const handleUpdatedValues = () => {
+  const handleUpdatedValues = async () => {
     setSelectedOrders([]);
     fetchProductDetails();
-    fetchProductOrderDetails();
   };
 
   const columns = [
