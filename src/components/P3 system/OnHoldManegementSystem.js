@@ -31,7 +31,6 @@ function OnHoldManegementSystem() {
     const [receivedBoxes, setReceivedBoxes] = useState(0);
     const [productNameF, setProductName] = useState('')
     const [productIDF, setProductID] = useState('')
-    const [productIDF2, setProductID2] = useState('')
     const [singleProductD, setSingleProductD] = useState([])
     const [tableData, setTableData] = useState([])
     const [date, setDate] = useState(getTodayDate())
@@ -287,10 +286,12 @@ function OnHoldManegementSystem() {
 
     useEffect(() => {
         handalADDProduct()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [singleProductD])
 
     useEffect(() => {
         getAllProducts()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [productNameF, productIDF, tableData])
 
     useEffect(() => {
