@@ -139,6 +139,11 @@ function OnHoldManagement() {
 
       try {
         const response = await dispatch(AddProductOrderForPre(requestedDataP));
+        const unfilledOrderIdsString =
+            response?.data?.unfilled_order_ids?.join(", ");
+          const message =
+            response.data.message +
+            (unfilledOrderIdsString ? `: ${unfilledOrderIdsString}` : "");
         if (response?.data?.status_code === 200) {
           console.log(
             response?.data?.status_code,
@@ -154,23 +159,16 @@ function OnHoldManagement() {
             "",
             3500
           );
-        } else if (response?.data?.status_code === 400) {
+        } else{
           console.log(
             response?.data?.status_code,
             "response?.data?.status_code 400"
           );
-          const unfilledOrderIdsString =
-            response?.data?.unfilled_order_ids?.join(", ");
-          const message =
-            response.data.message +
-            (unfilledOrderIdsString ? `: ${unfilledOrderIdsString}` : "");
           ShowAlert(message, "", "error", false, false, "", "", 3500);
         }
-
         await selectedOrders.forEach((order) => {
           order.isSelected = false;
         });
-
         setSelectedOrders([]);
         handleUpdatedValues();
       } catch (error) {

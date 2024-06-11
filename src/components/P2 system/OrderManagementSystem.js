@@ -1073,7 +1073,7 @@ function OrderManagementSystem() {
                 <Col xs="auto" lg="4">
                   <Form.Group className="fw-semibold mb-0">
                     <Form.Label>Factory Filter:</Form.Label>
-                    <Form.Control
+                    <Form.Select
                       as="select"
                       className="mr-sm-2"
                       value={selectedFactory}
@@ -1085,7 +1085,7 @@ function OrderManagementSystem() {
                           {factory.factory_name}
                         </option>
                       ))}
-                    </Form.Control>
+                    </Form.Select>
                   </Form.Group>
                 </Col>
 
