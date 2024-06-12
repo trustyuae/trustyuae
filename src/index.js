@@ -15,7 +15,7 @@ import "./assets/vendor/remixicon/remixicon.css"
 import "./assets/vendor/bootstrap/js/bootstrap.bundle.min.js"
 import "./assets/vendor/tinymce/tinymce.min.js"
 import "./assets/js/main.js"
-import './lib/i18n'
+import './lib/i18n.js'
 import i18next from "i18next";
 i18next.init({
   interpolation: { escapeValue: false },  // React already does escaping
