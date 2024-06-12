@@ -38,6 +38,7 @@ const PoDetails = () => {
   const [poDetailsModal, setPoDetailsModal] = useState(false);
   const [productId, setProductId] = useState(null);
   const [erId, setERId] = useState(null);
+  const [lang, setLang] = useState("En");
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -58,11 +59,12 @@ const PoDetails = () => {
 
   const radios = [
     { name: "English", value: "En" },
-    { name: "Chinese", value: "Zn" },
+    { name: "中國人", value: "Zn" },
   ];
 
-  const handleLanguageChange = (language) => {
-    i18n.changeLanguage(language);
+  const handleLanguageChange = async (language) => {
+    setLang(language); // Update the state with the selected language
+    i18n.changeLanguage(language); // Change the language using the selected language
   };
 
   const fetchPO = async () => {
@@ -95,6 +97,11 @@ const PoDetails = () => {
   useEffect(() => {
     fetchPO();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
   }, []);
 
   const availabilityStatus = [
@@ -290,7 +297,7 @@ const PoDetails = () => {
     },
     {
       field: "",
-      headerName: (t("POManagement.RMBPrice")),
+      headerName: t("POManagement.RMBPrice"),
       flex: 3,
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
@@ -302,7 +309,7 @@ const PoDetails = () => {
 
     {
       field: "total_price",
-      headerName: (t("POManagement.AEDPrice")),
+      headerName: t("POManagement.AEDPrice"),
       flex: 3,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
@@ -433,7 +440,7 @@ const PoDetails = () => {
                   variant={idx % 2 ? "outline-success" : "outline-danger"}
                   name="radio"
                   value={radio.value}
-                  checked={i18n.language === radio.value}
+                  checked={lang === radio.value}
                   onClick={() => handleLanguageChange(radio.value)}
                 >
                   {radio.name}
@@ -447,7 +454,7 @@ const PoDetails = () => {
         <Box className="d-flex align-items-center justify-content-between">
           <Box>
             <Typography variant="h6" className="fw-bold mb-3">
-              {t('POManagement.PODetails')}
+              {t("POManagement.PODetails")}
             </Typography>
             <Box className="d-flex justify-content-between">
               <Box>
@@ -503,8 +510,8 @@ const PoDetails = () => {
         <Row className="mb-3">
           <Col xs="auto" lg="4">
             <Form.Group className="fw-semibold mb-0">
-              <Form.Label>{t('POManagement.PaymentStatus')}</Form.Label>
-              <Form.Control
+              <Form.Label>{t("POManagement.PaymentStatus")}</Form.Label>
+              <Form.Select
                 as="select"
                 className="mr-sm-2"
                 value={paymentStatus}
@@ -523,13 +530,13 @@ const PoDetails = () => {
                       </option>
                     )
                 )}
-              </Form.Control>
+              </Form.Select>
             </Form.Group>
           </Col>
           <Col xs="auto" lg="4">
             <Form.Group className="fw-semibold mb-0">
-              <Form.Label>{t('POManagement.POStatus')}</Form.Label>
-              <Form.Control
+              <Form.Label>{t("POManagement.POStatus")}</Form.Label>
+              <Form.Select
                 as="select"
                 className="mr-sm-2"
                 value={PoStatus}
@@ -548,7 +555,7 @@ const PoDetails = () => {
                       </option>
                     )
                 )}
-              </Form.Control>
+              </Form.Select>
             </Form.Group>
           </Col>
         </Row>

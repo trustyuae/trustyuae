@@ -33,6 +33,8 @@ function ERManagement() {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [lang, setLang] = useState("En");
+
   const loader = useSelector(
     (state) => state?.exchange_And_return_Data?.isErmanagementData
   );
@@ -42,7 +44,7 @@ function ERManagement() {
 
   const radios = [
     { name: "English", value: "En" },
-    { name: "Chinese", value: "Zn" },
+    { name: "中國人", value: "Zn" },
   ];
 
   useEffect(() => {
@@ -86,9 +88,11 @@ function ERManagement() {
     setSelectedFactory(e.target.value);
   };
 
-  const handleLanguageChange = (language) => {
+  const handleLanguageChange = async (language) => {
+    setLang(language); 
     i18n.changeLanguage(language);
   };
+
 
   const columns = [
     {
@@ -177,28 +181,34 @@ function ERManagement() {
   useEffect(() => {
     fetchOrders();
   }, [pageSize, page, dueDate, selectedFactory, selectedDate]);
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   return (
     <Container fluid className="py-3">
       <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-          ER Management
+          {t("POManagement.ERManagement")}
         </Typography>
         <ButtonGroup>
-          {radios.map((radio, idx) => (
-            <ToggleButton
-              key={idx}
-              id={`radio-${idx}`}
-              type="radio"
-              variant={idx % 2 ? "outline-success" : "outline-danger"}
-              name="radio"
-              value={radio.value}
-              checked={i18n.language === radio.value}
-              onClick={() => handleLanguageChange(radio.value)} 
-            >
-              {radio.name}
-            </ToggleButton>
-          ))}
-        </ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>

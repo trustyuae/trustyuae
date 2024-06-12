@@ -66,7 +66,7 @@ i18n
             ER:'此 PO 不支援換貨或退貨!',
             AvlQty:'平均數量',
             AvlStatus:"平均狀態",
-            DispatchStatus:'出貨狀態'
+            DispatchStatus:'出貨狀態',
           }
         }
       },
@@ -125,7 +125,8 @@ i18n
             ER:'There are no exchanges or returns for this PO!',
             AvlQty:'Avl Qty',
             AvlStatus:"Avl Status",
-            DispatchStatus:'Dispatch Status'
+            DispatchStatus:'Dispatch Status',
+            PODetails:'PO Details'
           }
         }
       },

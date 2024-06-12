@@ -43,6 +43,7 @@ function ExchangeAndReturn() {
   const [selectPOId, setSelectPOId] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
+  const [lang, setLang] = useState("En");
 
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
   const dispatch = useDispatch();
@@ -55,10 +56,11 @@ function ExchangeAndReturn() {
 
   const radios = [
     { name: "English", value: "En" },
-    { name: "Chinese", value: "Zn" },
+    { name: "中國人", value: "Zn" },
   ];
 
-  const handleLanguageChange = (language) => {
+  const handleLanguageChange = async (language) => {
+    setLang(language);
     i18n.changeLanguage(language);
   };
 
@@ -253,10 +255,6 @@ function ExchangeAndReturn() {
     setFactories(allFactoryDatas);
   }, [allFactoryDatas]);
 
-  // useEffect(() => {
-  //     fetchOrders();
-  // }, [pageSize, page]);
-
   const selectPOType = async () => {
     try {
       const response = await axios.get(
@@ -351,11 +349,16 @@ function ExchangeAndReturn() {
     }
   }, [selectedPOType, selectedFactory]);
 
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   return (
     <Container fluid className="py-3">
       <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-        {t("POManagement.ExchangeAndReturn")}
+          {t("POManagement.ExchangeAndReturn")}
         </Typography>
         <ButtonGroup>
           {radios.map((radio, idx) => (
@@ -366,8 +369,8 @@ function ExchangeAndReturn() {
               variant={idx % 2 ? "outline-success" : "outline-danger"}
               name="radio"
               value={radio.value}
-              checked={i18n.language === radio.value}
-              onClick={() => handleLanguageChange(radio.value)} 
+              checked={lang === radio.value}
+              onClick={() => handleLanguageChange(radio.value)}
             >
               {radio.name}
             </ToggleButton>
@@ -396,7 +399,9 @@ function ExchangeAndReturn() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">{t("POManagement.POtype")}</Form.Label>
+                <Form.Label className="fw-semibold">
+                  {t("POManagement.POtype")}
+                </Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
                   value={selectedPOType}
@@ -411,7 +416,9 @@ function ExchangeAndReturn() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">{t("POManagement.SelectPO")}</Form.Label>
+                <Form.Label className="fw-semibold">
+                  {t("POManagement.SelectPO")}
+                </Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
                   disabled={!allPoTypes || allPoTypes.length === 0}
@@ -433,7 +440,7 @@ function ExchangeAndReturn() {
               <Box className="d-flex justify-content-end">
                 <Form.Group className="d-flex mx-1 align-items-center">
                   <Form.Label className="fw-semibold mb-0 me-2">
-                    {t('POManagement.PageSize')}
+                    {t("POManagement.PageSize")}
                   </Form.Label>
                   <Form.Control
                     as="select"
@@ -471,13 +478,13 @@ function ExchangeAndReturn() {
           severity="warning"
           sx={{ fontFamily: "monospace", fontSize: "18px" }}
         >
-          {t('POManagement.PleaseSelectFactoryPOtypeAndPO')}
+          {t("POManagement.PleaseSelectFactoryPOtypeAndPO")}
         </Alert>
       )}
       <MDBRow className="justify-content-end px-3">
         <Button
           variant="primary"
-          style={{ width: "100px",marginTop:'10px' }}
+          style={{ width: "100px", marginTop: "10px" }}
           disabled={selectedOrderIds.length === 0}
           onClick={submit}
         >
@@ -490,7 +497,7 @@ function ExchangeAndReturn() {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>{t('POManagement.ProductImage')}</Modal.Title>
+          <Modal.Title>{t("POManagement.ProductImage")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Card className="factory-card">

@@ -45,6 +45,7 @@ function POManagementSystem() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
+  const [lang, setLang] = useState("En");
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -122,7 +123,7 @@ function POManagementSystem() {
 
   const radios = [
     { name: "English", value: "En" },
-    { name: "Chinese", value: "Zn" },
+    { name: "中國人", value: "Zn" },
   ];
 
   const columns = [
@@ -229,9 +230,16 @@ function POManagementSystem() {
     setPage(value);
   };
 
-  const handleLanguageChange = (language) => {
-    i18n.changeLanguage(language);
+  const handleLanguageChange = async (language) => {
+    setLang(language);
+    i18n.changeLanguage(language); 
   };
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
 
   return (
     <Container fluid className="p-5">
@@ -240,21 +248,21 @@ function POManagementSystem() {
           {t("POManagement.title")}
         </Typography>
         <ButtonGroup>
-          {radios.map((radio, idx) => (
-            <ToggleButton
-              key={idx}
-              id={`radio-${idx}`}
-              type="radio"
-              variant={idx % 2 ? "outline-success" : "outline-danger"}
-              name="radio"
-              value={radio.value}
-              checked={i18n.language === radio.value}
-              onClick={() => handleLanguageChange(radio.value)} 
-            >
-              {radio.name}
-            </ToggleButton>
-          ))}
-        </ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>

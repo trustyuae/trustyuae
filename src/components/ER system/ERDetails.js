@@ -39,6 +39,7 @@ const ERDetails = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedOrderIds, setSelectedOrderIds] = useState([]);
   const [addNote, setNote] = useState("");
+  const [lang, setLang] = useState("En");
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -53,11 +54,12 @@ const ERDetails = () => {
 
   const radios = [
     { name: "English", value: "En" },
-    { name: "Chinese", value: "Zn" },
+    { name: "中國人", value: "Zn" },
   ];
 
-  const handleLanguageChange = (language) => {
-    i18n.changeLanguage(language);
+  const handleLanguageChange = async (language) => {
+    setLang(language); 
+    i18n.changeLanguage(language); 
   };
 
   const fetchER = async () => {
@@ -339,6 +341,12 @@ const ERDetails = () => {
     fetchER();
   }, []);
 
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
+
   return (
     <Container fluid className="px-5">
       <MDBRow className="my-3">
@@ -351,21 +359,21 @@ const ERDetails = () => {
             <ArrowBackIcon className="me-1" />
           </Button>
           <ButtonGroup>
-            {radios.map((radio, idx) => (
-              <ToggleButton
-                key={idx}
-                id={`radio-${idx}`}
-                type="radio"
-                variant={idx % 2 ? "outline-success" : "outline-danger"}
-                name="radio"
-                value={radio.value}
-                checked={i18n.language === radio.value}
-                onClick={() => handleLanguageChange(radio.value)}
-              >
-                {radio.name}
-              </ToggleButton>
-            ))}
-          </ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
         </MDBCol>
       </MDBRow>
       <Card className="p-3 mb-3">
