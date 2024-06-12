@@ -120,7 +120,7 @@ function OnHoldManagement() {
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
-        "please select products for fullfilling orders",
+        "please select products for fulfilling orders",
         "",
         "error",
         false,
@@ -140,39 +140,22 @@ function OnHoldManagement() {
       try {
         const response = await dispatch(AddProductOrderForPre(requestedDataP));
         if (response?.data?.status_code === 200) {
-          console.log(
-            response?.data?.status_code,
-            "response?.data?.status_code 200"
-          );
           ShowAlert(
-            "Order fulfilled successfully!",
+            response?.data?.Message,
             "",
-            "success",
+            "",
             false,
             false,
             "",
             "",
             3500
           );
-        } else if (response?.data?.status_code === 400) {
-          console.log(
-            response?.data?.status_code,
-            "response?.data?.status_code 400"
+          await fetchProductOrderDetails();
+          setProductData((prevProductData) =>
+            prevProductData.map((row) => ({ ...row, isSelected: false }))
           );
-          const unfilledOrderIdsString =
-            response?.data?.unfilled_order_ids?.join(", ");
-          const message =
-            response.data.message +
-            (unfilledOrderIdsString ? `: ${unfilledOrderIdsString}` : "");
-          ShowAlert(message, "", "error", false, false, "", "", 3500);
+          setSelectedOrders([]);
         }
-
-        await selectedOrders.forEach((order) => {
-          order.isSelected = false;
-        });
-
-        setSelectedOrders([]);
-        handleUpdatedValues();
       } catch (error) {
         console.error("Error occurred:", error);
       }

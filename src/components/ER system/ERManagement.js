@@ -17,9 +17,12 @@ import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers-pro";
 import { GetErManagementData } from "../../redux/actions/ErManagementActions";
+import { useTranslation } from "react-i18next";
+import { ButtonGroup, ToggleButton } from "react-bootstrap";
 
 function ERManagement() {
   const dispatch = useDispatch();
+  const { t, i18n } = useTranslation();
   const [dueDate, setDueDate] = useState("");
   const [selectedDueType, setSelectedDueType] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
@@ -30,12 +33,19 @@ function ERManagement() {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [lang, setLang] = useState("En");
+
   const loader = useSelector(
     (state) => state?.exchange_And_return_Data?.isErmanagementData
   );
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
   );
+
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -78,28 +88,34 @@ function ERManagement() {
     setSelectedFactory(e.target.value);
   };
 
+  const handleLanguageChange = async (language) => {
+    setLang(language); 
+    i18n.changeLanguage(language);
+  };
+
+
   const columns = [
     {
       field: "er_no",
-      headerName: "ER No.",
+      headerName: t("POManagement.ERNo"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "er_total_qty",
-      headerName: "Total Qty",
+      headerName: t("POManagement.TotalQty"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "er_status",
-      headerName: "Status",
+      headerName: t("POManagement.Status"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "received_qty",
-      headerName: "Received Status",
+      headerName: t("POManagement.ReceivedStatus"),
       type: "string",
       className: "order-system",
       flex: 1,
@@ -109,7 +125,7 @@ function ERManagement() {
     },
     {
       field: "view_item",
-      headerName: "Action",
+      headerName: t("POManagement.Action"),
       flex: 0.5,
       className: "order-system",
       type: "html",
@@ -165,19 +181,41 @@ function ERManagement() {
   useEffect(() => {
     fetchOrders();
   }, [pageSize, page, dueDate, selectedFactory, selectedDate]);
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   return (
     <Container fluid className="py-3">
-      <Box className="mb-4">
+      <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-          ER Management
+          {t("POManagement.ERManagement")}
         </Typography>
+        <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group className="fw-semibold mb-0">
-                <Form.Label>Date filter:</Form.Label>
+                <Form.Label>{t('POManagement.DateFilter')}</Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     format="YYYY-MM-DD"
@@ -202,7 +240,7 @@ function ERManagement() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group className="fw-semibold mb-0">
-                <Form.Label>Factory Filter:</Form.Label>
+                <Form.Label>{t('POManagement.FactoryFilter')}</Form.Label>
                 <Form.Control
                   as="select"
                   className="mr-sm-2"
@@ -222,7 +260,7 @@ function ERManagement() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">Due by Filter:</Form.Label>
+                <Form.Label className="fw-semibold">{t('POManagement.DuebyFilter')}</Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
                   value={selectedDueType}
@@ -240,7 +278,7 @@ function ERManagement() {
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
               <Form.Label className="fw-semibold mb-0 me-2">
-                Page Size:
+               {t('POManagement.PageSize')}
               </Form.Label>
               <Form.Control
                 as="select"
@@ -260,14 +298,14 @@ function ERManagement() {
               className="mr-2 mx-1 w-auto"
               onClick={handleSearchFilter}
             >
-              Search
+              {t('POManagement.Search')}
             </Button>
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
               onClick={handleReset}
             >
-              Reset filter
+              {t('POManagement.ResetFilter')}
             </Button>
           </Box>
         </Form>
@@ -290,7 +328,7 @@ function ERManagement() {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-              No Exachange and Return Management Data Available!
+              {t('POManagement.NoExachangeandReturnManagementDataAvailable')}
             </Alert>
           )}
         </div>

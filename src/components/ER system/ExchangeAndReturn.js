@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import DataTable from "../DataTable";
-import { Card, Modal } from "react-bootstrap";
+import { ButtonGroup, Card, Modal, ToggleButton } from "react-bootstrap";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
@@ -25,10 +25,11 @@ import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import { MDBRow } from "mdb-react-ui-kit";
 import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
+import { useTranslation } from "react-i18next";
 
 function ExchangeAndReturn() {
   const navigate = useNavigate();
-
+  const { t, i18n } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [5, 10, 20, 50, 100];
@@ -42,6 +43,7 @@ function ExchangeAndReturn() {
   const [selectPOId, setSelectPOId] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
+  const [lang, setLang] = useState("En");
 
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
   const dispatch = useDispatch();
@@ -51,15 +53,26 @@ function ExchangeAndReturn() {
     setPage(1);
   };
   const ReturnType = ["Exchange", "Return "];
+
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
+
+  const handleLanguageChange = async (language) => {
+    setLang(language);
+    i18n.changeLanguage(language);
+  };
+
   const columns = [
     {
       field: "product_name",
-      headerName: "Product Name",
+      headerName: t("POManagement.ProductName"),
       flex: 1,
     },
     {
       field: "factory_image",
-      headerName: "Image",
+      headerName: t("POManagement.Image"),
       flex: 1,
       renderCell: (params) => (
         <Box
@@ -86,12 +99,12 @@ function ExchangeAndReturn() {
     },
     {
       field: "quantity",
-      headerName: "Qty Ordered",
+      headerName: t("POManagement.QtyOrdered"),
       flex: 1,
     },
     {
       field: "return_qty",
-      headerName: "Return Qty",
+      headerName: t("POManagement.ReturnQty"),
       type: "string",
       flex: 1,
       renderCell: (params) => {
@@ -112,7 +125,7 @@ function ExchangeAndReturn() {
     },
     {
       field: "return_type",
-      headerName: "Return Type",
+      headerName: t("POManagement.ReturnType"),
       flex: 1,
       renderCell: (params) => {
         const isDisabled = !selectedOrderIds.includes(params.row.id);
@@ -138,7 +151,7 @@ function ExchangeAndReturn() {
     },
     {
       field: "expected_delivery_date",
-      headerName: "Expected Delivery Date",
+      headerName: t("POManagement.ExpectedDeliveryDate"),
       flex: 1,
       type: "html",
       renderCell: (params) => {
@@ -156,7 +169,7 @@ function ExchangeAndReturn() {
     },
     {
       field: "select",
-      headerName: "Select",
+      headerName: t("POManagement.Select"),
       flex: 1,
       renderCell: (params) => {
         return (
@@ -241,10 +254,6 @@ function ExchangeAndReturn() {
   useEffect(() => {
     setFactories(allFactoryDatas);
   }, [allFactoryDatas]);
-
-  // useEffect(() => {
-  //     fetchOrders();
-  // }, [pageSize, page]);
 
   const selectPOType = async () => {
     try {
@@ -340,19 +349,40 @@ function ExchangeAndReturn() {
     }
   }, [selectedPOType, selectedFactory]);
 
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   return (
     <Container fluid className="py-3">
-      <Box className="mb-4">
+      <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-          Exchange and Return
+          {t("POManagement.ExchangeAndReturn")}
         </Typography>
+        <ButtonGroup>
+          {radios.map((radio, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`radio-${idx}`}
+              type="radio"
+              variant={idx % 2 ? "outline-success" : "outline-danger"}
+              name="radio"
+              value={radio.value}
+              checked={lang === radio.value}
+              onClick={() => handleLanguageChange(radio.value)}
+            >
+              {radio.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group className="fw-semibold mb-0">
-                <Form.Label>Factory Filter:</Form.Label>
+                <Form.Label>{t("POManagement.Factory")}</Form.Label>
                 <Form.Select
                   className="mr-sm-2"
                   value={selectedFactory}
@@ -369,7 +399,9 @@ function ExchangeAndReturn() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">PO type:</Form.Label>
+                <Form.Label className="fw-semibold">
+                  {t("POManagement.POtype")}
+                </Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
                   value={selectedPOType}
@@ -384,7 +416,9 @@ function ExchangeAndReturn() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">Select PO:</Form.Label>
+                <Form.Label className="fw-semibold">
+                  {t("POManagement.SelectPO")}
+                </Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
                   disabled={!allPoTypes || allPoTypes.length === 0}
@@ -406,7 +440,7 @@ function ExchangeAndReturn() {
               <Box className="d-flex justify-content-end">
                 <Form.Group className="d-flex mx-1 align-items-center">
                   <Form.Label className="fw-semibold mb-0 me-2">
-                    Page Size:
+                    {t("POManagement.PageSize")}
                   </Form.Label>
                   <Form.Control
                     as="select"
@@ -444,17 +478,17 @@ function ExchangeAndReturn() {
           severity="warning"
           sx={{ fontFamily: "monospace", fontSize: "18px" }}
         >
-          Please select Factory, PO type, and PO.
+          {t("POManagement.PleaseSelectFactoryPOtypeAndPO")}
         </Alert>
       )}
       <MDBRow className="justify-content-end px-3">
         <Button
           variant="primary"
-          style={{ width: "100px" }}
+          style={{ width: "100px", marginTop: "10px" }}
           disabled={selectedOrderIds.length === 0}
           onClick={submit}
         >
-          submit
+          {t("POManagement.submit")}
         </Button>
       </MDBRow>
       <Modal
@@ -463,7 +497,7 @@ function ExchangeAndReturn() {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>Product Image</Modal.Title>
+          <Modal.Title>{t("POManagement.ProductImage")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Card className="factory-card">

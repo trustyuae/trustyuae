@@ -6,9 +6,9 @@ import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
-import { Badge, Card, Col } from "react-bootstrap";
+import { Badge, ButtonGroup, Card, Col, ToggleButton } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Alert, Box,MenuItem, Select, Typography } from "@mui/material";
+import { Alert, Box, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
@@ -21,9 +21,11 @@ import {
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import PoDetailsModalInView from "./PoDetailsModalInView";
+import { useTranslation } from "react-i18next";
 
 const PoDetails = () => {
   const { id } = useParams();
+  const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState("");
@@ -36,6 +38,7 @@ const PoDetails = () => {
   const [poDetailsModal, setPoDetailsModal] = useState(false);
   const [productId, setProductId] = useState(null);
   const [erId, setERId] = useState(null);
+  const [lang, setLang] = useState("En");
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -53,6 +56,16 @@ const PoDetails = () => {
   useEffect(() => {
     setFactories(allFactoryDatas);
   }, [allFactoryDatas]);
+
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
+
+  const handleLanguageChange = async (language) => {
+    setLang(language); // Update the state with the selected language
+    i18n.changeLanguage(language); // Change the language using the selected language
+  };
 
   const fetchPO = async () => {
     try {
@@ -84,6 +97,11 @@ const PoDetails = () => {
   useEffect(() => {
     fetchPO();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
   }, []);
 
   const availabilityStatus = [
@@ -128,7 +146,7 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-    console.log(updatelist,'updatelist');
+    console.log(updatelist, "updatelist");
     const availabilityStatuses =
       updatelist?.map((item) => item.availability_status) || [];
     const flattenedStatuses = availabilityStatuses.flat();
@@ -185,39 +203,39 @@ const PoDetails = () => {
   };
 
   const variant2 = (variations) => {
-    console.log(variations.row.variation_value, 'variations');
+    console.log(variations.row.variation_value, "variations");
 
-    const variationArray = Object.entries(JSON.parse(variations.row.variation_value)).map(
-        ([key, value]) => ({ [key]: value })
-    );
-    console.log(variationArray, 'variationArray');
+    const variationArray = Object.entries(
+      JSON.parse(variations.row.variation_value)
+    ).map(([key, value]) => ({ [key]: value }));
+    console.log(variationArray, "variationArray");
 
     return (
-        <div className="container mt-4 mb-4">
-            {variationArray.length === 0 ? (
-                <div>Variations not available</div>
-            ) : (
-                <div>
-                    {variationArray.map((item, index) => {
-                        const attributeName = Object.keys(item)[0];
-                        const attributeValue = Object.values(item)[0];
-                        return (
-                            <span key={index}>
-                                {`${attributeName}: ${attributeValue}`}
-                                {index < variationArray.length - 1 ? ", " : ""}
-                            </span>
-                        );
-                    })}
-                </div>
-            )}
-        </div>
+      <div className="container mt-4 mb-4">
+        {variationArray.length === 0 ? (
+          <div>Variations not available</div>
+        ) : (
+          <div>
+            {variationArray.map((item, index) => {
+              const attributeName = Object.keys(item)[0];
+              const attributeValue = Object.values(item)[0];
+              return (
+                <span key={index}>
+                  {`${attributeName}: ${attributeValue}`}
+                  {index < variationArray.length - 1 ? ", " : ""}
+                </span>
+              );
+            })}
+          </div>
+        )}
+      </div>
     );
   };
 
   const columns = [
     {
       field: "product_name",
-      headerName: "Product Name",
+      headerName: t("POManagement.ProductName"),
       flex: 4,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
@@ -234,13 +252,13 @@ const PoDetails = () => {
     },
     {
       field: "variation_value",
-      headerName: "Variation",
+      headerName: t("POManagement.Variation"),
       flex: 4,
-      renderCell:variant2
+      renderCell: variant2,
     },
     {
       field: "image",
-      headerName: "Image",
+      headerName: t("POManagement.Image"),
       flex: 4,
       type: "html",
       renderCell: (value, row) => {
@@ -259,7 +277,7 @@ const PoDetails = () => {
 
     {
       field: "quantity",
-      headerName: "Qty Ord.",
+      headerName: t("POManagement.QtyOrdered"),
       flex: 2.5,
       renderCell: (params) => {
         const handleClick = () => {
@@ -279,7 +297,7 @@ const PoDetails = () => {
     },
     {
       field: "",
-      headerName: "RMB Cost",
+      headerName: t("POManagement.RMBPrice"),
       flex: 3,
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
@@ -291,7 +309,7 @@ const PoDetails = () => {
 
     {
       field: "total_price",
-      headerName: "AED Cost",
+      headerName: t("POManagement.AEDPrice"),
       flex: 3,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
@@ -309,7 +327,7 @@ const PoDetails = () => {
 
     {
       field: "available_quantity",
-      headerName: "Avl Qty.",
+      headerName: t("POManagement.AvlQty"),
       flex: 2.5,
       renderCell: (params) => {
         return (
@@ -328,17 +346,17 @@ const PoDetails = () => {
 
     {
       field: "availability_status",
-      headerName: "Avl Status",
+      headerName: t("POManagement.AvlStatus"),
       flex: 3,
       renderCell: (params) => {
-        console.log(params.row.variation_value, 'params');
+        console.log(params.row.variation_value, "params");
         return (
           <Select
             labelId={`customer-status-${params.row.id}-label`}
             id={`customer-status-${params.row.id}`}
             value={
               params.row.availability_status !== "" &&
-                params.row.availability_status !== "0"
+              params.row.availability_status !== "0"
                 ? params.row.availability_status
                 : params.row.estimated_production_time
             }
@@ -358,7 +376,7 @@ const PoDetails = () => {
 
     {
       field: "dispatch_status",
-      headerName: "Dispatch Status",
+      headerName: t("POManagement.DispatchStatus"),
       flex: 3,
       renderCell: (params) => {
         return (
@@ -405,20 +423,38 @@ const PoDetails = () => {
           >
             <ArrowBackIcon className="me-1" />
           </Button>
-          <Button
-            variant="outline-primary"
-            className="p-1 me-3 bg-transparent text-primary"
-            onClick={handlePrint}
-          >
-            <LocalPrintshopOutlinedIcon className="me-1" />
-          </Button>
+          <Box>
+            <Button
+              variant="outline-primary"
+              className="p-1 me-3 bg-transparent text-primary"
+              onClick={handlePrint}
+            >
+              <LocalPrintshopOutlinedIcon className="me-1" />
+            </Button>
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
+          </Box>
         </MDBCol>
       </MDBRow>
       <Card className="p-3 mb-3">
         <Box className="d-flex align-items-center justify-content-between">
           <Box>
             <Typography variant="h6" className="fw-bold mb-3">
-              PO Details
+              {t("POManagement.PODetails")}
             </Typography>
             <Box className="d-flex justify-content-between">
               <Box>
@@ -453,7 +489,7 @@ const PoDetails = () => {
                       severity="warning"
                       sx={{ fontFamily: "monospace", fontSize: "18px" }}
                     >
-                      There are no exchanges or returns for this PO!
+                      {t("POManagement.ER")}
                     </Alert>
                   )}
                 </Box>
@@ -474,8 +510,8 @@ const PoDetails = () => {
         <Row className="mb-3">
           <Col xs="auto" lg="4">
             <Form.Group className="fw-semibold mb-0">
-              <Form.Label>Payment Status:</Form.Label>
-              <Form.Control
+              <Form.Label>{t("POManagement.PaymentStatus")}</Form.Label>
+              <Form.Select
                 as="select"
                 className="mr-sm-2"
                 value={paymentStatus}
@@ -486,21 +522,21 @@ const PoDetails = () => {
                     {paymentStatus}
                   </option>
                 )}
-                {paymentS.map((po) => (
-                  paymentStatus !== po && (
-                    <option key={po} value={po}>
-                      {po}
-                    </option>
-                  )
-                ))}
-              </Form.Control>
+                {paymentS.map(
+                  (po) =>
+                    paymentStatus !== po && (
+                      <option key={po} value={po}>
+                        {po}
+                      </option>
+                    )
+                )}
+              </Form.Select>
             </Form.Group>
-
           </Col>
           <Col xs="auto" lg="4">
             <Form.Group className="fw-semibold mb-0">
-              <Form.Label>PO Status:</Form.Label>
-              <Form.Control
+              <Form.Label>{t("POManagement.POStatus")}</Form.Label>
+              <Form.Select
                 as="select"
                 className="mr-sm-2"
                 value={PoStatus}
@@ -511,16 +547,16 @@ const PoDetails = () => {
                     {PoStatus}
                   </option>
                 )}
-                {POStatusFilter.map((po) => (
-                  PoStatus !== po && (
-                    <option key={po} value={po}>
-                      {po}
-                    </option>
-                  )
-                ))}
-              </Form.Control>
+                {POStatusFilter.map(
+                  (po) =>
+                    PoStatus !== po && (
+                      <option key={po} value={po}>
+                        {po}
+                      </option>
+                    )
+                )}
+              </Form.Select>
             </Form.Group>
-
           </Col>
         </Row>
         <MDBRow className="d-flex justify-content-center align-items-center">
@@ -537,16 +573,16 @@ const PoDetails = () => {
                 // pageSize={pageSizeSO}
                 // totalPages={totalPagesSO}
                 rowHeight={100}
-              // handleChange={handleChangeSO}
-              // // onCellEditStart={handleCellEditStart}
-              // processRowUpdate={processRowUpdateSPO}
+                // handleChange={handleChangeSO}
+                // // onCellEditStart={handleCellEditStart}
+                // processRowUpdate={processRowUpdateSPO}
               />
             </div>
           )}
 
           <Row>
             <Button type="button" className="w-auto" onClick={handleUpdate}>
-              Update
+              {t("POManagement.Update")}
             </Button>
           </Row>
         </MDBRow>
@@ -559,7 +595,7 @@ const PoDetails = () => {
         }
         PO_OrderList={PO_OrderList}
         handleClosePrintModal={() => setPrintModal(false)}
-      // showModal={printModal}
+        // showModal={printModal}
       />
       {poDetailsModal && (
         <PoDetailsModalInView
