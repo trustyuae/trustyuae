@@ -155,6 +155,7 @@ function OnHoldManagement() {
             prevProductData.map((row) => ({ ...row, isSelected: false }))
           );
           setSelectedOrders([]);
+          await fetchProductDetails();
         }
       } catch (error) {
         console.error("Error occurred:", error);
