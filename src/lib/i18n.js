@@ -84,7 +84,9 @@ i18n
             GeneralPO:'一般採購訂單',
             Today:'今天',
             Tomorrow:'明天',
-            InProgress:'進行中'
+            InProgress:'進行中',
+            Dispatched:'已派遣',
+            NotDispatched:'未出貨'
           }
         }
       },
@@ -162,7 +164,9 @@ i18n
             GeneralPO:'General PO',
             Today:'Today',
             Tomorrow:'Tomorrow',
-            InProgress:'In Progress'
+            InProgress:'In Progress',
+            Dispatched:'Dispatched',
+            NotDispatched:'Not Dispatched'
           }
         }
       },
