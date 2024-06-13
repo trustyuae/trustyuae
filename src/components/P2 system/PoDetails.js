@@ -29,8 +29,6 @@ const PoDetails = () => {
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState("");
-  const paymentS = [t("POManagement.Paid"), t("POManagement.Unpaid"), t("POManagement.Hold"), t("POManagement.Cancelled")];
-  const POStatusFilter = [t("POManagement.Open"), t("POManagement.Checkingwithfactory"), t("POManagement.Closed")];
   const [PoStatus, setPoStatus] = useState("");
   const [factories, setFactories] = useState([]);
   const [factorieName, setFactorieName] = useState("");
@@ -63,7 +61,7 @@ const PoDetails = () => {
   ];
 
   const handleLanguageChange = async (language) => {
-    setLang(language); 
+    setLang(language);
     i18n.changeLanguage(language);
   };
 
@@ -104,30 +102,20 @@ const PoDetails = () => {
     i18n.changeLanguage(lang);
   }, []);
 
-  const availabilityStatus = [
-    t('POManagement.Confirmed'),
-    t('POManagement.Oweek'),
-    t('POManagement.Tweek'),
-    t('POManagement.threeWeek'),
-    t('POManagement.Omonth'),
-    t('POManagement.OutofStock'),
-  ];
-  const dispatchedStatus = ["Dispatched", "Not Dispatched"];
-
-  const handleStatusChange = (index, event) => {
+  const handleStatusChange = (value, event) => {
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
-        return { ...item, availability_status: index.target.value };
+        return { ...item, availability_status: value };
       }
       return item;
     });
     setPO_OrderList(updatedData);
   };
 
-  const handleDispatchStatusChange = (index, event) => {
+  const handleDispatchStatusChange = (value, event) => {
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
-        return { ...item, dispatch_status: index.target.value };
+        return { ...item, dispatch_status: value };
       }
       return item;
     });
@@ -173,12 +161,12 @@ const PoDetails = () => {
     }
   };
 
-  const handlepayMentStatus = (e) => {
-    setPaymentStatus(e.target.value);
+  const handlepayMentStatus = (value) => {
+    setPaymentStatus(value);
   };
 
-  const handlePOStatus = (e) => {
-    setPoStatus(e.target.value);
+  const handlePOStatus = (value) => {
+    setPoStatus(value);
   };
 
   const handleAvailableQtyChange = (index, event) => {
@@ -351,25 +339,30 @@ const PoDetails = () => {
       renderCell: (params) => {
         console.log(params.row.variation_value, "params");
         return (
-          <Select
+          <Form.Select
             labelId={`customer-status-${params.row.id}-label`}
             id={`customer-status-${params.row.id}`}
+            className="mr-sm-2 py-2"
             value={
               params.row.availability_status !== "" &&
               params.row.availability_status !== "0"
                 ? params.row.availability_status
                 : params.row.estimated_production_time
             }
-            onChange={(event) => handleStatusChange(event, params.row)}
+            onChange={(event) => handleStatusChange(event.target.value, params.row)}
             fullWidth
             style={{ height: "40%", width: "100%" }}
           >
-            {availabilityStatus.map((status) => (
-              <MenuItem key={status} value={status}>
-                 {t(status)}
-              </MenuItem>
-            ))}
-          </Select>
+            <option disabled selected value="">
+              {t("POManagement.Select")}...
+            </option>
+            <option value="Confirmed">{t("POManagement.Confirmed")},</option>
+            <option value="1 week">{t("POManagement.Oweek")}</option>
+            <option value="2 weeks">{t("POManagement.Tweek")}</option>
+            <option value="3 weeks">{t("POManagement.threeWeek")}</option>
+            <option value="1 Month">{t("POManagement.Omonth")}</option>
+            <option value="Out of Stock">{t("POManagement.OutofStock")}</option>
+          </Form.Select>
         );
       },
     },
@@ -380,20 +373,17 @@ const PoDetails = () => {
       flex: 3,
       renderCell: (params) => {
         return (
-          <Select
-            labelId={`customer-status-${params.row.id}-label`}
-            id={`customer-status-${params.row.id}`}
-            value={params.row.dispatch_status}
-            onChange={(event) => handleDispatchStatusChange(event, params.row)}
-            fullWidth
-            style={{ height: "40%", width: "100%" }}
-          >
-            {dispatchedStatus.map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </Select>
+          <Form.Select
+                className="mr-sm-2 py-2"
+                value={params.row.dispatch_status}
+                onChange={(e) => handleDispatchStatusChange(e.target.value,params.row)}
+              >
+                <option disabled selected value="">
+                  {t("POManagement.Select")}...
+                </option>
+                <option value="Dispatched">{t("POManagement.Dispatched")}</option>
+                <option value="Not Dispatched">{t("POManagement.NotDispatched")}</option>
+              </Form.Select>
         );
       },
     },
@@ -512,24 +502,17 @@ const PoDetails = () => {
             <Form.Group className="fw-semibold mb-0">
               <Form.Label>{t("POManagement.PaymentStatus")}</Form.Label>
               <Form.Select
-                as="select"
-                className="mr-sm-2"
+                className="mr-sm-2 py-2"
                 value={paymentStatus}
-                onChange={(e) => handlepayMentStatus(e)}
+                onChange={(e) => handlepayMentStatus(e.target.value)}
               >
-                {paymentStatus && (
-                  <option key={paymentStatus} value={paymentStatus}>
-                    {paymentStatus}
-                  </option>
-                )}
-                {paymentS.map(
-                  (po) =>
-                    paymentStatus !== po && (
-                      <option key={po} value={po}>
-                        {po}
-                      </option>
-                    )
-                )}
+                <option disabled selected value="">
+                  {t("POManagement.Select")}...
+                </option>
+                <option value="Paid">{t("POManagement.Paid")}</option>
+                <option value="Unpaid">{t("POManagement.Unpaid")}</option>
+                <option value="Hold">{t("POManagement.Hold")}</option>
+                <option value="Cancelled">{t("POManagement.Cancelled")}</option>
               </Form.Select>
             </Form.Group>
           </Col>
@@ -537,24 +520,18 @@ const PoDetails = () => {
             <Form.Group className="fw-semibold mb-0">
               <Form.Label>{t("POManagement.POStatus")}</Form.Label>
               <Form.Select
-                as="select"
-                className="mr-sm-2"
+                className="mr-sm-2 py-2"
                 value={PoStatus}
-                onChange={(e) => handlePOStatus(e)} // Ensure you call the function correctly
+                onChange={(e) => handlePOStatus(e.target.value)}
               >
-                {PoStatus && (
-                  <option key={PoStatus} value={PoStatus}>
-                    {PoStatus}
-                  </option>
-                )}
-                {POStatusFilter.map(
-                  (po) =>
-                    PoStatus !== po && (
-                      <option key={po} value={po}>
-                        {po}
-                      </option>
-                    )
-                )}
+                <option disabled selected value="">
+                  {t("POManagement.Select")}...
+                </option>
+                <option value="Closed">{t("POManagement.Closed")}</option>
+                <option value="Open">{t("POManagement.Open")}</option>
+                <option value="Checking with factory">
+                  {t("POManagement.Checkingwithfactory")}
+                </option>
               </Form.Select>
             </Form.Group>
           </Col>
