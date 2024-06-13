@@ -412,8 +412,8 @@ const ERDetails = () => {
                 value={status}
                 onChange={(e) => handleStatusFilter(e)}
               >
-                <option value="In Progress">In Progress </option>
-                <option value="Closed">Closed </option>
+                <option value="In Progress">{t("POManagement.InProgress")}</option>
+                <option value="Closed">{t("POManagement.Closed")}</option>
               </Form.Select>
             </Form.Group>
           </Col>

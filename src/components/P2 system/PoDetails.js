@@ -29,8 +29,8 @@ const PoDetails = () => {
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState("");
-  const paymentS = ["Paid", "Unpaid", "Hold", "Cancelled"];
-  const POStatusFilter = ["Open", "Checking with factory", "Closed"];
+  const paymentS = [t("POManagement.Paid"), t("POManagement.Unpaid"), t("POManagement.Hold"), t("POManagement.Cancelled")];
+  const POStatusFilter = [t("POManagement.Open"), t("POManagement.Checkingwithfactory"), t("POManagement.Closed")];
   const [PoStatus, setPoStatus] = useState("");
   const [factories, setFactories] = useState([]);
   const [factorieName, setFactorieName] = useState("");
@@ -63,8 +63,8 @@ const PoDetails = () => {
   ];
 
   const handleLanguageChange = async (language) => {
-    setLang(language); // Update the state with the selected language
-    i18n.changeLanguage(language); // Change the language using the selected language
+    setLang(language); 
+    i18n.changeLanguage(language);
   };
 
   const fetchPO = async () => {
@@ -105,12 +105,12 @@ const PoDetails = () => {
   }, []);
 
   const availabilityStatus = [
-    "Confirmed",
-    "1 week",
-    "2 week",
-    "3 weeks",
-    "1 month",
-    "Out of Stock",
+    t('POManagement.Confirmed'),
+    t('POManagement.Oweek'),
+    t('POManagement.Tweek'),
+    t('POManagement.threeWeek'),
+    t('POManagement.Omonth'),
+    t('POManagement.OutofStock'),
   ];
   const dispatchedStatus = ["Dispatched", "Not Dispatched"];
 
@@ -366,7 +366,7 @@ const PoDetails = () => {
           >
             {availabilityStatus.map((status) => (
               <MenuItem key={status} value={status}>
-                {status}
+                 {t(status)}
               </MenuItem>
             ))}
           </Select>

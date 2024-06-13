@@ -267,10 +267,10 @@ function ERManagement() {
                   onChange={(e) => searchDueByFilter(e.target.value)}
                 >
                   <option disabled selected value="">
-                    Select...
+                  {t("POManagement.Select")}...
                   </option>
-                  <option value="today">Today</option>
-                  <option value="tomorrow">Tomorrow</option>
+                  <option value="today">{t("POManagement.Today")}</option>
+                  <option value="tomorrow">{t("POManagement.Tomorrow")}</option>
                 </Form.Select>
               </Form.Group>
             </Col>

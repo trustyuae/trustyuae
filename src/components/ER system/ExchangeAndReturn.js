@@ -407,10 +407,10 @@ function ExchangeAndReturn() {
                   value={selectedPOType}
                   onChange={(e) => setSelectedPOType(e.target.value)}
                 >
-                  <option value="all">All</option>
-                  <option value="General PO">General PO</option>
-                  <option value="Manual PO">Manual PO</option>
-                  <option value="Schedule PO">Scheduled PO</option>
+                  <option value="all">{t('POManagement.All')}</option>
+                  <option value="General PO">{t('POManagement.GeneralPO')}</option>
+                  <option value="Manual PO">{t('POManagement.ManualPO')}</option>
+                  <option value="Schedule PO">{t('POManagement.ScheduledPO')}</option>
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -425,7 +425,7 @@ function ExchangeAndReturn() {
                   // value={selectedPOType}
                   onChange={(e) => selectPO(e.target.value)}
                 >
-                  <option value="">select...</option>
+                  <option value="">{t("POManagement.Select")}...</option>
                   {allPoTypes?.map((po) => (
                     <option key={po} value={po}>
                       {po}
