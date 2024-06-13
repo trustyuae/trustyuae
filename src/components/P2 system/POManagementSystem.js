@@ -30,7 +30,7 @@ import { useTranslation } from "react-i18next";
 function POManagementSystem() {
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
-  const POStatusFilter = ["Open", "Checking with factory", "Closed"];
+  const POStatusFilter = [t('POManagement.Open'), t('POManagement.Checkingwithfactory'), t('POManagement.Closed')];
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
   const [selectedFactory, setSelectedFactory] = useState("");
   const [factories, setFactories] = useState([]);
@@ -321,7 +321,7 @@ function POManagementSystem() {
                   // value={selectedFactory}
                   onChange={handlePOStatus}
                 >
-                  <option value="">All </option>
+                  <option value="">{t('POManagement.All')}  </option>
                   {POStatusFilter.map((po) => (
                     <option key={po} value={po}>
                       {po}
