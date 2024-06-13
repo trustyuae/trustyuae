@@ -149,8 +149,12 @@ function OrderSystem() {
   const handleDateChange = async (newDateRange) => {
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
       setSelectedDateRange(newDateRange);
-      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format('YYYY-MM-DD');
-      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format('YYYY-MM-DD');
+      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
+      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
       setStartDate(isoStartDate);
       setEndDate(isoEndDate);
     } else {
@@ -236,38 +240,81 @@ function OrderSystem() {
               </Form.Group>
             </Col>
           </Row>
-          <Box className="d-flex justify-content-end">
-            <Form.Group className="d-flex mx-1 align-items-center">
-              <Form.Label className="fw-semibold mb-0 me-2">
-                Page Size:
-              </Form.Label>
-              <Form.Control
-                as="select"
-                className="w-auto"
-                value={pageSize}
-                onChange={handlePageSizeChange}
+          <Box className="d-flex justify-content-between">
+            <Box className="d-flex">
+              <Form.Group className="d-flex mx-1 align-items-center">
+                <Form.Label className="fw-semibold mb-0 me-2">
+                  Total Orders:
+                </Form.Label>
+                <Form.Control
+                  as="input"
+                  type="number"
+                  className="color-black"
+                  style={{ width: "100px",textAlign:'center'  }} // Add a custom width style here
+                  value="20"
+                  readOnly
+                />
+              </Form.Group>
+              <Form.Group className="d-flex mx-1 align-items-center">
+                <Form.Label className="fw-semibold mb-0 me-2">
+                  Dispatch Orders:
+                </Form.Label>
+                <Form.Control
+                  as="input"
+                  type="number"
+                  className="color-black"
+                  style={{ width: "100px",textAlign:'center' }} // Add a custom width style here
+                  value="20"
+                  readOnly
+                />
+              </Form.Group>
+              <Form.Group className="d-flex mx-1 align-items-center">
+                <Form.Label className="fw-semibold mb-0 me-2">
+                  Reserve Orders:
+                </Form.Label>
+                <Form.Control
+                  as="input"
+                  type="number"
+                  className="color-black"
+                  style={{ width: "100px",textAlign:'center'}} // Add a custom width style here
+                  value="20"
+                  readOnly
+                />
+              </Form.Group>
+            </Box>
+            <Box className="d-flex">
+              <Form.Group className="d-flex mx-1 align-items-center">
+                <Form.Label className="fw-semibold mb-0 me-2">
+                  Page Size:
+                </Form.Label>
+                <Form.Control
+                  as="select"
+                  className="w-auto"
+                  value={pageSize}
+                  onChange={handlePageSizeChange}
+                >
+                  {pageSizeOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+              <Button
+                type="button"
+                className="mr-2 mx-1 w-auto"
+                onClick={handleSearchFilter}
               >
-                {pageSizeOptions.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
-            <Button
-              type="button"
-              className="mr-2 mx-1 w-auto"
-              onClick={handleSearchFilter}
-            >
-              Search
-            </Button>
-            <Button
-              type="button"
-              className="mr-2 mx-1 w-auto"
-              onClick={handleReset}
-            >
-              Reset filter
-            </Button>
+                Search
+              </Button>
+              <Button
+                type="button"
+                className="mr-2 mx-1 w-auto"
+                onClick={handleReset}
+              >
+                Reset filter
+              </Button>
+            </Box>
           </Box>
         </Form>
       </Row>
@@ -296,9 +343,6 @@ function OrderSystem() {
           )}
         </>
       )}
-
-
-
     </Container>
   );
 }
