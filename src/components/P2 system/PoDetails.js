@@ -356,7 +356,7 @@ const PoDetails = () => {
             <option disabled selected value="">
               {t("POManagement.Select")}...
             </option>
-            <option value="Confirmed">{t("POManagement.Confirmed")},</option>
+            <option value="Confirmed">{t("POManagement.Confirmed")}</option>
             <option value="1 week">{t("POManagement.Oweek")}</option>
             <option value="2 weeks">{t("POManagement.Tweek")}</option>
             <option value="3 weeks">{t("POManagement.threeWeek")}</option>
