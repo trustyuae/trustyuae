@@ -33,6 +33,11 @@ function OrderSystem() {
   const [totalPages, setTotalPages] = useState(1);
   const [isReset, setIsReset] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
+  const [overAllData, setOverAllData] = useState({
+    total_count: 0,
+    total_dispatch_orders: 0,
+    total_reserve_orders: 0,
+  });
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
 
   const dispatch = useDispatch();
@@ -48,7 +53,13 @@ function OrderSystem() {
     )
       .then((response) => {
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+        console.log(response.data["total_count"],'consoled response.data')
         setOrders(data);
+        setOverAllData({
+          total_count: response.data.total_count,
+          total_dispatch_orders: response.data.total_dispatch_orders,
+          total_reserve_orders: response.data.total_reserve_orders,
+        });
         setTotalPages(response.data.total_pages);
       })
       .catch((error) => {
@@ -251,7 +262,7 @@ function OrderSystem() {
                   type="number"
                   className="color-black"
                   style={{ width: "100px",textAlign:'center'  }} // Add a custom width style here
-                  value="20"
+                  value={overAllData.total_count}
                   readOnly
                 />
               </Form.Group>
@@ -264,7 +275,7 @@ function OrderSystem() {
                   type="number"
                   className="color-black"
                   style={{ width: "100px",textAlign:'center' }} // Add a custom width style here
-                  value="20"
+                  value={overAllData.total_dispatch_orders}
                   readOnly
                 />
               </Form.Group>
@@ -277,7 +288,7 @@ function OrderSystem() {
                   type="number"
                   className="color-black"
                   style={{ width: "100px",textAlign:'center'}} // Add a custom width style here
-                  value="20"
+                  value={overAllData.total_reserve_orders}
                   readOnly
                 />
               </Form.Group>
