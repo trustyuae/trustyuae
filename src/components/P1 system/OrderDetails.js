@@ -893,10 +893,28 @@ function OrderDetails() {
             {userData?.user_id == orderDetails?.operation_user_id &&
             orderProcess == "started" &&
             tableData?.some((data) => data.dispatch_image != "") ? (
+                <>
+              <Button variant="success" className=" mx-2" onClick={handleFinishButtonClick}>
+                On Hold
+              </Button>
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
+                </>
             ) : (
+              <>
+              <Button
+                variant="success"
+                className=" mx-2" 
+                disabled={
+                  orderProcess != "started" ||
+                  userData?.user_id != orderDetails?.operation_user_id ||
+                  tableData?.some((data) => data.dispatch_image == "")
+                }
+                onClick={handleFinishButtonClick}
+                >
+                On Hold
+              </Button>
               <Button
                 variant="danger"
                 disabled={
@@ -905,9 +923,10 @@ function OrderDetails() {
                   tableData?.some((data) => data.dispatch_image == "")
                 }
                 onClick={handleFinishButtonClick}
-              >
+                >
                 Finish
               </Button>
+                </>
             )}
           </MDBCol>
         </MDBRow>

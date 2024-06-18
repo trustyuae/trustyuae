@@ -35,6 +35,7 @@ const PoDetails = () => {
   const [printModal, setPrintModal] = useState(false);
   const [poDetailsModal, setPoDetailsModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [variationId, setVariationId] = useState(null);
   const [erId, setERId] = useState(null);
   const [lang, setLang] = useState("En");
 
@@ -185,7 +186,8 @@ const PoDetails = () => {
     setPrintModal(true);
   };
 
-  const handlePoModal = (itemId) => {
+  const handlePoModal = (itemId,itemVId) => {
+    setVariationId(itemVId)
     setProductId(itemId);
     setPoDetailsModal(true);
   };
@@ -269,7 +271,8 @@ const PoDetails = () => {
       flex: 2.5,
       renderCell: (params) => {
         const handleClick = () => {
-          handlePoModal(params.row.product_id);
+          console.log(params.row,'params.row');
+          handlePoModal(params.row.product_id,params.row.variation_id);
         };
 
         if (params.row.id === "TAX") {
@@ -579,6 +582,7 @@ const PoDetails = () => {
           show={poDetailsModal}
           poDetailsModal={poDetailsModal}
           productId={productId}
+          variationId={variationId}
           handleClosePoDetailsModal={() => setPoDetailsModal(false)}
           poId={id}
         />

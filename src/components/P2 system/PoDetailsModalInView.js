@@ -8,6 +8,7 @@ const PoDetailsModalInView = ({
   show,
   handleClosePoDetailsModal,
   productId,
+  variationId,
   poId,
   poDetailsModal,
 }) => {
@@ -20,7 +21,7 @@ const PoDetailsModalInView = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await dispatch(QuantityPoDetailsForModalInView(productId,poId));
+        const response = await dispatch(QuantityPoDetailsForModalInView(productId,variationId,poId));
         const data = response?.data?.orders.map((v, id) => ({
           ...v,
           id,
