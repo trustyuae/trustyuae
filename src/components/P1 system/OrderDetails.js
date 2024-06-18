@@ -147,8 +147,11 @@ function OrderDetails() {
 
       console.log(result, 'result');
 
-      const response = await axios.post('https://wordpress.trustysystem.com/wp-json/custom-onhold-orders-convert/v1/update_onhold_note/',result)
+      const response = await axios.post(`${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,result)
       console.log(response,'response');
+      if(response.status===200){
+        navigate('/on_hold_orders_system')
+      }
     } catch (error) {
       console.log(error);
     }

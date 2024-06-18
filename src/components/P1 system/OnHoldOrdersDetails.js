@@ -558,7 +558,7 @@ function OnHoldOrdersDetails() {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/ordersystem")}
+              onClick={() => navigate("/on_hold_orders_system")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>

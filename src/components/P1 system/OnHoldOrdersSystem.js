@@ -83,7 +83,7 @@ function OnHoldOrdersSystem() {
   };
 
   const columns = [
-    { field: "start_date", headerName: "Started Date", className: "order-system", flex: 1 },
+    { field: "date", headerName: "Started Date", className: "order-system", flex: 1 },
     {
       field: "order_id",
       headerName: "Order ID",
@@ -111,7 +111,7 @@ function OnHoldOrdersSystem() {
       className: "order-system",
       type: "string",
     },
-    { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
+    // { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName: "View Item",
