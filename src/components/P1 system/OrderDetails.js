@@ -48,9 +48,11 @@ function OrderDetails() {
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
+  const [showMessageOHModal, setshowMessageOHModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
   const [message, setMessage] = useState("");
+  const [messageOH, setOHMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
@@ -88,7 +90,7 @@ function OrderDetails() {
   async function fetchOrder() {
     try {
       const response = await dispatch(OrderDetailsGet({ id: id }));
-
+      console.log(response.data.orders, 'response');
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
@@ -124,6 +126,35 @@ function OrderDetails() {
       }
     });
   };
+  const submitOH = async () => {
+    try {
+      console.log(orderData, 'orderData');
+      console.log(orderDetails, 'orderDetails');
+      const result = {
+        order_id: parseInt(orderDetails.order_id, 10),
+        item_id: [],
+        product_name: [],
+        variation_id: [],
+        user_id: parseInt(orderDetails.user_id, 10),
+        operation_user_id: parseInt(orderDetails.operation_user_id, 10),
+        onhold_note: messageOH
+      };
+      orderDetails.items.forEach(item => {
+        result.item_id.push(parseInt(item.item_id, 10));
+        result.product_name.push(item.product_name);
+        result.variation_id.push(parseInt(item.variation_id, 10));
+      });
+
+      console.log(result, 'result');
+
+      const response = await axios.post('https://wordpress.trustysystem.com/wp-json/custom-onhold-orders-convert/v1/update_onhold_note/',result)
+      console.log(response,'response');
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
 
   useEffect(() => {
     fetchOrder();
@@ -470,7 +501,7 @@ function OrderDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" && qty == avl_qty ? (
+                    orderProcess == "started" && qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -500,7 +531,7 @@ function OrderDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" && qty == avl_qty ? (
+                    orderProcess == "started" && qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -598,7 +629,7 @@ function OrderDetails() {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+                orderProcess == "started" ? (
                 <Button
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
@@ -792,7 +823,7 @@ function OrderDetails() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderProcess == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -828,7 +859,7 @@ function OrderDetails() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -891,42 +922,42 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" &&
-            tableData?.some((data) => data.dispatch_image != "") ? (
-                <>
-              <Button variant="success" className=" mx-2" onClick={handleFinishButtonClick}>
-                On Hold
-              </Button>
-              <Button variant="danger" onClick={handleFinishButtonClick}>
-                Finish
-              </Button>
-                </>
+              orderProcess == "started" &&
+              tableData?.some((data) => data.dispatch_image != "") ? (
+              <>
+                <Button variant="success" className=" mx-2" onClick={() => setshowMessageOHModal(true)}>
+                  On Hold
+                </Button>
+                <Button variant="danger" onClick={handleFinishButtonClick}>
+                  Finish
+                </Button>
+              </>
             ) : (
               <>
-              <Button
-                variant="success"
-                className=" mx-2" 
-                disabled={
-                  orderProcess != "started" ||
-                  userData?.user_id != orderDetails?.operation_user_id ||
-                  tableData?.some((data) => data.dispatch_image == "")
-                }
-                onClick={handleFinishButtonClick}
+                <Button
+                  variant="success"
+                  className=" mx-2"
+                  disabled={
+                    orderProcess != "started" ||
+                    userData?.user_id != orderDetails?.operation_user_id ||
+                    tableData?.some((data) => data.dispatch_image == "")
+                  }
+                  onClick={() => setshowMessageOHModal(true)}
                 >
-                On Hold
-              </Button>
-              <Button
-                variant="danger"
-                disabled={
-                  orderProcess != "started" ||
-                  userData?.user_id != orderDetails?.operation_user_id ||
-                  tableData?.some((data) => data.dispatch_image == "")
-                }
-                onClick={handleFinishButtonClick}
+                  On Hold
+                </Button>
+                <Button
+                  variant="danger"
+                  disabled={
+                    orderProcess != "started" ||
+                    userData?.user_id != orderDetails?.operation_user_id ||
+                    tableData?.some((data) => data.dispatch_image == "")
+                  }
+                  onClick={handleFinishButtonClick}
                 >
-                Finish
-              </Button>
-                </>
+                  Finish
+                </Button>
+              </>
             )}
           </MDBCol>
         </MDBRow>
@@ -1008,6 +1039,34 @@ function OrderDetails() {
                 onClick={handleAddMessage}
               >
                 Add Message
+              </Button>
+            </Box>
+          </Modal.Body>
+        </Modal>
+
+        <Modal
+          show={showMessageOHModal}
+          onHide={() => setshowMessageOHModal(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>On Hold Reason </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Control
+              as="textarea"
+              placeholder="Enter your reason here..."
+              rows={3}
+              value={messageOH}
+              onChange={(e) => setOHMessage(e.target.value)}
+            />
+            <Box className="text-end my-3">
+              <Button
+                variant="secondary"
+                className="mt-2 fw-semibold"
+                onClick={submitOH}
+              >
+                Submit
               </Button>
             </Box>
           </Modal.Body>
