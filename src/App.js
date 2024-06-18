@@ -30,6 +30,8 @@ import ERManagement from "./components/ER system/ERManagement";
 import ERDetails from "./components/ER system/ERDetails";
 import CompletedOrderSystem from "./components/P1 system/CompletedOrderSystem";
 import CompletedOrderDetails from "./components/P1 system/CompletedOrderDetails";
+import OnHoldOrdersSystem from "./components/P1 system/OnHoldOrdersSystem";
+import OnHoldOrdersDetails from "./components/P1 system/OnHoldOrdersDetails";
 
 function App() {
   return (
@@ -67,7 +69,9 @@ function App() {
               <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
               <Route exact path='/ER_details/:er_no' element={<ERDetails />} />
               <Route exact path='/completed_order_system' element={<CompletedOrderSystem />} />
+              <Route exact path='/on_hold_orders_system' element={<OnHoldOrdersSystem/>} />
               <Route exact path='/completed_order_details/:id' element={<CompletedOrderDetails />} />
+              <Route exact path='/on_hold_order_details/:id' element={<OnHoldOrdersDetails />} />
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
             </Route>
           </Route>
