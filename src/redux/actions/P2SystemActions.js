@@ -118,7 +118,7 @@ export const QuantityPoDetailsForModalInView =
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST });
         console.log(variationId,'variationId');
-        const response = await axios.get(`${API_URL}wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}`);
+        const response = await axios.get(`${API_URL}wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}/${variationId}`);
         console.log(response, 'rsponse of quntity details')
         dispatch({
           type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS,
