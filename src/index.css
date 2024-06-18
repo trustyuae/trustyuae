@@ -1398,3 +1398,8 @@ h6 {
     transform: rotate(-360deg);
   }
 }
+
+#custom-switch{
+  width: 100%;
+  height: 100%;
+}

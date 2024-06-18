@@ -481,7 +481,7 @@ function OnHoldOrdersDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" && qty == avl_qty ? (
+                    orderProcess == "started" && qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -511,7 +511,7 @@ function OnHoldOrdersDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" && qty == avl_qty ? (
+                    orderProcess == "started" && qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -544,6 +544,9 @@ function OnHoldOrdersDetails() {
     },
   ];
 
+  const handalswitch=(e)=>{
+    console.log(e,'e');
+  }
   return (
     <>
       <Container fluid className="px-5">
@@ -555,7 +558,7 @@ function OnHoldOrdersDetails() {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/ordersystem")}
+              onClick={() => navigate("/on_hold_orders_system")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
@@ -575,7 +578,7 @@ function OnHoldOrdersDetails() {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                Order Details
+               On Hold Order Details
               </Typography>
               {loader ? (
                 <Loader />
@@ -593,7 +596,7 @@ function OnHoldOrdersDetails() {
                 </Box>
               )}
             </Box>
-            <Box>
+            <Box className="d-flex">
               <Button
                 variant="outline-secondary"
                 className="p-1 me-3 bg-transparent text-secondary"
@@ -609,7 +612,7 @@ function OnHoldOrdersDetails() {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+                orderProcess == "started" ? (
                 <Button
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
@@ -622,6 +625,12 @@ function OnHoldOrdersDetails() {
                 <Button variant="success" disabled>
                  Send
                 </Button>
+                // <Form.Check // prettier-ignore
+                //   type="switch"
+                //   id="custom-switch"
+                //   label="Check this switch"
+                // />
+
               ) : (
                 <Button
                   variant="success"
@@ -630,6 +639,14 @@ function OnHoldOrdersDetails() {
                 >
                   Send
                 </Button>
+                // <Form.Check // prettier-ignore
+                //   type="switch"
+                //   id="custom-switch"
+                //   style={{width:'105px',height:'32px',display:'flex',alignItems:'center' }}
+                //   onChange={(e)=>handalswitch(e.target.checked)}
+                //   label="Send"
+                // />
+
               )}
             </Box>
           </Box>
@@ -803,7 +820,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderProcess == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -839,7 +856,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -874,7 +891,7 @@ function OnHoldOrdersDetails() {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-            Order Details
+            On Hold Order Details
           </Typography>
           {loader ? (
             <Loader />
@@ -902,27 +919,27 @@ function OnHoldOrdersDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" &&
-            tableData?.some((data) => data.dispatch_image != "") ? (
-                <>
-              <Button variant="danger" onClick={handleFinishButtonClick}>
-                Finish
-              </Button>
-                </>
+              orderProcess == "started" &&
+              tableData?.some((data) => data.dispatch_image != "") ? (
+              <>
+                <Button variant="danger" onClick={handleFinishButtonClick}>
+                  Finish
+                </Button>
+              </>
             ) : (
               <>
-              <Button
-                variant="danger"
-                disabled={
-                  orderProcess != "started" ||
-                  userData?.user_id != orderDetails?.operation_user_id ||
-                  tableData?.some((data) => data.dispatch_image == "")
-                }
-                onClick={handleFinishButtonClick}
+                <Button
+                  variant="danger"
+                  disabled={
+                    orderProcess != "started" ||
+                    userData?.user_id != orderDetails?.operation_user_id ||
+                    tableData?.some((data) => data.dispatch_image == "")
+                  }
+                  onClick={handleFinishButtonClick}
                 >
-                Finish
-              </Button>
-                </>
+                  Finish
+                </Button>
+              </>
             )}
           </MDBCol>
         </MDBRow>

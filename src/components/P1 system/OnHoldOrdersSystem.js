@@ -42,7 +42,7 @@ function OnHoldOrdersSystem() {
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?&page=${page}&per_page=${pageSize}`;
+    let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
     if (searchOrderID)
       apiUrl += `&orderid=${searchOrderID}`;
     if (endDate)
@@ -83,7 +83,7 @@ function OnHoldOrdersSystem() {
   };
 
   const columns = [
-    { field: "start_date", headerName: "Started Date", className: "order-system", flex: 1 },
+    { field: "date", headerName: "Started Date", className: "order-system", flex: 1 },
     {
       field: "order_id",
       headerName: "Order ID",
@@ -111,7 +111,7 @@ function OnHoldOrdersSystem() {
       className: "order-system",
       type: "string",
     },
-    { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
+    // { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName: "View Item",
