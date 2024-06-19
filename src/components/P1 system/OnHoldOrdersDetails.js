@@ -61,11 +61,15 @@ function OnHoldOrdersDetails() {
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
+  const [toggleStatus, setToggleStatus] = useState(0)
+
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
-  const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
+  // const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
+  const [loader, setLoader] = useState(true)
+
   if (!fileInputRef.current) {
     fileInputRef.current = {};
   }
@@ -98,11 +102,14 @@ function OnHoldOrdersDetails() {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(OrderDetailsGet({ id: id }));
+      // const response = await dispatch(OrderDetailsGet({ id: id }));
+      const response = await axios.get(`${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`)
 
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
+      console.log(response.data.orders[0].toggle_status, 'response.data.orders[0].toggle_status');
+      setToggleStatus(Number(response.data.orders[0].toggle_status))
       const order = response.data.orders[0];
       if (order) setOrderProcess(order.order_process);
       if (data) {
@@ -114,10 +121,15 @@ function OnHoldOrdersDetails() {
           setTableData(newData);
         });
       }
+      setLoader(false)
     } catch (error) {
       console.error(error);
     }
   }
+
+  useEffect(() => {
+    console.log(toggleStatus, 'toggleStatus');
+  }, [toggleStatus])
 
   const handleAddMessage = async () => {
     const orderId = parseInt(id, 10);
@@ -192,13 +204,15 @@ function OnHoldOrdersDetails() {
   };
 
   const handleSubmitAttachment = async () => {
+    setLoader(true)
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
         await dispatch(
           AttachmentFileUpload({
             user_id: user_id,
-            order_id: orderDetailsDataOrderId?.order_id,
+            // order_id: orderDetailsDataOrderId?.order_id,
+            order_id: id,
             item_id: selectedItemId,
             selectedFile: selectedFile,
           })
@@ -206,7 +220,8 @@ function OnHoldOrdersDetails() {
       } else {
         await dispatch(
           OverAllAttachmentFileUpload({
-            order_id: orderDetailsDataOrderId?.order_id,
+            // order_id: orderDetailsDataOrderId?.order_id,
+            order_id: id,
             order_dispatch_image: selectedFile,
           })
         );
@@ -225,12 +240,15 @@ function OnHoldOrdersDetails() {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
+      setLoader(false)
+
     } catch (error) {
       console.error(error);
     }
   };
 
   const handleStartOrderProcess = async () => {
+
     const requestData = {
       order_id: Number(id),
       user_id: userData.user_id,
@@ -544,9 +562,56 @@ function OnHoldOrdersDetails() {
     },
   ];
 
-  const handalswitch=(e)=>{
-    console.log(e,'e');
+  const handalswitch = async (e) => {
+    console.log(e, 'e');
+    setLoader(true)
+    if (e) {
+      // setToggleStatus(1)
+      handelSend(e)
+    } else {
+      // setToggleStatus(0)
+      handelSend(e)
+    }
+    console.log(orderData, 'orderData');
+    console.log(orderDetails, 'orderDetails');
+
   }
+  const handelSend = async (e) => {
+    console.log(e, 'e=====');
+    console.log(toggleStatus, 'toggleStatus');
+    const result = {
+      order_id: parseInt(orderDetails?.order_id, 10),
+      item_id: [],
+      product_name: [],
+      variation_id: [],
+      toggle_status: 0
+    };
+    orderDetails?.items.forEach(item => {
+      result.item_id.push(parseInt(item.item_id, 10));
+      result.product_name.push(item.product_name);
+      result.variation_id.push(item.variation_id);
+    });
+
+    if (e) {
+      result.toggle_status = 1
+      setToggleStatus(1)
+    } else {
+      result.toggle_status = 0
+      setToggleStatus(0)
+    }
+
+    console.log(result, 'result');
+
+    const response = await axios.post(`${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`, result)
+    console.log(response, 'response');
+    if (response) {
+      fetchOrder();
+    }
+  }
+
+  // useEffect(()=>{
+  //   handelSend()
+  // },[toggleStatus])
   return (
     <>
       <Container fluid className="px-5">
@@ -578,7 +643,7 @@ function OnHoldOrdersDetails() {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-               On Hold Order Details
+                On Hold Order Details
               </Typography>
               {loader ? (
                 <Loader />
@@ -613,23 +678,37 @@ function OnHoldOrdersDetails() {
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
                 orderProcess == "started" ? (
-                <Button
-                  variant="outline-danger"
-                  className="p-1 me-2 bg-transparent text-danger"
-                  onClick={handleCancelOrderProcess}
-                >
-                  <CancelIcon />
-                </Button>
+                // <Button
+                //   variant="outline-danger"
+                //   className="p-1 me-2 bg-transparent text-danger"
+                //   onClick={handleCancelOrderProcess}
+                // >
+                //   <CancelIcon />
+                // </Button>
+                <Form.Check // prettier-ignore
+                  type="switch"
+                  id="custom-switch"
+                  style={{ width: '105px', height: '32px', display: 'flex', alignItems: 'center' }}
+                  checked={toggleStatus}
+                  // checked={0}
+                  onChange={(e) => handalswitch(e.target.checked)}
+                  label="Send"
+                />
               ) : orderProcess == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
-                <Button variant="success" disabled>
-                 Send
-                </Button>
-                // <Form.Check // prettier-ignore
-                //   type="switch"
-                //   id="custom-switch"
-                //   label="Check this switch"
-                // />
+                // <Button variant="success" disabled>
+                //   Send
+                // </Button>
+                <Form.Check // prettier-ignore
+                  type="switch"
+                  disabled
+                  id="custom-switch"
+                  style={{ width: '105px', height: '32px', display: 'flex', alignItems: 'center' }}
+                  checked={toggleStatus}
+                  // checked={0}
+                  onChange={(e) => handalswitch(e.target.checked)}
+                  label="Send"
+                />
 
               ) : (
                 <Button
@@ -916,13 +995,17 @@ function OnHoldOrdersDetails() {
           <label>Meesage :-</label>{" "}
           <Box>{orderDetailsDataOrderId?.operation_user_note}</Box>
         </Alert>
+        <Alert variant={"success"}>
+          <label>On Hold Meesage :-</label>{" "}{orderDetails?.onhold_note}
+          {/* <Box>{orderDetails?.onhold_note}</Box> */}
+        </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
               orderProcess == "started" &&
               tableData?.some((data) => data.dispatch_image != "") ? (
               <>
-                <Button variant="danger" onClick={handleFinishButtonClick}>
+                <Button variant="danger" disabled={orderDetails.toggle_status == 1 ? false : true} onClick={handleFinishButtonClick}>
                   Finish
                 </Button>
               </>
@@ -933,6 +1016,7 @@ function OnHoldOrdersDetails() {
                   disabled={
                     orderProcess != "started" ||
                     userData?.user_id != orderDetails?.operation_user_id ||
+                    // orderDetails.toggle_status==1?true:false||
                     tableData?.some((data) => data.dispatch_image == "")
                   }
                   onClick={handleFinishButtonClick}
