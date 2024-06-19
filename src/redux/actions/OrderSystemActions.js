@@ -219,3 +219,17 @@ export const CustomOrderFinish =
       dispatch({ type: CUSTOM_ORDER_FINISH_FAIL, error: error.message });
     }
   };
+export const CustomOrderFinishOH =
+  (user_id, id, navigate) => async (dispatch) => {
+    dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
+    try {
+      const response = await axios.post(
+        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`
+      );
+      dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
+      return response;
+    } catch (error) {
+      console.log(error,'errrrypoooo')
+      dispatch({ type: CUSTOM_ORDER_FINISH_FAIL, error: error.message });
+    }
+  };

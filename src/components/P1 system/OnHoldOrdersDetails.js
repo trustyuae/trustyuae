@@ -28,6 +28,7 @@ import {
   AddMessage,
   AttachmentFileUpload,
   CustomOrderFinish,
+  CustomOrderFinishOH,
   InsertOrderPickup,
   InsertOrderPickupCancel,
   OrderDetailsGet,
@@ -283,14 +284,14 @@ function OnHoldOrdersDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
+      const response = await dispatch(CustomOrderFinishOH(user_id, id, navigate));
       if (response.data.status_code === 200) {
         await Swal.fire({
           title: response.data.message,
           icon: "success",
           showConfirmButton: true,
         });
-        navigate("/ordersystem");
+        navigate("/on_hold_orders_system");
       } else {
         Swal.fire({
           title: response.data.message,
@@ -465,7 +466,7 @@ function OnHoldOrdersDetails() {
                     }}
                   />
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && (
+                    orderProcess == "started" && toggleStatus != 0 && (
                       <CancelIcon
                         sx={{
                           position: "relative",
@@ -499,7 +500,7 @@ function OnHoldOrdersDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && qty == avl_qty ? (
+                    orderProcess == "started" && qty == avl_qty && toggleStatus !=0  ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -529,7 +530,7 @@ function OnHoldOrdersDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && qty == avl_qty ? (
+                    orderProcess == "started" && qty == avl_qty && toggleStatus != 0 ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -692,7 +693,7 @@ function OnHoldOrdersDetails() {
                   checked={toggleStatus}
                   // checked={0}
                   onChange={(e) => handalswitch(e.target.checked)}
-                  label="Send"
+                  // label="Send"
                 />
               ) : orderProcess == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
@@ -707,7 +708,7 @@ function OnHoldOrdersDetails() {
                   checked={toggleStatus}
                   // checked={0}
                   onChange={(e) => handalswitch(e.target.checked)}
-                  label="Send"
+                  // label="Send"
                 />
 
               ) : (

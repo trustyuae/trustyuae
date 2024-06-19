@@ -942,8 +942,8 @@ function OrderDetails() {
                   className=" mx-2"
                   disabled={
                     orderProcess != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id ||
-                    tableData?.some((data) => data.dispatch_image == "")
+                    userData?.user_id != orderDetails?.operation_user_id 
+                    // tableData?.some((data) => data.dispatch_image == "")
                   }
                   onClick={() => setshowMessageOHModal(true)}
                 >
@@ -1067,6 +1067,7 @@ function OrderDetails() {
               <Button
                 variant="secondary"
                 className="mt-2 fw-semibold"
+                disabled={messageOH==""?true:false}
                 onClick={submitOH}
               >
                 Submit
