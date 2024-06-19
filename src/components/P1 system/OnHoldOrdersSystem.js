@@ -30,6 +30,8 @@ function OnHoldOrdersSystem() {
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
+  const [dispatchType, setDispatchType] = useState("all");
+
   const [totalPages, setTotalPages] = useState(1);
   const [isReset, setIsReset] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
@@ -47,8 +49,8 @@ function OnHoldOrdersSystem() {
       apiUrl += `&orderid=${searchOrderID}`;
     if (endDate)
       apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
-    if (completedEndDate)
-      apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
+    if (dispatchType)
+      apiUrl += `&status=${dispatchType}`;
     await dispatch(
       CompletedOrderSystemGet({
         apiUrl: `${apiUrl}`,
@@ -177,10 +179,15 @@ function OnHoldOrdersSystem() {
     fetchOrders();
   };
 
+  const searchDispatchTypeFilter = (e) => {
+    setDispatchType(e);
+    setPage(1);
+  };
+
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, page, isReset,selectedDateRange,selectedCompletedDateRange]);
+  }, [pageSize, page,dispatchType, isReset,selectedDateRange,selectedCompletedDateRange]);
 
   return (
     <Container fluid className="py-3">
@@ -207,7 +214,7 @@ function OnHoldOrdersSystem() {
             <Col xs="auto" lg="4">
               <Form.Group>
                 <Form.Label className="fw-semibold mb-0">
-                  Start Date Filter:
+                  Date Filter:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -233,29 +240,15 @@ function OnHoldOrdersSystem() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">
-                  Completed Date Filter:
-                </Form.Label>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={["SingleInputDateRangeField"]}>
-                    <DateRangePicker
-                      sx={{
-                        "& .MuiInputBase-root": {
-                          paddingRight: 0,
-                        },
-                        "& .MuiInputBase-input": {
-                          padding: ".5rem .75rem .5rem .75rem",
-                          "&:hover": {
-                            borderColor: "#dee2e6",
-                          },
-                        },
-                      }}
-                      value={selectedCompletedDateRange}
-                      onChange={handleCompltedDateChange}
-                      slots={{ field: SingleInputDateRangeField }}
-                    />
-                  </DemoContainer>
-                </LocalizationProvider>
+                <Form.Label className="fw-semibold">Dispatch type:</Form.Label>
+                <Form.Select
+                  className="mr-sm-2 py-2"
+                  onChange={(e) => searchDispatchTypeFilter(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  <option value="dispatch">Dispatch</option>
+                  <option value="reserve">Reserve</option>
+                </Form.Select>
               </Form.Group>
             </Col>
           </Row>
