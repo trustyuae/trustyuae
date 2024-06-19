@@ -876,11 +876,11 @@ function OnHoldOrdersDetails() {
                             Please upload attachment for all the products in
                             below order table!
                           </Alert>
-                        ) : orderDetailsDataOrderId?.overall_order_dis_image !=
+                        ) : orderDetails?.overall_order_dis_image !=
                           "" ? (
                           <Avatar
                             src={
-                              orderDetailsDataOrderId?.overall_order_dis_image
+                              orderDetails?.overall_order_dis_image
                             }
                             alt="Product Image"
                             sx={{
@@ -899,7 +899,7 @@ function OnHoldOrdersDetails() {
                           <>
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
-                                orderDetailsDataOrderId?.operation_user_id &&
+                                orderDetails?.operation_user_id &&
                                 orderProcess == "started" ? (
                                 <>
                                   <Button
@@ -935,7 +935,7 @@ function OnHoldOrdersDetails() {
 
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
-                                orderDetailsDataOrderId?.operation_user_id &&
+                                orderDetails?.operation_user_id &&
                                 orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
