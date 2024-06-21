@@ -2,8 +2,10 @@ import React, { useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import * as XLSX from "xlsx"; // Import all functions from xlsx library
 import { Avatar, Box } from "@mui/material";
 import DataTable from "../DataTable";
+import { saveAs } from "file-saver";
 
 const OrderDetailsPrintModal = ({
   show,
@@ -26,18 +28,17 @@ const OrderDetailsPrintModal = ({
         format: "a4",
       });
 
-      const imgProps = pdf.getImageProperties(imgData)
-      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
 
-      let widthToFit,
-        heightToFit
+      let widthToFit, heightToFit;
 
       if (imgProps.width > pdfWidth) {
-        widthToFit = pdfWidth
-        heightToFit = (imgProps.height * pdfWidth) / imgProps.width
+        widthToFit = pdfWidth;
+        heightToFit = (imgProps.height * pdfWidth) / imgProps.width;
       } else {
-        widthToFit = imgProps.width
-        heightToFit = imgProps.height
+        widthToFit = imgProps.width;
+        heightToFit = imgProps.height;
       }
 
       pdf.addImage(imgData, "PNG", 5, 5, widthToFit - 10, heightToFit - 5);
@@ -46,33 +47,29 @@ const OrderDetailsPrintModal = ({
     });
   };
 
-  // async function getBase64ImageFromUrl(imageUrl) {
-  // var res = await fetch(imageUrl);
-  // var blob = await res.blob();
+  const handleExportExcel = () => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(
+      PO_OrderList.map((item) => ({
+        "Product Name": item.product_name,
+        "Quantity Ordered": item.quantity,
+      }))
+    );
+    XLSX.utils.book_append_sheet(wb, ws, "PO Orders");
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, `PoDetails-invoice.xlsx`);
+  };
 
-  // return new Promise((resolve, reject) => {
-  //   var reader = new FileReader();
-  //   reader.addEventListener("load", function () {
-  //     resolve(reader.result);
-  //   }, false);
-
-  //   reader.onerror = () => {
-  //     return reject(this);
-  //   };
-  //   reader.readAsDataURL(blob);
-  // })  
-  // }
+  const printModalContent = () => {
+    window.print();
+  };
 
   const columns = [
     {
       field: "product_image",
       headerName: "Factory Image",
       renderCell: (value, row) => {
-        console.log(value.row.image, 'valueeeeeeee')
-        // getBase64ImageFromUrl(''https://graph.facebook.com/3938027626271800/picture?type=normal'')
-        // getBase64ImageFromUrl('https://wordpress.trustysystem.com/wp-content/uploads/2024/04/4E2837DDA3_worn_2.webp')
-        //   .then(result => console.log(result, 'result'))
-        //   .catch(err => console.error(err));
         return (
           <Box className="h-100 w-100 d-flex align-items-center">
             <Avatar
@@ -92,7 +89,6 @@ const OrderDetailsPrintModal = ({
             />
           </Box>
         );
-
       },
     },
     {
@@ -112,11 +108,6 @@ const OrderDetailsPrintModal = ({
       },
     },
   ];
-
-  const printModalContent = () => {
-    window.print();
-  };
-
 
   return (
     <>
@@ -147,12 +138,11 @@ const OrderDetailsPrintModal = ({
           <Button variant="primary" onClick={printModalContent}>
             Print
           </Button>
-          <Button
-            variant="primary"
-            onClick={handleExport}
-            disabled={isDownloadPdf}
-          >
+          <Button variant="primary" onClick={handleExport}>
             {isDownloadPdf ? "Downloading..." : "Download PDF"}
+          </Button>
+          <Button variant="success" onClick={handleExportExcel}>
+            Download Excel
           </Button>
         </Modal.Footer>
       </Modal>

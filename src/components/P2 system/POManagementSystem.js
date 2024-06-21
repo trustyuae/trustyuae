@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -28,6 +28,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
 
 function POManagementSystem() {
+  const inputRef = useRef(null);
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const POStatusFilter = [
@@ -354,10 +355,8 @@ function POManagementSystem() {
                 <Form.Control
                   type="text"
                   placeholder={t("POManagement.EnterPoNumber")}
-                  onKeyDown={PoId}
+                  onKeyDown={(e)=>PoId(e)}
                   className="mr-sm-2 py-2"
-                  value={searchPoID}
-                  onChange={(e) => setSearchPoID(e.target.value)}
                 />
               </Form.Group>
             </Col>
