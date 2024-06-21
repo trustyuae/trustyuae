@@ -86,7 +86,9 @@ i18n
             Tomorrow:'明天',
             InProgress:'進行中',
             Dispatched:'已派遣',
-            NotDispatched:'未出貨'
+            NotDispatched:'未出貨',
+            PoNo:'採購訂單編號',
+            EnterPoNumber:'輸入訂單編號'
           }
         }
       },
@@ -166,7 +168,9 @@ i18n
             Tomorrow:'Tomorrow',
             InProgress:'In Progress',
             Dispatched:'Dispatched',
-            NotDispatched:'Not Dispatched'
+            NotDispatched:'Not Dispatched',
+            PoNo:'PO No.',
+            EnterPoNumber:'Enter Po Number'
           }
         }
       },
