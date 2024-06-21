@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -22,6 +22,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 
 function OrderSystem() {
+  const inputRef = useRef(null);
   const [dispatchType, setDispatchType] = useState("all");
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
@@ -68,6 +69,7 @@ function OrderSystem() {
   }
 
   const handleReset = () => {
+    inputRef.current.value = "";
     setSearchOrderID("");
     setStartDate("");
     setEndDate("");
@@ -214,6 +216,7 @@ function OrderSystem() {
                 <Form.Control
                   type="text"
                   placeholder="Enter Order ID"
+                  ref={inputRef}
                   // value={searchOrderID}
                   onKeyDown={(e) => orderId(e)}
                   className="mr-sm-2 py-2"
