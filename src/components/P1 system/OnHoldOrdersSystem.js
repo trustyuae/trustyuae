@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -21,6 +21,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 
 function OnHoldOrdersSystem() {
+  const inputRef = useRef(null);
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -47,6 +48,7 @@ function OnHoldOrdersSystem() {
     let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
     if (searchOrderID)
       apiUrl += `&orderid=${searchOrderID}`;
+    console.log(searchOrderID,'searchOrderID');
     if (endDate)
       apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (dispatchType)
@@ -67,6 +69,7 @@ function OnHoldOrdersSystem() {
   }
 
   const handleReset = () => {
+    inputRef.current.value = "";
     setSearchOrderID("");
     setStartDate("");
     setEndDate("");
@@ -183,11 +186,20 @@ function OnHoldOrdersSystem() {
     setDispatchType(e);
     setPage(1);
   };
+  const orderId=(e)=>{
+    // console.log(e,'e');
+    if (e.key === "Enter") {
+      console.log('hiiii');
+      setSearchOrderID(e.target.value);
+      // setProductName("");
+      // fetchOrders();
+    }
+  }
 
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, page,dispatchType, isReset,selectedDateRange,selectedCompletedDateRange]);
+  }, [pageSize,searchOrderID, page,dispatchType, isReset,selectedDateRange,selectedCompletedDateRange]);
 
   return (
     <Container fluid className="py-3">
@@ -205,8 +217,9 @@ function OnHoldOrdersSystem() {
                 <Form.Control
                   type="text"
                   placeholder="Enter Order ID"
-                  value={searchOrderID}
-                  onChange={(e) => setSearchOrderID(e.target.value)}
+                  // value={searchOrderID}
+                  ref={inputRef}
+                  onKeyDown={(e) => orderId(e)}
                   className="mr-sm-2 py-2"
                 />
               </Form.Group>
