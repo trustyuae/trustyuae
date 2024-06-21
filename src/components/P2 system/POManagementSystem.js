@@ -30,7 +30,11 @@ import { useTranslation } from "react-i18next";
 function POManagementSystem() {
   const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
-  const POStatusFilter = [t('POManagement.Open'), t('POManagement.Checkingwithfactory'), t('POManagement.Closed')];
+  const POStatusFilter = [
+    t("POManagement.Open"),
+    t("POManagement.Checkingwithfactory"),
+    t("POManagement.Closed"),
+  ];
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
   const [selectedFactory, setSelectedFactory] = useState("");
   const [factories, setFactories] = useState([]);
@@ -40,6 +44,7 @@ function POManagementSystem() {
   const [orderList, setOrderList] = useState([]);
 
   const [PoStatus, setPoStatus] = useState("");
+  const [searchPoID, setSearchPoID] = useState("");
   const [poType, setPOType] = useState("po");
 
   const [page, setPage] = useState(1);
@@ -47,9 +52,7 @@ function POManagementSystem() {
   const [totalPages, setTotalPages] = useState(1);
   const [lang, setLang] = useState("En");
 
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
-  );
+  const allFactoryDatas = useSelector((state) => state?.allFactoryData?.factory);
 
   const pomSystemProductDetailsLoader = useSelector(
     (state) => state?.orderNotAvailable?.isPomSystemProductDetails
@@ -74,12 +77,22 @@ function POManagementSystem() {
         apiUrl = `${API_URL}wp-json/custom-so-management/v1/generated-so-order/?&per_page=${pageSize}&page=${page}`;
       }
 
-      if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
-      if (selectedFactory) apiUrl += `?&factory_id=${selectedFactory}`;
-      if (PoStatus) apiUrl += `?&status=${PoStatus}`;
+      // Build query parameters based on selected filters
+      const params = {};
+      if (searchPoID) params.po_id = searchPoID;
+      if (startDate && endDate) {
+        params.start_date = startDate;
+        params.end_date = endDate;
+      }
+      if (selectedFactory) params.factory_id = selectedFactory;
+      if (PoStatus) params.status = PoStatus;
 
-      const response = await dispatch(PomSystemProductsDetails({ apiUrl }));
-      let data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
+      // Construct the final API URL with query parameters
+      const response = await dispatch(PomSystemProductsDetails({
+        apiUrl: `${apiUrl}&${new URLSearchParams(params).toString()}`
+      }));
+
+      const data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
       setOrderList(data);
       setTotalPages(response.data.total_pages);
     } catch (error) {
@@ -94,11 +107,11 @@ function POManagementSystem() {
 
   useEffect(() => {
     POM_system_products();
-  }, [page, endDate, selectedFactory, PoStatus, poType]);
+  }, [page, startDate, endDate, selectedFactory, PoStatus, searchPoID, poType]);
 
-  const handleDateChange = async (newDateRange) => {
-    if (newDateRange[0]?.["$d"] && newDateRange[1]?.["$d"]) {
-      setSelectedDateRange(newDateRange);
+  const handleDateChange = (newDateRange) => {
+    setSelectedDateRange(newDateRange);
+    if (newDateRange[0] && newDateRange[1]) {
       const isoStartDate = dayjs(newDateRange[0]["$d"].toDateString()).format(
         "YYYY-MM-DD"
       );
@@ -119,6 +132,13 @@ function POManagementSystem() {
 
   const handlePOStatus = (e) => {
     setPoStatus(e.target.value);
+  };
+
+  const PoId = (e) => {
+    if (e.key === "Enter") {
+      setSearchPoID(e.target.value);
+      setPage(1); // Reset page to 1 when searching
+    }
   };
 
   const radios = [
@@ -209,21 +229,20 @@ function POManagementSystem() {
         }
       } catch (error) {
         console.error(error);
-        if (error) {
-          POM_system_products();
-        }
+        POM_system_products();
       }
     }
   };
 
-  const handleTabChange = (e) => {
-    setPOType(e);
+  const handleTabChange = (tabType) => {
+    setPOType(tabType);
     setPage(1);
     setStartDate("");
     setEndDate("");
     setSelectedDateRange([null, null]);
     setSelectedFactory("");
     setPoStatus("");
+    setSearchPoID(""); 
   };
 
   const handleChange = (event, value) => {
@@ -232,42 +251,41 @@ function POManagementSystem() {
 
   const handleLanguageChange = async (language) => {
     setLang(language);
-    i18n.changeLanguage(language); 
+    i18n.changeLanguage(language);
   };
 
   useEffect(() => {
     // Set the initial language to 'En' when component mounts
     i18n.changeLanguage(lang);
-  }, []);
-
+  }, [lang]);
 
   return (
     <Container fluid className="p-5">
-      <Box className="d-flex mb-4 justify-content-between">
-        <Typography variant="h4" className="fw-semibold">
+      <Box className="d-flex justify-content-between align-items-center">
+        <Typography variant="h4" component="h2">
           {t("POManagement.title")}
         </Typography>
         <ButtonGroup>
-              {radios.map((radio, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`radio-${idx}`}
-                  type="radio"
-                  variant={idx % 2 ? "outline-success" : "outline-danger"}
-                  name="radio"
-                  value={radio.value}
-                  checked={lang === radio.value}
-                  onClick={() => handleLanguageChange(radio.value)}
-                >
-                  {radio.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
+          {radios.map((radio, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`radio-${idx}`}
+              type="radio"
+              variant={idx % 2 ? "outline-success" : "outline-danger"}
+              name="radio"
+              value={radio.value}
+              checked={lang === radio.value}
+              onClick={() => handleLanguageChange(radio.value)}
+            >
+              {radio.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>
           <Row>
-            <Col xs="auto" lg="4">
+            <Col xs="auto" lg="3">
               <Form.Group>
                 <Form.Label className="fw-semibold mb-0">
                   {t("POManagement.DateFilter")}
@@ -294,7 +312,7 @@ function POManagementSystem() {
                 </LocalizationProvider>
               </Form.Group>
             </Col>
-            <Col xs="auto" lg="4">
+            <Col xs="auto" lg="3">
               <Form.Group className="fw-semibold mb-0">
                 <Form.Label>{t("POManagement.FactoryFilter")}</Form.Label>
                 <Form.Select
@@ -312,22 +330,35 @@ function POManagementSystem() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col xs="auto" lg="4">
+            <Col xs="auto" lg="3">
               <Form.Group className="fw-semibold mb-0">
                 <Form.Label>{t("POManagement.POStatusFilter")}</Form.Label>
                 <Form.Select
                   as="select"
                   className="mr-sm-2"
-                  // value={selectedFactory}
+                  value={PoStatus}
                   onChange={handlePOStatus}
                 >
-                  <option value="">{t('POManagement.All')}  </option>
+                  <option value="">{t("POManagement.All")}</option>
                   {POStatusFilter.map((po) => (
                     <option key={po} value={po}>
                       {po}
                     </option>
                   ))}
                 </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col xs="auto" lg="3">
+              <Form.Group>
+                <Form.Label className="fw-semibold">{t("POManagement.PoNo")}</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder={t("POManagement.EnterPoNumber")}
+                  onKeyDown={PoId}
+                  className="mr-sm-2 py-2"
+                  value={searchPoID}
+                  onChange={(e) => setSearchPoID(e.target.value)}
+                />
               </Form.Group>
             </Col>
           </Row>
@@ -362,26 +393,22 @@ function POManagementSystem() {
               >
                 {pomSystemProductDetailsLoader ? (
                   <Loader />
+                ) : orderList && orderList.length !== 0 ? (
+                  <DataTable
+                    columns={columns}
+                    rows={orderList}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    handleChange={handleChange}
+                  />
                 ) : (
-                  <>
-                    {orderList && orderList.length !== 0 ? (
-                      <DataTable
-                        columns={columns}
-                        rows={orderList}
-                        page={page}
-                        pageSize={pageSize}
-                        totalPages={totalPages}
-                        handleChange={handleChange}
-                      />
-                    ) : (
-                      <Alert
-                        severity="warning"
-                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                      >
-                        {t("POManagement.RecordsIsNotAvailableForAboveFilter")}
-                      </Alert>
-                    )}
-                  </>
+                  <Alert
+                    severity="warning"
+                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                  >
+                    {t("POManagement.RecordsIsNotAvailableForAboveFilter")}
+                  </Alert>
                 )}
               </Tab>
               {/* MPO */}
@@ -402,26 +429,22 @@ function POManagementSystem() {
               >
                 {pomSystemProductDetailsLoader ? (
                   <Loader />
+                ) : orderList && orderList.length !== 0 ? (
+                  <DataTable
+                    columns={columns}
+                    rows={orderList}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    handleChange={handleChange}
+                  />
                 ) : (
-                  <>
-                    {orderList && orderList.length !== 0 ? (
-                      <DataTable
-                        columns={columns}
-                        rows={orderList}
-                        page={page}
-                        pageSize={pageSize}
-                        totalPages={totalPages}
-                        handleChange={handleChange}
-                      />
-                    ) : (
-                      <Alert
-                        severity="warning"
-                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                      >
-                        {t("POManagement.RecordsIsNotAvailableForAboveFilter")}
-                      </Alert>
-                    )}
-                  </>
+                  <Alert
+                    severity="warning"
+                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                  >
+                    {t("POManagement.RecordsIsNotAvailableForAboveFilter")}
+                  </Alert>
                 )}
               </Tab>
               {/* SPO */}
@@ -442,26 +465,22 @@ function POManagementSystem() {
               >
                 {pomSystemProductDetailsLoader ? (
                   <Loader />
+                ) : orderList && orderList.length !== 0 ? (
+                  <DataTable
+                    columns={columns}
+                    rows={orderList}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    handleChange={handleChange}
+                  />
                 ) : (
-                  <>
-                    {orderList && orderList.length !== 0 ? (
-                      <DataTable
-                        columns={columns}
-                        rows={orderList}
-                        page={page}
-                        pageSize={pageSize}
-                        totalPages={totalPages}
-                        handleChange={handleChange}
-                      />
-                    ) : (
-                      <Alert
-                        severity="warning"
-                        sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                      >
-                        {t("POManagement.RecordsIsNotAvailableForAboveFilter")}
-                      </Alert>
-                    )}
-                  </>
+                  <Alert
+                    severity="warning"
+                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                  >
+                    {t("POManagement.RecordsIsNotAvailableForAboveFilter")}
+                  </Alert>
                 )}
               </Tab>
             </Tabs>
