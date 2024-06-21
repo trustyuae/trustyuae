@@ -183,10 +183,20 @@ function OrderSystem() {
     setPage(1);
   };
 
+  const orderId=(e)=>{
+    // console.log('hiiii');
+    // console.log(e,'e');
+    if (e.key === "Enter") {
+      setSearchOrderID(e.target.value);
+      // setProductName("");
+      // fetchOrders();
+    }
+  }
+
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, page, dispatchType, isReset]);
+  }, [pageSize,searchOrderID, page, dispatchType, isReset]);
 
   return (
     <Container fluid className="py-3">
@@ -204,8 +214,8 @@ function OrderSystem() {
                 <Form.Control
                   type="text"
                   placeholder="Enter Order ID"
-                  value={searchOrderID}
-                  onChange={(e) => setSearchOrderID(e.target.value)}
+                  // value={searchOrderID}
+                  onKeyDown={(e) => orderId(e)}
                   className="mr-sm-2 py-2"
                 />
               </Form.Group>
