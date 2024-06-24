@@ -38,6 +38,8 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import PoDetailsModal from "./PoDetailsModal";
 import ShowAlert from "../../utils/ShowAlert";
+import CancelIcon from "@mui/icons-material/Cancel";
+
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -86,7 +88,7 @@ function OrderManagementSystem() {
 
   const [selectedMPOquantity, setSelectedMPOquantity] = useState([]);
   const [selectedSPOquantity, setSelectedSPOquantity] = useState([]);
-
+  const [isDisabled, setIsDisabled] = useState(false)
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -766,6 +768,7 @@ function OrderManagementSystem() {
 
   // PO Generate
   const handleGeneratePO = () => {
+    setIsDisabled(true)
     if (activeKey === "against_PO") handleGenerateAgainstPO();
     else if (activeKey === "manual_PO") handleGenerateManualPO();
     else if (activeKey === "scheduled_PO") handleGenerateScheduledPO();
@@ -809,14 +812,19 @@ function OrderManagementSystem() {
         order_ids: selectedOrderIdsStr,
       };
       try {
-        await dispatch(AddPO(payload, navigate));
+        const response = await dispatch(AddPO(payload, navigate));
+        if (response.status == 200) {
+          setIsDisabled(true)
+        }
       } catch (error) {
         console.error("Error generating PO IDs:", error);
+        setIsDisabled(true)
       }
     } else {
       let errMessage =
         "Selected orders belong to different factories. Please select orders from the same factory.";
       ShowAlert("", errMessage, "error", false, false, "", "", 1000);
+      setIsDisabled(false)
     }
   };
   const handleGenerateManualPO = async () => {
@@ -838,9 +846,13 @@ function OrderManagementSystem() {
         note: manualNote,
       };
       try {
-        await dispatch(AddManualPO(payload, navigate));
+        const response = await dispatch(AddManualPO(payload, navigate));
+        if (response.status == 200) {
+          setIsDisabled(true)
+        }
       } catch (error) {
         console.error("Error generating PO IDs:", error);
+        setIsDisabled(true)
       }
     } else {
       await ShowAlert(
@@ -853,6 +865,7 @@ function OrderManagementSystem() {
         "",
         1000
       );
+      setIsDisabled(true)
     }
   };
 
@@ -877,9 +890,13 @@ function OrderManagementSystem() {
           reminder_date: remainderDate,
         };
         try {
-          await dispatch(AddSchedulePO(payload, navigate));
+          const response = await dispatch(AddSchedulePO(payload, navigate));
+          if (response.status == 200) {
+            setIsDisabled(true)
+          }
         } catch (error) {
           console.error("Error generating PO IDs:", error);
+          setIsDisabled(true)
         }
       } else {
         await ShowAlert(
@@ -892,6 +909,7 @@ function OrderManagementSystem() {
           "",
           1000
         );
+        setIsDisabled(true)
       }
     } else {
       await ShowAlert(
@@ -964,6 +982,12 @@ function OrderManagementSystem() {
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
     setPage(1);
+  };
+
+  const clearDateRange = () => {
+    setSelectedDateRange([null, null]);
+    setStartDate("")
+    setEndDate("")
   };
 
   return (
@@ -1040,7 +1064,7 @@ function OrderManagementSystem() {
               <Row>
                 {activeKey === "against_PO" ? (
                   <Col xs="auto" lg="4">
-                    <Form.Group>
+                    <Form.Group style={{ position: "relative" }}>
                       <Form.Label className="fw-semibold mb-0">
                         Date filter:
                       </Form.Label>
@@ -1066,6 +1090,9 @@ function OrderManagementSystem() {
                           />
                         </DemoContainer>
                       </LocalizationProvider>
+                      {selectedDateRange[0] && selectedDateRange[1] && (
+                        <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                      )}
                     </Form.Group>
                   </Col>
                 ) : null}
@@ -1275,6 +1302,7 @@ function OrderManagementSystem() {
             <Button
               variant="primary"
               className="ms-2 fw-semibold"
+              disabled={isDisabled}
               onClick={handleGeneratePO}
             >
               Create PO
