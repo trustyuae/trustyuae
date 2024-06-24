@@ -26,6 +26,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 function POManagementSystem() {
   const inputRef = useRef(null);
@@ -260,6 +261,11 @@ function POManagementSystem() {
     i18n.changeLanguage(lang);
   }, [lang]);
 
+  const clearDateRange = () => {
+    setSelectedDateRange([null, null]);
+    setStartDate("")
+    setEndDate("")
+  };
   return (
     <Container fluid className="p-5">
       <Box className="d-flex justify-content-between align-items-center">
@@ -287,7 +293,7 @@ function POManagementSystem() {
         <Form inline>
           <Row>
             <Col xs="auto" lg="3">
-              <Form.Group>
+              <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
                   {t("POManagement.DateFilter")}
                 </Form.Label>
@@ -311,6 +317,9 @@ function POManagementSystem() {
                     />
                   </DemoContainer>
                 </LocalizationProvider>
+                {selectedDateRange[0] && selectedDateRange[1] && (
+                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                )}
               </Form.Group>
             </Col>
             <Col xs="auto" lg="3">
