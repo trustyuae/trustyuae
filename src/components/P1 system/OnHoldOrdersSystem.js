@@ -19,6 +19,7 @@ import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions"
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 function OnHoldOrdersSystem() {
   const inputRef = useRef(null);
@@ -195,11 +196,16 @@ function OnHoldOrdersSystem() {
       // fetchOrders();
     }
   }
+  const clearDateRange = () => {
+    setSelectedDateRange([null, null]);
+    setStartDate("")
+    setEndDate("")
+  };
 
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize,searchOrderID, page,dispatchType, isReset,selectedDateRange,selectedCompletedDateRange]);
+  }, [pageSize,searchOrderID, page,dispatchType, isReset,]);
 
   return (
     <Container fluid className="py-3">
@@ -225,7 +231,7 @@ function OnHoldOrdersSystem() {
               </Form.Group>
             </Col>
             <Col xs="auto" lg="4">
-              <Form.Group>
+              <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
                   Date Filter:
                 </Form.Label>
@@ -249,6 +255,9 @@ function OnHoldOrdersSystem() {
                     />
                   </DemoContainer>
                 </LocalizationProvider>
+                {selectedDateRange[0] && selectedDateRange[1] && (
+                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                )}
               </Form.Group>
             </Col>
             <Col xs="auto" lg="4">
