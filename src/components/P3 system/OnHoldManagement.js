@@ -135,6 +135,7 @@ function OnHoldManagement() {
         order_id: orderId,
         quantity: quantity,
         grn_no: params.grn_no,
+        variation_id:params.variation_id
       };
 
       try {

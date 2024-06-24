@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import * as XLSX from "xlsx"; // Import all functions from xlsx library
+import * as XLSX from "xlsx";
+import autoTable from "jspdf-autotable";
 import { Avatar, Box } from "@mui/material";
 import DataTable from "../DataTable";
 import { saveAs } from "file-saver";
@@ -19,31 +19,123 @@ const OrderDetailsPrintModal = ({
 
   const handleExport = async () => {
     setIsDownloadPdf(true);
-    const input = orderDetailsRef.current;
-    html2canvas(input).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "p",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-
-      let widthToFit, heightToFit;
-
-      if (imgProps.width > pdfWidth) {
-        widthToFit = pdfWidth;
-        heightToFit = (imgProps.height * pdfWidth) / imgProps.width;
-      } else {
-        widthToFit = imgProps.width;
-        heightToFit = imgProps.height;
+  
+    // Initialize jsPDF document
+    const doc = new jsPDF();
+  
+    // Set font styles for header text
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+  
+    // Calculate center position for POId and Factory Name
+    const pageWidth = doc.internal.pageSize.width;
+    const textWidth = doc.getStringUnitWidth(`${poId}`);
+    const textHeight = 10;
+    const textX = (pageWidth - textWidth * doc.internal.getFontSize() / 2) / 2;
+    const textY = 5;
+  
+    // Add POId and Factory Name to PDF
+    doc.text(`POId: ${poId}`, textX, textY, { align: 'center' });
+    doc.text(`Factory Name: ${factoryName}`, textX, textY + textHeight, { align: 'center' });
+  
+    // Default image for products without an image
+    const defaultImage = require("../../assets/default.png");
+  
+    // Define table columns
+    const tableColumn = ["Product Image", "Product Name", "Quantity Ordered"];
+    const tableRows = [];
+  
+    // Populate table rows with data
+    for (const item of PO_OrderList) {
+      let imgData = null;
+      if (item.image) {
+        try {
+          imgData = await loadImageToDataURL(item.image);
+        } catch (error) {
+          console.error('Error loading image:', error);
+        }
       }
-
-      pdf.addImage(imgData, "PNG", 5, 5, widthToFit - 10, heightToFit - 5);
-      pdf.save(`PoDetails-invoice.pdf`);
-      setIsDownloadPdf(false);
+  
+      tableRows.push([
+        { imgData: imgData || defaultImage, content: '' },
+        item.product_name,
+        item.quantity,
+      ]);
+    }
+    
+    autoTable(doc, {
+      startY: textY + textHeight + 5, 
+      headStyles: {
+        fillColor: [71, 183, 223], 
+        textColor: [255, 255, 255],
+        fontSize: 12,
+        fontStyle: 'bold',
+        halign: 'center',
+      },
+      bodyStyles: {
+        textColor: [0, 0, 0], 
+        fontSize: 10,
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245], 
+      },
+      rowPageBreak: 'avoid', 
+      rowHeight: 70, 
+      columnStyles: {
+        0: { cellWidth: 60, halign: 'center', cellPadding: 2 },
+        1: { cellWidth: 100, halign: 'center', cellPadding: 2 },
+        2: { cellWidth: 30, halign: 'center', cellPadding: 2 },
+      },
+      head: [tableColumn],
+      body: tableRows,
+      didDrawCell: (data) => {
+        if (data.column.index === 0 && data.cell.section === 'body') {
+          if (data.cell.raw.imgData) {
+            const imgWidth = data.cell.width - data.cell.padding('horizontal');
+            const imgHeight = data.cell.height - data.cell.padding('vertical');
+            doc.addImage(data.cell.raw.imgData, 'PNG', data.cell.x + data.cell.padding('left'), data.cell.y + data.cell.padding('top'), imgWidth, imgHeight);
+          } else {
+            // Draw default image if no imgData is available
+            const imgWidth = data.cell.width - data.cell.padding('horizontal');
+            const imgHeight = data.cell.height - data.cell.padding('vertical');
+            doc.addImage(defaultImage, 'PNG', data.cell.x + data.cell.padding('left'), data.cell.y + data.cell.padding('top'), imgWidth, imgHeight);
+          }
+        }
+      },
+      margin: { top: 10 },
+      theme: 'grid',
+      tableWidth: 'auto', 
+      columnWidth: 'wrap',
+      styles: {
+        lineWidth: 0.5, 
+        lineColor: [0, 0, 0], 
+      },
+    });
+  
+    // Save PDF file
+    doc.save('PoDetails-invoice.pdf');
+    setIsDownloadPdf(false);
+  };
+  
+  
+  const loadImageToDataURL = (url) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = (error) => {
+        console.error('Error loading image:', error);
+        reject(error);
+      };
+      img.src = url;
     });
   };
 
@@ -53,6 +145,7 @@ const OrderDetailsPrintModal = ({
       PO_OrderList.map((item) => ({
         "Product Name": item.product_name,
         "Quantity Ordered": item.quantity,
+        "Image URL": item.image || 'N/A',
       }))
     );
     XLSX.utils.book_append_sheet(wb, ws, "PO Orders");
@@ -118,16 +211,25 @@ const OrderDetailsPrintModal = ({
         <Modal.Body>
           <Box
             ref={orderDetailsRef}
-            sx={{ display: "flex", flexDirection: "column" }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              padding: "20px",
+              backgroundColor: "#f9f9f9",
+              borderRadius: "10px",
+              color: "#333",
+              fontSize: "14px",
+              lineHeight: "1.5",
+            }}
           >
-            <Box>
+            <Box sx={{ marginBottom: "10px" }}>
               <strong>POId:</strong> {poId}
             </Box>
-            <Box>
+            <Box sx={{ marginBottom: "10px" }}>
               <strong>Factory Name:</strong> {factoryName}
             </Box>
             <Box className="mt-2">
-              <DataTable columns={columns} rows={PO_OrderList} />
+              <DataTable columns={columns} rows={PO_OrderList} className="custom-data-table" />
             </Box>
           </Box>
         </Modal.Body>

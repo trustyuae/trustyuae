@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { QuantityPoDetailsForModalInView } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 
-const PoDetailsModalInView = ({
+const   PoDetailsModalInView = ({
   show,
   handleClosePoDetailsModal,
   productId,
