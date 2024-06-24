@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { GetGRNList } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
+import CancelIcon from "@mui/icons-material/Cancel";
+
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -110,6 +112,12 @@ function GRNManagement() {
     setPage(value);
   };
 
+  const clearDateRange = () => {
+    setSelectedDateRange([null, null]);
+    setStartDate("")
+    setEndDate("")
+  };
+
   useEffect(() => {
     handlGetGRNList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,7 +133,7 @@ function GRNManagement() {
       <Form inline className="mb-4">
         <Row className="align-items-center">
           <Col xs="auto" lg="3">
-            <Form.Group>
+            <Form.Group style={{ position: "relative" }}>
               <Form.Label className="fw-semibold mb-0">Date filter:</Form.Label>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer
@@ -154,6 +162,9 @@ function GRNManagement() {
                   />
                 </DemoContainer>
               </LocalizationProvider>
+              {selectedDateRange[0] && selectedDateRange[1] && (
+                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                )}
             </Form.Group>
           </Col>
           <Col xs="auto" lg="3">

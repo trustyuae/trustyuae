@@ -19,6 +19,7 @@ import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions"
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 function CompletedOrderSystem() {
   const [orders, setOrders] = useState([]);
@@ -70,6 +71,8 @@ function CompletedOrderSystem() {
     setEndDate("");
     setSelectedDateRange([null, null]);
     setTotalPages(1);
+    clearDateRange()
+    clearEndDateRange()
     if (isReset) {
       setIsReset(false);
     } else {
@@ -176,11 +179,30 @@ function CompletedOrderSystem() {
     setPage(1);
     fetchOrders();
   };
-
+  const orderId = (e) => {
+    // console.log(e,'e');
+    if (e.key === "Enter") {
+      console.log('hiiii');
+      setSearchOrderID(e.target.value);
+      // setProductName("");
+      // fetchOrders();
+    }
+  }
+  const clearDateRange = () => {
+    setSelectedDateRange([null, null]);
+    setStartDate("");
+    setEndDate("");
+  };
+  const clearEndDateRange = () => {
+    setSelectedCompletedDateRange([null, null]);
+    setCompletedStartDate("");
+    setCompletedEndDate("")
+  };
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, page, isReset,selectedDateRange,selectedCompletedDateRange]);
+    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
+  }, [pageSize, page, searchOrderID, isReset]);
 
   return (
     <Container fluid className="py-3">
@@ -198,14 +220,14 @@ function CompletedOrderSystem() {
                 <Form.Control
                   type="text"
                   placeholder="Enter Order ID"
-                  value={searchOrderID}
-                  onChange={(e) => setSearchOrderID(e.target.value)}
+                  // value={searchOrderID}
+                  onKeyDown={(e) => orderId(e)}
                   className="mr-sm-2 py-2"
                 />
               </Form.Group>
             </Col>
             <Col xs="auto" lg="4">
-              <Form.Group>
+              <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
                   Start Date Filter:
                 </Form.Label>
@@ -229,10 +251,14 @@ function CompletedOrderSystem() {
                     />
                   </DemoContainer>
                 </LocalizationProvider>
+                {selectedDateRange[0] && selectedDateRange[1] && (
+                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                )}
               </Form.Group>
             </Col>
+
             <Col xs="auto" lg="4">
-              <Form.Group>
+              <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold">
                   Completed Date Filter:
                 </Form.Label>
@@ -256,6 +282,9 @@ function CompletedOrderSystem() {
                     />
                   </DemoContainer>
                 </LocalizationProvider>
+                {selectedCompletedDateRange[0] && selectedCompletedDateRange[1] && (
+                  <CancelIcon style={{ position: "absolute", right: "0", top: "47px" }} onClick={clearEndDateRange} />
+                )}
               </Form.Group>
             </Col>
           </Row>

@@ -20,6 +20,7 @@ import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 function OrderSystem() {
   const inputRef = useRef(null);
@@ -54,7 +55,7 @@ function OrderSystem() {
     )
       .then((response) => {
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        console.log(response.data["total_count"],'consoled response.data')
+        console.log(response.data["total_count"], 'consoled response.data')
         setOrders(data);
         setOverAllData({
           total_count: response.data.total_count,
@@ -185,7 +186,7 @@ function OrderSystem() {
     setPage(1);
   };
 
-  const orderId=(e)=>{
+  const orderId = (e) => {
     // console.log('hiiii');
     // console.log(e,'e');
     if (e.key === "Enter") {
@@ -195,10 +196,16 @@ function OrderSystem() {
     }
   }
 
+  const clearDateRange = () => {
+    setSelectedDateRange([null, null]);
+    setStartDate("")
+    setEndDate("")
+  };
+
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize,searchOrderID, page, dispatchType, isReset]);
+  }, [pageSize, searchOrderID, page, dispatchType, isReset]);
 
   return (
     <Container fluid className="py-3">
@@ -224,10 +231,8 @@ function OrderSystem() {
               </Form.Group>
             </Col>
             <Col xs="auto" lg="4">
-              <Form.Group>
-                <Form.Label className="fw-semibold mb-0">
-                  Date filter:
-                </Form.Label>
+              <Form.Group style={{ position: "relative" }}>
+                <Form.Label className="fw-semibold mb-0">Date filter:</Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
                     <DateRangePicker
@@ -248,6 +253,9 @@ function OrderSystem() {
                     />
                   </DemoContainer>
                 </LocalizationProvider>
+                {selectedDateRange[0] && selectedDateRange[1] && (
+                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                )}
               </Form.Group>
             </Col>
             <Col xs="auto" lg="4">
@@ -274,7 +282,7 @@ function OrderSystem() {
                   as="input"
                   type="number"
                   className="color-black"
-                  style={{ width: "100px",textAlign:'center'  }} // Add a custom width style here
+                  style={{ width: "100px", textAlign: 'center' }} // Add a custom width style here
                   value={overAllData.total_count}
                   readOnly
                 />
@@ -287,7 +295,7 @@ function OrderSystem() {
                   as="input"
                   type="number"
                   className="color-black"
-                  style={{ width: "100px",textAlign:'center' }} // Add a custom width style here
+                  style={{ width: "100px", textAlign: 'center' }} // Add a custom width style here
                   value={overAllData.total_dispatch_orders}
                   readOnly
                 />
@@ -300,7 +308,7 @@ function OrderSystem() {
                   as="input"
                   type="number"
                   className="color-black"
-                  style={{ width: "100px",textAlign:'center'}} // Add a custom width style here
+                  style={{ width: "100px", textAlign: 'center' }} // Add a custom width style here
                   value={overAllData.total_reserve_orders}
                   readOnly
                 />
