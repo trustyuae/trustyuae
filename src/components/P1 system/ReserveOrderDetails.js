@@ -8,7 +8,7 @@ import { Avatar, Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
+import { CompletedOrderDetailsGet, ReserveOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
@@ -54,7 +54,7 @@ function ReserveOrderDetails() {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(CompletedOrderDetailsGet(params.id));
+      const response = await dispatch(ReserveOrderDetailsGet(params.id));
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
@@ -117,8 +117,8 @@ function ReserveOrderDetails() {
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
-        if (params.row.variations && params.row.variations !== "") {
-          return variant(params.row.variations);
+        if (params.row.variation_value && params.row.variation_value !== "") {
+          return variant(params.row.variation_value);
         } else {
           return "No variations available";
         }
