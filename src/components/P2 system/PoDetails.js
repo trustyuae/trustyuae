@@ -6,9 +6,9 @@ import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
-import { Badge, ButtonGroup, Card, Col, ToggleButton } from "react-bootstrap";
+import { Badge, ButtonGroup, Card, Col, Modal, ToggleButton } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Alert, Box, MenuItem, Select, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, List, ListItem, ListItemText, MenuItem, Select, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
@@ -22,8 +22,16 @@ import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import PoDetailsModalInView from "./PoDetailsModalInView";
 import { useTranslation } from "react-i18next";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 
 const PoDetails = () => {
+  const messages = [
+    { id: 1, message: 'Message 1', time: '10:00 AM' },
+    { id: 2, message: 'Message 2', time: '10:30 AM' },
+    { id: 3, message: 'Message 3', time: '11:00 AM' },
+  ];
+
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -38,6 +46,9 @@ const PoDetails = () => {
   const [variationId, setVariationId] = useState(null);
   const [erId, setERId] = useState(null);
   const [lang, setLang] = useState("En");
+  const [showMessageModal, setshowMessageModal] = useState(false);
+  const [message, setMessage] = useState("");
+
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -186,7 +197,7 @@ const PoDetails = () => {
     setPrintModal(true);
   };
 
-  const handlePoModal = (itemId,itemVId) => {
+  const handlePoModal = (itemId, itemVId) => {
     setVariationId(itemVId)
     setProductId(itemId);
     setPoDetailsModal(true);
@@ -271,8 +282,8 @@ const PoDetails = () => {
       flex: 2.5,
       renderCell: (params) => {
         const handleClick = () => {
-          console.log(params.row,'params.row');
-          handlePoModal(params.row.product_id,params.row.variation_id);
+          console.log(params.row, 'params.row');
+          handlePoModal(params.row.product_id, params.row.variation_id);
         };
 
         if (params.row.id === "TAX") {
@@ -348,7 +359,7 @@ const PoDetails = () => {
             className="mr-sm-2 py-2"
             value={
               params.row.availability_status !== "" &&
-              params.row.availability_status !== "0"
+                params.row.availability_status !== "0"
                 ? params.row.availability_status
                 : params.row.estimated_production_time
             }
@@ -377,16 +388,16 @@ const PoDetails = () => {
       renderCell: (params) => {
         return (
           <Form.Select
-                className="mr-sm-2 py-2"
-                value={params.row.dispatch_status}
-                onChange={(e) => handleDispatchStatusChange(e.target.value,params.row)}
-              >
-                <option disabled selected value="">
-                  {t("POManagement.Select")}...
-                </option>
-                <option value="Dispatched">{t("POManagement.Dispatched")}</option>
-                <option value="Not Dispatched">{t("POManagement.NotDispatched")}</option>
-              </Form.Select>
+            className="mr-sm-2 py-2"
+            value={params.row.dispatch_status}
+            onChange={(e) => handleDispatchStatusChange(e.target.value, params.row)}
+          >
+            <option disabled selected value="">
+              {t("POManagement.Select")}...
+            </option>
+            <option value="Dispatched">{t("POManagement.Dispatched")}</option>
+            <option value="Not Dispatched">{t("POManagement.NotDispatched")}</option>
+          </Form.Select>
         );
       },
     },
@@ -405,10 +416,27 @@ const PoDetails = () => {
       return "Scheduled PO";
     }
   };
+
+  const handleAddMessage = async () => {
+    const orderId = parseInt(id, 10);
+    const requestedMessage = {
+      message: message,
+      order_id: orderId,
+    };
+    // await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+    //   if (response.data) {
+    //     const result = await ShowAlert("", response.data, "success");
+    //     if (result.isConfirmed) {
+    //       setMessage("");
+    //       setshowMessageModal(false);
+    //     }
+    //   }
+    // });
+  };
   return (
     <Container fluid className="px-5">
       <MDBRow className="my-3">
-        <MDBCol className="d-flex justify-content-between align-items-center">
+        <MDBCol className="d-flex justify-content-between align-items-center position-relative">
           <Button
             variant="outline-secondary"
             className="p-1 me-2 bg-transparent text-secondary"
@@ -416,7 +444,37 @@ const PoDetails = () => {
           >
             <ArrowBackIcon className="me-1" />
           </Button>
+          <div style={{ position: "absolute", zIndex: "100", top: "0", right: "50%", width: "43%" }}>
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+              >
+                <Typography>Messages</Typography>
+              </AccordionSummary>
+              <AccordionDetails style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                <List>
+                  {messages.map(({ id, message, time }) => (
+                    <ListItem key={id}>
+                      <ListItemText
+                        primary={message}
+                        secondary={time}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </AccordionDetails>
+            </Accordion>
+          </div>
           <Box>
+            <Button
+              variant="outline-secondary"
+              className="p-1 me-3 bg-transparent text-secondary"
+              onClick={() => setshowMessageModal(true)}
+            >
+              <AddCommentOutlinedIcon />
+            </Button>
             <Button
               variant="outline-primary"
               className="p-1 me-3 bg-transparent text-primary"
@@ -465,6 +523,7 @@ const PoDetails = () => {
               </Box>
               <Box style={{ marginLeft: "20px" }}>
                 <Box>
+
                   {erId ? (
                     <div>
                       <Typography className="fw-bold"># {erId}</Typography>
@@ -553,9 +612,9 @@ const PoDetails = () => {
                 // pageSize={pageSizeSO}
                 // totalPages={totalPagesSO}
                 rowHeight={100}
-                // handleChange={handleChangeSO}
-                // // onCellEditStart={handleCellEditStart}
-                // processRowUpdate={processRowUpdateSPO}
+              // handleChange={handleChangeSO}
+              // // onCellEditStart={handleCellEditStart}
+              // processRowUpdate={processRowUpdateSPO}
               />
             </div>
           )}
@@ -567,6 +626,33 @@ const PoDetails = () => {
           </Row>
         </MDBRow>
       </Card>
+      <Modal
+        show={showMessageModal}
+        onHide={() => setshowMessageModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Message</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Control
+            as="textarea"
+            placeholder="Enter your message here..."
+            rows={3}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <Box className="text-end my-3">
+            <Button
+              variant="secondary"
+              className="mt-2 fw-semibold"
+              onClick={handleAddMessage}
+            >
+              Add Message
+            </Button>
+          </Box>
+        </Modal.Body>
+      </Modal>
       <OrderDetailsPrintModal
         show={printModal}
         poId={id}
@@ -575,7 +661,7 @@ const PoDetails = () => {
         }
         PO_OrderList={PO_OrderList}
         handleClosePrintModal={() => setPrintModal(false)}
-        // showModal={printModal}
+      // showModal={printModal}
       />
       {poDetailsModal && (
         <PoDetailsModalInView
