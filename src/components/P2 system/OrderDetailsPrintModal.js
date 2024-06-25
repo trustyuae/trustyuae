@@ -18,6 +18,7 @@ const OrderDetailsPrintModal = ({
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
 
+  console.log(PO_OrderList,'PO_OrderList')
   const handleExport = async () => {
     setIsDownloadPdf(true);
     const doc = new jsPDF();
@@ -36,7 +37,7 @@ const OrderDetailsPrintModal = ({
     const textX = pageWidth / 2;
     const textY = 15;
     doc.text(`POId: ${poId}`, textX, textY, { align: 'center' });
-    doc.text(`Factory Name: ${factoryName}`, textX, textY + 10, { align: 'center' });
+    doc.text(`Factory Name: ${factoryName}`, textX, textY + 7, { align: 'center' });
   
     const tableColumn = ["Product Image", "Product Name", "Quantity Ordered"];
     const tableRows = [];
@@ -46,7 +47,7 @@ const OrderDetailsPrintModal = ({
         let imgData = defaultImage;
         if (item?.image) {
           try {
-            imgData = await loadImageToDataURL(item.image);
+            imgData = await loadImageToDataURL(item?.image);
           } catch (error) {
             console.error('Error loading image:', error);
             imgData = defaultImage; // Fallback to default image on error
@@ -54,7 +55,7 @@ const OrderDetailsPrintModal = ({
         }
   
         tableRows.push([
-          { image: imgData, width: 40 },
+          { image: imgData, width: 40 }, // Include image data as an object with 'image' key
           item?.product_name || 'N/A',
           item?.quantity || 0,
         ]);
@@ -65,15 +66,15 @@ const OrderDetailsPrintModal = ({
     if (totalItem) {
       tableRows.push([
         { content: "Total:", colSpan: 2, styles: { halign: 'right' } },
-        totalItem?.totals || 0,
+        totalItem?.total_quantity || 0,
       ]);
     }
   
-    const startY = textY + 20; // Initial startY position
+    const startY = textY + 15; // Initial startY position
   
     // Calculate the table width and startX to center the table horizontally
     const tableWidth = tableColumn.length * 40 + 80 + 30; // Adjust according to your column widths
-    const startX = (pageWidth - tableWidth) / 2 + 20;
+    const startX = (pageWidth - tableWidth) / 2 + 100;
   
     autoTable(doc, {
       startY: startY,
@@ -93,7 +94,7 @@ const OrderDetailsPrintModal = ({
         fillColor: [245, 245, 245],
       },
       rowPageBreak: 'avoid',
-      rowHeight: 40,
+      rowHeight: 80,
       columnStyles: {
         0: { cellWidth: 40, halign: 'center', cellPadding: 2 },
         1: { cellWidth: 80, halign: 'center', cellPadding: 2 },
@@ -102,13 +103,13 @@ const OrderDetailsPrintModal = ({
       head: [tableColumn],
       body: tableRows,
       didDrawCell: (data) => {
-        if (data.column.index === 0 && data.cell.section === 'body' && data.cell.raw?.image) {
-          const imgWidth = data.cell.raw.width || 40;
-          const imgHeight = data.cell.height - data.cell.padding('vertical');
-          doc.addImage(data.cell.raw.image, 'PNG', data.cell.x + data.cell.padding('left'), data.cell.y + data.cell.padding('top'), imgWidth, imgHeight);
+        if (data?.column?.index == 0 && data?.cell?.section == 'body' && data.cell.raw?.image) {
+          const imgWidth = data?.cell?.raw?.width || 40;
+          const imgHeight = data?.cell?.height - data?.cell?.padding('vertical');
+          doc.addImage(data?.cell?.raw?.image, 'PNG', data?.cell?.x + data?.cell?.padding('left'), data.cell.y + data.cell.padding('top'), imgWidth, imgHeight);
         }
       },
-      margin: { top: 30 },
+      margin: { top: 10, left: 30 },
       theme: 'grid',
       tableWidth: 'auto',
       columnWidth: 'wrap',
@@ -131,8 +132,6 @@ const OrderDetailsPrintModal = ({
     setIsDownloadPdf(false);
   };
   
-  
-
   const loadImageToDataURL = (url) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -169,8 +168,7 @@ const OrderDetailsPrintModal = ({
     if (totalItem) {
       data.push({
         "Product Name": "Total:",
-        "Quantity Ordered": totalItem?.totals || 0,
-        "Image URL": '',
+        "Quantity Ordered": totalItem?.total_quantity || 0,
       });
     }
 
@@ -191,6 +189,7 @@ const OrderDetailsPrintModal = ({
       headerName: "Product Image",
       flex: 1,
       renderCell: (params) => {
+        console.log(params,'params of modal of pdf')
         if (params.row.content) {
           return null;
         }
@@ -220,22 +219,24 @@ const OrderDetailsPrintModal = ({
       },
     },
   ];
-
   const rows = PO_OrderList.map((item) => {
     if (item.id === "TAX") {
       return {
         id: item.id,
         content: "Total:",
-        quantity: item.totals,
+        quantity: item.total_quantity,
+        colspan: 2, // Add colspan property for Total row
+      };
+    } else {
+      return {
+        id: item.id,
+        product_name: item.id === "total" ? "Total:" : item.product_name,
+        quantity: item.total_quantity || 0,
+         colspan: 2,
       };
     }
-    return {
-      id: item.id,
-      image: item.image || defaultImage,
-      product_name: item.product_name || 'N/A',
-      quantity: item.quantity || 0,
-    };
   });
+  
 
   useEffect(() => {
     // Effect to handle changes in PO_OrderList, if needed

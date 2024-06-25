@@ -84,9 +84,9 @@ const PoDetails = () => {
           {
             id: "TAX",
             label: "Total:",
-            taxRate: response.data.total_count || 0,
+            total_quantity: response?.data?.total_count || 0,
             taxTotal: 8100,
-            totals: response.data.total_cost || 0,
+            total_cost: response?.data?.total_cost || 0,
           },
         ];
         console.log(row, 'row');
