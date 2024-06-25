@@ -24,13 +24,14 @@ import PoDetailsModalInView from "./PoDetailsModalInView";
 import { useTranslation } from "react-i18next";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
+import axios from "axios";
 
 const PoDetails = () => {
-  const messages = [
-    { id: 1, message: 'Message 1', time: '10:00 AM' },
-    { id: 2, message: 'Message 2', time: '10:30 AM' },
-    { id: 3, message: 'Message 3', time: '11:00 AM' },
-  ];
+  // const messages = [
+  //   { id: 1, message: 'Message 1', time: '10:00 AM' },
+  //   { id: 2, message: 'Message 2', time: '10:30 AM' },
+  //   { id: 3, message: 'Message 3', time: '11:00 AM' },
+  // ];
 
   const { id } = useParams();
   const { t, i18n } = useTranslation();
@@ -48,7 +49,8 @@ const PoDetails = () => {
   const [lang, setLang] = useState("En");
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
-
+  const [messages, setMessages] = useState([])
+  const [addMessageD, setAddMessageD] = useState(false)
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -105,10 +107,26 @@ const PoDetails = () => {
     }
   };
 
+  const getMessages = async () => {
+    try {
+      const response = await axios.get(`${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`)
+      console.log(response.data, 'response');
+      setMessages(response.data)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     fetchPO();
+    // getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    // fetchPO();
+    getMessages()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   useEffect(() => {
     // Set the initial language to 'En' when component mounts
@@ -417,23 +435,28 @@ const PoDetails = () => {
       return "Scheduled PO";
     }
   };
-
   const handleAddMessage = async () => {
-    const orderId = parseInt(id, 10);
-    const requestedMessage = {
-      message: message,
-      order_id: orderId,
-    };
-    // await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-    //   if (response.data) {
-    //     const result = await ShowAlert("", response.data, "success");
-    //     if (result.isConfirmed) {
-    //       setMessage("");
-    //       setshowMessageModal(false);
-    //     }
-    //   }
-    // });
+    setAddMessageD(true)
+    try {
+      // const orderId = parseInt(id, 10);
+      let userID = JSON.parse(localStorage.getItem('user_data'))
+      const requestedMessage = {
+        po_note: message,
+        po_id: id,
+        user_id: userID.id
+      };
+
+      const response = await axios.post(`${API_URL}wp-json/custom-po-note/v1/add-po-note/`, requestedMessage)
+      console.log(response.data);
+      setshowMessageModal(false)
+      setMessage("")
+      setAddMessageD(false)
+    } catch (error) {
+
+    }
+
   };
+
   return (
     <Container fluid className="px-5">
       <MDBRow className="my-3">
@@ -538,43 +561,57 @@ const PoDetails = () => {
           </Box>
         </Box>
       </Card>
-      <Card className="p-3 mb-3">
-        <Box className="d-flex align-items-center justify-content-between">
-          <Box className="w-100">
-            <Typography variant="h6" className="fw-bold mb-3">
-              {/* Proper translation or localization function can be used here */}
-              {/* Chat Messages */}
-            </Typography>
-            <Box className="d-flex justify-content-between">
-              <div style={{ zIndex: "100", top: "0", right: "50%", width: "100%" }}>
-                <Accordion>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1-content"
-                    id="panel1-header"
-                  >
-                    <Typography variant="h6" className="fw-bold mb-3">Messages</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                    <List>
-                      {messages.map(({ id, message, time }) => (
-                        <ListItem key={id} className="d-flex justify-content-start">
-                          <ListItemText
-                            primary={message}
-                            secondary={time}
-                            className="rounded p-2"
-                            style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </AccordionDetails>
-                </Accordion>
-              </div>
+      {messages && messages.length > 0 && (
+        <Card className="p-3 mb-3">
+          <Box className="d-flex align-items-center justify-content-between">
+            <Box className="w-100">
+              <Typography variant="h6" className="fw-bold mb-3">
+                {/* Proper translation or localization function can be used here */}
+                {/* Chat Messages */}
+              </Typography>
+              <Box className="d-flex justify-content-between">
+                <div style={{ zIndex: "100", top: "0", right: "50%", width: "100%" }}>
+                  <Accordion>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1-content"
+                      id="panel1-header"
+                    >
+                      <Typography variant="h6" className="fw-bold">Messages</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                      <List>
+                        {messages?.map(({ id, po_note, note_time }, i) => (
+                          // <ListItem key={i} className="d-flex justify-content-start">
+                          //   <ListItemText
+                          //     primary={po_note}
+                          //     secondary={note_time}
+                          //     className="rounded p-2"
+                          //     style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
+                          //   />
+                          // </ListItem>
+                          <ListItem key={i} className="d-flex justify-content-start">
+                            <ListItemText
+                              primary={
+                                <Typography variant="body1" style={{ fontSize: '20px' }}>{po_note}</Typography>
+                              }
+                              secondary={
+                                <Typography variant="body2" style={{ fontSize: '10px' }}>{note_time}</Typography>
+                              }
+                              className="rounded p-2"
+                              style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </AccordionDetails>
+                  </Accordion>
+                </div>
+              </Box>
             </Box>
           </Box>
-        </Box>
-      </Card>
+        </Card>
+      )}
       <Card className="p-3 mb-3">
         <Row className="mb-3">
           <Col xs="auto" lg="4">
@@ -662,6 +699,7 @@ const PoDetails = () => {
           <Box className="text-end my-3">
             <Button
               variant="secondary"
+              disabled={addMessageD}
               className="mt-2 fw-semibold"
               onClick={handleAddMessage}
             >
