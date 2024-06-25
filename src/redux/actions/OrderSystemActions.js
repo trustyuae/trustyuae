@@ -107,7 +107,7 @@ export const OrderDetailsGet =
   };
 
 export const AttachmentFileUpload =
-  ({ user_id, order_id, item_id, selectedFile }) =>
+  ({ user_id, order_id, item_id, selectedFile,variation_id }) =>
   async (dispatch) => {
     try {
       dispatch({ type: UPLOAD_ATTACH_FILE_REQUEST });
@@ -115,7 +115,7 @@ export const AttachmentFileUpload =
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
-        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}`,
+        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}`,
         requestData,
         {
           headers: {
