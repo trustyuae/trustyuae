@@ -62,7 +62,7 @@ function OrderDetails() {
   if (!fileInputRef.current) {
     fileInputRef.current = {};
   }
-  fileInputRef.current[selectedItemId] = useRef(null);
+  fileInputRef.current[selectedVariationId ? selectedVariationId : selectedItemId] = useRef(null);
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
@@ -176,7 +176,7 @@ function OrderDetails() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e, itemId) => {
+  const handleFileInputChange = async (e, itemId, itemVariationId) => {
     if (e.target.files[0]) {
       const file = await CompressImage(e.target.files[0]);
       const fr = new FileReader();
@@ -185,6 +185,7 @@ function OrderDetails() {
         setSelectedFile(file);
         setShowAttachmentModal(true);
         setSelectedItemId(itemId);
+        setSelectedVariationId(itemVariationId)
       };
       fr.readAsDataURL(file);
     }
@@ -367,7 +368,6 @@ function OrderDetails() {
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
-        setSelectedVariationId(params?.row?.variation_id);
         if (
           params.row.variations &&
           Object.keys(params.row.variations).length !== 0
@@ -440,10 +440,11 @@ function OrderDetails() {
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
+        const itemVariationId = value && value.row.variation_id ? value.row.variation_id : null;
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId);
+          handleFileInputChange(e, itemId,itemVariationId);
         };
 
         if (!fileInputRef.current) {
@@ -516,7 +517,7 @@ function OrderDetails() {
                   qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
-                      onClick={() => fileInputRef.current[itemId]?.click()}
+                      onClick={() => fileInputRef.current[selectedVariationId ? selectedVariationId : itemId]?.click()}
                     >
                       <CloudUploadIcon />
                       <Typography style={{ fontSize: "14px" }}>
@@ -524,7 +525,7 @@ function OrderDetails() {
                       </Typography>
                       <input
                         type="file"
-                        ref={(input) => (fileInputRef.current[itemId] = input)}
+                        ref={(input) => (fileInputRef.current[selectedVariationId ? selectedVariationId : itemId] = input)}
                         style={{ display: "none" }}
                         onChange={handleFileInputChangeForRow}
                       />
@@ -550,6 +551,7 @@ function OrderDetails() {
                       onClick={() => {
                         setShowAttachModal(true);
                         setSelectedItemId(itemId);
+                        setSelectedVariationId(itemVariationId)
                       }}
                     >
                       <CameraAltIcon />
