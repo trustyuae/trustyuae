@@ -88,11 +88,12 @@ const PoDetails = () => {
           {
             id: "TAX",
             label: "Total:",
-            taxRate: response.data.total_count,
+            taxRate: response.data.total_count || 0,
             taxTotal: 8100,
-            totals: response.data.total_cost,
+            totals: response.data.total_cost || 0,
           },
         ];
+        console.log(row, 'row');
         setPO_OrderList(row);
         setERId(response.data.er_no);
         setFactorieName(response.data.factory_id);
@@ -444,29 +445,7 @@ const PoDetails = () => {
           >
             <ArrowBackIcon className="me-1" />
           </Button>
-          <div style={{ position: "absolute", zIndex: "100", top: "0", right: "50%", width: "43%" }}>
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                <Typography>Messages</Typography>
-              </AccordionSummary>
-              <AccordionDetails style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                <List>
-                  {messages.map(({ id, message, time }) => (
-                    <ListItem key={id}>
-                      <ListItemText
-                        primary={message}
-                        secondary={time}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </AccordionDetails>
-            </Accordion>
-          </div>
+
           <Box>
             <Button
               variant="outline-secondary"
@@ -501,6 +480,7 @@ const PoDetails = () => {
           </Box>
         </MDBCol>
       </MDBRow>
+
       <Card className="p-3 mb-3">
         <Box className="d-flex align-items-center justify-content-between">
           <Box>
@@ -555,6 +535,43 @@ const PoDetails = () => {
                   ?.factory_name
               }
             </Typography>
+          </Box>
+        </Box>
+      </Card>
+      <Card className="p-3 mb-3">
+        <Box className="d-flex align-items-center justify-content-between">
+          <Box className="w-100">
+            <Typography variant="h6" className="fw-bold mb-3">
+              {/* Proper translation or localization function can be used here */}
+              {/* Chat Messages */}
+            </Typography>
+            <Box className="d-flex justify-content-between">
+              <div style={{ zIndex: "100", top: "0", right: "50%", width: "100%" }}>
+                <Accordion>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1-content"
+                    id="panel1-header"
+                  >
+                    <Typography variant="h6" className="fw-bold mb-3">Messages</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                    <List>
+                      {messages.map(({ id, message, time }) => (
+                        <ListItem key={id} className="d-flex justify-content-start">
+                          <ListItemText
+                            primary={message}
+                            secondary={time}
+                            className="rounded p-2"
+                            style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </AccordionDetails>
+                </Accordion>
+              </div>
+            </Box>
           </Box>
         </Box>
       </Card>
