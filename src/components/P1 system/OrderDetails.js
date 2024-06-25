@@ -37,7 +37,7 @@ function OrderDetails() {
   const fileInputRef = useRef({});
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [selectedVariationId, setSelectedVariationId] = useState([]);
+  const [selectedVariationId, setSelectedVariationId] = useState("");
   const [orderDetails, setOrderDetails] = useState(null);
   const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -67,7 +67,6 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
-  console.log(tableData, "tableData");
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedFileUrl(imageSrc);
@@ -219,6 +218,7 @@ function OrderDetails() {
   };
 
   const handleSubmitAttachment = async () => {
+    console.log(selectedVariationId, "selectedVariationId");
     setAttachmentsubmitbtn(true);
     try {
       const { user_id } = userData ?? {};
@@ -368,6 +368,7 @@ function OrderDetails() {
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
+        setSelectedVariationId(params?.row?.variation_id);
         if (
           params.row.variations &&
           Object.keys(params.row.variations).length !== 0
@@ -377,7 +378,6 @@ function OrderDetails() {
           params.row.variation_value &&
           params.row.variation_value !== ""
         ) {
-          setSelectedVariationId(params.row.variation_id);
           return variant(params.row.variation_value);
         } else {
           return "No variations available";
