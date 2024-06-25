@@ -56,6 +56,7 @@ function OrderDetails() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
+  const [attachmentsubmitbtn,setAttachmentsubmitbtn]=useState(false)
   const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -215,6 +216,7 @@ function OrderDetails() {
   };
 
   const handleSubmitAttachment = async () => {
+    setAttachmentsubmitbtn(true)
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
@@ -248,8 +250,10 @@ function OrderDetails() {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
+      setAttachmentsubmitbtn(false)
     } catch (error) {
       console.error(error);
+      setAttachmentsubmitbtn(false)
     }
   };
 
@@ -1117,6 +1121,7 @@ function OrderDetails() {
                       variant="primary"
                       className=""
                       onClick={handleSubmitAttachment}
+                      disabled={attachmentsubmitbtn}
                     >
                       Submit
                     </Button>
@@ -1125,6 +1130,7 @@ function OrderDetails() {
                       variant="primary"
                       className=""
                       onClick={handleSubmitAttachment}
+                      disabled={attachmentsubmitbtn}
                     >
                       Submitt
                     </Button>
