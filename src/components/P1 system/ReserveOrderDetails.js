@@ -212,7 +212,7 @@ function ReserveOrderDetails() {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/completed_order_system")}
+              onClick={() => navigate("/reserve_orders_system")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
@@ -224,7 +224,7 @@ function ReserveOrderDetails() {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                Completed Order Details
+                Reserve Order Details
               </Typography>
               {loader ? (
                 <Loader />

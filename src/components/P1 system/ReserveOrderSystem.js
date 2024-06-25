@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -22,6 +22,8 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 function ReserveOrderSystem() {
+  const inputRef = useRef(null);
+
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -66,6 +68,9 @@ function ReserveOrderSystem() {
   }
 
   const handleReset = () => {
+    // const inputRef = useRef(null);
+    inputRef.current.value = "";
+
     setSearchOrderID("");
     setStartDate("");
     setEndDate("");
@@ -86,7 +91,7 @@ function ReserveOrderSystem() {
   };
 
   const columns = [
-    { field: "start_date", headerName: "Started Date", className: "order-system", flex: 1 },
+    { field: "date", headerName: "Date", className: "order-system", flex: 1 },
     {
       field: "order_id",
       headerName: "Order ID",
@@ -114,7 +119,7 @@ function ReserveOrderSystem() {
       className: "order-system",
       type: "string",
     },
-    { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
+    // { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName: "View Item",
@@ -220,6 +225,7 @@ function ReserveOrderSystem() {
                 <Form.Control
                   type="text"
                   placeholder="Enter Order ID"
+                  ref={inputRef}
                   // value={searchOrderID}
                   onKeyDown={(e) => orderId(e)}
                   className="mr-sm-2 py-2"
@@ -229,7 +235,7 @@ function ReserveOrderSystem() {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
-                  Start Date Filter:
+                  Date Filter:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -257,7 +263,7 @@ function ReserveOrderSystem() {
               </Form.Group>
             </Col>
 
-            <Col xs="auto" lg="4">
+            {/* <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold">
                   Completed Date Filter:
@@ -286,7 +292,7 @@ function ReserveOrderSystem() {
                   <CancelIcon style={{ position: "absolute", right: "0", top: "47px" }} onClick={clearEndDateRange} />
                 )}
               </Form.Group>
-            </Col>
+            </Col> */}
           </Row>
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
