@@ -228,8 +228,8 @@ function OrderDetails() {
             user_id: user_id,
             order_id: orderDetailsDataOrderId?.order_id,
             item_id: selectedItemId,
-            selectedFile: selectedFile,
             variation_id: selectedVariationId,
+            selectedFile: selectedFile,
           })
         );
       } else {

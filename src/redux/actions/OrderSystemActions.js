@@ -107,11 +107,11 @@ export const OrderDetailsGet =
   };
 
 export const AttachmentFileUpload =
-  ({ user_id, order_id, item_id, selectedFile,variation_id }) =>
+  ({ user_id, order_id, item_id,variation_id,selectedFile}) =>
   async (dispatch) => {
+    console.log(variation_id,'variation_id')
     try {
       dispatch({ type: UPLOAD_ATTACH_FILE_REQUEST });
-
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
