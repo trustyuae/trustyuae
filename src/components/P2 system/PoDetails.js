@@ -443,7 +443,7 @@ const PoDetails = () => {
       const requestedMessage = {
         po_note: message,
         po_id: id,
-        user_id: userID.id
+        user_id: userID.user_id
       };
 
       const response = await axios.post(`${API_URL}wp-json/custom-po-note/v1/add-po-note/`, requestedMessage)
