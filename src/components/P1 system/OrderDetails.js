@@ -218,7 +218,6 @@ function OrderDetails() {
   };
 
   const handleSubmitAttachment = async () => {
-    console.log(selectedVariationId, "selectedVariationId");
     setAttachmentsubmitbtn(true);
     try {
       const { user_id } = userData ?? {};
