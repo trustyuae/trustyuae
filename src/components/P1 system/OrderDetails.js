@@ -37,26 +37,27 @@ function OrderDetails() {
   const fileInputRef = useRef({});
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [selectedVariationId, setSelectedVariationId] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
   const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState('');
+  const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showMessageOHModal, setshowMessageOHModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState('');
+  const [selectedItemId, setSelectedItemId] = useState("");
   const [message, setMessage] = useState("");
   const [messageOH, setOHMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
-  const [attachmentsubmitbtn,setAttachmentsubmitbtn]=useState(false)
+  const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
   const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -66,6 +67,7 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
+  console.log(tableData, "tableData");
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedFileUrl(imageSrc);
@@ -91,7 +93,7 @@ function OrderDetails() {
   async function fetchOrder() {
     try {
       const response = await dispatch(OrderDetailsGet({ id: id }));
-      console.log(response.data.orders, 'response');
+      console.log(response.data.orders, "response");
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
@@ -129,8 +131,8 @@ function OrderDetails() {
   };
   const submitOH = async () => {
     try {
-      console.log(orderData, 'orderData');
-      console.log(orderDetails, 'orderDetails');
+      console.log(orderData, "orderData");
+      console.log(orderDetails, "orderDetails");
       const result = {
         order_id: parseInt(orderDetails.order_id, 10),
         item_id: [],
@@ -138,27 +140,28 @@ function OrderDetails() {
         variation_id: [],
         user_id: parseInt(orderDetails.user_id, 10),
         operation_user_id: parseInt(orderDetails.operation_user_id, 10),
-        onhold_note: messageOH
+        onhold_note: messageOH,
       };
-      orderDetails.items.forEach(item => {
+      orderDetails.items.forEach((item) => {
         result.item_id.push(parseInt(item.item_id, 10));
         result.product_name.push(item.product_name);
         result.variation_id.push(parseInt(item.variation_id, 10));
       });
 
-      console.log(result, 'result');
+      console.log(result, "result");
 
-      const response = await axios.post(`${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,result)
-      console.log(response,'response');
-      if(response.status===200){
-        navigate('/on_hold_orders_system')
+      const response = await axios.post(
+        `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
+        result
+      );
+      console.log(response, "response");
+      if (response.status === 200) {
+        navigate("/on_hold_orders_system");
       }
     } catch (error) {
       console.log(error);
     }
-
-  }
-
+  };
 
   useEffect(() => {
     fetchOrder();
@@ -216,7 +219,7 @@ function OrderDetails() {
   };
 
   const handleSubmitAttachment = async () => {
-    setAttachmentsubmitbtn(true)
+    setAttachmentsubmitbtn(true);
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
@@ -226,10 +229,11 @@ function OrderDetails() {
             order_id: orderDetailsDataOrderId?.order_id,
             item_id: selectedItemId,
             selectedFile: selectedFile,
+            variation_id: selectedVariationId,
           })
         );
       } else {
-        await dispatch(
+        dispatch(
           OverAllAttachmentFileUpload({
             order_id: orderDetailsDataOrderId?.order_id,
             order_dispatch_image: selectedFile,
@@ -250,10 +254,10 @@ function OrderDetails() {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
-      setAttachmentsubmitbtn(false)
+      setAttachmentsubmitbtn(false);
     } catch (error) {
       console.error(error);
-      setAttachmentsubmitbtn(false)
+      setAttachmentsubmitbtn(false);
     }
   };
 
@@ -373,6 +377,7 @@ function OrderDetails() {
           params.row.variation_value &&
           params.row.variation_value !== ""
         ) {
+          setSelectedVariationId(params.row.variation_id);
           return variant(params.row.variation_value);
         } else {
           return "No variations available";
@@ -508,7 +513,8 @@ function OrderDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && qty == avl_qty ? (
+                  orderProcess == "started" &&
+                  qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -538,7 +544,8 @@ function OrderDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && qty == avl_qty ? (
+                  orderProcess == "started" &&
+                  qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -636,7 +643,7 @@ function OrderDetails() {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-                orderProcess == "started" ? (
+              orderProcess == "started" ? (
                 <Button
                   variant="outline-danger"
                   className="p-1 me-2 bg-transparent text-danger"
@@ -830,7 +837,7 @@ function OrderDetails() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                                orderProcess == "started" ? (
+                              orderProcess == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -866,7 +873,7 @@ function OrderDetails() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                                orderProcess == "started" ? (
+                              orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -929,10 +936,14 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" &&
-              tableData?.some((data) => data.dispatch_image != "") ? (
+            orderProcess == "started" &&
+            tableData?.some((data) => data.dispatch_image != "") ? (
               <>
-                <Button variant="success" className=" mx-2" onClick={() => setshowMessageOHModal(true)}>
+                <Button
+                  variant="success"
+                  className=" mx-2"
+                  onClick={() => setshowMessageOHModal(true)}
+                >
                   On Hold
                 </Button>
                 <Button variant="danger" onClick={handleFinishButtonClick}>
@@ -946,7 +957,7 @@ function OrderDetails() {
                   className=" mx-2"
                   disabled={
                     orderProcess != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id 
+                    userData?.user_id != orderDetails?.operation_user_id
                     // tableData?.some((data) => data.dispatch_image == "")
                   }
                   onClick={() => setshowMessageOHModal(true)}
@@ -1071,7 +1082,7 @@ function OrderDetails() {
               <Button
                 variant="secondary"
                 className="mt-2 fw-semibold"
-                disabled={messageOH==""?true:false}
+                disabled={messageOH == "" ? true : false}
                 onClick={submitOH}
               >
                 Submit
