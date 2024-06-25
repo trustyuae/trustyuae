@@ -6,6 +6,7 @@ import { Box } from "@mui/material";
 import DataTable from "../DataTable";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+import defaultImage from "../../assets/default.png"; // Assuming you have a default image
 
 const OrderDetailsPrintModal = ({
   show,
@@ -16,13 +17,10 @@ const OrderDetailsPrintModal = ({
 }) => {
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
-  
+
   const handleExport = async () => {
-    setIsDownloadPdf(true); // Assuming this manages UI state for download progress
-  
+    setIsDownloadPdf(true);
     const doc = new jsPDF();
-  
-    // Set document properties
     doc.setProperties({
       title: 'Purchase Order Details',
       subject: 'PO Details',
@@ -30,42 +28,39 @@ const OrderDetailsPrintModal = ({
       keywords: 'PO, Purchase Order, Invoice',
     });
   
-    // Set default font and size
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);
   
-    // Header text
     const pageWidth = doc.internal.pageSize.width;
     const textX = pageWidth / 2;
     const textY = 15;
     doc.text(`POId: ${poId}`, textX, textY, { align: 'center' });
     doc.text(`Factory Name: ${factoryName}`, textX, textY + 10, { align: 'center' });
   
-    // Table data
     const tableColumn = ["Product Image", "Product Name", "Quantity Ordered"];
     const tableRows = [];
   
     for (const item of PO_OrderList) {
       if (item?.id !== "TAX") {
-        let imgData = null;
+        let imgData = defaultImage;
         if (item?.image) {
           try {
             imgData = await loadImageToDataURL(item.image);
           } catch (error) {
             console.error('Error loading image:', error);
+            imgData = defaultImage; // Fallback to default image on error
           }
         }
   
         tableRows.push([
-          { image: imgData, width: 40 }, // Adjust width as needed
+          { image: imgData, width: 40 },
           item?.product_name || 'N/A',
           item?.quantity || 0,
         ]);
       }
     }
   
-    // Adding the total row at the end
     const totalItem = PO_OrderList.find(item => item?.id === "TAX");
     if (totalItem) {
       tableRows.push([
@@ -74,9 +69,15 @@ const OrderDetailsPrintModal = ({
       ]);
     }
   
-    // Generate table
+    const startY = textY + 20; // Initial startY position
+  
+    // Calculate the table width and startX to center the table horizontally
+    const tableWidth = tableColumn.length * 40 + 80 + 30; // Adjust according to your column widths
+    const startX = (pageWidth - tableWidth) / 2 + 20;
+  
     autoTable(doc, {
-      startY: textY + 20,
+      startY: startY,
+      startX: startX,
       headStyles: {
         fillColor: [71, 183, 223],
         textColor: [255, 255, 255],
@@ -102,7 +103,7 @@ const OrderDetailsPrintModal = ({
       body: tableRows,
       didDrawCell: (data) => {
         if (data.column.index === 0 && data.cell.section === 'body' && data.cell.raw?.image) {
-          const imgWidth = data.cell.raw.width || 40; // Adjust width as needed
+          const imgWidth = data.cell.raw.width || 40;
           const imgHeight = data.cell.height - data.cell.padding('vertical');
           doc.addImage(data.cell.raw.image, 'PNG', data.cell.x + data.cell.padding('left'), data.cell.y + data.cell.padding('top'), imgWidth, imgHeight);
         }
@@ -115,14 +116,23 @@ const OrderDetailsPrintModal = ({
         lineWidth: 0.5,
         lineColor: [0, 0, 0],
       },
+      addPageContent: function(data) {
+        // Add footer with page number centered horizontally
+        const totalPages = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+        const text = `Page ${data.pageNumber} of ${totalPages}`;
+        const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+        const textX = (pageWidth - textWidth) / 2;
+        doc.text(textX, pageHeight - 10, text);
+      }
     });
   
-    // Save PDF
     doc.save('PoDetails-invoice.pdf');
-  
-    setIsDownloadPdf(false); // Reset UI state
+    setIsDownloadPdf(false);
   };
   
+  
+
   const loadImageToDataURL = (url) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -137,7 +147,7 @@ const OrderDetailsPrintModal = ({
       };
       img.onerror = (error) => {
         console.error('Error loading image:', error);
-        reject(error);
+        reject(defaultImage); // Fallback to default image on error
       };
       img.src = url;
     });
@@ -155,7 +165,6 @@ const OrderDetailsPrintModal = ({
       }
     }).filter(item => item !== undefined);
 
-    // Adding the total row at the end
     const totalItem = PO_OrderList.find(item => item?.id === "TAX");
     if (totalItem) {
       data.push({
@@ -183,9 +192,9 @@ const OrderDetailsPrintModal = ({
       flex: 1,
       renderCell: (params) => {
         if (params.row.content) {
-          return null; // Render nothing for the "Total" row
+          return null;
         }
-        return <img src={params.value} alt="Product" style={{ width: 50, height: 50 }} />;
+        return <img src={params.value || defaultImage} alt="Product" style={{ width: 50, height: 50 }} />;
       },
     },
     {
@@ -194,7 +203,7 @@ const OrderDetailsPrintModal = ({
       flex: 1,
       renderCell: (params) => {
         if (params.row.content) {
-          return <strong>{params.row.content}</strong>; // Render the "Total" label
+          return <strong>{params.row.content}</strong>;
         }
         return params.value;
       },
@@ -205,7 +214,7 @@ const OrderDetailsPrintModal = ({
       flex: 1,
       renderCell: (params) => {
         if (params.row.content) {
-          return <strong>{params.value}</strong>; // Render the total value
+          return <strong>{params.value}</strong>;
         }
         return params.value;
       },
@@ -222,14 +231,14 @@ const OrderDetailsPrintModal = ({
     }
     return {
       id: item.id,
-      image: item.image || require("../../assets/default.png"),
+      image: item.image || defaultImage,
       product_name: item.product_name || 'N/A',
       quantity: item.quantity || 0,
     };
   });
 
   useEffect(() => {
-    // This effect runs when PO_OrderList changes, e.g., on initial load or updates
+    // Effect to handle changes in PO_OrderList, if needed
   }, [PO_OrderList]);
 
   return (
