@@ -65,6 +65,18 @@ const Sidebar = () => {
                   <span>On Hold Orders System</span>
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/reserve_orders_system"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/reserve_orders_system" ? "active" : "")
+                  }
+                >
+                  <i className="bi bi-circle"></i>
+                  <span>Reserve Orders System</span>
+                </Link>
+              </li>
             </ul>
           </li>
 
