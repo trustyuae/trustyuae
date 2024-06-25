@@ -27,12 +27,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import axios from "axios";
 
 const PoDetails = () => {
-  // const messages = [
-  //   { id: 1, message: 'Message 1', time: '10:00 AM' },
-  //   { id: 2, message: 'Message 2', time: '10:30 AM' },
-  //   { id: 3, message: 'Message 3', time: '11:00 AM' },
-  // ];
-
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
