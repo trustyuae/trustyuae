@@ -88,6 +88,26 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
     });
   }
 };
+export const ReserveOrderDetailsGet = (id) => async (dispatch) => {
+  console.log(id, "idueeeeeeee");
+  try {
+    dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
+
+    const response = await axios.get(
+      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`
+    );
+    dispatch({
+      type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({
+      type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_FAIL,
+      error: error.message,
+    });
+  }
+};
 
 export const OrderDetailsGet =
   ({ id }) =>
