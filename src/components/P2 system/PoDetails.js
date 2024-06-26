@@ -122,8 +122,8 @@ const PoDetails = () => {
     // fetchPO();
     getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [messages]);
-  }, []);
+  }, [messages]);
+  // }, []);
 
   useEffect(() => {
     // Set the initial language to 'En' when component mounts
