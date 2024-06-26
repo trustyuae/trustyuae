@@ -206,12 +206,8 @@ const OrderDetailsPrintModal = ({
     {
       field: "product_name",
       headerName: "Product Name",
-      flex: 1,
-      
+      flex: 1, 
       renderCell: (params) => {
-        // if (params.row.content) {
-        //   return <strong>{params.row.content}</strong>;
-        // }
         return params.value;
       },
     },
