@@ -71,6 +71,7 @@ function App() {
               <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
               <Route exact path='/ER_details/:er_no' element={<ERDetails />} />
               <Route exact path='/completed_order_system' element={<CompletedOrderSystem />} />
+              <Route exact path='/completed_order_details/:id' element={<CompletedOrderDetails />} />
               <Route exact path='/reserve_orders_system' element={<ReserveOrderSystem />} />
               <Route exact path='/on_hold_orders_system' element={<OnHoldOrdersSystem/>} />
               <Route exact path='/on_hold_orders_system' element={<OnHoldOrdersSystem/>} />
