@@ -77,6 +77,8 @@ const PoDetails = () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`;
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
+        console.log(response,'response');
+        console.log(response?.data?.total_count,'response?.data?.total_count');
         let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "Dispatched" }));
         const row = [
@@ -120,7 +122,8 @@ const PoDetails = () => {
     // fetchPO();
     getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  // }, [messages]);
+  }, []);
 
   useEffect(() => {
     // Set the initial language to 'En' when component mounts
@@ -304,7 +307,7 @@ const PoDetails = () => {
         };
 
         if (params.row.id === "TAX") {
-          return params.row.taxRate;
+          return params.row.total_quantity;
         }
 
         return (
@@ -338,7 +341,7 @@ const PoDetails = () => {
       },
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
-          return `${row.totals}`;
+          return `${row.total_cost}`;
         }
         return value;
       },

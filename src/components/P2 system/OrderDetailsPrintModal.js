@@ -8,6 +8,7 @@ import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import defaultImage from "../../assets/default.png"; // Assuming you have a default image
 
+
 const OrderDetailsPrintModal = ({
   show,
   handleClosePrintModal,
@@ -18,7 +19,7 @@ const OrderDetailsPrintModal = ({
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
 
-  console.log(PO_OrderList,'PO_OrderList')
+  console.log(PO_OrderList, 'PO_OrderList')
   const handleExport = async () => {
     setIsDownloadPdf(true);
     const doc = new jsPDF();
@@ -28,32 +29,32 @@ const OrderDetailsPrintModal = ({
       author: 'Your Name',
       keywords: 'PO, Purchase Order, Invoice',
     });
-  
+
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);
-  
+
     const pageWidth = doc.internal.pageSize.width;
     const textX = pageWidth / 2;
     const textY = 15;
     doc.text(`POId: ${poId}`, textX, textY, { align: 'center' });
     doc.text(`Factory Name: ${factoryName}`, textX, textY + 7, { align: 'center' });
-  
-    const tableColumn = ["Product Image", "Product Name", "Quantity Ordered"];
+
+    const tableColumn = ["Factory Image", "Product Name", "Quantity Ordered"];
     const tableRows = [];
-  
     for (const item of PO_OrderList) {
+
       if (item?.id !== "TAX") {
         let imgData = defaultImage;
-        if (item?.image) {
+        if (item?.factory_image) {
           try {
-            imgData = await loadImageToDataURL(item?.image);
+            imgData = await loadImageToDataURL(item?.factory_image);
           } catch (error) {
             console.error('Error loading image:', error);
             imgData = defaultImage; // Fallback to default image on error
           }
         }
-  
+
         tableRows.push([
           { image: imgData, width: 40 }, // Include image data as an object with 'image' key
           item?.product_name || 'N/A',
@@ -61,7 +62,7 @@ const OrderDetailsPrintModal = ({
         ]);
       }
     }
-  
+
     const totalItem = PO_OrderList.find(item => item?.id === "TAX");
     if (totalItem) {
       tableRows.push([
@@ -69,13 +70,13 @@ const OrderDetailsPrintModal = ({
         totalItem?.total_quantity || 0,
       ]);
     }
-  
+
     const startY = textY + 15; // Initial startY position
-  
+
     // Calculate the table width and startX to center the table horizontally
     const tableWidth = tableColumn.length * 40 + 80 + 30; // Adjust according to your column widths
     const startX = (pageWidth - tableWidth) / 2 + 100;
-  
+
     autoTable(doc, {
       startY: startY,
       startX: startX,
@@ -96,9 +97,9 @@ const OrderDetailsPrintModal = ({
       rowPageBreak: 'avoid',
       rowHeight: 80,
       columnStyles: {
-        0: { cellWidth: 40, halign: 'center', cellPadding: 2 },
-        1: { cellWidth: 80, halign: 'center', cellPadding: 2 },
-        2: { cellWidth: 30, halign: 'center', cellPadding: 2 },
+        0: { cellWidth: 40, halign: 'center', cellPadding: 2 ,minCellHeight: 30 },
+        1: { cellWidth: 80, halign: 'center', cellPadding: 2 ,minCellHeight: 4 },
+        2: { cellWidth: 30, halign: 'center', cellPadding: 2 ,minCellHeight: 4 },
       },
       head: [tableColumn],
       body: tableRows,
@@ -127,11 +128,11 @@ const OrderDetailsPrintModal = ({
         doc.text(textX, pageHeight - 10, text);
       }
     });
-  
+
     doc.save('PoDetails-invoice.pdf');
     setIsDownloadPdf(false);
   };
-  
+
   const loadImageToDataURL = (url) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -185,11 +186,11 @@ const OrderDetailsPrintModal = ({
 
   const columns = [
     {
-      field: "image",
-      headerName: "Product Image",
+      field: "factory_image",
+      headerName: "Factory Image",
       flex: 1,
       renderCell: (params) => {
-        console.log(params,'params of modal of pdf')
+        console.log(params, 'params of modal of pdf')
         if (params.row.content) {
           return null;
         }
@@ -219,6 +220,7 @@ const OrderDetailsPrintModal = ({
       },
     },
   ];
+  console.log(PO_OrderList,'PO_OrderList');
   const rows = PO_OrderList.map((item) => {
     if (item.id === "TAX") {
       return {
@@ -231,12 +233,13 @@ const OrderDetailsPrintModal = ({
       return {
         id: item.id,
         product_name: item.id === "total" ? "Total:" : item.product_name,
-        quantity: item.total_quantity || 0,
-         colspan: 2,
+        quantity: item.quantity || 0,
+        colspan: 2,
+        factory_image: item.factory_image
       };
     }
   });
-  
+  console.log(rows, 'rows');
 
   useEffect(() => {
     // Effect to handle changes in PO_OrderList, if needed
