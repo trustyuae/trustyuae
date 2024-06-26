@@ -189,10 +189,16 @@ const OrderDetailsPrintModal = ({
       field: "factory_image",
       headerName: "Factory Image",
       flex: 1,
+      colSpan: (value, row) => {
+        if (row.id === "TAX") {
+          return 2;
+        }
+        return undefined;
+      },
       renderCell: (params) => {
         console.log(params, 'params of modal of pdf')
         if (params.row.content) {
-          return null;
+          return <strong>{params.row.content}</strong>
         }
         return <img src={params.value || defaultImage} alt="Product" style={{ width: 50, height: 50 }} />;
       },
@@ -201,10 +207,11 @@ const OrderDetailsPrintModal = ({
       field: "product_name",
       headerName: "Product Name",
       flex: 1,
+      
       renderCell: (params) => {
-        if (params.row.content) {
-          return <strong>{params.row.content}</strong>;
-        }
+        // if (params.row.content) {
+        //   return <strong>{params.row.content}</strong>;
+        // }
         return params.value;
       },
     },
