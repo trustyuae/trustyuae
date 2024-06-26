@@ -183,6 +183,7 @@ const PoDetails = () => {
       availability_status: updatelist?.map((item) => item.availability_status),
       request_quantity: updatelist?.map((item) => item.available_quantity),
       product_ids: updatelist?.map((item) => item.product_id),
+      variation_id:updatelist?.map((item)=>item.variation_id) || 0,
       po_status: PoStatus,
       payment_status: paymentStatus,
     };
@@ -201,10 +202,13 @@ const PoDetails = () => {
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    if (index.target.value >= 0) {
+    console.log(event,'event');
+    if (index.target.value >= 0 && index.target.value<= event.quantity) {
       const updatedData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
-          return { ...item, available_quantity: index.target.value };
+          if(item.variation_id == event.variation_id){
+            return { ...item, available_quantity: index.target.value };
+          }
         }
         return item;
       });
@@ -277,7 +281,7 @@ const PoDetails = () => {
       renderCell: variant2,
     },
     {
-      field: "image",
+      field: "factory_image",
       headerName: t("POManagement.Image"),
       flex: 4,
       type: "html",
@@ -285,7 +289,7 @@ const PoDetails = () => {
         return (
           <>
             <img
-              src={value.row.image}
+              src={value.row.factory_image}
               alt={value.row.product_name}
               className="img-fluid"
               width={100}
