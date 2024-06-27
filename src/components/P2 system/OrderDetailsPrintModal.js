@@ -56,7 +56,7 @@ const OrderDetailsPrintModal = ({
         }
 
         tableRows.push([
-          { image: imgData, width: 40 }, // Include image data as an object with 'image' key
+          { image: imgData, width: 30 }, // Include image data as an object with 'image' key
           item?.product_name || 'N/A',
           item?.quantity || 0,
         ]);
