@@ -810,6 +810,7 @@ function OrderManagementSystem() {
         product_ids: selectedProductIds,
         factory_ids: factoryIds.join(","),
         order_ids: selectedOrderIdsStr,
+        variation_id:selectedAgainstOrderDetails.map((order)=>order.variation_id).join(",")||0
       };
       try {
         const response = await dispatch(AddPO(payload, navigate));
