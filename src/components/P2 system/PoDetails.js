@@ -6,9 +6,28 @@ import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
-import { Badge, ButtonGroup, Card, Col, Modal, ToggleButton } from "react-bootstrap";
+import {
+  Badge,
+  ButtonGroup,
+  Card,
+  Col,
+  Modal,
+  ToggleButton,
+} from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Box, List, ListItem, ListItemText, MenuItem, Select, Typography } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
@@ -22,7 +41,7 @@ import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import PoDetailsModalInView from "./PoDetailsModalInView";
 import { useTranslation } from "react-i18next";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import axios from "axios";
 
@@ -43,8 +62,8 @@ const PoDetails = () => {
   const [lang, setLang] = useState("En");
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([])
-  const [addMessageD, setAddMessageD] = useState(false)
+  const [messages, setMessages] = useState([]);
+  const [addMessageD, setAddMessageD] = useState(false);
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -77,8 +96,8 @@ const PoDetails = () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`;
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
-        console.log(response,'response');
-        console.log(response?.data?.total_count,'response?.data?.total_count');
+        console.log(response, "response");
+        console.log(response?.data?.total_count, "response?.data?.total_count");
         let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "Dispatched" }));
         const row = [
@@ -91,7 +110,7 @@ const PoDetails = () => {
             total_cost: response?.data?.total_cost || 0,
           },
         ];
-        console.log(row, 'row');
+        console.log(row, "row");
         setPO_OrderList(row);
         setERId(response.data.er_no);
         setFactorieName(response.data.factory_id);
@@ -105,13 +124,15 @@ const PoDetails = () => {
 
   const getMessages = async () => {
     try {
-      const response = await axios.get(`${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`)
-      console.log(response.data, 'response');
-      setMessages(response.data)
+      const response = await axios.get(
+        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`
+      );
+      console.log(response.data, "response");
+      setMessages(response.data);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchPO();
@@ -120,7 +141,7 @@ const PoDetails = () => {
   }, []);
   useEffect(() => {
     // fetchPO();
-    getMessages()
+    getMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
   // }, []);
@@ -133,7 +154,9 @@ const PoDetails = () => {
   const handleStatusChange = (value, event) => {
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
-        return { ...item, availability_status: value };
+        if (item.variation_id == event.variation_id) {
+          return { ...item, availability_status: value };
+        }
       }
       return item;
     });
@@ -143,7 +166,9 @@ const PoDetails = () => {
   const handleDispatchStatusChange = (value, event) => {
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
-        return { ...item, dispatch_status: value };
+        if (item.variation_id == event.variation_id) {
+          return { ...item, dispatch_status: value };
+        }
       }
       return item;
     });
@@ -162,7 +187,6 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-    console.log(updatelist, "updatelist");
     const availabilityStatuses =
       updatelist?.map((item) => item.availability_status) || [];
     const flattenedStatuses = availabilityStatuses.flat();
@@ -180,7 +204,7 @@ const PoDetails = () => {
       availability_status: updatelist?.map((item) => item.availability_status),
       request_quantity: updatelist?.map((item) => item.available_quantity),
       product_ids: updatelist?.map((item) => item.product_id),
-      variation_id:updatelist?.map((item)=>item.variation_id) || 0,
+      variation_id: updatelist?.map((item) => item.variation_id) || 0,
       po_status: PoStatus,
       payment_status: paymentStatus,
     };
@@ -199,11 +223,11 @@ const PoDetails = () => {
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    console.log(event,'event');
-    if (index.target.value >= 0 && index.target.value<= event.quantity) {
+    console.log(event, "event");
+    if (index.target.value >= 0 && index.target.value <= event.quantity) {
       const updatedData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
-          if(item.variation_id == event.variation_id){
+          if (item.variation_id == event.variation_id) {
             return { ...item, available_quantity: index.target.value };
           }
         }
@@ -218,7 +242,7 @@ const PoDetails = () => {
   };
 
   const handlePoModal = (itemId, itemVId) => {
-    setVariationId(itemVId)
+    setVariationId(itemVId);
     setProductId(itemId);
     setPoDetailsModal(true);
   };
@@ -302,7 +326,7 @@ const PoDetails = () => {
       flex: 2.5,
       renderCell: (params) => {
         const handleClick = () => {
-          console.log(params.row, 'params.row');
+          console.log(params.row, "params.row");
           handlePoModal(params.row.product_id, params.row.variation_id);
         };
 
@@ -379,11 +403,13 @@ const PoDetails = () => {
             className="mr-sm-2 py-2"
             value={
               params.row.availability_status !== "" &&
-                params.row.availability_status !== "0"
+              params.row.availability_status !== "0"
                 ? params.row.availability_status
                 : params.row.estimated_production_time
             }
-            onChange={(event) => handleStatusChange(event.target.value, params.row)}
+            onChange={(event) =>
+              handleStatusChange(event.target.value, params.row)
+            }
             fullWidth
             style={{ height: "40%", width: "100%" }}
           >
@@ -410,13 +436,17 @@ const PoDetails = () => {
           <Form.Select
             className="mr-sm-2 py-2"
             value={params.row.dispatch_status}
-            onChange={(e) => handleDispatchStatusChange(e.target.value, params.row)}
+            onChange={(e) =>
+              handleDispatchStatusChange(e.target.value, params.row)
+            }
           >
             <option disabled selected value="">
               {t("POManagement.Select")}...
             </option>
             <option value="Dispatched">{t("POManagement.Dispatched")}</option>
-            <option value="Not Dispatched">{t("POManagement.NotDispatched")}</option>
+            <option value="Not Dispatched">
+              {t("POManagement.NotDispatched")}
+            </option>
           </Form.Select>
         );
       },
@@ -437,25 +467,25 @@ const PoDetails = () => {
     }
   };
   const handleAddMessage = async () => {
-    setAddMessageD(true)
+    setAddMessageD(true);
     try {
       // const orderId = parseInt(id, 10);
-      let userID = JSON.parse(localStorage.getItem('user_data'))
+      let userID = JSON.parse(localStorage.getItem("user_data"));
       const requestedMessage = {
         po_note: message,
         po_id: id,
-        user_id: userID.user_id
+        user_id: userID.user_id,
       };
 
-      const response = await axios.post(`${API_URL}wp-json/custom-po-note/v1/add-po-note/`, requestedMessage)
+      const response = await axios.post(
+        `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
+        requestedMessage
+      );
       console.log(response.data);
-      setshowMessageModal(false)
-      setMessage("")
-      setAddMessageD(false)
-    } catch (error) {
-
-    }
-
+      setshowMessageModal(false);
+      setMessage("");
+      setAddMessageD(false);
+    } catch (error) {}
   };
 
   return (
@@ -527,7 +557,6 @@ const PoDetails = () => {
               </Box>
               <Box style={{ marginLeft: "20px" }}>
                 <Box>
-
                   {erId ? (
                     <div>
                       <Typography className="fw-bold"># {erId}</Typography>
@@ -571,16 +600,27 @@ const PoDetails = () => {
                 {/* Chat Messages */}
               </Typography>
               <Box className="d-flex justify-content-between">
-                <div style={{ zIndex: "100", top: "0", right: "50%", width: "100%" }}>
+                <div
+                  style={{
+                    zIndex: "100",
+                    top: "0",
+                    right: "50%",
+                    width: "100%",
+                  }}
+                >
                   <Accordion>
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                       aria-controls="panel1-content"
                       id="panel1-header"
                     >
-                      <Typography variant="h6" className="fw-bold">Messages</Typography>
+                      <Typography variant="h6" className="fw-bold">
+                        Messages
+                      </Typography>
                     </AccordionSummary>
-                    <AccordionDetails style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                    <AccordionDetails
+                      style={{ maxHeight: "200px", overflowY: "auto" }}
+                    >
                       <List>
                         {messages?.map(({ id, po_note, note_time }, i) => (
                           // <ListItem key={i} className="d-flex justify-content-start">
@@ -591,16 +631,33 @@ const PoDetails = () => {
                           //     style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
                           //   />
                           // </ListItem>
-                          <ListItem key={i} className="d-flex justify-content-start">
+                          <ListItem
+                            key={i}
+                            className="d-flex justify-content-start"
+                          >
                             <ListItemText
                               primary={
-                                <Typography variant="body1" style={{ fontSize: '20px' }}>{po_note}</Typography>
+                                <Typography
+                                  variant="body1"
+                                  style={{ fontSize: "20px" }}
+                                >
+                                  {po_note}
+                                </Typography>
                               }
                               secondary={
-                                <Typography variant="body2" style={{ fontSize: '10px' }}>{note_time}</Typography>
+                                <Typography
+                                  variant="body2"
+                                  style={{ fontSize: "10px" }}
+                                >
+                                  {note_time}
+                                </Typography>
                               }
                               className="rounded p-2"
-                              style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
+                              style={{
+                                maxWidth: "70%",
+                                minWidth: "50px",
+                                backgroundColor: "#bfdffb",
+                              }}
                             />
                           </ListItem>
                         ))}
@@ -667,9 +724,9 @@ const PoDetails = () => {
                 // pageSize={pageSizeSO}
                 // totalPages={totalPagesSO}
                 rowHeight={100}
-              // handleChange={handleChangeSO}
-              // // onCellEditStart={handleCellEditStart}
-              // processRowUpdate={processRowUpdateSPO}
+                // handleChange={handleChangeSO}
+                // // onCellEditStart={handleCellEditStart}
+                // processRowUpdate={processRowUpdateSPO}
               />
             </div>
           )}
@@ -717,7 +774,7 @@ const PoDetails = () => {
         }
         PO_OrderList={PO_OrderList}
         handleClosePrintModal={() => setPrintModal(false)}
-      // showModal={printModal}
+        // showModal={printModal}
       />
       {poDetailsModal && (
         <PoDetailsModalInView
