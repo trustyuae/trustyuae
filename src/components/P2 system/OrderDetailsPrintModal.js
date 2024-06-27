@@ -29,21 +29,20 @@ const OrderDetailsPrintModal = ({
       author: 'Your Name',
       keywords: 'PO, Purchase Order, Invoice',
     });
-
+  
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);
-
+  
     const pageWidth = doc.internal.pageSize.width;
     const textX = pageWidth / 2;
     const textY = 15;
     doc.text(`POId: ${poId}`, textX, textY, { align: 'center' });
     doc.text(`Factory Name: ${factoryName}`, textX, textY + 7, { align: 'center' });
-
+  
     const tableColumn = ["Factory Image", "Product Name", "Quantity Ordered"];
     const tableRows = [];
     for (const item of PO_OrderList) {
-
       if (item?.id !== "TAX") {
         let imgData = defaultImage;
         if (item?.factory_image) {
@@ -54,7 +53,7 @@ const OrderDetailsPrintModal = ({
             imgData = defaultImage; // Fallback to default image on error
           }
         }
-
+  
         tableRows.push([
           { image: imgData, width: 30 }, // Include image data as an object with 'image' key
           item?.product_name || 'N/A',
@@ -62,24 +61,19 @@ const OrderDetailsPrintModal = ({
         ]);
       }
     }
-
+  
     const totalItem = PO_OrderList.find(item => item?.id === "TAX");
     if (totalItem) {
       tableRows.push([
-        { content: "Total:", colSpan: 2, styles: { halign: 'right' } },
-        totalItem?.total_quantity || 0,
+        { content: "Total:", colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+        { content: totalItem?.total_quantity || 0, styles: { halign: 'center', fontStyle: 'bold' } },
       ]);
     }
-
+  
     const startY = textY + 15; // Initial startY position
-
-    // Calculate the table width and startX to center the table horizontally
-    const tableWidth = tableColumn.length * 40 + 80 + 30; // Adjust according to your column widths
-    const startX = (pageWidth - tableWidth) / 2 + 100;
-
+  
     autoTable(doc, {
       startY: startY,
-      startX: startX,
       headStyles: {
         fillColor: [71, 183, 223],
         textColor: [255, 255, 255],
@@ -90,6 +84,7 @@ const OrderDetailsPrintModal = ({
       bodyStyles: {
         textColor: [0, 0, 0],
         fontSize: 10,
+        halign: 'center', // Center text in all body cells
       },
       alternateRowStyles: {
         fillColor: [245, 245, 245],
@@ -97,20 +92,20 @@ const OrderDetailsPrintModal = ({
       rowPageBreak: 'avoid',
       rowHeight: 80,
       columnStyles: {
-        0: { cellWidth: 40, halign: 'center', cellPadding: 2 ,minCellHeight: 30 },
-        1: { cellWidth: 80, halign: 'center', cellPadding: 2 ,minCellHeight: 4 },
-        2: { cellWidth: 30, halign: 'center', cellPadding: 2 ,minCellHeight: 4 },
+        0: { cellWidth: 40, halign: 'center', cellPadding: 2, minCellHeight: 30 },
+        1: { cellWidth: 80, halign: 'center', cellPadding: 2, minCellHeight: 30 },
+        2: { cellWidth: 30, halign: 'center', cellPadding: 2, minCellHeight: 30 },
       },
       head: [tableColumn],
       body: tableRows,
       didDrawCell: (data) => {
-        if (data?.column?.index == 0 && data?.cell?.section == 'body' && data.cell.raw?.image) {
+        if (data?.column?.index === 0 && data?.cell?.section === 'body' && data.cell.raw?.image) {
           const imgWidth = data?.cell?.raw?.width || 40;
           const imgHeight = data?.cell?.height - data?.cell?.padding('vertical');
           doc.addImage(data?.cell?.raw?.image, 'PNG', data?.cell?.x + data?.cell?.padding('left'), data.cell.y + data.cell.padding('top'), imgWidth, imgHeight);
         }
       },
-      margin: { top: 10, left: 30 },
+      margin: { top: 10, bottom: 10, left: (pageWidth - (tableColumn.length * 50)) / 2, right: (pageWidth - (tableColumn.length * 50)) / 2 },
       theme: 'grid',
       tableWidth: 'auto',
       columnWidth: 'wrap',
@@ -128,10 +123,13 @@ const OrderDetailsPrintModal = ({
         doc.text(textX, pageHeight - 10, text);
       }
     });
-
+  
     doc.save('PoDetails-invoice.pdf');
     setIsDownloadPdf(false);
   };
+  
+  
+  
 
   const loadImageToDataURL = (url) => {
     return new Promise((resolve, reject) => {
