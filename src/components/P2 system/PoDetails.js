@@ -143,7 +143,7 @@ const PoDetails = () => {
     // fetchPO();
     getMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
+  }, [setMessages]);
   // }, []);
 
   useEffect(() => {
@@ -482,9 +482,11 @@ const PoDetails = () => {
         requestedMessage
       );
       console.log(response.data);
+
       setshowMessageModal(false);
       setMessage("");
       setAddMessageD(false);
+      getMessages()
     } catch (error) {}
   };
 
