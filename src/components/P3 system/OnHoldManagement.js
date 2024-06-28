@@ -43,7 +43,7 @@ function OnHoldManagement() {
   );
 
   async function fetchProductDetails() {
-    let apiUrl = `${API_URL}wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}`;
+    let apiUrl = `${API_URL}wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
     await dispatch(
       GetProductDetails({
         apiUrl: `${apiUrl}`,
