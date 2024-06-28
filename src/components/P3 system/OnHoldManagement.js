@@ -350,7 +350,7 @@ function OnHoldManagement() {
       <MDBRow>
         <MDBCol md="12" className="d-flex justify-content-end">
           {productData.length === 0 ? (
-            <Button variant="success" onClick={handleOrderStock}>
+            <Button variant="success" disabled onClick={handleOrderStock}>
               Send For InStock
             </Button>
           ) : (
