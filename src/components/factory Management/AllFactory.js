@@ -1,29 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
-import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { useDispatch, useSelector } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
 import {
-  AllFactoryActions,
   FactoryEdit,
 } from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";
+import { API_URL } from "../../redux/constants/Constants";
+import axios from "axios";
 
 function AllFactory() {
   const dispatch = useDispatch();
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
-  );
-
   const [factories, setFactories] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  
+
   const [factoryName, setFactoryName] = useState("");
   const [address, setAddress] = useState("");
   const [contactPerson, setContactPerson] = useState("");
@@ -32,17 +28,26 @@ function AllFactory() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  
-  useEffect(() => {
-    dispatch(AllFactoryActions());
-  }, [dispatch]);
-  
-  useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+
+  async function fetchFactories() {
+    try {
+      let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?&page=${page}&per_page=${pageSize}`;
+      const response = await axios.get(apiUrl);
+      const factoryData = response.data.factories.map((item) => ({ ...item }));
+      setFactories(factoryData);
+      setTotalPages(response.data.total_pages);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error);
+      throw error;
     }
-  }, [allFactoryDatas]);
+  }
+
+  useEffect(() => {
+    fetchFactories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
+  }, [pageSize, page]);
 
   const handleEdit = (factoryId) => {
     const factory = factories.find((f) => f.id === factoryId);
@@ -52,6 +57,10 @@ function AllFactory() {
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
+  };
+
+  const handleChange = (event, value) => {
+    setPage(value);
   };
 
   const handleSaveEdit = async () => {
@@ -119,7 +128,7 @@ function AllFactory() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value.row.id,'value.row.id of ')
+        console.log(value.row.id, "value.row.id of ");
         return (
           <Button
             type="button"
@@ -191,7 +200,11 @@ function AllFactory() {
         <div className="mt-2">
           <DataTable
             columns={columns}
-            rows={filteredProducts || []} // Provide an empty array as fallback if filteredProducts is undefined
+            rows={filteredProducts || []}
+            page={page}
+            pageSize={pageSize}
+            totalPages={totalPages}
+            handleChange={handleChange}
           />
         </div>
       </Row>
