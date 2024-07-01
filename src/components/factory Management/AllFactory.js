@@ -32,6 +32,11 @@ function AllFactory() {
   async function fetchFactories() {
     try {
       let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?&page=${page}&per_page=${pageSize}`;
+      if(factoryName) apiUrl += `&factory_name=${factoryName}`
+      if(address) apiUrl += `&address=${address}`
+      if(contactPerson) apiUrl += `&contact_person=${contactPerson}`
+      if(contactNumber) apiUrl += `&contact_number=${contactNumber}`
+      if(email) apiUrl += `&contact_email=${email}`
       const response = await axios.get(apiUrl);
       const factoryData = response.data.factories.map((item) => ({ ...item }));
       setFactories(factoryData);
