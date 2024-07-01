@@ -17,6 +17,7 @@ import {
 } from "../../redux/actions/ProductManagementActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
+import defaultImage from "../../assets/default.png";
 
 function AllProductList() {
   const dispatch = useDispatch();
@@ -30,17 +31,19 @@ function AllProductList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
-  const allFactoryDatas = useSelector((state) => state?.allFactoryData?.factory);
+  const allFactoryDatas = useSelector(
+    (state) => state?.allFactoryData?.factory
+  );
   const loader = useSelector((state) => state?.allProducts?.isAllProducts);
 
   useEffect(() => {
     dispatch(AllFactoryActions());
   }, [dispatch]);
-  
+
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas.factories) {
       let data = allFactoryDatas?.factories?.map((item) => ({ ...item }));
-      setFactories(data); 
+      setFactories(data);
     }
   }, [allFactoryDatas]);
 
@@ -125,7 +128,11 @@ function AllProductList() {
         return (
           <Box className="h-100 w-100 d-flex align-items-center">
             <Avatar
-              src={value?.row?.factory_image}
+              src={
+                value?.row?.factory_image || value?.row?.product_image
+                  ? value?.row?.factory_image || value?.row?.product_image
+                  : defaultImage
+              }
               alt="Product Image"
               sx={{
                 height: "45px",
@@ -247,10 +254,7 @@ function AllProductList() {
       </Row>
 
       {/* Edit Modal */}
-      <Modal
-        show={showEditModal}
-        onHide={handleCloseEditModal}
-      >
+      <Modal show={showEditModal} onHide={handleCloseEditModal}>
         <Modal.Header closeButton>
           <Modal.Title>Edit Product</Modal.Title>
         </Modal.Header>
