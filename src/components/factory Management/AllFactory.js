@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
-import {
-  FactoryEdit,
-} from "../../redux/actions/AllFactoryActions";
+import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
@@ -31,13 +29,16 @@ function AllFactory() {
 
   async function fetchFactories() {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?&page=${page}&per_page=${pageSize}`;
-      if(factoryName) apiUrl += `&factory_name=${factoryName}`
-      if(address) apiUrl += `&address=${address}`
-      if(contactPerson) apiUrl += `&contact_person=${contactPerson}`
-      if(contactNumber) apiUrl += `&contact_number=${contactNumber}`
-      if(email) apiUrl += `&contact_email=${email}`
-      const response = await axios.get(apiUrl);
+      let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
+      const params = {
+        factory_name: factoryName,
+        address: address,
+        contact_person: contactPerson,
+        contact_number: contactNumber,
+        contact_email: email,
+      };
+
+      const response = await axios.get(apiUrl, { params });
       const factoryData = response.data.factories.map((item) => ({ ...item }));
       setFactories(factoryData);
       setTotalPages(response.data.total_pages);
@@ -50,9 +51,7 @@ function AllFactory() {
 
   useEffect(() => {
     fetchFactories();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
-  }, [pageSize, page]);
+  }, [pageSize, page, factoryName, address, contactPerson, contactNumber, email]);
 
   const handleEdit = (factoryId) => {
     const factory = factories.find((f) => f.id === factoryId);
@@ -93,28 +92,6 @@ function AllFactory() {
     }
   };
 
-  const filteredProducts = factories?.filter((factory) => {
-    return (
-      factory.factory_name.toLowerCase().includes(factoryName.toLowerCase()) &&
-      (factory.address
-        ? factory.address.toLowerCase().includes(address.toLowerCase())
-        : true) &&
-      (factory.contact_person
-        ? factory.contact_person
-            .toLowerCase()
-            .includes(contactPerson.toLowerCase())
-        : true) &&
-      (factory.contact_number
-        ? factory.contact_number
-            .toLowerCase()
-            .includes(contactNumber.toLowerCase())
-        : true) &&
-      (factory.contact_email
-        ? factory.contact_email.toLowerCase().includes(email.toLowerCase())
-        : true)
-    );
-  });
-
   const columns = [
     { field: "factory_name", headerName: "Factory Name", flex: 1 },
     { field: "address", headerName: "Address", flex: 1 },
@@ -133,12 +110,11 @@ function AllFactory() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        console.log(value.row.id, "value.row.id of ");
         return (
           <Button
             type="button"
             className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-            onClick={() => handleEdit(value.row.id)}
+            onClick={() => handleEdit(row.id)}
           >
             <FaEye className="mb-1" />
           </Button>
@@ -205,7 +181,7 @@ function AllFactory() {
         <div className="mt-2">
           <DataTable
             columns={columns}
-            rows={filteredProducts || []}
+            rows={factories}
             page={page}
             pageSize={pageSize}
             totalPages={totalPages}
