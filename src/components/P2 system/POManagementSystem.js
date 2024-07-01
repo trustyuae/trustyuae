@@ -65,7 +65,10 @@ function POManagementSystem() {
   }, [dispatch]);
 
   useEffect(() => {
-    setFactories(allFactoryDatas);
+    if (allFactoryDatas && allFactoryDatas.factories) {
+      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
+      setFactories(data); 
+    }
   }, [allFactoryDatas]);
 
   const POM_system_products = async () => {

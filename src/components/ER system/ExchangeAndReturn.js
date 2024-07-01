@@ -252,7 +252,10 @@ function ExchangeAndReturn() {
   }, [dispatch]);
 
   useEffect(() => {
-    setFactories(allFactoryDatas);
+    if (allFactoryDatas && allFactoryDatas.factories) {
+      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
+      setFactories(data); 
+    }
   }, [allFactoryDatas]);
 
   const selectPOType = async () => {

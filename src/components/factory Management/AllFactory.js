@@ -29,6 +29,9 @@ function AllFactory() {
   const [contactPerson, setContactPerson] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
   
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -116,6 +119,7 @@ function AllFactory() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
+        console.log(value.row.id,'value.row.id of ')
         return (
           <Button
             type="button"
