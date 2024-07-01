@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
@@ -20,6 +20,7 @@ import Loader from "../../utils/Loader";
 import defaultImage from "../../assets/default.png";
 
 function AllProductList() {
+  const inputRef = useRef(null);
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -186,6 +187,18 @@ function AllProductList() {
     setCurrentPage(value);
   };
 
+  const searchIdd = (e) => {
+    if (e.key === "Enter") {
+      setSearchId(e.target.value);
+    }
+  }
+
+  const searchNamee = (e) => {
+    if (e.key === "Enter") {
+      setSearchName(e.target.value);
+    }
+  }
+
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -199,9 +212,10 @@ function AllProductList() {
             <Form.Label className="me-2 fw-semibold">Product ID:</Form.Label>
             <Form.Control
               type="text"
+              ref={inputRef}
               placeholder="Search by Product ID"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
+              onKeyDown={(e) => searchIdd(e)}
+              // onChange={(e) => setSearchId(e.target.value)}
             />
           </Form.Group>
         </Col>
@@ -211,8 +225,8 @@ function AllProductList() {
             <Form.Control
               type="text"
               placeholder="Search by Product Name"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
+              ref={inputRef}
+              onKeyDown={(e) => searchNamee(e)}
             />
           </Form.Group>
         </Col>

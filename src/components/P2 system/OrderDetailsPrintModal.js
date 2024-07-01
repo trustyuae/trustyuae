@@ -73,7 +73,7 @@ const OrderDetailsPrintModal = ({
         // Add row data
         tableRows.push([
           { image: imgData, width: 56}, // Include image data as an object with 'image' key
-          productName || "No Variation Available",
+          productName || " ",
           item?.quantity || 0,
         ]);
       }
