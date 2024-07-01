@@ -159,7 +159,7 @@ function AllFactory() {
             onChange={(e) => setFactoryName(e.target.value)}
           />
         </MDBCol>
-        <MDBCol md="2">
+        <MDBCol md="3">
           <Form.Label className="me-2 fw-semibold">Address</Form.Label>
           <Form.Control
             type="text"
@@ -186,7 +186,7 @@ function AllFactory() {
             onChange={(e) => setContactNumber(e.target.value)}
           />
         </MDBCol>
-        <MDBCol md="2">
+        <MDBCol md="3">
           <Form.Label className="me-2 fw-semibold">Contact email</Form.Label>
           <Form.Control
             type="text"
