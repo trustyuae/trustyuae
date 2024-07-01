@@ -30,7 +30,7 @@ function AllProductList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
-  const allFactoryDatas = useSelector((state) => state.allFactoryData.factory);
+  const allFactoryDatas = useSelector((state) => state?.allFactoryData?.factory);
   const loader = useSelector((state) => state?.allProducts?.isAllProducts);
 
   useEffect(() => {
@@ -38,7 +38,10 @@ function AllProductList() {
   }, [dispatch]);
   
   useEffect(() => {
-    setFactories(allFactoryDatas);
+    if (allFactoryDatas && allFactoryDatas.factories) {
+      let data = allFactoryDatas?.factories?.map((item) => ({ ...item }));
+      setFactories(data); 
+    }
   }, [allFactoryDatas]);
 
   const fetchProducts = async () => {

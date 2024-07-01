@@ -105,7 +105,6 @@ function FactoryForm() {
                     value={factory.address}
                     onChange={handleChange}
                     className="form-control"
-                    required
                   />
                   <Form.Control.Feedback type="invalid">Please enter factory address.</Form.Control.Feedback>
                 </Form.Group>
@@ -123,7 +122,6 @@ function FactoryForm() {
                     value={factory.contact_person}
                     onChange={handleChange}
                     className="form-control"
-                    required
                   />
                   <Form.Control.Feedback type="invalid">Please enter cntact person.</Form.Control.Feedback>
                 </Form.Group>
@@ -143,7 +141,6 @@ function FactoryForm() {
                     value={factory.contact_number}
                     onChange={handleChange}
                     className="form-control"
-                    required
                   />
                   <Form.Control.Feedback type="invalid">Please enter cpntact number.</Form.Control.Feedback>
                 </Form.Group>
@@ -161,7 +158,6 @@ function FactoryForm() {
                     value={factory.contact_email}
                     onChange={handleChange}
                     className="form-control"
-                    required
                   />
                   <Form.Control.Feedback type="invalid">Please entercontact email.</Form.Control.Feedback>
                 </Form.Group>
@@ -179,7 +175,6 @@ function FactoryForm() {
                     value={factory.bank_account_details}
                     onChange={handleChange}
                     className="form-control"
-                    required
                   />
                   <Form.Control.Feedback type="invalid">Please enter bank account details.</Form.Control.Feedback>
                 </Form.Group>

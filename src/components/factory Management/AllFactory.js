@@ -5,7 +5,10 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { useDispatch, useSelector } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
-import { AllFactoryActions, FactoryEdit } from "../../redux/actions/AllFactoryActions";
+import {
+  AllFactoryActions,
+  FactoryEdit,
+} from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
@@ -20,21 +23,21 @@ function AllFactory() {
   const [factories, setFactories] = useState([]);
   const [selectedFactory, setSelectedFactory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-
+  
   const [factoryName, setFactoryName] = useState("");
   const [address, setAddress] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
-
+  
   useEffect(() => {
     dispatch(AllFactoryActions());
   }, [dispatch]);
-
+  
   useEffect(() => {
-    if (Array.isArray(allFactoryDatas)) {
-      let data = allFactoryDatas.map((v, i) => ({ ...v, id: i }));
-      setFactories(data);
+    if (allFactoryDatas && allFactoryDatas.factories) {
+      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
+      setFactories(data); 
     }
   }, [allFactoryDatas]);
 
@@ -59,8 +62,8 @@ function AllFactory() {
     };
     try {
       await dispatch(FactoryEdit(selectedFactory, data));
-      setFactories(prevFactories => {
-        return prevFactories.map(factory => {
+      setFactories((prevFactories) => {
+        return prevFactories.map((factory) => {
           if (factory.id === selectedFactory.id) {
             return { ...factory, ...data };
           }
@@ -73,22 +76,27 @@ function AllFactory() {
     }
   };
 
-  const filteredProducts = factories.filter(
-    (factory) =>
+  const filteredProducts = factories?.filter((factory) => {
+    return (
       factory.factory_name.toLowerCase().includes(factoryName.toLowerCase()) &&
-      (factory?.address
+      (factory.address
         ? factory.address.toLowerCase().includes(address.toLowerCase())
         : true) &&
-      (factory?.contact_person
-        ? factory.contact_person.toLowerCase().includes(contactPerson.toLowerCase())
+      (factory.contact_person
+        ? factory.contact_person
+            .toLowerCase()
+            .includes(contactPerson.toLowerCase())
         : true) &&
-      (factory?.contact_person
-        ? factory.contact_number.toLowerCase().includes(contactNumber.toLowerCase())
+      (factory.contact_number
+        ? factory.contact_number
+            .toLowerCase()
+            .includes(contactNumber.toLowerCase())
         : true) &&
-      (factory?.contact_email
+      (factory.contact_email
         ? factory.contact_email.toLowerCase().includes(email.toLowerCase())
         : true)
-  );
+    );
+  });
 
   const columns = [
     { field: "factory_name", headerName: "Factory Name", flex: 1 },
@@ -96,16 +104,22 @@ function AllFactory() {
     { field: "contact_person", headerName: "Contact Person", flex: 1 },
     { field: "contact_number", headerName: "Contact Number", flex: 1 },
     { field: "contact_email", headerName: "Contact email", flex: 1 },
-    { field: "bank_account_details", headerName: "Bank Account Details", flex: 1 },
     {
-      field: "view_item",
+      field: "bank_account_details",
+      headerName: "Bank Account Details",
+      flex: 1,
+    },
+    {
+      field: "",
       headerName: "View Item",
       flex: 1,
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
         return (
-          <Button type="button" className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+          <Button
+            type="button"
+            className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
             onClick={() => handleEdit(value.row.id)}
           >
             <FaEye className="mb-1" />
@@ -114,6 +128,7 @@ function AllFactory() {
       },
     },
   ];
+
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -172,12 +187,7 @@ function AllFactory() {
         <div className="mt-2">
           <DataTable
             columns={columns}
-            rows={filteredProducts}
-          // rows={factories}
-          // page={page}
-          // pageSize={pageSize}
-          // totalPages={totalPages}
-          // handleChange={handleChange}
+            rows={filteredProducts || []} // Provide an empty array as fallback if filteredProducts is undefined
           />
         </div>
       </Row>
