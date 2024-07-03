@@ -1,5 +1,5 @@
-export const url = "https://wordpress.trustysystem.com/wp-json/";
-export const API_URL = "https://wordpress.trustysystem.com/";
+export const url = "https://trustyuae.com/wp-json/";
+export const API_URL = "https://trustyuae.com/";
 
 export const username = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
 export const password = "ck_176cdf1ee0c4ccb0376ffa22baf84c096d5a155a";
