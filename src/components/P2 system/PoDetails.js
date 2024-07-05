@@ -44,6 +44,7 @@ import { useTranslation } from "react-i18next";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import axios from "axios";
+import defaulImage from '../../../src/assets/default.png'
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -313,7 +314,7 @@ const PoDetails = () => {
         return (
           <>
             <img
-              src={value.row.factory_image}
+              src={value.row.factory_image ? value.row.factory_image : (value.row.image ? value.row.image : defaulImage)              }
               alt={value.row.product_name}
               className="img-fluid"
               width={100}

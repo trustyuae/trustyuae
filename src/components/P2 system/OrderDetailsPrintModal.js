@@ -44,7 +44,7 @@ const OrderDetailsPrintModal = ({
     for (const item of PO_OrderList) {
       if (item?.id !== "TAX") {
         let imgData = defaultImage;
-        if (item?.factory_image) {
+        if (item?.factory_image ? item.factory_image : (item.image ? item.image : defaultImage)) {
           try {
             imgData = await loadImageToDataURL(item?.factory_image);
           } catch (error) {
@@ -301,7 +301,7 @@ const OrderDetailsPrintModal = ({
         product_name: item.id === "total" ? "Total:" : item.product_name,
         quantity: item.quantity || 0,
         colspan: 2,
-        factory_image: item.factory_image,
+        factory_image: item.factory_image ? item.factory_image : (item.image ? item.image : defaultImage),
       };
     }
   });
