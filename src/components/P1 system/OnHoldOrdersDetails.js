@@ -62,6 +62,7 @@ function OnHoldOrdersDetails() {
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState('');
+  const [selectedVariationId, setSelecetedVariationId] = useState('');
   const [toggleStatus, setToggleStatus] = useState(0)
 
   const [message, setMessage] = useState("");
@@ -216,6 +217,7 @@ function OnHoldOrdersDetails() {
             order_id: id,
             item_id: selectedItemId,
             selectedFile: selectedFile,
+            variation_id:selectedVariationId,
           })
         );
       } else {
@@ -428,6 +430,8 @@ function OnHoldOrdersDetails() {
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
+        const variationId = value && value.row.variation_id ? Number(value.row.variation_id) : 0;
+        console.log(variationId,'variationId');
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
@@ -536,6 +540,7 @@ function OnHoldOrdersDetails() {
                       onClick={() => {
                         setShowAttachModal(true);
                         setSelectedItemId(itemId);
+                        setSelecetedVariationId(variationId)
                       }}
                     >
                       <CameraAltIcon />

@@ -7,6 +7,11 @@ import styled from "styled-components";
 
 const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
   const customerData = orderData && orderData[0];
+  console.log(customerData?.customer_shipping_address, 'customerData.customer_shipping_address');
+  // console.log(customerData.customer_shipping_address.split(",")[0],'customerData.customer_shipping_address.split(",")[0] ');
+  //   const addressLines = customerData?.customer_shipping_address.split(',\n')[0];
+  // console.log(addressLines,'addressLines');
+  // console.log('a, \n b, \n c','a \n b \n c');
   const modalRef = useRef(null);
 
   const downloadPDF = () => {
@@ -51,7 +56,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     doc.setLineWidth(0.3); // Set line width for the separator
     doc.line(cardX, titleY + 5, cardX + cardWidth, titleY + 5);
 
-    
+
     doc.setFontSize(12); // Reduce font size for details// Reset font style
     // doc.setFontStyle("normal");
 
@@ -78,6 +83,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
 
     doc.text(
       `Address : ${customerData.customer_shipping_address}`,
+      // `Address : a \n b \n c`,
       cardContentX,
       titleY + 42
     );
