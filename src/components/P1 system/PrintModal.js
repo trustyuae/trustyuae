@@ -82,6 +82,12 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
       titleY + 42
     );
 
+    doc.text(
+      `Shipping Method : ${customerData.shipping_method}`,
+      cardContentX,
+      titleY + 50
+    );
+
     // Draw bottom border of the card
     doc.setLineWidth(borderWidth);
     doc.line(cardX, cardY + cardHeight, cardX + cardWidth, cardY + cardHeight);
