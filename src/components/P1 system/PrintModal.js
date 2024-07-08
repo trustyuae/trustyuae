@@ -3,46 +3,90 @@ import { Button, Modal } from "react-bootstrap";
 import jsPDF from "jspdf";
 import { Box, Typography } from "@mui/material";
 import { getCountryName } from "../../utils/GetCountryName";
+import styled from "styled-components";
 
-const PrintModal = ({ show, handleClosePrintModal, orderData}) => {
-  const customerData = orderData && orderData[0]
+const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
+  const customerData = orderData && orderData[0];
   const modalRef = useRef(null);
 
   const downloadPDF = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight(); 
-    const cardWidth = 140; 
-    const cardHeight = 60; 
-    const cardX = (pageWidth - cardWidth) / 2; 
-    const cardY = (pageHeight - cardHeight) / 2; 
-    doc.setFillColor(200, 200, 200); 
-    doc.rect(cardX, cardY, cardWidth, cardHeight, "F"); 
-    const cardContentX = cardX + 5; 
-    const cardContentY = cardY + 10; 
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const cardWidth = 85;
+    const cardHeight = 85;
+    const borderWidth = 1; // Border width
 
-    doc.setTextColor(0, 0, 0); 
-    doc.text(`Order Id: ${customerData.order_id}`, cardContentX, cardContentY);
+    const cardX = (pageWidth - cardWidth) / 2;
+    const cardY = (pageHeight - cardHeight) / 2;
+
+    // Draw outer border of the card
+    doc.setLineWidth(borderWidth);
+    doc.setDrawColor(0); // Black border color
+    doc.rect(cardX, cardY, cardWidth, cardHeight);
+
+    // Fill background with light gray
+    doc.setFillColor(200, 200, 200);
+    doc.rect(
+      cardX + borderWidth,
+      cardY + borderWidth,
+      cardWidth - 2 * borderWidth,
+      cardHeight - 2 * borderWidth,
+      "F"
+    );
+
+    const cardContentX = cardX + 5;
+    const cardContentY = cardY + 10;
+
+    const titleX = cardX + cardWidth / 2;
+    const titleY = cardY + 10; // Adjust for vertical centering
+    doc.setFontSize(16);
+    doc.setTextColor(0); // Black text color
+
+    // Print "Shipping Label" with bold font weight
+    // doc.setFontStyle("bold");
+    doc.text("Shipping Label", titleX, titleY, { align: "center" });
+
+    // Draw horizontal line below "Shipping Label"
+    doc.setLineWidth(0.1); // Set line width for the separator
+    doc.line(cardX, titleY + 5, cardX + cardWidth, titleY + 5);
+
+    // Reset font style
+    // doc.setFontStyle("normal");
+
+    // Draw horizontal line above address
+    // doc.line(cardX, addressY - 5, cardX + cardWidth, addressY - 5);
+
+    // Print customer details
+    doc.setFontSize(12); // Reduce font size for details
+    doc.text(`Order Id : ${customerData.order_id}`, cardContentX, titleY + 10);
     doc.text(
-      `Customer Name: ${customerData.customer_name} ${customerData?.last_name}`,
+      `Customer Name :${customerData.customer_name} ${customerData?.last_name}`,
       cardContentX,
-      cardContentY + 10
+      titleY + 18
     );
     doc.text(
-      `Contact Number: ${customerData.contact_no}`,
+      `Contact Number : ${customerData.contact_no}`,
       cardContentX,
-      cardContentY + 20
-    ); 
-    doc.text(
-      `Country: ${getCountryName(customerData.shipping_country)}`,
-      cardContentX,
-      cardContentY + 30
+      titleY + 26
     );
     doc.text(
-      `Address: ${customerData.customer_shipping_address}`,
+      `Country : ${getCountryName(customerData.shipping_country)}`,
       cardContentX,
-      cardContentY + 40
+      titleY + 34
     );
+
+    doc.text(
+      `Address : ${customerData.customer_shipping_address}`,
+      cardContentX,
+      titleY + 42
+    );
+
+    // Draw bottom border of the card
+    doc.setLineWidth(borderWidth);
+    doc.line(cardX, cardY + cardHeight, cardX + cardWidth, cardY + cardHeight);
+
+    // Save the PDF with the name "invoice.pdf"
     doc.save("invoice.pdf");
   };
 
@@ -51,53 +95,165 @@ const PrintModal = ({ show, handleClosePrintModal, orderData}) => {
   };
 
   return (
-    <Modal
-      show={show}
-      onHide={handleClosePrintModal}
-      centered
-      ref={modalRef}
-    >
+    <Modal show={show} onHide={handleClosePrintModal} centered ref={modalRef}>
       <Modal.Header closeButton>
-        <Modal.Title>Invoice</Modal.Title>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <Title>Shipping Lable</Title>
+        </Box>
       </Modal.Header>
       <Modal.Body>
         <div>
           {customerData && (
             <>
               <Box>
-                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
-                  Order Id:{" "}
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Order Id :{" "}
                 </Typography>
-                <Typography variant="label" className="fw-semibold fs-5">
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
                   {customerData.order_id}
                 </Typography>
-              </Box><Box>
-                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
-                  Customer Name:{" "}
+              </Box>
+              <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Customer Name :{" "}
                 </Typography>
-                <Typography variant="label" className="fw-semibold fs-5">
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
                   {customerData.customer_name}
                 </Typography>
-              </Box><Box>
-                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
-                  Contact Number:{" "}
+              </Box>
+              <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Contact Number :{" "}
                 </Typography>
-                <Typography variant="label" className="fw-semibold fs-5">
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
                   {customerData.contact_no}
                 </Typography>
-              </Box><Box>
-                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
-                  Country:{" "}
+              </Box>
+              <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Country :{" "}
                 </Typography>
-                <Typography variant="label" className="fw-semibold fs-5">
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
                   {getCountryName(customerData.shipping_country)}
                 </Typography>
-              </Box><Box>
-                <Typography variant="label" style={{ color: '#bf4f74' }} className="fw-semibold fs-5">
-                  Address:{" "}
+              </Box>
+              <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Address :{" "}
                 </Typography>
-                <Typography variant="label" className="fw-semibold fs-5">
-                  {customerData.customer_shipping_address}
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
+                  {customerData.customer_shipping_address
+                    .split(",")
+                    .map((line, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          display: "block",
+                          marginLeft: index > 0 ? "102px" : "0",
+                        }}
+                      >
+                        {line.trim()}
+                      </span>
+                    ))}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Shipping Method :{" "}
+                </Typography>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
+                  {customerData.shipping_method}
                 </Typography>
               </Box>
             </>
@@ -120,3 +276,14 @@ const PrintModal = ({ show, handleClosePrintModal, orderData}) => {
 };
 
 export default PrintModal;
+
+const Title = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 35px;
+  font-weight: 700;
+  color: #000000;
+  align-self: "center";
+`;
