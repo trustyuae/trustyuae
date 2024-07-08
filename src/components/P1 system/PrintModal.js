@@ -209,7 +209,16 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                     fontWeight: "700",
                   }}
                 >
-                  Address :{" "}
+                  Address:{" "}
+                  <span
+                    style={{
+                      color: "#7d6c71",
+                      fontSize: "20px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {customerData.customer_shipping_address.split(",")[0]}
+                  </span>
                 </Typography>
                 <Typography
                   variant="label"
@@ -221,12 +230,13 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                 >
                   {customerData.customer_shipping_address
                     .split(",")
+                    .slice(1)
                     .map((line, index) => (
                       <span
                         key={index}
                         style={{
                           display: "block",
-                          marginLeft: index > 0 ? "102px" : "0",
+                          marginLeft: "102px",
                         }}
                       >
                         {line.trim()}
