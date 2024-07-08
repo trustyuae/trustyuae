@@ -15,7 +15,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     const pageHeight = doc.internal.pageSize.getHeight();
     const cardWidth = 85;
     const cardHeight = 85;
-    const borderWidth = 1; // Border width
+    const borderWidth = 0.5; // Border width
 
     const cardX = (pageWidth - cardWidth) / 2;
     const cardY = (pageHeight - cardHeight) / 2;
@@ -26,7 +26,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     doc.rect(cardX, cardY, cardWidth, cardHeight);
 
     // Fill background with light gray
-    doc.setFillColor(200, 200, 200);
+    doc.setFillColor(255, 255, 255);
     doc.rect(
       cardX + borderWidth,
       cardY + borderWidth,
@@ -48,17 +48,17 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     doc.text("Shipping Label", titleX, titleY, { align: "center" });
 
     // Draw horizontal line below "Shipping Label"
-    doc.setLineWidth(0.1); // Set line width for the separator
+    doc.setLineWidth(0.3); // Set line width for the separator
     doc.line(cardX, titleY + 5, cardX + cardWidth, titleY + 5);
 
-    // Reset font style
+    
+    doc.setFontSize(12); // Reduce font size for details// Reset font style
     // doc.setFontStyle("normal");
 
     // Draw horizontal line above address
     // doc.line(cardX, addressY - 5, cardX + cardWidth, addressY - 5);
 
     // Print customer details
-    doc.setFontSize(12); // Reduce font size for details
     doc.text(`Order Id : ${customerData.order_id}`, cardContentX, titleY + 10);
     doc.text(
       `Customer Name :${customerData.customer_name} ${customerData?.last_name}`,
@@ -87,6 +87,9 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
       cardContentX,
       titleY + 50
     );
+
+    doc.setLineWidth(0.3); // Set line width for the separator
+    doc.line(cardX, titleY + 55, cardX + cardWidth, titleY + 55);
 
     // Draw bottom border of the card
     doc.setLineWidth(borderWidth);
