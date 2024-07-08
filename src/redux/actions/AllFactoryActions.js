@@ -1,3 +1,4 @@
+import ShowAlert from "../../utils/ShowAlert";
 import {
   GET_All_FACTORY_REQUEST,
   GET_All_FACTORY_SUCCESS,
@@ -16,7 +17,7 @@ import axios from "axios";
 export const AllFactoryActions = () => async (dispatch) => {
   try {
     dispatch({ type: GET_All_FACTORY_REQUEST });
-    const response = await axios.get(`${API_URL}wp-json/custom-factory/v1/fetch-factories`);
+    const response = await axios.get(`${API_URL}wp-json/custom-factory/v1/fetch-factories/?page=1&per_page=2000000`);
     console.log(response, 'response of factories from reducer');
     dispatch({ type: GET_All_FACTORY_SUCCESS, payload: response.data });
   } catch (error) {
@@ -59,6 +60,8 @@ export const FactoryAdd = (factData, navigate) => async (dispatch) => {
       }
     );
     dispatch({ type: ADD_FACTORY_SUCCESS, payload: response?.data });
+    const result = await ShowAlert("Success", response?.data?.message, 'success', false, false, 'OK', '', 1000);
+    // if (result.isConfirmed) navigate("/ordersystem");
     navigate("/all_factory");
   } catch (error) {
     dispatch({ type: ADD_FACTORY_FAIL, error: error.message });

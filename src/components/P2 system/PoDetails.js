@@ -103,7 +103,7 @@ const PoDetails = () => {
         console.log(response, "response");
         console.log(response?.data?.total_count, "response?.data?.total_count");
         let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
-        data = data.map((v, i) => ({ ...v, dispatch_status: "Dispatched" }));
+        data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
         const row = [
           ...data,
           {
@@ -171,7 +171,7 @@ const PoDetails = () => {
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
         if (item.variation_id == event.variation_id) {
-          return { ...item, dispatch_status: value };
+          return { ...item, dispatch_type: value };
         }
       }
       return item;
@@ -191,6 +191,8 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
+    console.log(updatelist,'updatelist');
+    // console.log([updatelist[0]]?.map((item) =>item.dispatch_type),'dispatch_type');
     const availabilityStatuses =
       updatelist?.map((item) => item.availability_status) || [];
     const flattenedStatuses = availabilityStatuses.flat();
@@ -209,9 +211,12 @@ const PoDetails = () => {
       request_quantity: updatelist?.map((item) => item.available_quantity),
       product_ids: updatelist?.map((item) => item.product_id),
       variation_id: updatelist?.map((item) => item.variation_id) || 0,
+      dispatch_type: updatelist?.map((item) => item.dispatch_type==null?'':item.dispatch_type),
       po_status: PoStatus,
       payment_status: paymentStatus,
+
     };
+    console.log(updatedData,'updatedData');
     if (validationMessage == "Successful") {
       let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
       await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
@@ -432,14 +437,14 @@ const PoDetails = () => {
     },
 
     {
-      field: "dispatch_status",
+      field: "dispatch_type",
       headerName: t("POManagement.DispatchStatus"),
       flex: 3,
       renderCell: (params) => {
         return (
           <Form.Select
             className="mr-sm-2 py-2"
-            value={params.row.dispatch_status}
+            value={params.row.dispatch_type}
             onChange={(e) =>
               handleDispatchStatusChange(e.target.value, params.row)
             }
