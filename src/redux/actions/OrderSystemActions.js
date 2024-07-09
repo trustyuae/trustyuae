@@ -32,6 +32,12 @@ import {
   UPLOAD_OVERALL_ATTACH_FILE_SUCCESS,
   UPLOAD_OVERALL_ATTACH_FILE_FAIL,
   UPLOAD_OVERALL_ATTACH_FILE_REQUEST,
+  CUSTOM_ORDER_ON_HOLD_REQUEST,
+  CUSTOM_ORDER_ON_HOLD_SUCCESS,
+  CUSTOM_ORDER_ON_HOLD_FAIL,
+  CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST,
+  CUSTOM_ORDER_ON_HOLD_FINISH_FAIL,
+  CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -127,7 +133,7 @@ export const OrderDetailsGet =
   };
 
 export const AttachmentFileUpload =
-  ({ user_id, order_id, item_id,variation_id,selectedFile}) =>
+  ({ user_id, order_id, item_id, variation_id, selectedFile }) =>
   async (dispatch) => {
     try {
       dispatch({ type: UPLOAD_ATTACH_FILE_REQUEST });
@@ -149,8 +155,7 @@ export const AttachmentFileUpload =
     }
   };
 
-
-  export const OverAllAttachmentFileUpload =
+export const OverAllAttachmentFileUpload =
   ({ order_id, order_dispatch_image }) =>
   async (dispatch) => {
     try {
@@ -166,7 +171,10 @@ export const AttachmentFileUpload =
           },
         }
       );
-      dispatch({ type: UPLOAD_OVERALL_ATTACH_FILE_SUCCESS, payload: response?.data });
+      dispatch({
+        type: UPLOAD_OVERALL_ATTACH_FILE_SUCCESS,
+        payload: response?.data,
+      });
       return response;
     } catch (error) {
       dispatch({ type: UPLOAD_OVERALL_ATTACH_FILE_FAIL, error: error.message });
@@ -234,21 +242,59 @@ export const CustomOrderFinish =
       dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
       return response;
     } catch (error) {
-      console.log(error,'errrrypoooo')
+      console.log(error, "errrrypoooo");
       dispatch({ type: CUSTOM_ORDER_FINISH_FAIL, error: error.message });
     }
   };
+
+export const CustomOrderOH = (result, navigate) => async (dispatch) => {
+  dispatch({ type: CUSTOM_ORDER_ON_HOLD_REQUEST });
+  try {
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
+      result
+    );
+    dispatch({ type: CUSTOM_ORDER_ON_HOLD_SUCCESS, payload: response.data });
+    if (response.status === 200) {
+      navigate("/on_hold_orders_system");
+    }
+    return response;
+  } catch (error) {
+    console.log(error, "errrrypoooo");
+    dispatch({ type: CUSTOM_ORDER_ON_HOLD_FAIL, error: error.message });
+  }
+};
+
 export const CustomOrderFinishOH =
   (user_id, id, navigate) => async (dispatch) => {
-    dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
+    dispatch({ type: CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST });
     try {
       const response = await axios.post(
         `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`
       );
-      dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
+      dispatch({
+        type: CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS,
+        payload: response.data,
+      });
+      if (response.data.status_code === 200) {
+        await Swal.fire({
+          title: response.data.message,
+          icon: "success",
+          showConfirmButton: true,
+        });
+        navigate("/on_hold_orders_system");
+      } else {
+        Swal.fire({
+          title: response.data.message,
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
       return response;
     } catch (error) {
-      console.log(error,'errrrypoooo')
-      dispatch({ type: CUSTOM_ORDER_FINISH_FAIL, error: error.message });
+      dispatch({
+        type: CUSTOM_ORDER_ON_HOLD_FINISH_FAIL,
+        error: error.message,
+      });
     }
   };

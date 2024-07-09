@@ -17,6 +17,7 @@ import {
   AddMessage,
   AttachmentFileUpload,
   CustomOrderFinish,
+  CustomOrderOH,
   InsertOrderPickup,
   InsertOrderPickupCancel,
   OrderDetailsGet,
@@ -62,9 +63,20 @@ function OrderDetails() {
   if (!fileInputRef.current) {
     fileInputRef.current = {};
   }
-  fileInputRef.current[selectedVariationId ? selectedVariationId : selectedItemId] = useRef(null);
+  fileInputRef.current[
+    selectedVariationId ? selectedVariationId : selectedItemId
+  ] = useRef(null);
+
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
+  );
+
+  const AddInOnHold = useSelector(
+    (state) => state?.orderSystemData?.isCustomOrderOnHold
+  );
+
+  const Finished = useSelector(
+    (state) => state?.orderSystemData?.isCustomOrder
   );
 
   const capture = useCallback(() => {
@@ -128,6 +140,7 @@ function OrderDetails() {
       }
     });
   };
+
   const submitOH = async () => {
     try {
       console.log(orderData, "orderData");
@@ -146,17 +159,7 @@ function OrderDetails() {
         result.product_name.push(item.product_name);
         result.variation_id.push(parseInt(item.variation_id, 10));
       });
-
-      console.log(result, "result");
-
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
-        result
-      );
-      console.log(response, "response");
-      if (response.status === 200) {
-        navigate("/on_hold_orders_system");
-      }
+      dispatch(CustomOrderOH(result, navigate));
     } catch (error) {
       console.log(error);
     }
@@ -185,7 +188,7 @@ function OrderDetails() {
         setSelectedFile(file);
         setShowAttachmentModal(true);
         setSelectedItemId(itemId);
-        setSelectedVariationId(itemVariationId)
+        setSelectedVariationId(itemVariationId);
       };
       fr.readAsDataURL(file);
     }
@@ -440,11 +443,12 @@ function OrderDetails() {
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
-        const itemVariationId = value && value.row.variation_id ? value.row.variation_id : null;
+        const itemVariationId =
+          value && value.row.variation_id ? value.row.variation_id : null;
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId,itemVariationId);
+          handleFileInputChange(e, itemId, itemVariationId);
         };
 
         if (!fileInputRef.current) {
@@ -517,7 +521,11 @@ function OrderDetails() {
                   qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
-                      onClick={() => fileInputRef.current[selectedVariationId ? selectedVariationId : itemId]?.click()}
+                      onClick={() =>
+                        fileInputRef.current[
+                          selectedVariationId ? selectedVariationId : itemId
+                        ]?.click()
+                      }
                     >
                       <CloudUploadIcon />
                       <Typography style={{ fontSize: "14px" }}>
@@ -525,7 +533,11 @@ function OrderDetails() {
                       </Typography>
                       <input
                         type="file"
-                        ref={(input) => (fileInputRef.current[selectedVariationId ? selectedVariationId : itemId] = input)}
+                        ref={(input) =>
+                          (fileInputRef.current[
+                            selectedVariationId ? selectedVariationId : itemId
+                          ] = input)
+                        }
                         style={{ display: "none" }}
                         onChange={handleFileInputChangeForRow}
                       />
@@ -551,7 +563,7 @@ function OrderDetails() {
                       onClick={() => {
                         setShowAttachModal(true);
                         setSelectedItemId(itemId);
-                        setSelectedVariationId(itemVariationId)
+                        setSelectedVariationId(itemVariationId);
                       }}
                     >
                       <CameraAltIcon />
@@ -947,9 +959,19 @@ function OrderDetails() {
                 >
                   On Hold
                 </Button>
-                <Button variant="danger" onClick={handleFinishButtonClick}>
-                  Finish
-                </Button>
+                {Finished ? (
+                  <Button
+                    variant="danger"
+                    disabled
+                    onClick={handleFinishButtonClick}
+                  >
+                    Finish
+                  </Button>
+                ) : (
+                  <Button variant="danger" onClick={handleFinishButtonClick}>
+                    Finish
+                  </Button>
+                )}
               </>
             ) : (
               <>
@@ -965,17 +987,27 @@ function OrderDetails() {
                 >
                   On Hold
                 </Button>
-                <Button
-                  variant="danger"
-                  disabled={
-                    orderProcess != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id ||
-                    tableData?.some((data) => data.dispatch_image == "")
-                  }
-                  onClick={handleFinishButtonClick}
-                >
-                  Finish
-                </Button>
+                {Finished ? (
+                  <Button
+                    variant="danger"
+                    disabled
+                    onClick={handleFinishButtonClick}
+                  >
+                    Finish
+                  </Button>
+                ) : (
+                  <Button
+                    variant="danger"
+                    disabled={
+                      orderProcess != "started" ||
+                      userData?.user_id != orderDetails?.operation_user_id ||
+                      tableData?.some((data) => data.dispatch_image == "")
+                    }
+                    onClick={handleFinishButtonClick}
+                  >
+                    Finish
+                  </Button>
+                )}
               </>
             )}
           </MDBCol>
@@ -1080,14 +1112,25 @@ function OrderDetails() {
               onChange={(e) => setOHMessage(e.target.value)}
             />
             <Box className="text-end my-3">
-              <Button
-                variant="secondary"
-                className="mt-2 fw-semibold"
-                disabled={messageOH == "" ? true : false}
-                onClick={submitOH}
-              >
-                Submit
-              </Button>
+              {AddInOnHold ? (
+                <Button
+                  variant="secondary"
+                  className="mt-2 fw-semibold"
+                  onClick={submitOH}
+                  disabled
+                >
+                  Submit
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  className="mt-2 fw-semibold"
+                  disabled={messageOH == "" ? true : false}
+                  onClick={submitOH}
+                >
+                  Submit
+                </Button>
+              )}
             </Box>
           </Modal.Body>
         </Modal>

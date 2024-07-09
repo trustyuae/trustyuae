@@ -286,21 +286,7 @@ function OnHoldOrdersDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      const response = await dispatch(CustomOrderFinishOH(user_id, id, navigate));
-      if (response.data.status_code === 200) {
-        await Swal.fire({
-          title: response.data.message,
-          icon: "success",
-          showConfirmButton: true,
-        });
-        navigate("/on_hold_orders_system");
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          icon: "error",
-          showConfirmButton: true,
-        });
-      }
+      dispatch(CustomOrderFinishOH(user_id, id, navigate));
     } catch (error) {
       console.error("Error while finishing order:", error);
     }

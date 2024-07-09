@@ -203,7 +203,7 @@ const PoDetails = () => {
       product_ids: updatelist.map((item) => item.product_id),
       variation_id: updatelist.map((item) => item.variation_id || 0),
       po_status: PoStatus,
-      dispatch_type:updatelist.map((item) => item.dispatch_type),
+      dispatch_type:updatelist.map((item) => item.dispatch_type==null?'':item.dispatch_type),
       payment_status: paymentStatus,
     };
   
