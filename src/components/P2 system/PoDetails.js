@@ -44,7 +44,7 @@ import { useTranslation } from "react-i18next";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import axios from "axios";
-import defaulImage from '../../../src/assets/default.png'
+import defaulImage from "../../../src/assets/default.png";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -71,6 +71,10 @@ const PoDetails = () => {
     (state) => state?.allFactoryData?.factory
   );
 
+  const PoUpdate = useSelector(
+    (state) => state?.orderNotAvailable?.isUpdatedPoDetails
+  );
+
   const perticularOrderDetailsLoader = useSelector(
     (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
   );
@@ -82,7 +86,7 @@ const PoDetails = () => {
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas.factories) {
       let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+      setFactories(data);
     }
   }, [allFactoryDatas]);
 
@@ -191,37 +195,45 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-    console.log(updatelist,'updatelist');
-    // console.log([updatelist[0]]?.map((item) =>item.dispatch_type),'dispatch_type');
-    const availabilityStatuses =
-      updatelist?.map((item) => item.availability_status) || [];
-    const flattenedStatuses = availabilityStatuses.flat();
-    const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
-    if (validationMessage == "Availability status is empty.") {
-      Swal.fire({
-        icon: "error",
-        title: validationMessage,
-        showConfirmButton: true,
-      });
-    }
-
+  
+    // Extracting necessary data for update
     const updatedData = {
       po_number: id,
-      availability_status: updatelist?.map((item) => item.availability_status),
-      request_quantity: updatelist?.map((item) => item.available_quantity),
-      product_ids: updatelist?.map((item) => item.product_id),
-      variation_id: updatelist?.map((item) => item.variation_id) || 0,
-      dispatch_type: updatelist?.map((item) => item.dispatch_type==null?'':item.dispatch_type),
+      request_quantity: updatelist.map((item) => item.available_quantity),
+      product_ids: updatelist.map((item) => item.product_id),
+      variation_id: updatelist.map((item) => item.variation_id || 0),
       po_status: PoStatus,
       payment_status: paymentStatus,
-
     };
-    console.log(updatedData,'updatedData');
-    if (validationMessage == "Successful") {
-      let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
-      await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
+  
+    // Check if availability_status is not empty
+    const availabilityStatuses = updatelist.map((item) => item.availability_status ? item.availability_status : (item.estimated_production_time ? item.estimated_production_time : []) );
+    const flattenedStatuses = availabilityStatuses.flat();
+    
+    // Validate only if availability_status is not empty
+    if (flattenedStatuses.length > 0) {
+      const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
+  
+      if (validationMessage === "Availability status is empty.") {
+        Swal.fire({
+          icon: "error",
+          title: validationMessage,
+          showConfirmButton: true,
+        });
+        return; // Stop execution if validation fails
+      }
+  
+      // Include availability_status in updatedData
+      updatedData.availability_status = availabilityStatuses;
     }
+  
+    console.log(updatedData, "updatedData");
+    
+    // Proceed with dispatch update action
+    let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
+    await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
   };
+  
 
   const handlepayMentStatus = (value) => {
     setPaymentStatus(value);
@@ -319,7 +331,13 @@ const PoDetails = () => {
         return (
           <>
             <img
-              src={value.row.factory_image ? value.row.factory_image : (value.row.image ? value.row.image : defaulImage)              }
+              src={
+                value.row.factory_image
+                  ? value.row.factory_image
+                  : value.row.image
+                  ? value.row.image
+                  : defaulImage
+              }
               alt={value.row.product_name}
               className="img-fluid"
               width={100}
@@ -495,7 +513,7 @@ const PoDetails = () => {
       setshowMessageModal(false);
       setMessage("");
       setAddMessageD(false);
-      getMessages()
+      getMessages();
     } catch (error) {}
   };
 
@@ -743,9 +761,15 @@ const PoDetails = () => {
           )}
 
           <Row>
-            <Button type="button" className="w-auto" onClick={handleUpdate}>
-              {t("POManagement.Update")}
-            </Button>
+            {PoUpdate ? (
+              <Button type="button" className="w-auto" onClick={handleUpdate} disabled>
+                {t("POManagement.Update")}
+              </Button>
+            ) : (
+              <Button type="button" className="w-auto" onClick={handleUpdate}>
+                {t("POManagement.Update")}
+              </Button>
+            )}
           </Row>
         </MDBRow>
       </Card>

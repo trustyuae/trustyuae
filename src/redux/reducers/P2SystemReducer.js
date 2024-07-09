@@ -47,12 +47,8 @@ import {
 const initialState = {
   poDetailsData: [],
   isPoDetailsData: false,
-  // manualPoDetailsData: [],
-  // isManualPoDetailsData: false,
   manualOrScheduledPoDetailsData: [],
   isManualOrScheduledPoDetailsData: false,
-  // schedulePoDetailsData: [],
-  // isSchedulePoDetailsData: false,
   perticularPoDetailsData: [],
   isPerticularPoDetailsData: false,
   quantityDetailsData: [],
