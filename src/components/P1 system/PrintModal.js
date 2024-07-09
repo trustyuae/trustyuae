@@ -76,20 +76,27 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
       titleY + 34
     );
 
-    doc.text(
-      `Address:${customerData?.customer_shipping_address.split(',').join(' ,\n              ')}`,
-      cardContentX,
-      titleY + 42
-    );
+    let titleVe = titleY + 42;
 
-    doc.text(
-      `Shipping Method : ${customerData.shipping_method}`,
-      cardContentX,
-      titleY + 70
-    );
+    function getTextHeight(text) {
+      // Assuming a font size of 12 for demonstration purposes
+      return 12; // Adjust this value based on your actual font size and line height
+    }
 
-    // doc.setLineWidth(0.3); // Set line width for the separator
-    // doc.line(cardX, titleY + 55, cardX + cardWidth, titleY + 55);
+    let addressText = `Address: ${customerData?.customer_shipping_address.split(',').join(' ,\n              ')}`;
+    doc.text(addressText, cardContentX, titleVe);
+
+    let text1Height = getTextHeight(addressText);
+
+    // Update titleY for Text 2
+    titleVe += text1Height + 8; // Adjust 8 based on your desired vertical spacing
+    
+    // Text 2: Shipping Method
+    let shippingMethodText = `Shipping Method: ${customerData.shipping_method}`;
+    doc.text(shippingMethodText, cardContentX, titleVe);
+
+    doc.setLineWidth(0.3); // Set line width for the separator
+    doc.line(cardX, titleVe + 5, cardX + cardWidth, titleVe + 5);
 
     // Draw bottom border of the card
     doc.setLineWidth(borderWidth);
