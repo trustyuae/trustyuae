@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
 
-const Header = ({onToggleSidebar }) => {
+const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogOut = async () => {
@@ -29,7 +29,10 @@ const Header = ({onToggleSidebar }) => {
             />
           </Box>
         </Link>
-        <i className="bi bi-list toggle-sidebar-btn" onClick={onToggleSidebar}></i>
+        <i
+          className="bi bi-list toggle-sidebar-btn"
+          onClick={onToggleSidebar}
+        ></i>
       </div>
       {/* <div className="search-bar">
         <form
@@ -205,18 +208,21 @@ const Header = ({onToggleSidebar }) => {
           </li> */}
           <li className="nav-item dropdown pe-3">
             <a
-              className="nav-link nav-profile d-flex align-items-center pe-0"
+              className="nav-link nav-profile d-block text-center pe-0"
               href="/"
               data-bs-toggle="dropdown"
             >
-              <img
-                src={userData?.user_image_url}
-                alt="Profile"
-                className="rounded-circle"
-              />
-              <span className="d-none d-md-block dropdown-toggle ps-2">
-                {userData?.first_name} {userData?.last_name}
-              </span>
+              <div className="d-flex flex-column align-items-center">
+                <img
+                  src={userData?.user_image_url}
+                  alt="Profile"
+                  className="rounded-circle"
+                  style={{marginTop:'2px'}} 
+                />
+                <span className="d-none d-md-block">
+                  {userData?.first_name} {userData?.last_name}
+                </span>
+              </div>
             </a>
             <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
               <li className="dropdown-header">
