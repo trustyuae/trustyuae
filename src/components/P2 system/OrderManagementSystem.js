@@ -994,6 +994,13 @@ function OrderManagementSystem() {
     setEndDate("")
   };
 
+  const productNamee = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      setManualProductF(e.target.value);
+    }
+  }
+
   return (
     <Container
       fluid
@@ -1127,8 +1134,9 @@ function OrderManagementSystem() {
                       <Form.Control
                         type="text"
                         placeholder="Enter Product"
-                        value={manualProductF}
-                        onChange={(e) => setManualProductF(e.target.value)}
+                        // value={manualProductF}
+                        // onChange={(e) => setManualProductF(e.target.value)}
+                        onKeyDown={(e) => productNamee(e)}
                       />
                     </Form.Group>
                   </Col>
