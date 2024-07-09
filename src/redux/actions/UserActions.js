@@ -7,6 +7,7 @@ import {
   USER_LOGOUT_REQUEST,
   USER_LOGOUT_SUCCESS,
   CLEAR_STORE,
+  API_URL,
 } from "../constants/Constants";
 import { loginURL, logoutURL } from "../../utils/constants";
 import ShowAlert from "../../utils/ShowAlert";
@@ -14,7 +15,7 @@ import ShowAlert from "../../utils/ShowAlert";
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
   try {
-    const res = await axios.post(`${loginURL}`, data, {
+    const res = await axios.post(`${API_URL}wp-json/custom-login/v1/login`, data, {
       headers: { "content-type": "application/json" },
     });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
@@ -35,7 +36,7 @@ export const loginUser = (data, navigate) => async (dispatch) => {
 export const logoutUser = (navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGOUT_REQUEST });
   try {
-    const res = await axios.post(`${logoutURL}`, null);
+    const res = await axios.post(`${API_URL}wp-json/custom-login/v1/logout`, null);
     console.log(res, "logout res");
     dispatch({ type: USER_LOGOUT_SUCCESS });
     localStorage.clear();
