@@ -15,7 +15,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     const pageHeight = doc.internal.pageSize.getHeight();
     const cardWidth = 85;
     const cardHeight = 85;
-    const borderWidth = 0.5; // Border width
+    const borderWidth = 0.7; // Border width
 
     const cardX = (pageWidth - cardWidth) / 2;
     const cardY = (pageHeight - cardHeight) / 2;
@@ -49,8 +49,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
 
     // Draw horizontal line below "Shipping Label"
     doc.setLineWidth(0.3); // Set line width for the separator
-    doc.line(cardX, titleY + 5, cardX + cardWidth, titleY + 5);
-
+    doc.line(cardX + 2, titleY + 5, cardX + cardWidth - 2, titleY + 5);
 
     doc.setFontSize(12); // Reduce font size for details// Reset font style
     // doc.setFontStyle("normal");
@@ -83,20 +82,22 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
       return 12; // Adjust this value based on your actual font size and line height
     }
 
-    let addressText = `Address: ${customerData?.customer_shipping_address.split(',').join(' ,\n              ')}`;
+    let addressText = `Address : ${customerData?.customer_shipping_address
+      .split(",")
+      .join(" ,\n                ")}`;
     doc.text(addressText, cardContentX, titleVe);
 
     let text1Height = getTextHeight(addressText);
 
     // Update titleY for Text 2
-    titleVe += text1Height + 8; // Adjust 8 based on your desired vertical spacing
-    
+    titleVe += text1Height + 6; // Adjust 8 based on your desired vertical spacing
+
     // Text 2: Shipping Method
-    let shippingMethodText = `Shipping Method: ${customerData.shipping_method}`;
+    let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
     doc.text(shippingMethodText, cardContentX, titleVe);
 
     doc.setLineWidth(0.3); // Set line width for the separator
-    doc.line(cardX, titleVe + 5, cardX + cardWidth, titleVe + 5);
+    doc.line(cardX + 2, titleVe + 2, cardX + cardWidth - 2, titleVe + 2);
 
     // Draw bottom border of the card
     doc.setLineWidth(borderWidth);

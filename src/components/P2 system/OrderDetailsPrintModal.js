@@ -39,14 +39,30 @@ const OrderDetailsPrintModal = ({
       align: "center",
     });
 
-    const tableColumn = ["Factory Image", "Product Variations", "Quantity Ordered"];
+    const tableColumn = [
+      "Factory Image",
+      "Product Variations",
+      "Quantity Ordered",
+    ];
     const tableRows = [];
     for (const item of PO_OrderList) {
       if (item?.id !== "TAX") {
         let imgData = defaultImage;
-        if (item?.factory_image ? item.factory_image : (item.image ? item.image : defaultImage)) {
+        if (
+          item?.factory_image
+            ? item.factory_image
+            : item.image
+            ? item.image
+            : defaultImage
+        ) {
           try {
-            imgData = await loadImageToDataURL(item?.factory_image);
+            imgData = await loadImageToDataURL(
+              item?.factory_image
+                ? item?.factory_image
+                : item.image
+                ? item.image
+                : defaultImage
+            );
           } catch (error) {
             console.error("Error loading image:", error);
             imgData = defaultImage; // Fallback to default image on error
@@ -72,7 +88,7 @@ const OrderDetailsPrintModal = ({
 
         // Add row data
         tableRows.push([
-          { image: imgData, width: 56}, // Include image data as an object with 'image' key
+          { image: imgData, width: 40 }, // Include image data as an object with 'image' key
           productName || " ",
           item?.quantity || 0,
         ]);
@@ -117,7 +133,7 @@ const OrderDetailsPrintModal = ({
       rowHeight: 80,
       columnStyles: {
         0: {
-          cellWidth: 60,
+          cellWidth: 44,
           halign: "center",
           valign: "center",
           cellPadding: 2,
@@ -301,7 +317,11 @@ const OrderDetailsPrintModal = ({
         product_name: item.id === "total" ? "Total:" : item.product_name,
         quantity: item.quantity || 0,
         colspan: 2,
-        factory_image: item.factory_image ? item.factory_image : (item.image ? item.image : defaultImage),
+        factory_image: item.factory_image
+          ? item.factory_image
+          : item.image
+          ? item.image
+          : defaultImage,
       };
     }
   });
