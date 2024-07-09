@@ -7,7 +7,7 @@ import Form from "react-bootstrap/Form";
 import { API_URL } from "../../redux/constants/Constants";
 import DataTable from "../DataTable";
 import { Col, Row } from "react-bootstrap";
-import { Avatar, Box, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Typography } from "@mui/material";
 import { CompressImage } from "../../utils/CompressImage";
 import EditIcon from "@mui/icons-material/Edit";
 import { useDispatch, useSelector } from "react-redux";
@@ -215,7 +215,7 @@ function AllProductList() {
               ref={inputRef}
               placeholder="Search by Product ID"
               onKeyDown={(e) => searchIdd(e)}
-              // onChange={(e) => setSearchId(e.target.value)}
+            // onChange={(e) => setSearchId(e.target.value)}
             />
           </Form.Group>
         </Col>
@@ -246,7 +246,7 @@ function AllProductList() {
       </MDBRow>
 
       <Row>
-        {loader ? (
+        {/* {loader ? (
           <Loader />
         ) : (
           <div className="mt-2">
@@ -264,6 +264,37 @@ function AllProductList() {
               handleChange={handleChange}
             />
           </div>
+        )} */}
+
+        {loader ? (
+          <Loader />
+        ) : (
+          <>
+            {products && products.length !== 0 ? (
+              <div className="mt-2">
+                <DataTable
+                  columns={columns}
+                  rows={products}
+                  // rows={factories}
+                  // page={page}
+                  // pageSize={pageSize}
+                  // totalPages={totalPages}
+                  // handleChange={handleChange}
+                  page={currentPage}
+                  pageSize={itemsPerPage}
+                  totalPages={totalPages}
+                  handleChange={handleChange}
+                />
+              </div>
+            ) : (
+              <Alert
+                severity="warning"
+                sx={{ fontFamily: "monospace", fontSize: "18px" }}
+              >
+                Records is not Available for above filter
+              </Alert>
+            )}
+          </>
         )}
       </Row>
 
