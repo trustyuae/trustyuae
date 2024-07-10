@@ -11,6 +11,7 @@ import DataTable from "../DataTable";
 import { Alert, Box, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
+import Loader from "../../utils/Loader";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -26,8 +27,10 @@ function AllFactory() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   async function fetchFactories() {
+    setLoading(true);
     try {
       let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
       const params = {
@@ -42,16 +45,26 @@ function AllFactory() {
       const factoryData = response.data.factories.map((item) => ({ ...item }));
       setFactories(factoryData);
       setTotalPages(response.data.total_pages);
+      setLoading(false); // Stop loading
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error);
+      setLoading(false); // Stop loading
       throw error;
     }
   }
 
   useEffect(() => {
     fetchFactories();
-  }, [pageSize, page, factoryName, address, contactPerson, contactNumber, email]);
+  }, [
+    pageSize,
+    page,
+    factoryName,
+    address,
+    contactPerson,
+    contactNumber,
+    email,
+  ]);
 
   const handleEdit = (factoryId) => {
     const factory = factories.find((f) => f.id === factoryId);
@@ -179,7 +192,9 @@ function AllFactory() {
       </MDBRow>
       <Row>
         <div className="mt-2">
-          {factories && factories.length !== 0 ? (
+          {loading ? (
+            <Loader /> 
+          ) : factories && factories.length !== 0 ? (
             <div className="mt-2">
               <DataTable
                 columns={columns}
