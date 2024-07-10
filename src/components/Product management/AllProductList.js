@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { API_URL } from "../../redux/constants/Constants";
 import DataTable from "../DataTable";
-import { Col, Row } from "react-bootstrap";
+import { Card, Col, Row } from "react-bootstrap";
 import { Alert, Avatar, Box, Typography } from "@mui/material";
 import { CompressImage } from "../../utils/CompressImage";
 import EditIcon from "@mui/icons-material/Edit";
@@ -25,6 +25,7 @@ function AllProductList() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showProdModal, setShowProdModal] = useState(false);
   const [factories, setFactories] = useState([]);
   const [selectFile, setFile] = useState(null);
   const [searchId, setSearchId] = useState("");
@@ -32,6 +33,7 @@ function AllProductList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
+  const [imageURL, setImageURL] = useState("");
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
   );
@@ -77,6 +79,11 @@ function AllProductList() {
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
+  };
+
+  const imageModule = (url) => {
+    setImageURL(url);
+    setShowProdModal(true);
   };
 
   const handleSaveEdit = async () => {
@@ -126,8 +133,16 @@ function AllProductList() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
+        console.log(value);
         return (
-          <Box className="h-100 w-100 d-flex align-items-center">
+          <Box
+            className="h-100 w-100 d-flex align-items-center"
+            onClick={(e) =>
+              imageModule(
+                value?.row?.factory_image || value?.row?.product_image
+              )
+            }
+          >
             <Avatar
               src={
                 value?.row?.factory_image || value?.row?.product_image
@@ -191,13 +206,13 @@ function AllProductList() {
     if (e.key === "Enter") {
       setSearchId(e.target.value);
     }
-  }
+  };
 
   const searchNamee = (e) => {
     if (e.key === "Enter") {
       setSearchName(e.target.value);
     }
-  }
+  };
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -215,7 +230,7 @@ function AllProductList() {
               ref={inputRef}
               placeholder="Search by Product ID"
               onKeyDown={(e) => searchIdd(e)}
-            // onChange={(e) => setSearchId(e.target.value)}
+              // onChange={(e) => setSearchId(e.target.value)}
             />
           </Form.Group>
         </Col>
@@ -374,6 +389,23 @@ function AllProductList() {
             Save Changes
           </Button>
         </Modal.Footer>
+      </Modal>
+      <Modal
+        show={showProdModal}
+        onHide={() => setShowProdModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Product Image</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card className="factory-card">
+            <img
+              src={imageURL || `${require("../../assets/default.png")}`}
+              alt="Product"
+            />
+          </Card>
+        </Modal.Body>
       </Modal>
     </Container>
   );
