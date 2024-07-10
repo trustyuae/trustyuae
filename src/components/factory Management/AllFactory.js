@@ -8,7 +8,7 @@ import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
 
@@ -179,14 +179,25 @@ function AllFactory() {
       </MDBRow>
       <Row>
         <div className="mt-2">
-          <DataTable
-            columns={columns}
-            rows={factories}
-            page={page}
-            pageSize={pageSize}
-            totalPages={totalPages}
-            handleChange={handleChange}
-          />
+          {factories && factories.length !== 0 ? (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={factories}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
+              />
+            </div>
+          ) : (
+            <Alert
+              severity="warning"
+              sx={{ fontFamily: "monospace", fontSize: "18px" }}
+            >
+              Factory Records are not Available
+            </Alert>
+          )}
         </div>
       </Row>
       <EditFactoryModal
