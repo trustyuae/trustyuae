@@ -176,7 +176,14 @@ function OrderSystem() {
     }
   };
 
-  const handleSearchFilter = () => {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setSearchOrderID(inputRef.current.value);
+    }
+  };
+
+  const handleSearchFilter = (e) => {
+    setSearchOrderID(inputRef.current.value);
     setPage(1);
     fetchOrders();
   };
@@ -225,7 +232,7 @@ function OrderSystem() {
                   placeholder="Enter Order ID"
                   ref={inputRef}
                   // value={searchOrderID}
-                  onKeyDown={(e) => orderId(e)}
+                  onKeyDown={handleKeyDown}
                   className="mr-sm-2 py-2"
                 />
               </Form.Group>
