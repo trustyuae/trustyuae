@@ -118,7 +118,6 @@ const PoDetails = () => {
             total_cost: response?.data?.total_cost || 0,
           },
         ];
-        console.log(row, "row");
         setPO_OrderList(row);
         setERId(response.data.er_no);
         setFactorieName(response.data.factory_id);
@@ -368,12 +367,14 @@ const PoDetails = () => {
           </Box>
         );
       },
-    },
+    },  
     {
-      field: "",
+      field: "rmb_price",
       headerName: t("POManagement.RMBPrice"),
       flex: 3,
       valueGetter: (value, row) => {
+        console.log(value,'rmb price')
+        console.log(row,'row rmb price')
         if (row.id === "TAX") {
           return row.taxTotal;
         }
