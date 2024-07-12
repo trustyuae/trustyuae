@@ -40,7 +40,7 @@ export const loginUser = (data, navigate) => async (dispatch) => {
           navigate("/ordersystem");
         } else if (res.data.user_data.user_role === "packing_assistant") {
           navigate("/ordersystem");
-        } else if (res.data.user_data.user_role === "factory_co-ordinator") {
+        } else if (res.data.user_data.user_role === "factory_coordinator") {
           navigate("/PO_ManagementSystem");
         } else if (res.data.user_data.user_role === "customer_support") {
           navigate("/order_not_available");
