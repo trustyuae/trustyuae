@@ -92,7 +92,7 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {(userType === "factory_co-ordinator" ||
+          {(userType === "administrator" || userType === "factory_co-ordinator" ||
             userType === "customer_support") && (
             <li className="nav-item">
               <a
@@ -126,7 +126,7 @@ const Sidebar = () => {
                     </Link>
                   </li>
                 )}
-                {userType === "factory_co-ordinator" && (
+                {(userType === "administrator" || userType === "factory_co-ordinator") && (
                   <li>
                     <Link
                       to="/PO_ManagementSystem"
@@ -142,7 +142,7 @@ const Sidebar = () => {
                     </Link>
                   </li>
                 )}
-                {userType === "customer_support" && (
+                {(userType === "administrator" || userType === "customer_support") && (
                   <li>
                     <Link
                       to="/order_not_available"
@@ -339,3 +339,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+
