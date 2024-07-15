@@ -176,7 +176,8 @@ function AllProductList() {
       },
     },
     { field: "stock_quantity", headerName: "Quntity", flex: 1 },
-    { field: "stock_status", headerName: "Status", flex: 1 },
+    { field: "stock_status", headerName: "Stcok Status", flex: 1 },
+    { field: "product_status", headerName: "Product Status", flex: 1 },
     {
       field: "action",
       headerName: "Action",
