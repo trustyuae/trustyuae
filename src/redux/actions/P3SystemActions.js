@@ -28,12 +28,16 @@ import {
 } from "../constants/Constants";
 import ShowAlert from "../../utils/ShowAlert";
 
+const token = JSON.parse(localStorage.getItem('token'))
+const headers = {
+  Authorization: `Live ${token}`,
+};
 export const GetProductManual =
   ({ apiUrl }) =>
   async (dispatch) => {
     try {
       dispatch({ type: GET_PRODUCT_MANUAL_REQUEST });
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl,{headers});
       console.log(response, "response of order not available data");
       dispatch({ type: GET_PRODUCT_MANUAL_SUCCESS, payload: response?.data });
       return response;
@@ -50,6 +54,7 @@ export const AddGrn = (payload, navigate) => async (dispatch) => {
       payload,
       {
         headers: {
+          Authorization: `Live ${token}`,
           "Content-Type": "multipart/form-data",
         },
       }
@@ -80,7 +85,7 @@ export const GetGRNList =
   async (dispatch) => {
     try {
       dispatch({ type: GET_GRN_LIST_REQUEST });
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl,{headers});
       dispatch({
         type: GET_GRN_LIST_SUCCESS,
         payload: response?.data,
@@ -96,7 +101,7 @@ export const GetGRNView =
   async (dispatch) => {
     try {
       dispatch({ type: GET_GRN_VIEW_REQUEST });
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl,{headers});
       console.log(response, "response of GetProductOrderDetails");
       dispatch({
         type: GET_GRN_VIEW_SUCCESS,
@@ -113,7 +118,7 @@ export const GetProductDetails =
   async (dispatch) => {
     try {
       dispatch({ type: GET_PRODUCT_DETAILS_REQUEST });
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl,{headers});
       console.log(response, "response of GetProductDetails");
       dispatch({
         type: GET_PRODUCT_DETAILS_SUCCESS,
@@ -130,7 +135,7 @@ export const GetProductOrderDetails =
   async (dispatch) => {
     try {
       dispatch({ type: GET_PRODUCT_ORDER_DETAILS_REQUEST });
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl,{headers});
       console.log(response, "response of GetProductOrderDetails");
       dispatch({
         type: GET_PRODUCT_ORDER_DETAILS_SUCCESS,
@@ -147,7 +152,7 @@ export const AddProductOrderForPre = (requestedDataP) => async (dispatch) => {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_PREP_REQUEST });
     const response = await axios.post(
       `${API_URL}wp-json/order-preparation-api/v1/order-send-by-product/`,
-      requestedDataP
+      requestedDataP,{headers}
     );
     dispatch({
       type: ADD_PRODUCT_ORDER_FOR_PREP_SUCCESS,
@@ -164,7 +169,7 @@ export const AddProductOrderForStock = (requestedData) => async (dispatch) => {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST });
     const response = await axios.post(
       `${API_URL}wp-json/custom-instock-api/v1/quantity-instock-api/`,
-      requestedData
+      requestedData,{headers}
     );
     dispatch({
       type: ADD_PRODUCT_ORDER_FOR_STOCK_SUCCESS,

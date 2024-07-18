@@ -1,14 +1,3 @@
-// import React from 'react'
-
-// const OnHoldOrdersDetails = () => {
-//   return (
-//     <div>OnHoldOrdersDetails</div>
-//   )
-// }
-
-// export default OnHoldOrdersDetails
-
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
@@ -55,22 +44,22 @@ function OnHoldOrdersDetails() {
   const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState('');
+  const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
   const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState('');
-  const [selectedVariationId, setSelecetedVariationId] = useState('');
-  const [toggleStatus, setToggleStatus] = useState(0)
+  const [selectedItemId, setSelectedItemId] = useState("");
+  const [selectedVariationId, setSelecetedVariationId] = useState("");
+  const [toggleStatus, setToggleStatus] = useState(0);
 
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   // const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
-  const [loader, setLoader] = useState(true)
+  const [loader, setLoader] = useState(true);
 
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -79,6 +68,11 @@ function OnHoldOrdersDetails() {
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
+
+  const token = JSON.parse(localStorage.getItem("token"));
+  const headers = {
+    Authorization: `Live ${token}`,
+  };
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -105,13 +99,18 @@ function OnHoldOrdersDetails() {
   async function fetchOrder() {
     try {
       // const response = await dispatch(OrderDetailsGet({ id: id }));
-      const response = await axios.get(`${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`)
+      const response = await axios.get(
+        `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
+      );
 
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
-      console.log(response.data.orders[0].toggle_status, 'response.data.orders[0].toggle_status');
-      setToggleStatus(Number(response.data.orders[0].toggle_status))
+      console.log(
+        response.data.orders[0].toggle_status,
+        "response.data.orders[0].toggle_status"
+      );
+      setToggleStatus(Number(response.data.orders[0].toggle_status));
       const order = response.data.orders[0];
       if (order) setOrderProcess(order.order_process);
       if (data) {
@@ -123,15 +122,15 @@ function OnHoldOrdersDetails() {
           setTableData(newData);
         });
       }
-      setLoader(false)
+      setLoader(false);
     } catch (error) {
       console.error(error);
     }
   }
 
   useEffect(() => {
-    console.log(toggleStatus, 'toggleStatus');
-  }, [toggleStatus])
+    console.log(toggleStatus, "toggleStatus");
+  }, [toggleStatus]);
 
   const handleAddMessage = async () => {
     const orderId = parseInt(id, 10);
@@ -206,7 +205,7 @@ function OnHoldOrdersDetails() {
   };
 
   const handleSubmitAttachment = async () => {
-    setLoader(true)
+    setLoader(true);
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
@@ -217,7 +216,7 @@ function OnHoldOrdersDetails() {
             order_id: id,
             item_id: selectedItemId,
             selectedFile: selectedFile,
-            variation_id:selectedVariationId,
+            variation_id: selectedVariationId,
           })
         );
       } else {
@@ -243,15 +242,13 @@ function OnHoldOrdersDetails() {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
-      setLoader(false)
-
+      setLoader(false);
     } catch (error) {
       console.error(error);
     }
   };
 
   const handleStartOrderProcess = async () => {
-
     const requestData = {
       order_id: Number(id),
       user_id: userData.user_id,
@@ -416,8 +413,9 @@ function OnHoldOrdersDetails() {
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
-        const variationId = value && value.row.variation_id ? Number(value.row.variation_id) : 0;
-        console.log(variationId,'variationId');
+        const variationId =
+          value && value.row.variation_id ? Number(value.row.variation_id) : 0;
+        console.log(variationId, "variationId");
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
@@ -456,7 +454,8 @@ function OnHoldOrdersDetails() {
                     }}
                   />
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && toggleStatus != 0 && (
+                    orderProcess == "started" &&
+                    toggleStatus != 0 && (
                       <CancelIcon
                         sx={{
                           position: "relative",
@@ -490,7 +489,9 @@ function OnHoldOrdersDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && qty == avl_qty && toggleStatus !=0  ? (
+                  orderProcess == "started" &&
+                  qty == avl_qty &&
+                  toggleStatus != 0 ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => fileInputRef.current[itemId]?.click()}
@@ -520,13 +521,15 @@ function OnHoldOrdersDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && qty == avl_qty && toggleStatus != 0 ? (
+                  orderProcess == "started" &&
+                  qty == avl_qty &&
+                  toggleStatus != 0 ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
                         setShowAttachModal(true);
                         setSelectedItemId(itemId);
-                        setSelecetedVariationId(variationId)
+                        setSelecetedVariationId(variationId);
                       }}
                     >
                       <CameraAltIcon />
@@ -555,51 +558,53 @@ function OnHoldOrdersDetails() {
   ];
 
   const handalswitch = async (e) => {
-    console.log(e, 'e');
-    setLoader(true)
+    console.log(e, "e");
+    setLoader(true);
     if (e) {
       // setToggleStatus(1)
-      handelSend(e)
+      handelSend(e);
     } else {
       // setToggleStatus(0)
-      handelSend(e)
+      handelSend(e);
     }
-    console.log(orderData, 'orderData');
-    console.log(orderDetails, 'orderDetails');
-
-  }
+    console.log(orderData, "orderData");
+    console.log(orderDetails, "orderDetails");
+  };
   const handelSend = async (e) => {
-    console.log(e, 'e=====');
-    console.log(toggleStatus, 'toggleStatus');
+    console.log(e, "e=====");
+    console.log(toggleStatus, "toggleStatus");
     const result = {
       order_id: parseInt(orderDetails?.order_id, 10),
       item_id: [],
       product_name: [],
       variation_id: [],
-      toggle_status: 0
+      toggle_status: 0,
     };
-    orderDetails?.items.forEach(item => {
+    orderDetails?.items.forEach((item) => {
       result.item_id.push(parseInt(item.item_id, 10));
       result.product_name.push(item.product_name);
       result.variation_id.push(item.variation_id);
     });
 
     if (e) {
-      result.toggle_status = 1
-      setToggleStatus(1)
+      result.toggle_status = 1;
+      setToggleStatus(1);
     } else {
-      result.toggle_status = 0
-      setToggleStatus(0)
+      result.toggle_status = 0;
+      setToggleStatus(0);
     }
 
-    console.log(result, 'result');
+    console.log(result, "result");
 
-    const response = await axios.post(`${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`, result)
-    console.log(response, 'response');
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
+      result,{headers}
+    );
+    console.log(response, "response");
     if (response) {
       fetchOrder();
     }
-  }
+  };
 
   // useEffect(()=>{
   //   handelSend()
@@ -669,7 +674,7 @@ function OnHoldOrdersDetails() {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-                orderProcess == "started" ? (
+              orderProcess == "started" ? (
                 // <Button
                 //   variant="outline-danger"
                 //   className="p-1 me-2 bg-transparent text-danger"
@@ -680,7 +685,12 @@ function OnHoldOrdersDetails() {
                 <Form.Check // prettier-ignore
                   type="switch"
                   id="custom-switch"
-                  style={{ width: '105px', height: '32px', display: 'flex', alignItems: 'center' }}
+                  style={{
+                    width: "105px",
+                    height: "32px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                   checked={toggleStatus}
                   // checked={0}
                   onChange={(e) => handalswitch(e.target.checked)}
@@ -695,13 +705,17 @@ function OnHoldOrdersDetails() {
                   type="switch"
                   disabled
                   id="custom-switch"
-                  style={{ width: '105px', height: '32px', display: 'flex', alignItems: 'center' }}
+                  style={{
+                    width: "105px",
+                    height: "32px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                   checked={toggleStatus}
                   // checked={0}
                   onChange={(e) => handalswitch(e.target.checked)}
                   // label="Send"
                 />
-
               ) : (
                 <Button
                   variant="success"
@@ -717,7 +731,6 @@ function OnHoldOrdersDetails() {
                 //   onChange={(e)=>handalswitch(e.target.checked)}
                 //   label="Send"
                 // />
-
               )}
             </Box>
           </Box>
@@ -867,12 +880,9 @@ function OnHoldOrdersDetails() {
                             Please upload attachment for all the products in
                             below order table!
                           </Alert>
-                        ) : orderDetails?.overall_order_dis_image !=
-                          "" ? (
+                        ) : orderDetails?.overall_order_dis_image != "" ? (
                           <Avatar
-                            src={
-                              orderDetails?.overall_order_dis_image
-                            }
+                            src={orderDetails?.overall_order_dis_image}
                             alt="Product Image"
                             sx={{
                               height: "150px",
@@ -891,7 +901,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                                orderProcess == "started" ? (
+                              orderProcess == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -927,7 +937,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                                orderProcess == "started" ? (
+                              orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -988,16 +998,20 @@ function OnHoldOrdersDetails() {
           <Box>{orderDetailsDataOrderId?.operation_user_note}</Box>
         </Alert>
         <Alert variant={"success"}>
-          <label>On Hold Meesage :-</label>{" "}{orderDetails?.onhold_note}
+          <label>On Hold Meesage :-</label> {orderDetails?.onhold_note}
           {/* <Box>{orderDetails?.onhold_note}</Box> */}
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" &&
-              tableData?.some((data) => data.dispatch_image != "") ? (
+            orderProcess == "started" &&
+            tableData?.some((data) => data.dispatch_image != "") ? (
               <>
-                <Button variant="danger" disabled={orderDetails.toggle_status == 1 ? false : true} onClick={handleFinishButtonClick}>
+                <Button
+                  variant="danger"
+                  disabled={orderDetails.toggle_status == 1 ? false : true}
+                  onClick={handleFinishButtonClick}
+                >
                   Finish
                 </Button>
               </>

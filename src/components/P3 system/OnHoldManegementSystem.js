@@ -50,9 +50,14 @@ function OnHoldManegementSystem() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [optionsArray, setoptionsArray] = useState([]);
 
+  const token = JSON.parse(localStorage.getItem("token"));
+  const headers = {
+    Authorization: `Live ${token}`,
+  };
+
   const getall = async () => {
     let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
-    const response = await axios.get(url);
+    const response = await axios.get(url,{headers});
     setoptionsArray(
       response.data.products.map((user) => ({
         label: user.product_name,

@@ -48,6 +48,11 @@ function ExchangeAndReturn() {
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
   const dispatch = useDispatch();
 
+  const token = JSON.parse(localStorage.getItem("token"));
+  const headers = {
+    Authorization: `Live ${token}`,
+  };
+
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
     setPage(1);
@@ -254,7 +259,7 @@ function ExchangeAndReturn() {
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas.factories) {
       let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+      setFactories(data);
     }
   }, [allFactoryDatas]);
 
@@ -262,6 +267,7 @@ function ExchangeAndReturn() {
     try {
       const response = await axios.get(
         `${API_URL}wp-json/custom-er-api/v1/fetch-products-po/`,
+        { headers },
         {
           params: {
             factory_id: selectedFactory,
@@ -285,7 +291,8 @@ function ExchangeAndReturn() {
     try {
       setSelectPOId(id);
       const response = await axios.get(
-        `${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`
+        `${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`,
+        { headers }
       );
       console.log(response, "response");
       let data2 = [
@@ -320,7 +327,8 @@ function ExchangeAndReturn() {
     try {
       const response = await axios.post(
         `${API_URL}wp-json/custom-er-generate/v1/create-er/`,
-        payload
+        payload,
+        { headers }
       );
       console.log(response, "response");
       if (response.data.message) {
@@ -410,10 +418,16 @@ function ExchangeAndReturn() {
                   value={selectedPOType}
                   onChange={(e) => setSelectedPOType(e.target.value)}
                 >
-                  <option value="all">{t('POManagement.All')}</option>
-                  <option value="General PO">{t('POManagement.GeneralPO')}</option>
-                  <option value="Manual PO">{t('POManagement.ManualPO')}</option>
-                  <option value="Schedule PO">{t('POManagement.ScheduledPO')}</option>
+                  <option value="all">{t("POManagement.All")}</option>
+                  <option value="General PO">
+                    {t("POManagement.GeneralPO")}
+                  </option>
+                  <option value="Manual PO">
+                    {t("POManagement.ManualPO")}
+                  </option>
+                  <option value="Schedule PO">
+                    {t("POManagement.ScheduledPO")}
+                  </option>
                 </Form.Select>
               </Form.Group>
             </Col>

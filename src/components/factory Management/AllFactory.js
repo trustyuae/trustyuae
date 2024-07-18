@@ -32,6 +32,7 @@ function AllFactory() {
   async function fetchFactories() {
     setLoading(true);
     try {
+      const token = await JSON.parse(localStorage.getItem("token"));
       let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
       const params = {
         factory_name: factoryName,
@@ -41,7 +42,11 @@ function AllFactory() {
         contact_email: email,
       };
 
-      const response = await axios.get(apiUrl, { params });
+      const headers = {
+        Authorization: `Live ${token}`,
+      };
+
+      const response = await axios.get(apiUrl, { params, headers });
       const factoryData = response.data.factories.map((item) => ({ ...item }));
       setFactories(factoryData);
       setTotalPages(response.data.total_pages);
@@ -193,7 +198,7 @@ function AllFactory() {
       <Row>
         <div className="mt-2">
           {loading ? (
-            <Loader /> 
+            <Loader />
           ) : factories && factories.length !== 0 ? (
             <div className="mt-2">
               <DataTable

@@ -9,12 +9,16 @@ import {
 } from "../constants/Constants";
 import axios from "axios";
 
+const token = JSON.parse(localStorage.getItem('token'))
+const headers = {
+  Authorization: `Live ${token}`,
+};
 export const GetAllProductsList =
   ({ apiUrl }) =>
   async (dispatch) => {
     try {
       dispatch({ type: GET_ALL_PRODUCTS_LIST_REQUEST });
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl,{headers});
       console.log(response, "response of GetAllProducts");
       dispatch({
         type: GET_ALL_PRODUCTS_LIST_SUCCESS,
@@ -35,6 +39,7 @@ export const EditProductsList = (formData, id) => async (dispatch) => {
       formData,
       {
         headers: {
+          Authorization: `Live ${token}`,
           "Content-Type": "multipart/form-data",
         },
       }

@@ -79,6 +79,11 @@ const PoDetails = () => {
     (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
   );
 
+  const token = JSON.parse(localStorage.getItem("token"));
+  const headers = {
+    Authorization: `Live ${token}`,
+  };
+
   useEffect(() => {
     dispatch(AllFactoryActions());
   }, [dispatch]);
@@ -132,7 +137,7 @@ const PoDetails = () => {
   const getMessages = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`
+        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`,{headers}
       );
       console.log(response.data, "response");
       setMessages(response.data);
@@ -194,7 +199,7 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-  
+
     // Extracting necessary data for update
     const updatedData = {
       po_number: id,
@@ -202,18 +207,26 @@ const PoDetails = () => {
       product_ids: updatelist.map((item) => item.product_id),
       variation_id: updatelist.map((item) => item.variation_id || 0),
       po_status: PoStatus,
-      dispatch_type:updatelist.map((item) => item.dispatch_type==null?'':item.dispatch_type),
+      dispatch_type: updatelist.map((item) =>
+        item.dispatch_type == null ? "" : item.dispatch_type
+      ),
       payment_status: paymentStatus,
     };
-  
+
     // Check if availability_status is not empty
-    const availabilityStatuses = updatelist.map((item) => item.availability_status ? item.availability_status : (item.estimated_production_time ? item.estimated_production_time : []) );
+    const availabilityStatuses = updatelist.map((item) =>
+      item.availability_status
+        ? item.availability_status
+        : item.estimated_production_time
+        ? item.estimated_production_time
+        : []
+    );
     const flattenedStatuses = availabilityStatuses.flat();
-    
+
     // Validate only if availability_status is not empty
     if (flattenedStatuses.length > 0) {
       const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
-  
+
       if (validationMessage === "Availability status is empty.") {
         Swal.fire({
           icon: "error",
@@ -222,18 +235,17 @@ const PoDetails = () => {
         });
         return; // Stop execution if validation fails
       }
-  
+
       // Include availability_status in updatedData
       updatedData.availability_status = availabilityStatuses;
     }
-  
+
     console.log(updatedData, "updatedData");
-    
+
     // Proceed with dispatch update action
     let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
     await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
   };
-  
 
   const handlepayMentStatus = (value) => {
     setPaymentStatus(value);
@@ -367,14 +379,14 @@ const PoDetails = () => {
           </Box>
         );
       },
-    },  
+    },
     {
       field: "rmb_price",
       headerName: t("POManagement.RMBPrice"),
       flex: 3,
       valueGetter: (value, row) => {
-        console.log(value,'rmb price')
-        console.log(row,'row rmb price')
+        console.log(value, "rmb price");
+        console.log(row, "row rmb price");
         if (row.id === "TAX") {
           return row.taxTotal;
         }
@@ -508,7 +520,7 @@ const PoDetails = () => {
 
       const response = await axios.post(
         `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
-        requestedMessage
+        requestedMessage,{headers}
       );
       console.log(response.data);
 
@@ -764,7 +776,12 @@ const PoDetails = () => {
 
           <Row>
             {PoUpdate ? (
-              <Button type="button" className="w-auto" onClick={handleUpdate} disabled>
+              <Button
+                type="button"
+                className="w-auto"
+                onClick={handleUpdate}
+                disabled
+              >
                 {t("POManagement.Update")}
               </Button>
             ) : (

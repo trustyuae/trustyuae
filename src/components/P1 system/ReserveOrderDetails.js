@@ -8,7 +8,10 @@ import { Avatar, Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { CompletedOrderDetailsGet, ReserveOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
+import {
+  CompletedOrderDetailsGet,
+  ReserveOrderDetailsGet,
+} from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
@@ -27,11 +30,16 @@ function ReserveOrderDetails() {
   const [userName, setUserName] = useState(null);
   const [attachmentZoom, setAttachmentZoom] = useState(false);
 
+  const token = JSON.parse(localStorage.getItem("token"));
+  const headers = {
+    Authorization: `Live ${token}`,
+  };
+
   useEffect(() => {
     const fetchUserName = async () => {
       try {
         const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`
+          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,{headers}
         );
         setUserName(name.data);
       } catch (error) {

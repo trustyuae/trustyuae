@@ -64,6 +64,11 @@ function POManagementSystem() {
     dispatch(AllFactoryActions());
   }, [dispatch]);
 
+  const token = JSON.parse(localStorage.getItem('token'))
+const headers = {
+  Authorization: `Live ${token}`,
+};
+
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas.factories) {
       let data = allFactoryDatas.factories.map((item) => ({ ...item }));
@@ -234,7 +239,7 @@ function POManagementSystem() {
     if (result.isConfirmed) {
       try {
         const response = await axios.get(
-          `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`
+          `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`,{headers}
         );
         if (response) {
           POM_system_products();

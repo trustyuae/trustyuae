@@ -12,6 +12,11 @@ import {
 import { loginURL, logoutURL } from "../../utils/constants";
 import ShowAlert from "../../utils/ShowAlert";
 
+const token = JSON.parse(localStorage.getItem('token'))
+const headers = {
+  Authorization: `Live ${token}`,
+};
+
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
   try {
@@ -19,7 +24,9 @@ export const loginUser = (data, navigate) => async (dispatch) => {
       `${API_URL}wp-json/custom-login/v1/login`,
       data,
       {
-        headers: { "content-type": "application/json" },
+        headers: { 
+          Authorization: `Live ${token}`,
+          "content-type": "application/json"},
       }
     );
     console.log(res, "respuncee");
@@ -71,7 +78,7 @@ export const logoutUser = (navigate) => async (dispatch) => {
   try {
     const res = await axios.post(
       `${API_URL}wp-json/custom-login/v1/logout`,
-      null
+      null,
     );
     console.log(res, "logout res");
     dispatch({ type: USER_LOGOUT_SUCCESS });

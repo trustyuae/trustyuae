@@ -41,6 +41,11 @@ const ERDetails = () => {
   const [addNote, setNote] = useState("");
   const [lang, setLang] = useState("En");
 
+  const token = JSON.parse(localStorage.getItem('token'))
+  const headers = {
+    Authorization: `Live ${token}`,
+  };
+
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
   );
@@ -319,7 +324,7 @@ const ERDetails = () => {
     try {
       const response = await axios.post(
         `${API_URL}wp-json/custom-er-update/v1/update-er-item/`,
-        payload
+        payload,{headers}
       );
       if (response.data.message) {
         const result = await ShowAlert(
