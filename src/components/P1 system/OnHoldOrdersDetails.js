@@ -67,15 +67,9 @@ function OnHoldOrdersDetails() {
   }
   fileInputRef.current[selectedItemId] = useRef(null);
 
-  useEffect(()=>{
-
-  })
-
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
-
-  console.log(orderDetailsDataOrderId,'akash operation_user_note')
 
   const token = JSON.parse(localStorage.getItem("token"));
   const headers = {
@@ -172,7 +166,7 @@ function OnHoldOrdersDetails() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e, itemId) => {
+  const handleFileInputChange = async (e, itemId,itemVariationId) => {
     if (e.target.files[0]) {
       const file = await CompressImage(e.target.files[0]);
       const fr = new FileReader();
@@ -181,6 +175,7 @@ function OnHoldOrdersDetails() {
         setSelectedFile(file);
         setShowAttachmentModal(true);
         setSelectedItemId(itemId);
+        setSelecetedVariationId(itemVariationId);
       };
       fr.readAsDataURL(file);
     }
@@ -192,6 +187,7 @@ function OnHoldOrdersDetails() {
     setShowAttachmentModal(false);
   };
   const handleCancelImg = async (e) => {
+    console.log(e.variation_id, "e.variation_id");
     Swal.fire({
       title: "Are you sure you want to delete this image?",
       icon: "question",
@@ -204,9 +200,10 @@ function OnHoldOrdersDetails() {
         await axios.post(
           `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
-            variation_id: e.variation_id,
+            variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
-          }
+          },
+          { headers }
         );
         fetchOrder();
       }
@@ -214,18 +211,25 @@ function OnHoldOrdersDetails() {
   };
 
   const handleSubmitAttachment = async () => {
+    console.log(selectedVariationId, "selectedVariationId akakki");
     setLoader(true);
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
         await dispatch(
           AttachmentFileUpload({
+            // user_id: user_id,
+            // // order_id: orderDetailsDataOrderId?.order_id,
+            // order_id: id,
+            // item_id: selectedItemId,
+            // selectedFile: selectedFile,
+            // variation_id: selectedVariationId,
+
             user_id: user_id,
-            // order_id: orderDetailsDataOrderId?.order_id,
-            order_id: id,
+            order_id: orderDetailsDataOrderId?.order_id,
             item_id: selectedItemId,
-            selectedFile: selectedFile,
             variation_id: selectedVariationId,
+            selectedFile: selectedFile,
           })
         );
       } else {
@@ -422,13 +426,13 @@ function OnHoldOrdersDetails() {
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
-        const variationId =
-          value && value.row.variation_id ? Number(value.row.variation_id) : 0;
-        console.log(variationId, "variationId");
+        const itemVariationId =
+          value && value.row.variation_id ? value.row.variation_id : 0;
+
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId);
+          handleFileInputChange(e, itemId,itemVariationId);
         };
 
         if (!fileInputRef.current) {
@@ -503,7 +507,11 @@ function OnHoldOrdersDetails() {
                   toggleStatus != 0 ? (
                     <Button
                       className="bg-transparent border-0 text-black"
-                      onClick={() => fileInputRef.current[itemId]?.click()}
+                      onClick={() =>
+                        fileInputRef.current[
+                          selectedVariationId ? selectedVariationId : itemId
+                        ]?.click()
+                      }
                     >
                       <CloudUploadIcon />
                       <Typography style={{ fontSize: "14px" }}>
@@ -511,7 +519,11 @@ function OnHoldOrdersDetails() {
                       </Typography>
                       <input
                         type="file"
-                        ref={(input) => (fileInputRef.current[itemId] = input)}
+                        ref={(input) =>
+                          (fileInputRef.current[
+                            selectedVariationId ? selectedVariationId : itemId
+                          ] = input)
+                        }
                         style={{ display: "none" }}
                         onChange={handleFileInputChangeForRow}
                       />
@@ -538,7 +550,7 @@ function OnHoldOrdersDetails() {
                       onClick={() => {
                         setShowAttachModal(true);
                         setSelectedItemId(itemId);
-                        setSelecetedVariationId(variationId);
+                        setSelecetedVariationId(itemVariationId);
                       }}
                     >
                       <CameraAltIcon />
@@ -607,7 +619,8 @@ function OnHoldOrdersDetails() {
 
     const response = await axios.post(
       `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
-      result,{headers}
+      result,
+      { headers }
     );
     console.log(response, "response");
     if (response) {
@@ -1003,7 +1016,8 @@ function OnHoldOrdersDetails() {
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
         <Alert variant={"success"}>
-          <label>Meesage :-</label>{" "}{orderDetailsDataOrderId?.operation_user_note}
+          <label>Meesage :-</label>{" "}
+          {orderDetailsDataOrderId?.operation_user_note}
           {/* <Box>{orderDetailsDataOrderId?.operation_user_note}</Box> */}
         </Alert>
         <Alert variant={"success"}>
