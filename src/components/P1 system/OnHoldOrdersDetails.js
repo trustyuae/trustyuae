@@ -1003,8 +1003,8 @@ function OnHoldOrdersDetails() {
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
         <Alert variant={"success"}>
-          <label>Meesage :-</label>{" "}
-          <Box>{orderDetailsDataOrderId?.operation_user_note}</Box>
+          <label>Meesage :-</label>{" "}{orderDetailsDataOrderId?.operation_user_note}
+          {/* <Box>{orderDetailsDataOrderId?.operation_user_note}</Box> */}
         </Alert>
         <Alert variant={"success"}>
           <label>On Hold Meesage :-</label> {orderDetails?.onhold_note}
