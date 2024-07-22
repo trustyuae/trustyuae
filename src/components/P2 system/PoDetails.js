@@ -65,6 +65,10 @@ const PoDetails = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [addMessageD, setAddMessageD] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -107,7 +111,7 @@ const PoDetails = () => {
 
   const fetchPO = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}`;
+      let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
         console.log(response, "response");
         console.log(response?.data?.total_count, "response?.data?.total_count");
@@ -128,6 +132,7 @@ const PoDetails = () => {
         setFactorieName(response.data.factory_id);
         setPoStatus(response.data.po_status);
         setPaymentStatus(response.data.payment_status);
+        setTotalPages(response?.data?.total_pages);
       });
     } catch {
       console.error("Error fetching PO:");
@@ -137,7 +142,8 @@ const PoDetails = () => {
   const getMessages = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`,{headers}
+        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`,
+        { headers }
       );
       console.log(response.data, "response");
       setMessages(response.data);
@@ -150,7 +156,8 @@ const PoDetails = () => {
     fetchPO();
     // getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pageSize, page,]);
+
   useEffect(() => {
     // fetchPO();
     getMessages();
@@ -520,7 +527,8 @@ const PoDetails = () => {
 
       const response = await axios.post(
         `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
-        requestedMessage,{headers}
+        requestedMessage,
+        { headers }
       );
       console.log(response.data);
 
@@ -529,6 +537,15 @@ const PoDetails = () => {
       setAddMessageD(false);
       getMessages();
     } catch (error) {}
+  };
+
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(1);
   };
 
   return (
@@ -733,7 +750,7 @@ const PoDetails = () => {
               </Form.Select>
             </Form.Group>
           </Col>
-          <Col xs="auto" lg="4">
+          <Col xs="auto" lg="4" className="d-flex align-items-center">
             <Form.Group className="fw-semibold mb-0">
               <Form.Label>{t("POManagement.POStatus")}</Form.Label>
               <Form.Select
@@ -750,6 +767,21 @@ const PoDetails = () => {
                   {t("POManagement.Checkingwithfactory")}
                 </option>
               </Form.Select>
+            </Form.Group>
+            <Form.Group className="fw-semibold mb-0 ms-3">
+              <Form.Label>Page Size:</Form.Label>
+              <Form.Control
+                as="select"
+                className="w-auto"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
           </Col>
         </Row>
@@ -770,6 +802,10 @@ const PoDetails = () => {
                 // handleChange={handleChangeSO}
                 // // onCellEditStart={handleCellEditStart}
                 // processRowUpdate={processRowUpdateSPO}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
               />
             </div>
           )}
