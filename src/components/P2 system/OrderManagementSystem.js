@@ -511,7 +511,7 @@ function OrderManagementSystem() {
       scheduledPO();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, endDate, selectedFactory, manualProductF]);
+  }, [page, pageSize, endDate, selectedFactory, manualProductF,setSelectedFactory]);
 
   useEffect(() => {
     dispatch(AllFactoryActions());
