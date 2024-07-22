@@ -178,7 +178,9 @@ function OnHoldOrdersSystem() {
     }
   };
 
-  const handleSearchFilter = () => {
+  const handleSearchFilter = (e) => {
+    e.preventDefault();
+    setSearchOrderID(inputRef.current.value);
     setPage(1);
     fetchOrders();
   };
@@ -205,7 +207,7 @@ function OnHoldOrdersSystem() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize,searchOrderID, page,dispatchType, isReset,]);
+  }, [pageSize,searchOrderID, page,dispatchType, isReset,setSearchOrderID]);
 
   return (
     <Container fluid className="py-3">
@@ -295,7 +297,7 @@ function OnHoldOrdersSystem() {
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
-              onClick={handleSearchFilter}
+              onClick={(e)=>handleSearchFilter(e)}
             >
               Search
             </Button>

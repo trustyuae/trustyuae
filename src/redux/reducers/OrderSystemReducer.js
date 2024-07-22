@@ -36,6 +36,9 @@ import {
   CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST,
   CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS,
   CUSTOM_ORDER_ON_HOLD_FINISH_FAIL,
+  GET_ON_HOLD_ORDER_DETAILS_SYSTEM_FAIL,
+  GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS,
+  GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST,
 } from "../constants/Constants";
 
 const initialState = {
@@ -47,6 +50,8 @@ const initialState = {
   isOrderDetails: false,
   completedOrderDetails: [],
   isCompletedOrderDetails: false,
+  onHoldOrderDetails: [],
+  isOnHoldOrderDetails: false,
   uploadAttachFile: [],
   isUploadAttachFile: false,
   uploadOverAllAttachFile: [],
@@ -107,6 +112,21 @@ const OrderSystemReducer = (state = initialState, action) => {
       return { ...state, isOrderDetails: false, orderDetails: action.payload };
     case GET_ORDER_DETAILS_FAIL:
       return { ...state, isOrderDetails: false, error: action.payload };
+
+      case GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST:
+      return { ...state, isOnHoldOrderDetails: true };
+    case GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS:
+      return {
+        ...state,
+        isOnHoldOrderDetails: false,
+        onHoldOrderDetails: action.payload,
+      };
+    case GET_ON_HOLD_ORDER_DETAILS_SYSTEM_FAIL:
+      return {
+        ...state,
+        isOnHoldOrderDetails: false,
+        error: action.payload,
+      };
 
     case UPLOAD_ATTACH_FILE_REQUEST:
       return { ...state, isUploadAttachFile: true };

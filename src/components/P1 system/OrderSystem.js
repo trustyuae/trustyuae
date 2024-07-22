@@ -212,7 +212,7 @@ function OrderSystem() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, searchOrderID, page, dispatchType, isReset]);
+  }, [pageSize, searchOrderID, page, dispatchType, isReset,setSearchOrderID]);
 
   return (
     <Container fluid className="py-3">

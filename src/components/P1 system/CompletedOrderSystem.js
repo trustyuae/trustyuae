@@ -23,7 +23,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 
 function CompletedOrderSystem() {
   const inputRef = useRef(null);
-
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -179,7 +178,9 @@ function CompletedOrderSystem() {
     }
   };
 
-  const handleSearchFilter = () => {
+  const handleSearchFilter = (e) => {
+    e.preventDefault();
+    setSearchOrderID(inputRef.current.value);
     setPage(1);
     fetchOrders();
   };
@@ -206,7 +207,7 @@ function CompletedOrderSystem() {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
-  }, [pageSize, page, searchOrderID, isReset]);
+  }, [pageSize, page, searchOrderID, isReset,setSearchOrderID]);
 
   return (
     <Container fluid className="py-3">
@@ -314,7 +315,7 @@ function CompletedOrderSystem() {
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
-              onClick={handleSearchFilter}
+              onClick={(e)=>handleSearchFilter(e)}
             >
               Search
             </Button>

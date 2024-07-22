@@ -38,6 +38,9 @@ import {
   CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST,
   CUSTOM_ORDER_ON_HOLD_FINISH_FAIL,
   CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS,
+  GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS,
+  GET_ON_HOLD_ORDER_DETAILS_SYSTEM_FAIL,
+  GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -100,6 +103,28 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
     });
   }
 };
+
+export const OnHoldOrderDetailsGet = (id) => async (dispatch) => {
+  console.log(id, "idueeeeeeee");
+  try {
+    dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST});
+
+    const response = await axios.get(
+      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
+    );
+    dispatch({
+      type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS,
+      payload: response?.data,
+    });
+    return response;
+  } catch (error) {
+    dispatch({
+      type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_FAIL,
+      error: error.message,
+    });
+  }
+};
+
 export const ReserveOrderDetailsGet = (id) => async (dispatch) => {
   console.log(id, "idueeeeeeee");
   try {

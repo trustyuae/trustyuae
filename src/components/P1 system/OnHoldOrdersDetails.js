@@ -20,6 +20,7 @@ import {
   CustomOrderFinishOH,
   InsertOrderPickup,
   InsertOrderPickupCancel,
+  OnHoldOrderDetailsGet,
   OrderDetailsGet,
   OverAllAttachmentFileUpload,
 } from "../../redux/actions/OrderSystemActions";
@@ -65,9 +66,16 @@ function OnHoldOrdersDetails() {
     fileInputRef.current = {};
   }
   fileInputRef.current[selectedItemId] = useRef(null);
+
+  useEffect(()=>{
+
+  })
+
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
+
+  console.log(orderDetailsDataOrderId,'akash operation_user_note')
 
   const token = JSON.parse(localStorage.getItem("token"));
   const headers = {
@@ -99,9 +107,10 @@ function OnHoldOrdersDetails() {
   async function fetchOrder() {
     try {
       // const response = await dispatch(OrderDetailsGet({ id: id }));
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
-      );
+      // const response = await axios.get(
+      //   `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
+      // );
+      const response = await dispatch(OnHoldOrderDetailsGet(id));
 
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
