@@ -93,15 +93,15 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     titleVe += text1Height + 6; // Adjust 8 based on your desired vertical spacing
 
     // Text 2: Shipping Method
+    // let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
+    // doc.text(shippingMethodText, cardContentX, titleVe);
     let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
-    doc.text(shippingMethodText, cardContentX, titleVe);
+    let textLines = doc.splitTextToSize(shippingMethodText, cardWidth - 10);
+    let shippingTextHeight = textLines.length *6; 
+    doc.text(textLines, cardContentX, titleY + 42 + shippingTextHeight);
 
     doc.setLineWidth(0.3); // Set line width for the separator
     doc.line(cardX + 2, titleVe + 2, cardX + cardWidth - 2, titleVe + 2);
-
-    // Draw bottom border of the card
-    doc.setLineWidth(borderWidth);
-    doc.line(cardX, cardY + cardHeight, cardX + cardWidth, cardY + cardHeight);
 
     // Save the PDF with the name "invoice.pdf"
     doc.save("invoice.pdf");
