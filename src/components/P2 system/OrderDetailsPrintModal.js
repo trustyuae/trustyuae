@@ -227,6 +227,14 @@ const OrderDetailsPrintModal = ({
   };
 
   const handleExportExcel = () => {
+    const orderIds = PO_OrderList?.map((item) => {
+      return item?.order_ids?.map((item2) => {
+        return item2;
+      });
+    });
+
+    const orderIdsString = orderIds.flat().join(', ');
+
     const wb = XLSX.utils.book_new();
     const data = PO_OrderList.map((item) => {
       if (item?.id !== "TAX") {
@@ -234,10 +242,12 @@ const OrderDetailsPrintModal = ({
           "Product Name": item?.product_name || "N/A",
           "Quantity Ordered": item?.quantity || 0,
           "Image URL": item?.image || "N/A",
+          "order ids":orderIdsString
         };
       }
     }).filter((item) => item !== undefined);
-
+    
+    console.log(data,'data of po_orderlist')
     const totalItem = PO_OrderList.find((item) => item?.id === "TAX");
     if (totalItem) {
       data.push({

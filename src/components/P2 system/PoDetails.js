@@ -123,7 +123,7 @@ const PoDetails = () => {
             id: "TAX",
             label: "Total:",
             total_quantity: response?.data?.total_count || 0,
-            taxTotal: 8100,
+            taxTotal: response?.data?.total_rmb_cost,
             total_cost: response?.data?.total_cost || 0,
           },
         ];
