@@ -219,7 +219,8 @@ function OrderDetails() {
           {
             variation_id: e.variation_id,
             image_url: e.dispatch_image,
-          },{headers}
+          },
+          { headers }
         );
         fetchOrder();
       }
@@ -632,16 +633,34 @@ function OrderDetails() {
               {loader ? (
                 <Loader />
               ) : (
-                <Box>
-                  <Typography className="fw-bold">Order# {id}</Typography>
-                  <Typography
-                    className=""
-                    sx={{
-                      fontSize: 14,
-                    }}
-                  >
-                    <Badge bg="success">{orderDetails?.order_status}</Badge>
-                  </Typography>
+                <Box className="d-flex">
+                  <Box>
+                    <Typography className="fw-bold">Order# {id}</Typography>
+                    <Typography
+                      className=""
+                      sx={{
+                        fontSize: 14,
+                      }}
+                    >
+                      <Badge bg="success">{orderDetails?.order_status}</Badge>
+                    </Typography>
+                  </Box>
+                  {orderDetails?.operation_user_id != userData?.user_id &&
+                    orderDetails?.order_process == "started" && (
+                      <Box className="ms-5">
+                        <Typography className="fw-bold">
+                          {orderDetails?.user_name}
+                        </Typography>
+                        <Typography
+                          className=""
+                          sx={{
+                            fontSize: 14,
+                          }}
+                        >
+                          <Badge bg="success">Order Started By</Badge>
+                        </Typography>
+                      </Box>
+                    )}
                 </Box>
               )}
             </Box>
