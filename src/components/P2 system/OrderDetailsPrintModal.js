@@ -226,15 +226,7 @@ const OrderDetailsPrintModal = ({
     });
   };
 
-  const handleExportExcel = () => {
-    const orderIds = PO_OrderList?.map((item) => {
-      return item?.order_ids?.map((item2) => {
-        return item2;
-      });
-    });
-
-    const orderIdsString = orderIds.flat().join(', ');
-
+  const handleExportExcel = (e) => {
     const wb = XLSX.utils.book_new();
     const data = PO_OrderList.map((item) => {
       if (item?.id !== "TAX") {
@@ -242,12 +234,12 @@ const OrderDetailsPrintModal = ({
           "Product Name": item?.product_name || "N/A",
           "Quantity Ordered": item?.quantity || 0,
           "Image URL": item?.image || "N/A",
-          "order ids":orderIdsString
+          "order ids": item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
         };
       }
     }).filter((item) => item !== undefined);
-    
-    console.log(data,'data of po_orderlist')
+
+    console.log(data, "data of po_orderlist");
     const totalItem = PO_OrderList.find((item) => item?.id === "TAX");
     if (totalItem) {
       data.push({
@@ -386,7 +378,7 @@ const OrderDetailsPrintModal = ({
           <Button variant="primary" onClick={handleExport}>
             {isDownloadPdf ? "Downloading..." : "Download PDF"}
           </Button>
-          <Button variant="success" onClick={handleExportExcel}>
+          <Button variant="success" onClick={(e)=>handleExportExcel(e)}>
             Download Excel
           </Button>
         </Modal.Footer>
