@@ -16,11 +16,17 @@ import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { OrderSystemGet } from "../../redux/actions/OrderSystemActions";
+import {
+  OrderDetailsGet,
+  OrderSystemGet,
+} from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import OrderDetails from "./OrderDetails";
+import PrintModal from "./PrintModal";
 
 function OrderSystem() {
   const inputRef = useRef(null);
@@ -40,6 +46,8 @@ function OrderSystem() {
     total_dispatch_orders: 0,
     total_reserve_orders: 0,
   });
+  const [orderData, setOrderData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
 
   const dispatch = useDispatch();
@@ -55,7 +63,7 @@ function OrderSystem() {
     )
       .then((response) => {
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        console.log(response.data["total_count"], 'consoled response.data')
+        console.log(response.data["total_count"], "consoled response.data");
         setOrders(data);
         setOverAllData({
           total_count: response.data.total_count,
@@ -88,6 +96,18 @@ function OrderSystem() {
     setPage(1);
   };
 
+  const handlePrint = async (orderId) => {
+    try {
+      const response = await dispatch(OrderDetailsGet({ id: orderId }));
+      console.log(response.data.orders, "response");
+      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      setOrderData(data);
+      setShowModal(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const columns = [
     { field: "date", headerName: "Date", className: "order-system", flex: 1 },
     {
@@ -116,6 +136,25 @@ function OrderSystem() {
       flex: 1,
       className: "order-system",
       type: "string",
+    },
+    {
+      field: "",
+      headerName: "print pdf",
+      flex: 0.5,
+      className: "order-system",
+      type: "html",
+      renderCell: (value, row) => {
+        const orderId = value && value.row && value.row.order_id;
+        return (
+          <Button
+            type="button"
+            className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+            onClick={() => handlePrint(orderId)}
+          >
+            <LocalPrintshopOutlinedIcon className="mb-1" />
+          </Button>
+        );
+      },
     },
     {
       field: "view_item",
@@ -201,18 +240,18 @@ function OrderSystem() {
       // setProductName("");
       // fetchOrders();
     }
-  }
+  };
 
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
-    setStartDate("")
-    setEndDate("")
+    setStartDate("");
+    setEndDate("");
   };
 
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, searchOrderID, page, dispatchType, isReset,setSearchOrderID]);
+  }, [pageSize, searchOrderID, page, dispatchType, isReset, setSearchOrderID]);
 
   return (
     <Container fluid className="py-3">
@@ -239,7 +278,9 @@ function OrderSystem() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
-                <Form.Label className="fw-semibold mb-0">Date filter:</Form.Label>
+                <Form.Label className="fw-semibold mb-0">
+                  Date filter:
+                </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
                     <DateRangePicker
@@ -261,7 +302,10 @@ function OrderSystem() {
                   </DemoContainer>
                 </LocalizationProvider>
                 {selectedDateRange[0] && selectedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                  <CancelIcon
+                    style={{ position: "absolute", right: "0", top: "39px" }}
+                    onClick={clearDateRange}
+                  />
                 )}
               </Form.Group>
             </Col>
@@ -289,7 +333,7 @@ function OrderSystem() {
                   as="input"
                   type="number"
                   className="color-black"
-                  style={{ width: "100px", textAlign: 'center' }} // Add a custom width style here
+                  style={{ width: "100px", textAlign: "center" }} // Add a custom width style here
                   value={overAllData.total_count}
                   readOnly
                 />
@@ -302,7 +346,7 @@ function OrderSystem() {
                   as="input"
                   type="number"
                   className="color-black"
-                  style={{ width: "100px", textAlign: 'center' }} // Add a custom width style here
+                  style={{ width: "100px", textAlign: "center" }} // Add a custom width style here
                   value={overAllData.total_dispatch_orders}
                   readOnly
                 />
@@ -315,7 +359,7 @@ function OrderSystem() {
                   as="input"
                   type="number"
                   className="color-black"
-                  style={{ width: "100px", textAlign: 'center' }} // Add a custom width style here
+                  style={{ width: "100px", textAlign: "center" }} // Add a custom width style here
                   value={overAllData.total_reserve_orders}
                   readOnly
                 />
@@ -382,6 +426,12 @@ function OrderSystem() {
           )}
         </>
       )}
+      <PrintModal
+        show={showModal}
+        handleClosePrintModal={() => setShowModal(false)}
+        showModal={showModal}
+        orderData={orderData}
+      />
     </Container>
   );
 }
