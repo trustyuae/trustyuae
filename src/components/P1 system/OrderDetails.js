@@ -129,7 +129,11 @@ function OrderDetails() {
     }
   }
 
-  const handleAddMessage = async () => {
+  const handleChange = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const handleAddMessage = async (e) => {
     const orderId = parseInt(id, 10);
     const requestedMessage = {
       message: message,
@@ -137,11 +141,18 @@ function OrderDetails() {
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {
-        const result = await ShowAlert("", response.data, "success");
-        if (result.isConfirmed) {
-          setMessage("");
-          setshowMessageModal(false);
-        }
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
       }
     });
   };
@@ -173,7 +184,7 @@ function OrderDetails() {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, setTableData, setOrderData]);
+  }, [setMessage, setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -1105,7 +1116,7 @@ function OrderDetails() {
               placeholder="Enter your message here..."
               rows={3}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => handleChange(e)}
             />
             <Box className="text-end my-3">
               <Button
