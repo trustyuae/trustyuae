@@ -359,7 +359,7 @@ function OnHoldManegementSystem() {
     const mergedData = Updatedata.reduce((acc, item) => {
       // Create a unique key based on product_name and variation_values
       const key = JSON.stringify({
-        product_name: item.product_name,
+        product_name: item.product_id,
         variation_values: item.variation_values,
       });
 
@@ -367,7 +367,7 @@ function OnHoldManegementSystem() {
       const existingIndex = acc.findIndex(
         (entry) =>
           JSON.stringify({
-            product_name: entry.product_name,
+            product_name: entry.product_id,
             variation_values: entry.variation_values,
           }) === key
       );
