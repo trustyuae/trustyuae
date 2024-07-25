@@ -153,7 +153,7 @@ function OrderDetails() {
     const requestedMessage = {
       message: message,
       order_id: orderId,
-      user: userID.first_name,
+      name: userID.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(
       async (response) => {
