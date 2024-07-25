@@ -15,6 +15,7 @@ const OrderDetailsPrintModal = ({
   factoryName,
   poId,
 }) => {
+  console.log(PO_OrderList, "PO_OrderList akash");
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
   const handleExport = async () => {
@@ -40,28 +41,21 @@ const OrderDetailsPrintModal = ({
     });
 
     const tableColumn = [
+      "Product ID",
       "Factory Image",
       "Product Variations",
       "Quantity Ordered",
+      "Order IDs",
     ];
     const tableRows = [];
+
     for (const item of PO_OrderList) {
       if (item?.id !== "TAX") {
         let imgData = defaultImage;
-        if (
-          item?.factory_image
-            ? item.factory_image
-            : item.image
-            ? item.image
-            : defaultImage
-        ) {
+        if (item?.factory_image || item?.image) {
           try {
             imgData = await loadImageToDataURL(
-              item?.factory_image
-                ? item?.factory_image
-                : item.image
-                ? item.image
-                : defaultImage
+              item?.factory_image || item?.image
             );
           } catch (error) {
             console.error("Error loading image:", error);
@@ -70,27 +64,25 @@ const OrderDetailsPrintModal = ({
         }
 
         // Parse variation_value if present
-        let variationValue = {};
+        let productName = "";
         if (item?.variation_value) {
           try {
-            variationValue = JSON.parse(item.variation_value);
+            const variationValue = JSON.parse(item.variation_value);
+            productName = Object.keys(variationValue)
+              .map((key) => `${key}: ${variationValue[key]}`)
+              .join(", ");
           } catch (error) {
             console.error("Error parsing variation_value:", error);
           }
         }
 
-        // Construct product name with all variation keys and values
-        let productName = "";
-        Object.keys(variationValue).forEach((key, index) => {
-          if (index > 0) productName += ", "; // Separate with comma and space
-          productName += `${key}: ${variationValue[key]}`;
-        });
-
         // Add row data
         tableRows.push([
-          { image: imgData, width: 40 }, // Include image data as an object with 'image' key
-          productName || " ",
-          item?.quantity || 0,
+          item.product_id || "N/A",
+          { image: imgData, width: 48 },
+          productName || "N/A",
+          item.quantity || 0,
+          item.order_ids?.join(", ") || "N/A",
         ]);
       }
     }
@@ -100,7 +92,7 @@ const OrderDetailsPrintModal = ({
       tableRows.push([
         {
           content: "Total:",
-          colSpan: 2,
+          colSpan: 3, // Span across all columns
           styles: { halign: "center", fontStyle: "bold" },
         },
         {
@@ -124,7 +116,7 @@ const OrderDetailsPrintModal = ({
       bodyStyles: {
         textColor: [0, 0, 0],
         fontSize: 10,
-        halign: "center", // Center text in all body cells
+        halign: "center",
       },
       alternateRowStyles: {
         fillColor: [245, 245, 245],
@@ -133,32 +125,47 @@ const OrderDetailsPrintModal = ({
       rowHeight: 80,
       columnStyles: {
         0: {
-          cellWidth: 44,
-          halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
-        },
-        1: {
-          cellWidth: 70,
-          halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
-        },
-        2: {
           cellWidth: 30,
           halign: "center",
           valign: "center",
           cellPadding: 2,
           minCellHeight: 38,
         },
+        1: {
+          cellWidth: 52,
+          halign: "middle",
+          valign: "middle",
+          cellPadding: 2,
+          minCellHeight: 38,
+        },
+        2: {
+          cellWidth: 40,
+          halign: "center",
+          valign: "center",
+          cellPadding: 2,
+          minCellHeight: 38,
+        },
+        3: {
+          cellWidth: 30,
+          halign: "center",
+          valign: "center",
+          cellPadding: 2,
+          minCellHeight: 38,
+        },
+        4: {
+          cellWidth: 48,
+          halign: "center",
+          valign: "center",
+          cellPadding: 2,
+          minCellHeight: 38,
+        },
       },
+
       head: [tableColumn],
       body: tableRows,
       didDrawCell: (data) => {
         if (
-          data?.column?.index === 0 &&
+          data?.column?.index === 1 &&
           data?.cell?.section === "body" &&
           data.cell.raw?.image
         ) {
@@ -178,8 +185,8 @@ const OrderDetailsPrintModal = ({
       margin: {
         top: 10,
         bottom: 10,
-        left: (pageWidth - tableColumn.length * 53) / 2,
-        right: (pageWidth - tableColumn.length * 50) / 2,
+        left: (pageWidth - tableColumn.length * 40) / 2,
+        right: (pageWidth - tableColumn.length * 40) / 2,
       },
       theme: "grid",
       tableWidth: "auto",
@@ -189,7 +196,6 @@ const OrderDetailsPrintModal = ({
         lineColor: [0, 0, 0],
       },
       addPageContent: function (data) {
-        // Add footer with page number centered horizontally
         const totalPages = doc.internal.getNumberOfPages();
         const pageHeight =
           doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
@@ -234,7 +240,8 @@ const OrderDetailsPrintModal = ({
           "Product Name": item?.product_name || "N/A",
           "Quantity Ordered": item?.quantity || 0,
           "Image URL": item?.image || "N/A",
-          "order ids": item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
+          "order ids":
+            item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
         };
       }
     }).filter((item) => item !== undefined);
@@ -318,6 +325,7 @@ const OrderDetailsPrintModal = ({
         id: item.id,
         product_name: item.id === "total" ? "Total:" : item.product_name,
         quantity: item.quantity || 0,
+        order_ids: item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
         colspan: 2,
         factory_image: item.factory_image
           ? item.factory_image
@@ -379,7 +387,7 @@ const OrderDetailsPrintModal = ({
           <Button variant="primary" onClick={handleExport}>
             {isDownloadPdf ? "Downloading..." : "Download PDF"}
           </Button>
-          <Button variant="success" onClick={(e)=>handleExportExcel(e)}>
+          <Button variant="success" onClick={(e) => handleExportExcel(e)}>
             Download Excel
           </Button>
         </Modal.Footer>
