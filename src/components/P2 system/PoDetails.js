@@ -26,6 +26,7 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  TextField,
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -45,6 +46,11 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import axios from "axios";
 import defaulImage from "../../../src/assets/default.png";
+import { DatePicker } from "@mui/x-date-pickers-pro";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -69,6 +75,9 @@ const PoDetails = () => {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedDueType, setSelectedDueType] = useState(null);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -107,6 +116,19 @@ const PoDetails = () => {
   const handleLanguageChange = async (language) => {
     setLang(language);
     i18n.changeLanguage(language);
+  };
+
+  const handleDateChange = async (newDateRange) => {
+    setSelectedDueType("");
+    setDueDate("");
+    if (newDateRange?.$d) {
+      const isoDate = dayjs(newDateRange.$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
+      setSelectedDate(isoDate);
+    } else {
+      console.error("Invalid date range");
+    }
   };
 
   const fetchPO = async () => {
@@ -445,32 +467,54 @@ const PoDetails = () => {
       renderCell: (params) => {
         console.log(params.row.variation_value, "params");
         return (
-          <Form.Select
-            labelId={`customer-status-${params.row.id}-label`}
-            id={`customer-status-${params.row.id}`}
-            className="mr-sm-2 py-2"
-            value={
-              params.row.availability_status !== "" &&
-              params.row.availability_status !== "0"
-                ? params.row.availability_status
-                : params.row.estimated_production_time
-            }
-            onChange={(event) =>
-              handleStatusChange(event.target.value, params.row)
-            }
-            fullWidth
-            style={{ height: "40%", width: "100%" }}
-          >
-            <option disabled selected value="">
-              {t("POManagement.Select")}...
-            </option>
-            <option value="Confirmed">{t("POManagement.Confirmed")}</option>
-            <option value="1 week">{t("POManagement.Oweek")}</option>
-            <option value="2 weeks">{t("POManagement.Tweek")}</option>
-            <option value="3 weeks">{t("POManagement.threeWeek")}</option>
-            <option value="1 Month">{t("POManagement.Omonth")}</option>
-            <option value="Out of Stock">{t("POManagement.OutofStock")}</option>
-          </Form.Select>
+          // <Form.Select
+          //   labelId={`customer-status-${params.row.id}-label`}
+          //   id={`customer-status-${params.row.id}`}
+          //   className="mr-sm-2 py-2"
+          //   value={
+          //     params.row.availability_status !== "" &&
+          //     params.row.availability_status !== "0"
+          //       ? params.row.availability_status
+          //       : params.row.estimated_production_time
+          //   }
+          //   onChange={(event) =>
+          //     handleStatusChange(event.target.value, params.row)
+          //   }
+          //   fullWidth
+          //   style={{ height: "40%", width: "100%" }}
+          // >
+          //   <option disabled selected value="">
+          //     {t("POManagement.Select")}...
+          //   </option>
+          //   <option value="Confirmed">{t("POManagement.Confirmed")}</option>
+          //   <option value="1 week">{t("POManagement.Oweek")}</option>
+          //   <option value="2 weeks">{t("POManagement.Tweek")}</option>
+          //   <option value="3 weeks">{t("POManagement.threeWeek")}</option>
+          //   <option value="1 Month">{t("POManagement.Omonth")}</option>
+          //   <option value="Out of Stock">{t("POManagement.OutofStock")}</option>
+          // </Form.Select>
+          <Box>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    format="YYYY-MM-DD"
+                    value={dayjs(selectedDate)} 
+                    onChange={(e) => handleDateChange(e)}
+                    sx={{
+                      display: "block",
+                      verticalAlign: "unset",
+                      "& .MuiInputBase-input": {
+                        padding: ".5rem .75rem .5rem .75rem",
+                        "&:hover": {
+                          borderColor: "#dee2e6",
+                        },
+                      },
+                    }}
+                    renderInput={(props) => (
+                      <TextField {...props} helperText="valid mask" />
+                    )}
+                  />
+                </LocalizationProvider>
+          </Box>
         );
       },
     },
