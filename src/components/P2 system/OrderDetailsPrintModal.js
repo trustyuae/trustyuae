@@ -279,7 +279,7 @@ const OrderDetailsPrintModal = ({
           <img
             src={params.value || defaultImage}
             alt="Product"
-            style={{ width: 50, height: 50 }}
+            style={{ width: 100, height: 95 }}
           />
         );
       },
@@ -287,15 +287,15 @@ const OrderDetailsPrintModal = ({
     {
       field: "product_name",
       headerName: "Product Name",
-      flex: 1,
+      flex: 1.5,
       renderCell: (params) => {
-        return params.value;
+        return <div className="wrap-text">{params.value}</div>;
       },
     },
     {
       field: "quantity",
       headerName: "Qty Ordered",
-      flex: 1,
+      flex: 0.5,
       renderCell: (params) => {
         if (params.row.content) {
           return <strong>{params.value}</strong>;
@@ -364,6 +364,7 @@ const OrderDetailsPrintModal = ({
                 columns={columns}
                 rows={rows}
                 className="custom-data-table"
+                rowHeight={100}
               />
             </Box>
           </Box>
