@@ -4,7 +4,18 @@ import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
-import { Alert, Avatar, Box, Typography } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  Box,
+  ListItem,
+  ListItemText,
+  Typography,
+  AccordionDetails,
+  List,
+  Accordion,
+  AccordionSummary,
+} from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -32,6 +43,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -70,6 +82,8 @@ function OrderDetails() {
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
+
+  console.log(orderDetailsDataOrderId, "orderDetailsDataOrderIdinnnnnnn");
 
   const AddInOnHold = useSelector(
     (state) => state?.orderSystemData?.isCustomOrderOnHold
@@ -135,26 +149,30 @@ function OrderDetails() {
 
   const handleAddMessage = async (e) => {
     const orderId = parseInt(id, 10);
+    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
       order_id: orderId,
+      user: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        setMessage("");
-        setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
+    await dispatch(AddMessage(requestedMessage)).then(
+      async (response) => {
+        if (response.data) {
+          setMessage("");
+          setshowMessageModal(false);
+          const result = await ShowAlert(
+            "",
+            response.data,
+            "success",
+            null,
+            null,
+            null,
+            null,
+            2000
+          );
+        }
       }
-    });
+    );
   };
 
   const submitOH = async () => {
@@ -634,7 +652,6 @@ function OrderDetails() {
               </MDBCol>
             )}
         </MDBRow>
-
         <Card className="p-3 mb-3">
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
@@ -953,7 +970,6 @@ function OrderDetails() {
             </Col>
           ) : null}
         </Row>
-
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
             Order Details
@@ -974,12 +990,61 @@ function OrderDetails() {
             </div>
           )}
         </Card>
+        {orderDetailsDataOrderId?.operation_user_note &&
+          orderDetailsDataOrderId?.operation_user_note.length > 0 && (
+            <Card className="p-3 mb-3">
+              <Box className="d-flex align-items-center justify-content-between">
+                <Box className="w-100">
+                  <Typography
+                    variant="h6"
+                    className="fw-bold mb-3"
+                  ></Typography>
+                  <Box className="d-flex justify-content-between">
+                    <div style={{ width: "100%" }}>
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel1-content"
+                          id="panel1-header"
+                        >
+                          <Typography variant="h6" className="fw-bold">
+                            Messages
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails
+                          style={{ maxHeight: "200px", overflowY: "auto" }}
+                        >
+                          <List>
+                            {orderDetailsDataOrderId?.operation_user_note.map(
+                              (message, i) => (
+                                <ListItem
+                                  key={i}
+                                  className="d-flex justify-content-start"
+                                >
+                                  <ListItemText
+                                    primary={message.message}
+                                    secondary={message.user}
+                                    className="rounded p-2"
+                                    style={{
+                                      maxWidth: "70%",
+                                      minWidth: "50px",
+                                      backgroundColor: "#bfdffb",
+                                    }}
+                                  />
+                                </ListItem>
+                              )
+                            )}
+                          </List>
+                        </AccordionDetails>
+                      </Accordion>
+                    </div>
+                  </Box>
+                </Box>
+              </Box>
+            </Card>
+          )}
         <Alert variant={"info"}>
           <label>Customer Note :-</label> "There is a customer note!"
-        </Alert>
-        <Alert variant={"success"}>
-          <label>Meesage :-</label>{" "}
-          <Box>{orderDetailsDataOrderId?.operation_user_note}</Box>
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
@@ -1047,7 +1112,6 @@ function OrderDetails() {
             )}
           </MDBCol>
         </MDBRow>
-
         <Modal
           show={showAttachModal}
           onHide={() => setShowAttachModal(false)}
@@ -1078,7 +1142,6 @@ function OrderDetails() {
             </Box>
           </Modal.Body>
         </Modal>
-
         <Modal
           show={showEditModal}
           // onHide={handleCloseEditModal}
@@ -1129,7 +1192,6 @@ function OrderDetails() {
             </Box>
           </Modal.Body>
         </Modal>
-
         <Modal
           show={showMessageOHModal}
           onHide={() => setshowMessageOHModal(false)}
@@ -1169,7 +1231,6 @@ function OrderDetails() {
             </Box>
           </Modal.Body>
         </Modal>
-
         <Modal
           show={showAttachmentModal}
           onHide={() => setShowAttachmentModal(false)}
