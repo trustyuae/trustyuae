@@ -422,14 +422,13 @@ const PoDetails = () => {
         return value;
       },
     },
-
     {
       field: "total_price",
       headerName: t("POManagement.AEDPrice"),
       flex: 3,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
-          return 4;
+          return 1;
         }
         return undefined;
       },
@@ -440,9 +439,35 @@ const PoDetails = () => {
         return value;
       },
     },
-
     {
       field: "available_quantity",
+      headerName: t("POManagement.ReceivedQty"),
+      flex: 2.5,
+      colSpan: (value, row) => {
+        if (row.id === "TAX") {
+          return 4;
+        }
+        return undefined;
+      },
+      renderCell: (params) => {
+        if (params.row.id === "TAX") {
+          return null
+        }
+        return (
+          <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+            <Form.Control
+              style={{ justifyContent: "center" }}
+              type="number"
+              value={params.row.available_quantity}
+              placeholder="0"
+              onChange={(e) => handleAvailableQtyChange(e, params.row)}
+            />
+          </Form.Group>
+        );
+      },
+    },
+    {
+      field: "",
       headerName: t("POManagement.AvlQty"),
       flex: 2.5,
       renderCell: (params) => {
@@ -459,7 +484,6 @@ const PoDetails = () => {
         );
       },
     },
-
     {
       field: "availability_status",
       headerName: t("POManagement.AvlStatus"),

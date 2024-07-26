@@ -34,6 +34,14 @@ import OnHoldOrdersSystem from "./components/P1 system/OnHoldOrdersSystem";
 import OnHoldOrdersDetails from "./components/P1 system/OnHoldOrdersDetails";
 import ReserveOrderSystem from "./components/P1 system/ReserveOrderSystem";
 import ReserveOrderDetails from "./components/P1 system/ReserveOrderDetails";
+import OrderSystemInChina from "./components/P1 system china/OrderSystemInChina";
+import OrderDetailsInChina from "./components/P1 system china/OrderDetailsInChina";
+import CompletedOrderSystemInChina from "./components/P1 system china/CompletedOrderSystemInChina";
+import CompletedOrderDetailsInChina from "./components/P1 system china/CompletedOrderDetailsInChina";
+import ReserveOrderSystemInChina from "./components/P1 system china/ReserveOrderSystemInChina";
+import OnHoldOrdersSystemInChina from "./components/P1 system china/OnHoldOrdersSystemInChina";
+import ReserveOrderdetailsInChina from "./components/P1 system china/ReserveOrderdetailsInChina";
+import OnHoldOrdersdetailsInChina from "./components/P1 system china/OnHoldOrdersdetailsInChina";
 
 function App() {
   return (
@@ -70,13 +78,23 @@ function App() {
               <Route exact path="/ER_Management_System" element={<ERManagement/>} />
               <Route exact path='/Exchange_And_Return' element={<ExchangeAndReturn />} />
               <Route exact path='/ER_details/:er_no' element={<ERDetails />} />
+
               <Route exact path='/completed_order_system' element={<CompletedOrderSystem />} />
               <Route exact path='/completed_order_details/:id' element={<CompletedOrderDetails />} />
               <Route exact path='/reserve_orders_system' element={<ReserveOrderSystem />} />
               <Route exact path='/on_hold_orders_system' element={<OnHoldOrdersSystem/>} />
-              <Route exact path='/on_hold_orders_system' element={<OnHoldOrdersSystem/>} />
               <Route exact path='/reserve_order_details/:id' element={<ReserveOrderDetails />} />
               <Route exact path='/on_hold_order_details/:id' element={<OnHoldOrdersDetails />} />
+
+              <Route exact path="/ordersystem_in_china" element={<OrderSystemInChina/>} />
+              <Route exact path="/order_details_in_china/:id" element={<OrderDetailsInChina/>} />
+              <Route exact path='/completed_order_system_in_china' element={<CompletedOrderSystemInChina />} />
+              <Route exact path='/completed_order_details_in_china/:id' element={<CompletedOrderDetailsInChina />} />
+              <Route exact path='/reserve_orders_system_in_china' element={<ReserveOrderSystemInChina />} />
+              <Route exact path='/on_hold_orders_system_in_china' element={<OnHoldOrdersSystemInChina/>} />
+              <Route exact path='/reserve_order_details_in_china/:id' element={<ReserveOrderdetailsInChina />} />
+              <Route exact path='/on_hold_order_details_in_china/:id' element={<OnHoldOrdersdetailsInChina />} />
+
               <Route exact path='/PageNotFound' element={<PageNotFound />} />
             </Route>
           {/* </Route> */}
