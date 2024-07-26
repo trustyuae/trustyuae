@@ -88,7 +88,8 @@ i18n
             Dispatched:'已派遣',
             NotDispatched:'未出貨',
             PoNo:'採購訂單編號',
-            EnterPoNumber:'輸入訂單編號'
+            EnterPoNumber:'輸入訂單編號',
+            InStock:'有存貨'
           }
         }
       },
@@ -170,7 +171,8 @@ i18n
             Dispatched:'Dispatched',
             NotDispatched:'Not Dispatched',
             PoNo:'PO No.',
-            EnterPoNumber:'Enter Po Number'
+            EnterPoNumber:'Enter Po Number',
+            InStock:'In Stock'
           }
         }
       },

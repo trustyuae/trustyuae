@@ -344,7 +344,7 @@ const Sidebar = () => {
               href="/"
             >
               <i className="bi bi-menu-button-wide"></i>
-              <span>P1 System</span>
+              <span>P1 System China</span>
               <i className="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul

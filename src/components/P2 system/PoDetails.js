@@ -487,62 +487,68 @@ const PoDetails = () => {
     {
       field: "availability_status",
       headerName: t("POManagement.AvlStatus"),
-      flex: 3,
+      flex: 8,
       renderCell: (params) => {
         console.log(params.row.variation_value, "params");
         return (
-          // <Form.Select
-          //   labelId={`customer-status-${params.row.id}-label`}
-          //   id={`customer-status-${params.row.id}`}
-          //   className="mr-sm-2 py-2"
-          //   value={
-          //     params.row.availability_status !== "" &&
-          //     params.row.availability_status !== "0"
-          //       ? params.row.availability_status
-          //       : params.row.estimated_production_time
-          //   }
-          //   onChange={(event) =>
-          //     handleStatusChange(event.target.value, params.row)
-          //   }
-          //   fullWidth
-          //   style={{ height: "40%", width: "100%" }}
-          // >
-          //   <option disabled selected value="">
-          //     {t("POManagement.Select")}...
-          //   </option>
-          //   <option value="Confirmed">{t("POManagement.Confirmed")}</option>
-          //   <option value="1 week">{t("POManagement.Oweek")}</option>
-          //   <option value="2 weeks">{t("POManagement.Tweek")}</option>
-          //   <option value="3 weeks">{t("POManagement.threeWeek")}</option>
-          //   <option value="1 Month">{t("POManagement.Omonth")}</option>
-          //   <option value="Out of Stock">{t("POManagement.OutofStock")}</option>
-          // </Form.Select>
-          <Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column', // Align items in a column
+              alignItems: 'center', // Center items horizontally
+              justifyContent: 'center', // Center items vertically
+              gap: 0.5, // Small gap between items
+              height: '100%', // Ensure the box takes full height
+              width: '100%', // Ensure the box takes full width
+            }}
+          >
+            <Form.Select
+              labelId={`customer-status-${params.row.id}-label`}
+              id={`customer-status-${params.row.id}`}
+              value={
+                params.row.availability_status !== "" &&
+                params.row.availability_status !== "0"
+                  ? params.row.availability_status
+                  : params.row.estimated_production_time
+              }
+              onChange={(event) =>
+                handleStatusChange(event.target.value, params.row)
+              }
+              fullWidth
+              style={{ 
+                height: '30px', // Reduced height
+                fontSize: '0.875rem', // Smaller font size
+                width: '80%', // Adjust width as needed
+              }}
+            >
+              <option disabled value="">
+                {t("POManagement.Select")}...
+              </option>
+              <option value="In Stock">{t("POManagement.InStock")}</option>
+              <option value="Out Of Stock">{t("POManagement.OutofStock")}</option>
+            </Form.Select>
+    
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    format="YYYY-MM-DD"
-                    value={dayjs(selectedDate)} 
-                    onChange={(e) => handleDateChange(e)}
-                    sx={{
-                      display: "block",
-                      verticalAlign: "unset",
-                      "& .MuiInputBase-input": {
-                        padding: ".5rem .75rem .5rem .75rem",
-                        "&:hover": {
-                          borderColor: "#dee2e6",
-                        },
-                      },
-                    }}
-                    renderInput={(props) => (
-                      <TextField {...props} helperText="valid mask" />
-                    )}
-                  />
-                </LocalizationProvider>
+              <DatePicker
+                format="YYYY-MM-DD"
+                value={dayjs(selectedDate)} 
+                onChange={(date) => handleDateChange(date)}
+                sx={{
+                  width: '80%', // Adjust width as needed
+                  '& .MuiInputBase-input': {
+                    padding: '0.25rem 0.5rem', // Reduced padding
+                    fontSize: '0.875rem', // Smaller font size
+                  },
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} helperText="valid mask" />
+                )}
+              />
+            </LocalizationProvider>
           </Box>
         );
       },
-    },
-
+    },       
     {
       field: "dispatch_type",
       headerName: t("POManagement.DispatchStatus"),
