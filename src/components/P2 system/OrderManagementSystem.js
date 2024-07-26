@@ -207,7 +207,7 @@ function OrderManagementSystem() {
               className="mx-auto"
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
-              checked={selectedOrderIds.includes(params.row.item_id)}
+              checked={selectedOrderIds.includes(params.row.id)}
               onChange={(event) => handleOrderSelection(params.row)}
             />
           </FormGroup>
@@ -511,7 +511,7 @@ function OrderManagementSystem() {
       scheduledPO();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, endDate, selectedFactory, manualProductF, setSelectedFactory]);
+  }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -520,7 +520,7 @@ function OrderManagementSystem() {
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas.factories) {
       let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data);
+      setFactories(data); 
     }
   }, [allFactoryDatas]);
 
@@ -534,7 +534,6 @@ function OrderManagementSystem() {
           ...v,
           id: i + currentStartIndex,
         }));
-        console.log(data, '<==== data')
         setOrders(data);
         setTotalPages(response.data.total_pages);
       });
@@ -631,13 +630,12 @@ function OrderManagementSystem() {
   };
 
   const handleOrderSelection = (rowData) => {
-    // const filteredOrders = orders.filter((order) => order.id === rowData.id);
-    const filteredOrders = orders.filter((order) => order.item_id === rowData.item_id);
+    const filteredOrders = orders.filter((order) => order.id === rowData.id);
     const orderIds = filteredOrders.map((order) => order.order_ids);
-    const selectedIndex = selectedOrderIds.indexOf(rowData.item_id);
+    const selectedIndex = selectedOrderIds.indexOf(rowData.id);
     const newSelected = selectedIndex !== -1
-      ? selectedOrderIds.filter((id) => id !== rowData.item_id)
-      : [...selectedOrderIds, rowData.item_id];
+      ? selectedOrderIds.filter((id) => id !== rowData.id)
+      : [...selectedOrderIds, rowData.id];
 
     if (selectedIndex === -1) {
       setSelectedAgainstOrderDetails([...selectedAgainstOrderDetails, rowData]);
@@ -647,7 +645,7 @@ function OrderManagementSystem() {
 
     const newSelected2 = selectedIndex !== -1
       ? selectedOrderIdss
-        .filter((id) => id !== rowData.item_id)
+        .filter((id) => id !== rowData.id)
         .flatMap((id) => id.split(","))
       : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
@@ -656,7 +654,6 @@ function OrderManagementSystem() {
   };
 
   const handleOrderManualSelection = (rowData) => {
-    console.log(rowData, 'rowData manual selection')
     const selectedIndex = selectedManualOrderIds.indexOf(rowData.id);
     const selectedQtyIndex = selectedMPOquantity?.findIndex(
       (qty) => qty.id === rowData.id
@@ -816,7 +813,7 @@ function OrderManagementSystem() {
         product_ids: selectedProductIds,
         factory_ids: factoryIds.join(","),
         order_ids: selectedOrderIdsStr,
-        variation_id: selectedAgainstOrderDetails.map((order) => order.variation_id).join(",") || 0
+        variation_id:selectedAgainstOrderDetails.map((order)=>order.variation_id).join(",")||0
       };
       try {
         const response = await dispatch(AddPO(payload, navigate));
@@ -968,7 +965,6 @@ function OrderManagementSystem() {
   };
 
   const handleChange = (event, value) => {
-    console.log(value, 'valie index')
     setPage(value);
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
