@@ -74,10 +74,7 @@ const PoDetails = () => {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedDueType, setSelectedDueType] = useState(null);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [rowDates, setRowDates] = useState({});
+  const [rowDates, setRowDates] = useState([]);
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -154,7 +151,6 @@ const PoDetails = () => {
         setPoStatus(response.data.po_status);
         setPaymentStatus(response.data.payment_status);
         setTotalPages(response?.data?.total_pages);
-        setSelectedDate(response?.data?.availability_date);
       });
     } catch {
       console.error("Error fetching PO:");
@@ -214,6 +210,7 @@ const PoDetails = () => {
       return item;
     });
     setPO_OrderList(updatedData);
+    console.log(PO_OrderList, "PO_OrderList");
   };
 
   const validateAvailabilityStatuses = (statuses) => {
@@ -241,7 +238,10 @@ const PoDetails = () => {
         item.dispatch_type == null ? "" : item.dispatch_type
       ),
       payment_status: paymentStatus,
+      availability_date: rowDates,
+      received_quantity: updatelist.map((item) => item.received_quantity),
     };
+    console.log(updatedData, "updatedData below obj");
 
     // Check if availability_status is not empty
     const availabilityStatuses = updatelist.map((item) =>
@@ -283,6 +283,21 @@ const PoDetails = () => {
 
   const handlePOStatus = (value) => {
     setPoStatus(value);
+  };
+
+  const handleRecievedQtyChange = (index, event) => {
+    console.log(event, "event");
+    if (index.target.value >= 0) {
+      const updatedRecivedQtyData = PO_OrderList.map((item) => {
+        if (item.product_id === event.product_id) {
+          if (item.variation_id == event.variation_id) {
+            return { ...item, received_quantity: index.target.value };
+          }
+        }
+        return item;
+      });
+      setPO_OrderList(updatedRecivedQtyData);
+    }
   };
 
   const handleAvailableQtyChange = (index, event) => {
@@ -461,7 +476,7 @@ const PoDetails = () => {
               type="number"
               value={params.row.received_quantity}
               placeholder="0"
-              // onChange={(e) => handleAvailableQtyChange(e, params.row)}
+              onChange={(e) => handleRecievedQtyChange(e, params.row)}
             />
           </Form.Group>
         );
@@ -493,25 +508,27 @@ const PoDetails = () => {
       headerName: t("POManagement.AvlStatus"),
       flex: 8,
       renderCell: (params) => {
-        console.log(params.row.variation_value, "params");
-        if (params?.row?.id == "TAX") {
+        const rowId = params.row.id;
+        const selectedDate = params.row.availability_date || ''; // Use the state date or default to an empty string
+        if (rowId === "TAX") {
           return null;
         }
+    
         return (
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column", // Align items in a column
-              alignItems: "center", // Center items horizontally
-              justifyContent: "center", // Center items vertically
-              gap: 0.5, // Small gap between items
-              height: "100%", // Ensure the box takes full height
-              width: "100%", // Ensure the box takes full width
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 0.5,
+              height: "100%",
+              width: "100%",
             }}
           >
             <Form.Select
-              labelId={`customer-status-${params.row.id}-label`}
-              id={`customer-status-${params.row.id}`}
+              labelId={`customer-status-${rowId}-label`}
+              id={`customer-status-${rowId}`}
               value={
                 params.row.availability_status !== "" &&
                 params.row.availability_status !== "0"
@@ -523,30 +540,28 @@ const PoDetails = () => {
               }
               fullWidth
               style={{
-                height: "30px", // Reduced height
-                fontSize: "0.875rem", // Smaller font size
-                width: "80%", // Adjust width as needed
+                height: "30px",
+                fontSize: "0.875rem",
+                width: "80%",
               }}
             >
               <option disabled value="">
                 {t("POManagement.Select")}...
               </option>
               <option value="In Stock">{t("POManagement.InStock")}</option>
-              <option value="Out Of Stock">
-                {t("POManagement.OutofStock")}
-              </option>
+              <option value="Out Of Stock">{t("POManagement.OutofStock")}</option>
             </Form.Select>
-
+    
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 format="YYYY-MM-DD"
                 value={dayjs(selectedDate)}
-                onChange={(date) => handleDateChange(date)}
+                onChange={(date) => handleDateChange(rowId, date)}
                 sx={{
-                  width: "80%", // Adjust width as needed
+                  width: "80%",
                   "& .MuiInputBase-input": {
-                    padding: "0.25rem 0.5rem", // Reduced padding
-                    fontSize: "0.875rem", // Smaller font size
+                    padding: "0.25rem 0.5rem",
+                    fontSize: "0.875rem",
                   },
                 }}
                 renderInput={(params) => (
