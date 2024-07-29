@@ -509,11 +509,16 @@ const PoDetails = () => {
       flex: 8,
       renderCell: (params) => {
         const rowId = params.row.id;
-        const selectedDate = params.row.availability_date || ''; // Use the state date or default to an empty string
+        const selectedDate = params.row.availability_date || ""; // Use the state date or default to an empty string
         if (rowId === "TAX") {
           return null;
         }
-    
+
+        const dateValue =
+          selectedDate && selectedDate !== "0000-00-00"
+            ? dayjs(selectedDate)
+            : dayjs();
+
         return (
           <Box
             sx={{
@@ -549,14 +554,16 @@ const PoDetails = () => {
                 {t("POManagement.Select")}...
               </option>
               <option value="In Stock">{t("POManagement.InStock")}</option>
-              <option value="Out Of Stock">{t("POManagement.OutofStock")}</option>
+              <option value="Out Of Stock">
+                {t("POManagement.OutofStock")}
+              </option>
             </Form.Select>
-    
+
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 format="YYYY-MM-DD"
-                value={dayjs(selectedDate)}
-                onChange={(date) => handleDateChange(rowId, date)}
+                value={dateValue} // Use determined value for DatePicker
+                onChange={(date) => handleDateChange(date)}
                 sx={{
                   width: "80%",
                   "& .MuiInputBase-input": {
