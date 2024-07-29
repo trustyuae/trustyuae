@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_URL } from "../../redux/constants/Constants";
+import { API_URL, API_URL_N } from "../../redux/constants/Constants";
 import {
   Badge,
   ButtonGroup,
@@ -78,6 +78,7 @@ const PoDetails = () => {
   const [selectedDueType, setSelectedDueType] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [rowDates, setRowDates] = useState({});
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -118,18 +119,18 @@ const PoDetails = () => {
     i18n.changeLanguage(language);
   };
 
-  const handleDateChange = async (newDateRange) => {
-    setSelectedDueType("");
-    setDueDate("");
-    if (newDateRange?.$d) {
-      const isoDate = dayjs(newDateRange.$d.toDateString()).format(
-        "YYYY-MM-DD"
-      );
-      setSelectedDate(isoDate);
+  const handleDateChange = (rowId, newDate) => {
+    if (newDate?.$d) {
+      const isoDate = dayjs(newDate.$d.toDateString()).format("YYYY-MM-DD");
+      setRowDates((prevDates) => ({
+        ...prevDates,
+        [rowId]: isoDate,
+      }));
     } else {
       console.error("Invalid date range");
     }
   };
+
 
   const fetchPO = async () => {
     try {
@@ -228,6 +229,7 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
+    console.log(updatelist,'fetching update list')
 
     // Extracting necessary data for update
     const updatedData = {
@@ -548,7 +550,7 @@ const PoDetails = () => {
           </Box>
         );
       },
-    },       
+    },     
     {
       field: "dispatch_type",
       headerName: t("POManagement.DispatchStatus"),
