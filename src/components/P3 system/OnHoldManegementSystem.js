@@ -52,14 +52,13 @@ function OnHoldManegementSystem() {
   const [optionsArray, setoptionsArray] = useState([]);
 
   const [selectedFactory, setSelectedFactory] = useState("");
-  const [selectedPOType, setSelectedPOType] = useState("");
+  const [selectedPOId, setSelectedPOId] = useState("");
   const [factories, setFactories] = useState([]);
 
-  const [allPoTypes, setAllPoTypes] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [selectPOId, setSelectPOId] = useState("");
+  const [allPoIds, setAllPoIds] = useState([]);
 
   const token = JSON.parse(localStorage.getItem("token"));
+
   const headers = {
     Authorization: `Live ${token}`,
   };
@@ -414,13 +413,6 @@ function OnHoldManegementSystem() {
     }
   };
 
-  const handleFileChange = async (e) => {
-    if (e.target.files[0]) {
-      const file = await CompressImage(e?.target?.files[0]);
-      setFile(file);
-    }
-  };
-
   const validateForm = (data) => {
     let dataa = data.filter(
       (o) => o.variation_values && Object.keys(o.variation_values).length > 0
@@ -469,7 +461,7 @@ function OnHoldManegementSystem() {
         qty_remain: parseInt(item.Quantity),
         updated_date: currentDate,
       }));
-      // const convertedData = tableData
+
       const payload = {
         created_date: date,
         verified_by: userName,
@@ -495,47 +487,14 @@ function OnHoldManegementSystem() {
     setShowEditModal(true);
   };
 
-  const selectPOType = async () => {
-    console.log(selectedFactory, "selectedfactory for akash");
-    console.log(selectedPOType, "selectedPOType for akash");
+  const selectPOId = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}wp-json/get-po-ids/v1/show-po-id/`,
-        // { headers },
-        {
-          params: {
-            factory_id: selectedFactory,
-          },
-        }
-      );
-      console.log(response.data, "response");
-      setAllPoTypes(response.data);
-      // selectPO(response.data[0])
-      if (response.data.length === 0) {
-        setOrders([]);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const selectPO = async (id) => {
-    console.log(id, "e");
-    try {
-      setSelectPOId(id);
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`,
+        `${API_URL}wp-json/get-po-ids/v1/show-po-id/${selectedFactory}`,
         { headers }
       );
-      console.log(response, "response");
-      let data2 = [
-        ...response.data.items_with_variations,
-        ...response.data.items_without_variations,
-      ];
-      console.log(data2, "data====");
-      let data = data2.map((v, i) => ({ ...v, id: i }));
-      console.log(data, "data");
-      setOrders(data);
+      let data = response.data;
+      setAllPoIds(data);
     } catch (error) {
       console.error(error);
     }
@@ -549,11 +508,8 @@ function OnHoldManegementSystem() {
   }, [allFactoryDatas]);
 
   useEffect(() => {
-    if (selectedPOType) {
-      selectPOType();
-    }
-  }, [selectedPOType, selectedFactory]);
-
+    selectPOId();
+  }, [selectedFactory]);
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -608,16 +564,15 @@ function OnHoldManegementSystem() {
           </Col>
           <Col xs="auto" lg="3">
             <Form.Group>
-              <Form.Label className="fw-semibold">select PoID</Form.Label>
+              <Form.Label className="fw-semibold">Select PO ID</Form.Label>
               <Form.Select
                 className="mr-sm-2 py-2"
-                // disabled={!allPoTypes || allPoTypes.length === 0}
-                value={selectedPOType}
-                onChange={(e) => selectPO(e.target.value)}
+                value={selectedPOId}
+                onChange={(e) => setSelectedPOId(e.target.value)} // Update this to set the selected PO type
               >
-                <option value="">select...</option>
-                {allPoTypes?.map((po) => (
-                  <option key={po} value={po}>
+                <option value="">Select...</option>
+                {allPoIds?.map((po) => (
+                  <option key={po.id} value={po.id}>
                     {po}
                   </option>
                 ))}
