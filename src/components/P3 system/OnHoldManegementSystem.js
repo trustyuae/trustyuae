@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import DataTable from "../DataTable";
 import { API_URL } from "../../redux/constants/Constants";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddGrn, GetProductManual } from "../../redux/actions/P3SystemActions";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,7 @@ import axios from "axios";
 
 import Select from "react-select";
 import Swal from "sweetalert2";
+import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -50,14 +51,30 @@ function OnHoldManegementSystem() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [optionsArray, setoptionsArray] = useState([]);
 
+  const [selectedFactory, setSelectedFactory] = useState("");
+  const [selectedPOType, setSelectedPOType] = useState("");
+  const [factories, setFactories] = useState([]);
+
+  const [allPoTypes, setAllPoTypes] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [selectPOId, setSelectPOId] = useState("");
+
   const token = JSON.parse(localStorage.getItem("token"));
   const headers = {
     Authorization: `Live ${token}`,
   };
 
+  useEffect(() => {
+    dispatch(AllFactoryActions());
+  }, [dispatch]);
+
+  const allFactoryDatas = useSelector(
+    (state) => state?.allFactoryData?.factory
+  );
+
   const getall = async () => {
     let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
-    const response = await axios.get(url,{headers});
+    const response = await axios.get(url, { headers });
     setoptionsArray(
       response.data.products.map((user) => ({
         label: user.product_name,
@@ -469,10 +486,73 @@ function OnHoldManegementSystem() {
     }
   };
 
+  const handleFactoryChange = (e) => {
+    setSelectedFactory(e.target.value);
+  };
+
   const ImageModule = (url) => {
     setImageURL(url);
     setShowEditModal(true);
   };
+
+  const selectPOType = async () => {
+    console.log(selectedFactory, "selectedfactory for akash");
+    console.log(selectedPOType, "selectedPOType for akash");
+    try {
+      const response = await axios.get(
+        `${API_URL}wp-json/get-po-ids/v1/show-po-id/`,
+        // { headers },
+        {
+          params: {
+            factory_id: selectedFactory,
+          },
+        }
+      );
+      console.log(response.data, "response");
+      setAllPoTypes(response.data);
+      // selectPO(response.data[0])
+      if (response.data.length === 0) {
+        setOrders([]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const selectPO = async (id) => {
+    console.log(id, "e");
+    try {
+      setSelectPOId(id);
+      const response = await axios.get(
+        `${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`,
+        { headers }
+      );
+      console.log(response, "response");
+      let data2 = [
+        ...response.data.items_with_variations,
+        ...response.data.items_without_variations,
+      ];
+      console.log(data2, "data====");
+      let data = data2.map((v, i) => ({ ...v, id: i }));
+      console.log(data, "data");
+      setOrders(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (allFactoryDatas && allFactoryDatas?.factories) {
+      let data = allFactoryDatas?.factories?.map((item) => ({ ...item }));
+      setFactories(data);
+    }
+  }, [allFactoryDatas]);
+
+  useEffect(() => {
+    if (selectedPOType) {
+      selectPOType();
+    }
+  }, [selectedPOType, selectedFactory]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -510,32 +590,38 @@ function OnHoldManegementSystem() {
             </Form.Group>
           </Col>
           <Col xs="auto" lg="3">
-            <Form.Group>
-              <Form.Label className="fw-semibold">Boxes Received:</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter No of received boxes"
-                value={receivedBoxes}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value >= 0) {
-                    setReceivedBoxes(e.target.value);
-                  }
-                }}
-                className="mr-sm-2 py-2"
-              />
+            <Form.Group className="fw-semibold mb-0">
+              <Form.Label>Factory Filter</Form.Label>
+              <Form.Select
+                className="mr-sm-2"
+                value={selectedFactory}
+                onChange={(e) => handleFactoryChange(e)}
+              >
+                <option value="">All Factory</option>
+                {factories?.map((factory) => (
+                  <option key={factory?.id} value={factory?.id}>
+                    {factory?.factory_name}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </Col>
           <Col xs="auto" lg="3">
             <Form.Group>
-              <Form.Label className="fw-semibold">
-                Attach the Delivery Bill:
-              </Form.Label>
-              <Form.Control
-                type="file"
+              <Form.Label className="fw-semibold">select PoID</Form.Label>
+              <Form.Select
                 className="mr-sm-2 py-2"
-                onChange={handleFileChange}
-              />
+                // disabled={!allPoTypes || allPoTypes.length === 0}
+                value={selectedPOType}
+                onChange={(e) => selectPO(e.target.value)}
+              >
+                <option value="">select...</option>
+                {allPoTypes?.map((po) => (
+                  <option key={po} value={po}>
+                    {po}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </Col>
         </Row>
