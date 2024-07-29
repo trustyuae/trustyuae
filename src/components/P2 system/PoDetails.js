@@ -51,7 +51,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
-
 const PoDetails = () => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
@@ -131,7 +130,6 @@ const PoDetails = () => {
     }
   };
 
-
   const fetchPO = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
@@ -156,6 +154,7 @@ const PoDetails = () => {
         setPoStatus(response.data.po_status);
         setPaymentStatus(response.data.payment_status);
         setTotalPages(response?.data?.total_pages);
+        setSelectedDate(response?.data?.availability_date);
       });
     } catch {
       console.error("Error fetching PO:");
@@ -179,7 +178,7 @@ const PoDetails = () => {
     fetchPO();
     // getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, page,]);
+  }, [pageSize, page]);
 
   useEffect(() => {
     // fetchPO();
@@ -229,7 +228,7 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-    console.log(updatelist,'fetching update list')
+    console.log(updatelist, "fetching update list");
 
     // Extracting necessary data for update
     const updatedData = {
@@ -442,37 +441,40 @@ const PoDetails = () => {
       },
     },
     {
-      field: "available_quantity",
+      field: "received_quantity",
       headerName: t("POManagement.ReceivedQty"),
       flex: 2.5,
       colSpan: (value, row) => {
-        if (row.id === "TAX") {
-          return 4;
+        if (row?.id == "TAX") {
+          return 5;
         }
         return undefined;
       },
       renderCell: (params) => {
-        if (params.row.id === "TAX") {
-          return null
+        if (params?.row?.id == "TAX") {
+          return null;
         }
         return (
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
             <Form.Control
               style={{ justifyContent: "center" }}
               type="number"
-              value={params.row.available_quantity}
+              value={params.row.received_quantity}
               placeholder="0"
-              onChange={(e) => handleAvailableQtyChange(e, params.row)}
+              // onChange={(e) => handleAvailableQtyChange(e, params.row)}
             />
           </Form.Group>
         );
       },
     },
     {
-      field: "",
+      field: "available_quantity",
       headerName: t("POManagement.AvlQty"),
       flex: 2.5,
       renderCell: (params) => {
+        if (params.row.id === "TAX") {
+          return null;
+        }
         return (
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
             <Form.Control
@@ -492,16 +494,19 @@ const PoDetails = () => {
       flex: 8,
       renderCell: (params) => {
         console.log(params.row.variation_value, "params");
+        if (params?.row?.id == "TAX") {
+          return null;
+        }
         return (
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'column', // Align items in a column
-              alignItems: 'center', // Center items horizontally
-              justifyContent: 'center', // Center items vertically
+              display: "flex",
+              flexDirection: "column", // Align items in a column
+              alignItems: "center", // Center items horizontally
+              justifyContent: "center", // Center items vertically
               gap: 0.5, // Small gap between items
-              height: '100%', // Ensure the box takes full height
-              width: '100%', // Ensure the box takes full width
+              height: "100%", // Ensure the box takes full height
+              width: "100%", // Ensure the box takes full width
             }}
           >
             <Form.Select
@@ -517,29 +522,31 @@ const PoDetails = () => {
                 handleStatusChange(event.target.value, params.row)
               }
               fullWidth
-              style={{ 
-                height: '30px', // Reduced height
-                fontSize: '0.875rem', // Smaller font size
-                width: '80%', // Adjust width as needed
+              style={{
+                height: "30px", // Reduced height
+                fontSize: "0.875rem", // Smaller font size
+                width: "80%", // Adjust width as needed
               }}
             >
               <option disabled value="">
                 {t("POManagement.Select")}...
               </option>
               <option value="In Stock">{t("POManagement.InStock")}</option>
-              <option value="Out Of Stock">{t("POManagement.OutofStock")}</option>
+              <option value="Out Of Stock">
+                {t("POManagement.OutofStock")}
+              </option>
             </Form.Select>
-    
+
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 format="YYYY-MM-DD"
-                value={dayjs(selectedDate)} 
+                value={dayjs(selectedDate)}
                 onChange={(date) => handleDateChange(date)}
                 sx={{
-                  width: '80%', // Adjust width as needed
-                  '& .MuiInputBase-input': {
-                    padding: '0.25rem 0.5rem', // Reduced padding
-                    fontSize: '0.875rem', // Smaller font size
+                  width: "80%", // Adjust width as needed
+                  "& .MuiInputBase-input": {
+                    padding: "0.25rem 0.5rem", // Reduced padding
+                    fontSize: "0.875rem", // Smaller font size
                   },
                 }}
                 renderInput={(params) => (
@@ -550,12 +557,15 @@ const PoDetails = () => {
           </Box>
         );
       },
-    },     
+    },
     {
       field: "dispatch_type",
       headerName: t("POManagement.DispatchStatus"),
       flex: 3,
       renderCell: (params) => {
+        if (params?.row?.id == "TAX") {
+          return null;
+        }
         return (
           <Form.Select
             className="mr-sm-2 py-2"

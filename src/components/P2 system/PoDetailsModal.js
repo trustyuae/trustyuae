@@ -25,11 +25,6 @@ const PoDetailsModal = ({
   useEffect(() => {
     console.log(startD,endD,'date');
     const fetchData = async () => {
-      // const payload={
-      //   "factory_id": Number(factoryId),
-      //   "variation_id": Number(variationId),
-      //   "product_name": productName,
-      // }
 
       const payload = {
         "factory_id": Number(factoryId),
