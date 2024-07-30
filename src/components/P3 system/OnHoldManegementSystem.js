@@ -581,59 +581,61 @@ function OnHoldManegementSystem() {
           </Col>
         </Row>
       </Form>
-      <MDBRow className="px-3">
-        <Card className="py-3">
-          <Row className=" justify-content-start">
-            <Col xs="auto" lg="4">
-              <Form.Group className="fw-semibold mb-0">
-                <Form.Label>Product Name:</Form.Label>
-                <Select
-                  value={selectedOption}
-                  onChange={(option) => setSelectedOption(option)}
-                  options={optionsArray}
-                />
-              </Form.Group>
-            </Col>
-            <Col xs="auto" lg="4">
-              <Form.Group className="fw-semibold mb-0">
-                <Form.Label>Product ID:</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter Product ID"
-                  ref={inputRef}
-                  onKeyDown={(e) => handalonChangeProductId(e)}
-                />
-              </Form.Group>
-            </Col>
-          </Row>
-          {tableData.length > 0 && (
-            <>
-              <div className="mt-2">
-                <DataTable
-                  columns={columns}
-                  rows={tableData}
-                  // rowHeight={'auto'}
-                  // page={page}
-                  // pageSize={pageSize}
-                  // totalPages={totalPages}
-                  // handleChange={handleChange}
-                  rowHeight="auto"
-                />
-              </div>
-              <MDBRow className="justify-content-end px-3">
-                <Button
-                  variant="primary"
-                  disabled={!isValid}
-                  style={{ width: "100px" }}
-                  onClick={handleSubmit}
-                >
-                  submit
-                </Button>
-              </MDBRow>
-            </>
-          )}
-        </Card>
-      </MDBRow>
+      {selectedFactory.length <= 0 && (
+        <MDBRow className="px-3">
+          <Card className="py-3">
+            <Row className=" justify-content-start">
+              <Col xs="auto" lg="4">
+                <Form.Group className="fw-semibold mb-0">
+                  <Form.Label>Product Name:</Form.Label>
+                  <Select
+                    value={selectedOption}
+                    onChange={(option) => setSelectedOption(option)}
+                    options={optionsArray}
+                  />
+                </Form.Group>
+              </Col>
+              <Col xs="auto" lg="4">
+                <Form.Group className="fw-semibold mb-0">
+                  <Form.Label>Product ID:</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter Product ID"
+                    ref={inputRef}
+                    onKeyDown={(e) => handalonChangeProductId(e)}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            {tableData.length > 0 && (
+              <>
+                <div className="mt-2">
+                  <DataTable
+                    columns={columns}
+                    rows={tableData}
+                    // rowHeight={'auto'}
+                    // page={page}
+                    // pageSize={pageSize}
+                    // totalPages={totalPages}
+                    // handleChange={handleChange}
+                    rowHeight="auto"
+                  />
+                </div>
+                <MDBRow className="justify-content-end px-3">
+                  <Button
+                    variant="primary"
+                    disabled={!isValid}
+                    style={{ width: "100px" }}
+                    onClick={handleSubmit}
+                  >
+                    submit
+                  </Button>
+                </MDBRow>
+              </>
+            )}
+          </Card>
+        </MDBRow>
+      )}
 
       <Modal
         show={showEditModal}
