@@ -72,6 +72,11 @@ function GRNManagement() {
       type: "string",
     },
     {
+      field: "po ref",
+      headerName: "Po Ref No.",
+      flex: 1,
+    },
+    {
       field: "",
       headerName: "Action",
       flex: 1,

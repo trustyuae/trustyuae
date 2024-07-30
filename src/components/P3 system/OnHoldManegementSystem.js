@@ -41,6 +41,7 @@ function OnHoldManegementSystem() {
   const [productIDF, setProductID] = useState("");
   const [singleProductD, setSingleProductD] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [poTableData, setPoTableData] = useState([]);
   const [date, setDate] = useState(getTodayDate());
   const [selectFile, setFile] = useState(null);
   const [userName, setuserName] = useState("");
@@ -56,6 +57,11 @@ function OnHoldManegementSystem() {
   const [factories, setFactories] = useState([]);
 
   const [allPoIds, setAllPoIds] = useState([]);
+
+  const [pageSize, setPageSize] = useState(10);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const token = JSON.parse(localStorage.getItem("token"));
 
@@ -172,6 +178,81 @@ function OnHoldManegementSystem() {
   };
 
   const columns = [
+    {
+      field: "product_name",
+      headerName: "product name",
+      flex: 1,
+      className: " d-flex justify-content-center align-items-center",
+    },
+    {
+      field: "product_image",
+      headerName: "product image",
+      flex: 1,
+      type: "html",
+      renderCell: (params) => (
+        <Box
+          className="h-100 w-100 d-flex align-items-center"
+          onClick={() => ImageModule(params.value)}
+        >
+          <Avatar
+            src={params.value || require("../../assets/default.png")}
+            alt="Product Image"
+            sx={{
+              height: "45px",
+              width: "45px",
+              borderRadius: "2px",
+              margin: "0 auto",
+              "& .MuiAvatar-img": {
+                height: "100%",
+                width: "100%",
+                borderRadius: "2px",
+              },
+            }}
+          />
+        </Box>
+      ),
+    },
+    {
+      field: "Quantity",
+      headerName: "Quantity",
+      flex: 1,
+      renderCell: (params) => (
+        <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+          <Form.Control
+            style={{ justifyContent: "center" }}
+            type="number"
+            value={params.row.Quantity}
+            placeholder="0"
+            onChange={(e) => handleQtyChange(e, params.row)}
+          />
+        </Form.Group>
+      ),
+    },
+    {
+      field: "variation_values",
+      headerName: "Variation Values",
+      flex: 3,
+      renderCell: renderVariationValues,
+    },
+
+    {
+      field: "",
+      headerName: "Action",
+      flex: 1,
+      type: "html",
+      renderCell: (params) => (
+        <Button
+          type="button"
+          className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+          onClick={() => handleDelete(params.row.id)}
+        >
+          <MdDelete className="mb-1" />
+        </Button>
+      ),
+    },
+  ];
+
+  const poColumns = [
     {
       field: "product_name",
       headerName: "product name",
@@ -500,6 +581,16 @@ function OnHoldManegementSystem() {
     }
   };
 
+  const fetchPoProductData = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=1&per_page=10`,
+        { headers }
+      );
+      console.log(response, "fetchPoProductData");
+    } catch {}
+  };
+
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas?.factories) {
       let data = allFactoryDatas?.factories?.map((item) => ({ ...item }));
@@ -510,6 +601,13 @@ function OnHoldManegementSystem() {
   useEffect(() => {
     selectPOId();
   }, [selectedFactory]);
+
+  useEffect(() => {
+    if (selectedPOId) {
+      fetchPoProductData();
+    }
+  }, [selectedPOId, selectedFactory]);
+
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -580,6 +678,27 @@ function OnHoldManegementSystem() {
             </Form.Group>
           </Col>
         </Row>
+        {selectedFactory > 0 && <Row className="align-items-center py-3">
+          <Box className="d-flex justify-content-end">
+            <Form.Group className="d-flex mx-1 align-items-center">
+              <Form.Label className="fw-semibold mb-0 me-2">
+                PageSize
+              </Form.Label>
+              <Form.Control
+                as="select"
+                className="w-auto"
+                value={pageSize}
+                // onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Box>
+        </Row>}
       </Form>
       {selectedFactory.length <= 0 && (
         <MDBRow className="px-3">
