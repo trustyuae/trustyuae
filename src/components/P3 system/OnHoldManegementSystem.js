@@ -556,6 +556,7 @@ function OnHoldManegementSystem() {
       } catch (error) {
         console.error(error);
       }
+    }
   };
 
   const handleFactoryChange = (e) => {
