@@ -556,7 +556,6 @@ function OnHoldManegementSystem() {
       } catch (error) {
         console.error(error);
       }
-    }
   };
 
   const handleFactoryChange = (e) => {
@@ -589,6 +588,10 @@ function OnHoldManegementSystem() {
       );
       console.log(response, "fetchPoProductData");
     } catch {}
+  };
+
+  const handleChange = (event, value) => {
+    setPage(value);
   };
 
   useEffect(() => {
@@ -678,7 +681,7 @@ function OnHoldManegementSystem() {
             </Form.Group>
           </Col>
         </Row>
-        {selectedFactory > 0 && (
+        {selectedFactory.length > 0 && (
           <Row className="align-items-center py-3">
             <Box className="d-flex justify-content-end">
               <Form.Group className="d-flex mx-1 align-items-center">
@@ -745,17 +748,17 @@ function OnHoldManegementSystem() {
                 </Form.Group>
               </Col>
             </Row>
-            {tableData.length > 0 && (
+            {tableData.length > 0 && selectedFactory.length <= 0 && (
               <>
                 <div className="mt-2">
                   <DataTable
                     columns={columns}
                     rows={tableData}
                     // rowHeight={'auto'}
-                    // page={page}
-                    // pageSize={pageSize}
-                    // totalPages={totalPages}
-                    // handleChange={handleChange}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    handleChange={handleChange}
                     rowHeight="auto"
                   />
                 </div>
@@ -767,6 +770,33 @@ function OnHoldManegementSystem() {
                     onClick={handleSubmit}
                   >
                     submit
+                  </Button>
+                </MDBRow>
+              </>
+            )}
+
+            {poTableData.length > 0 && selectedFactory.length > 0 && (
+              <>
+                <div className="mt-2">
+                  <DataTable
+                    columns={columns}
+                    rows={tableData}
+                    // rowHeight={'auto'}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    handleChange={handleChange}
+                    rowHeight="auto"
+                  />
+                </div>
+                <MDBRow className="justify-content-end px-3">
+                  <Button
+                    variant="primary"
+                    disabled={!isValid}
+                    style={{ width: "100px" }}
+                    onClick={handleSubmit}
+                  >
+                    Create GRN
                   </Button>
                 </MDBRow>
               </>
