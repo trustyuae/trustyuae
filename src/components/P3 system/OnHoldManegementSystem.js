@@ -584,7 +584,7 @@ function OnHoldManegementSystem() {
   const fetchPoProductData = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=1&per_page=10`,
+        `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`,
         { headers }
       );
       console.log(response, "fetchPoProductData");
@@ -678,27 +678,29 @@ function OnHoldManegementSystem() {
             </Form.Group>
           </Col>
         </Row>
-        {selectedFactory > 0 && <Row className="align-items-center py-3">
-          <Box className="d-flex justify-content-end">
-            <Form.Group className="d-flex mx-1 align-items-center">
-              <Form.Label className="fw-semibold mb-0 me-2">
-                PageSize
-              </Form.Label>
-              <Form.Control
-                as="select"
-                className="w-auto"
-                value={pageSize}
-                // onChange={handlePageSizeChange}
-              >
-                {pageSizeOptions.map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
-          </Box>
-        </Row>}
+        {selectedFactory > 0 && (
+          <Row className="align-items-center py-3">
+            <Box className="d-flex justify-content-end">
+              <Form.Group className="d-flex mx-1 align-items-center">
+                <Form.Label className="fw-semibold mb-0 me-2">
+                  PageSize
+                </Form.Label>
+                <Form.Control
+                  as="select"
+                  className="w-auto"
+                  value={pageSize}
+                  // onChange={handlePageSizeChange}
+                >
+                  {pageSizeOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+            </Box>
+          </Row>
+        )}
       </Form>
       {selectedFactory.length <= 0 && (
         <MDBRow className="px-3">
@@ -723,6 +725,23 @@ function OnHoldManegementSystem() {
                     ref={inputRef}
                     onKeyDown={(e) => handalonChangeProductId(e)}
                   />
+                </Form.Group>
+              </Col>
+              <Col xs="auto" lg="4">
+                <Form.Group className="fw-semibold mb-0">
+                  <Form.Label>PageSize</Form.Label>
+                  <Form.Control
+                    as="select"
+                    className="w-auto"
+                    value={pageSize}
+                    // onChange={handlePageSizeChange}
+                  >
+                    {pageSizeOptions.map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </Form.Control>
                 </Form.Group>
               </Col>
             </Row>
