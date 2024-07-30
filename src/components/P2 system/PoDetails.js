@@ -509,7 +509,9 @@ const PoDetails = () => {
       flex: 8,
       renderCell: (params) => {
         const rowId = params.row.id;
-        const selectedDate = params.row.availability_date || ""; // Use the state date or default to an empty string
+        const selectedDate =
+          rowDates[rowId] || params.row.availability_date || ""; // Use state date or fallback to availability_date
+
         if (rowId === "TAX") {
           return null;
         }
@@ -563,7 +565,7 @@ const PoDetails = () => {
               <DatePicker
                 format="YYYY-MM-DD"
                 value={dateValue} // Use determined value for DatePicker
-                onChange={(date) => handleDateChange(date)}
+                onChange={(date) => handleDateChange(rowId, date)}
                 sx={{
                   width: "80%",
                   "& .MuiInputBase-input": {
