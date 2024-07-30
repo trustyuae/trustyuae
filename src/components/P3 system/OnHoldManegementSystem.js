@@ -36,14 +36,12 @@ function OnHoldManegementSystem() {
     return `${year}-${month}-${day}`;
   };
 
-  const [receivedBoxes, setReceivedBoxes] = useState(0);
   const [productNameF, setProductName] = useState("");
   const [productIDF, setProductID] = useState("");
   const [singleProductD, setSingleProductD] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [poTableData, setPoTableData] = useState([]);
   const [date, setDate] = useState(getTodayDate());
-  const [selectFile, setFile] = useState(null);
   const [userName, setuserName] = useState("");
   const [isValid, setIsValid] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -62,6 +60,7 @@ function OnHoldManegementSystem() {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
   const token = JSON.parse(localStorage.getItem("token"));
 
@@ -231,10 +230,9 @@ function OnHoldManegementSystem() {
     {
       field: "variation_values",
       headerName: "Variation Values",
-      flex: 3,
+      flex: 1,
       renderCell: renderVariationValues,
     },
-
     {
       field: "",
       headerName: "Action",
@@ -254,75 +252,55 @@ function OnHoldManegementSystem() {
 
   const poColumns = [
     {
-      field: "product_name",
+      field: "product_id",
       headerName: "product name",
       flex: 1,
       className: " d-flex justify-content-center align-items-center",
     },
     {
-      field: "product_image",
-      headerName: "product image",
+      field: "image",
+      headerName: "product name",
       flex: 1,
-      type: "html",
+      className: " d-flex justify-content-center align-items-center",
+    },
+    // {
+    //   field: "variation_values",
+    //   headerName: "Variation Values",
+    //   flex: 3,
+    //   renderCell: renderVariationValues,
+    // },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      flex: 1,
       renderCell: (params) => (
         <Box
-          className="h-100 w-100 d-flex align-items-center"
-          onClick={() => ImageModule(params.value)}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            width: "100%",
+          }}
         >
-          <Avatar
-            src={params.value || require("../../assets/default.png")}
-            alt="Product Image"
-            sx={{
-              height: "45px",
-              width: "45px",
-              borderRadius: "2px",
-              margin: "0 auto",
-              "& .MuiAvatar-img": {
-                height: "100%",
-                width: "100%",
-                borderRadius: "2px",
-              },
-            }}
-          />
+          {params.row.quantity}
         </Box>
       ),
     },
     {
-      field: "Quantity",
-      headerName: "Quantity",
+      field: "received_quantity",
+      headerName: "received quantity",
       flex: 1,
       renderCell: (params) => (
         <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
           <Form.Control
-            style={{ justifyContent: "center" }}
+            style={{ justifyContent: "center",alignItems:'center' }}
             type="number"
             value={params.row.Quantity}
             placeholder="0"
             onChange={(e) => handleQtyChange(e, params.row)}
           />
         </Form.Group>
-      ),
-    },
-    {
-      field: "variation_values",
-      headerName: "Variation Values",
-      flex: 3,
-      renderCell: renderVariationValues,
-    },
-
-    {
-      field: "",
-      headerName: "Action",
-      flex: 1,
-      type: "html",
-      renderCell: (params) => (
-        <Button
-          type="button"
-          className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-          onClick={() => handleDelete(params.row.id)}
-        >
-          <MdDelete className="mb-1" />
-        </Button>
       ),
     },
   ];
@@ -509,53 +487,42 @@ function OnHoldManegementSystem() {
   };
 
   const handleSubmit = async () => {
-    if (receivedBoxes === 0) {
-      Swal.fire({
-        icon: "error",
-        title: "please note received boxes quantity",
-        showConfirmButton: true,
-      });
-    } else {
-      const currentDate = new Date().toISOString().split("T")[0];
-      tableData.forEach((data) => {
-        if (data.variation_details && data.variation_values) {
-          const { variation_details, variation_values } = data;
-          const matchingKeys = Object.keys(variation_details).filter((key) => {
-            const detail = variation_details[key];
-            // Check if all properties in variation_values match with detail
-            return Object.keys(variation_values).every((prop) => {
-              return detail[prop] === variation_values[prop];
-            });
+    const currentDate = new Date().toISOString().split("T")[0];
+    tableData.forEach((data) => {
+      if (data.variation_details && data.variation_values) {
+        const { variation_details, variation_values } = data;
+        const matchingKeys = Object.keys(variation_details).filter((key) => {
+          const detail = variation_details[key];
+          // Check if all properties in variation_values match with detail
+          return Object.keys(variation_values).every((prop) => {
+            return detail[prop] === variation_values[prop];
           });
-          if (matchingKeys.length > 0) {
-            data.variation_id = Number(matchingKeys[0]);
-          }
+        });
+        if (matchingKeys.length > 0) {
+          data.variation_id = Number(matchingKeys[0]);
         }
-      });
-      const convertedData = tableData.map((item) => ({
-        product_id: parseInt(item.product_id),
-        product_name: item.product_name,
-        product_image: item.product_image,
-        variation_id: item.variation_id ? item.variation_id : 0,
-        variations: item.variation_values,
-        qty_received: parseInt(item.Quantity),
-        qty_remain: parseInt(item.Quantity),
-        updated_date: currentDate,
-      }));
-
-      const payload = {
-        created_date: date,
-        verified_by: userName,
-        boxes_received: receivedBoxes,
-        attachment_bill_image: selectFile,
-        status: "Pending for process",
-        products: convertedData,
-      };
-      try {
-        dispatch(AddGrn(payload, navigate));
-      } catch (error) {
-        console.error(error);
       }
+    });
+    const convertedData = tableData.map((item) => ({
+      product_id: parseInt(item.product_id),
+      product_name: item.product_name,
+      product_image: item.product_image,
+      variation_id: item.variation_id ? item.variation_id : 0,
+      variations: item.variation_values,
+      qty_remain: parseInt(item.Quantity),
+      updated_date: currentDate,
+    }));
+
+    const payload = {
+      created_date: date,
+      verified_by: userName,
+      status: "Pending for process",
+      products: convertedData,
+    };
+    try {
+      dispatch(AddGrn(payload, navigate));
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -587,12 +554,25 @@ function OnHoldManegementSystem() {
         `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`,
         { headers }
       );
-      console.log(response, "fetchPoProductData");
-    } catch {}
+      console.log(response.data, "fetchPoProductData");
+
+      // Ensure each row has a unique 'id'
+      const data = response.data.line_items.map((item, i) => ({
+        ...item,
+        id: i + currentStartIndex, // or use another unique property
+      }));
+
+      setPoTableData(data);
+      setTotalPages(response.data.total_pages);
+    } catch (error) {
+      console.error("Error fetching PO product data:", error);
+    }
   };
 
   const handleChange = (event, value) => {
     setPage(value);
+    let currIndex = value * pageSize - pageSize + 1;
+    setCurrentStartIndex(currIndex, "currIndex");
   };
 
   useEffect(() => {
@@ -611,6 +591,8 @@ function OnHoldManegementSystem() {
       fetchPoProductData();
     }
   }, [selectedPOId, selectedFactory]);
+
+  console.log(tableData, "tableData");
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -749,62 +731,66 @@ function OnHoldManegementSystem() {
                 </Form.Group>
               </Col>
             </Row>
-            {tableData.length > 0 && selectedFactory.length <= 0 && (
-              <>
-                <div className="mt-2">
-                  <DataTable
-                    columns={columns}
-                    rows={tableData}
-                    // rowHeight={'auto'}
-                    page={page}
-                    pageSize={pageSize}
-                    totalPages={totalPages}
-                    handleChange={handleChange}
-                    rowHeight="auto"
-                  />
-                </div>
-                <MDBRow className="justify-content-end px-3">
-                  <Button
-                    variant="primary"
-                    disabled={!isValid}
-                    style={{ width: "100px" }}
-                    onClick={handleSubmit}
-                  >
-                    submit
-                  </Button>
-                </MDBRow>
-              </>
-            )}
-
-            {poTableData.length > 0 && selectedFactory.length > 0 && (
-              <>
-                <div className="mt-2">
-                  <DataTable
-                    columns={columns}
-                    rows={tableData}
-                    // rowHeight={'auto'}
-                    page={page}
-                    pageSize={pageSize}
-                    totalPages={totalPages}
-                    handleChange={handleChange}
-                    rowHeight="auto"
-                  />
-                </div>
-                <MDBRow className="justify-content-end px-3">
-                  <Button
-                    variant="primary"
-                    disabled={!isValid}
-                    style={{ width: "100px" }}
-                    onClick={handleSubmit}
-                  >
-                    Create GRN
-                  </Button>
-                </MDBRow>
-              </>
-            )}
           </Card>
         </MDBRow>
       )}
+      <MDBRow className="px-3">
+        <Card className="py-3">
+          {tableData.length > 0 && selectedFactory.length <= 0 && (
+            <>
+              <div className="mt-2">
+                <DataTable
+                  columns={columns}
+                  rows={tableData}
+                  // rowHeight={'auto'}
+                  page={page}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  handleChange={handleChange}
+                  rowHeight="auto"
+                />
+              </div>
+              <MDBRow className="justify-content-end px-3">
+                <Button
+                  variant="primary"
+                  disabled={!isValid}
+                  style={{ width: "100px" }}
+                  onClick={handleSubmit}
+                >
+                  submit
+                </Button>
+              </MDBRow>
+            </>
+          )}
+
+          {selectedFactory.length > 0 && (
+            <>
+              <div className="mt-2">
+                <DataTable
+                  columns={poColumns}
+                  rows={poTableData}
+                  page={page}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  handleChange={handleChange}
+                  rowHeight="auto"
+                  // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
+                />
+              </div>
+              <MDBRow className="justify-content-end px-3">
+                <Button
+                  variant="primary"
+                  disabled={!isValid}
+                  style={{ width: "130px" }}
+                  onClick={handleSubmit}
+                >
+                  Create GRN
+                </Button>
+              </MDBRow>
+            </>
+          )}
+        </Card>
+      </MDBRow>
 
       <Modal
         show={showEditModal}
