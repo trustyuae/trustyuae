@@ -74,7 +74,6 @@ const PoDetails = () => {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [rowDates, setRowDates] = useState([]);
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -113,18 +112,6 @@ const PoDetails = () => {
   const handleLanguageChange = async (language) => {
     setLang(language);
     i18n.changeLanguage(language);
-  };
-
-  const handleDateChange = (rowId, newDate) => {
-    if (newDate?.$d) {
-      const isoDate = dayjs(newDate.$d.toDateString()).format("YYYY-MM-DD");
-      setRowDates((prevDates) => ({
-        ...prevDates,
-        [rowId]: isoDate,
-      }));
-    } else {
-      console.error("Invalid date range");
-    }
   };
 
   const fetchPO = async () => {
@@ -200,6 +187,25 @@ const PoDetails = () => {
     setPO_OrderList(updatedData);
   };
 
+  const handleDateChange = (rowId, newDate) => {
+    if (newDate?.$d) {
+      const isoDate = dayjs(newDate.$d).format("YYYY-MM-DD");
+
+      // Update the date in PO_OrderList
+      const updatedData = PO_OrderList.map((item) => {
+        if (item.id === rowId) {
+          return {
+            ...item,
+            availability_date: isoDate,
+          };
+        }
+        return item;
+      });
+      setPO_OrderList(updatedData);
+    } else {
+      console.error("Invalid date");
+    }
+  };
   const handleDispatchStatusChange = (value, event) => {
     const updatedData = PO_OrderList.map((item) => {
       if (item.product_id === event.product_id) {
@@ -238,7 +244,12 @@ const PoDetails = () => {
         item.dispatch_type == null ? "" : item.dispatch_type
       ),
       payment_status: paymentStatus,
-      availability_date: rowDates,
+      availability_date: updatelist.map((item) =>
+        item.availability_date == null ? "" : item.availability_date
+      ),
+      availability_status: updatelist.map((item) =>
+        item.availability_status == null ? "" : item.availability_status
+      ),
       received_quantity: updatelist.map((item) => item.received_quantity),
     };
     console.log(updatedData, "updatedData below obj");
@@ -509,8 +520,7 @@ const PoDetails = () => {
       flex: 8,
       renderCell: (params) => {
         const rowId = params.row.id;
-        const selectedDate =
-          rowDates[rowId] || params.row.availability_date || ""; // Use state date or fallback to availability_date
+        const selectedDate = params.row.availability_date || ""; // Use state date or fallback to availability_date
 
         if (rowId === "TAX") {
           return null;
@@ -565,7 +575,7 @@ const PoDetails = () => {
               <DatePicker
                 format="YYYY-MM-DD"
                 value={dateValue} // Use determined value for DatePicker
-                onChange={(date) => handleDateChange(rowId, date)}
+                onChange={(date) => handleDateChange(rowId,date)}
                 sx={{
                   width: "80%",
                   "& .MuiInputBase-input": {
