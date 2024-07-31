@@ -176,6 +176,95 @@ function OnHoldManegementSystem() {
     );
   };
 
+  const renderVariationValuesPoColumn = (params) => {
+    // Check if params.row and params.row.variation_values are defined
+    const variationValues = params.row?.variation_values;
+
+    // Handle case where variationValues is undefined or null
+    if (!variationValues || typeof variationValues !== "object") {
+      return (
+        <Box className="d-flex justify-content-around align-items-center w-100">
+          <Box>No any variation</Box>
+        </Box>
+      );
+    }
+
+    // Convert variationValues object to an array of objects
+    const variationArray = Object.entries(variationValues).map(
+      ([key, value]) => ({ [key]: value })
+    );
+
+    const noVariation = variationArray.length === 0;
+    return (
+      <Box className="d-flex justify-content-around align-items-center w-100">
+        {noVariation ? (
+          <Box>No any variation</Box>
+        ) : (
+          <div className="container mt-4 mb-4">
+            {variationArray.map((item, index) => {
+              const attributeName = Object.keys(item)[0];
+              const attributeValue = Object.values(item)[0];
+              console.log(attributeValue, "attributeValue");
+              console.log(typeof attributeValue, "attributeValue===");
+
+              return (
+                <React.Fragment key={index}>
+                  <div
+                    className={`row mb-${
+                      typeof attributeValue === "string" ? "3" : "4"
+                    }`}
+                  >
+                    <div className="col-6 d-flex justify-content-end align-items-center">
+                      <InputLabel
+                        id={`customer-color-${params.row.id}-label`}
+                        className="d-flex"
+                        style={{ marginRight: "10px", width: "100px" }}
+                      >
+                        {attributeName}:
+                      </InputLabel>
+                    </div>
+                    <div className="col-6 d-flex justify-content-start align-items-center">
+                      {typeof attributeValue === "string" ? (
+                        <div className="d-flex" style={{ flex: 1 }}>
+                          {attributeValue}
+                        </div>
+                      ) : (
+                        <MuiSelect
+                          labelId={`customer-color-${params.row.id}-label`}
+                          id={`customer-color-${params.row.id}`}
+                          onChange={(event) =>
+                            handleAttributeChange(
+                              event,
+                              params.row,
+                              attributeName
+                            )
+                          }
+                          fullWidth
+                          style={{
+                            height: "40px",
+                            width: "279px",
+                            marginLeft: "10px",
+                          }}
+                          value={params.row[attributeName] || ""}
+                        >
+                          {attributeValue?.map((value) => (
+                            <MenuItem key={value} value={value}>
+                              {value}
+                            </MenuItem>
+                          ))}
+                        </MuiSelect>
+                      )}
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
+          </div>
+        )}
+      </Box>
+    );
+  };
+
   const columns = [
     {
       field: "product_name",
@@ -253,22 +342,44 @@ function OnHoldManegementSystem() {
   const poColumns = [
     {
       field: "product_id",
-      headerName: "product name",
-      flex: 1,
+      headerName: "product id",
+      flex: 0.5,
       className: " d-flex justify-content-center align-items-center",
     },
     {
       field: "image",
-      headerName: "product name",
+      headerName: "product image",
       flex: 1,
       className: " d-flex justify-content-center align-items-center",
+      renderCell: (params) => (
+        <Box
+          className="h-100 w-100 d-flex align-items-center"
+          onClick={() => ImageModule(params.value)}
+        >
+          <Avatar
+            src={params.value || require("../../assets/default.png")}
+            alt="Product Image"
+            sx={{
+              height: "45px",
+              width: "45px",
+              borderRadius: "2px",
+              margin: "0 auto",
+              "& .MuiAvatar-img": {
+                height: "100%",
+                width: "100%",
+                borderRadius: "2px",
+              },
+            }}
+          />
+        </Box>
+      ),
     },
-    // {
-    //   field: "variation_values",
-    //   headerName: "Variation Values",
-    //   flex: 3,
-    //   renderCell: renderVariationValues,
-    // },
+    {
+      field: "variation_values",
+      headerName: "Variation Values",
+      flex: 1.5,
+      renderCell: renderVariationValuesPoColumn,
+    },
     {
       field: "quantity",
       headerName: "Quantity",
@@ -293,13 +404,29 @@ function OnHoldManegementSystem() {
       flex: 1,
       renderCell: (params) => (
         <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
-          <Form.Control
-            style={{ justifyContent: "center",alignItems:'center' }}
-            type="number"
-            value={params.row.Quantity}
-            placeholder="0"
-            onChange={(e) => handleQtyChange(e, params.row)}
-          />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <Form.Control
+              type="number"
+              value={params.row.Quantity}
+              placeholder="0"
+              onChange={(e) => handleQtyChange(e, params.row)}
+              style={{
+                textAlign: "center", 
+                height: "40px", 
+                lineHeight: "40px", 
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            />
+          </div>
         </Form.Group>
       ),
     },

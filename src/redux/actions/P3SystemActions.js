@@ -47,15 +47,16 @@ export const GetProductManual =
   };
 
 export const AddGrn = (payload, navigate) => async (dispatch) => {
+  console.log(payload,'payload for add grn')
   try {
     dispatch({ type: ADD_GRN_REQUEST });
     const response = await axios.post(
-      `${API_URL}wp-json/custom-api/v1/add-grn`,
+      `${API_URL}wp-json/create-po-grn/v1/create-grn-by-po/`,
       payload,
       {
         headers: {
           Authorization: `Live ${token}`,
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       }
     );
