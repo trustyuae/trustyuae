@@ -309,11 +309,13 @@ function OnHoldManegementSystem() {
       renderCell: (params) => (
         <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
           <Form.Control
-            style={{ justifyContent: "center" }}
             type="number"
-            value={params.row.Quantity}
+            min="0"
+            step="1"
+            value={params.row.Quantity || 0}
             placeholder="0"
-            onChange={(e) => handleQtyChange(e, params.row)}
+            onChange={(e) => handleQtyChange(params.row, e)}
+            style={{ width: "50%",textAlign: "center" }}
           />
         </Form.Group>
       ),
@@ -474,10 +476,19 @@ function OnHoldManegementSystem() {
     setTableData(updatedData);
     validateForm(updatedData);
   };
-  const handleQtyChange = (id, event) => {
-    const value = id.target.value;
-    if (value >= 0) {
-      handleFieldChange(id.target.value, "Quantity", event);
+
+  const handleQtyChange = (index, event) => {
+    const newQuantity = parseFloat(event?.target?.value);
+    if (!isNaN(newQuantity) && index.target.value >= 0) {
+      const updatedRecivedQtyData = poTableData.map((item) => {
+        if (item?.product_id === event?.product_id) {
+          if (item.variation_id == event.variation_id) {
+            return { ...item, received_quantity: index?.target?.value };
+          }
+        }
+        return item;
+      });
+      setPoTableData(updatedRecivedQtyData);
     }
   };
 
