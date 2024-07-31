@@ -135,7 +135,7 @@ function OnHoldManagement() {
         order_id: orderId,
         quantity: quantity,
         grn_no: params.grn_no,
-        variation_id:params.variation_id
+        variation_id: params.variation_id,
       };
 
       try {
@@ -207,7 +207,7 @@ function OnHoldManagement() {
       headerName: "Item Received",
       flex: 1,
       valueGetter: (value, row) => {
-        return `${row.quantity} / ${row.quantity}`;
+        return `${row.qty_fullfilled} / ${row.qty_received}`;
       },
     },
     {

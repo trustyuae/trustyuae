@@ -19,7 +19,6 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-
 function GRNManagement() {
   const dispatch = useDispatch();
   const [statusFilter, setStatusFilter] = useState("");
@@ -45,8 +44,12 @@ function GRNManagement() {
   const handleDateChange = async (newDateRange) => {
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
       setSelectedDateRange(newDateRange);
-      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format('YYYY-MM-DD');
-      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format('YYYY-MM-DD');
+      const isoStartDate = dayjs(newDateRange[0].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
+      const isoEndDate = dayjs(newDateRange[1].$d.toDateString()).format(
+        "YYYY-MM-DD"
+      );
       setStartDate(isoStartDate);
       setEndDate(isoEndDate);
     } else {
@@ -72,9 +75,13 @@ function GRNManagement() {
       type: "string",
     },
     {
-      field: "po ref",
+      field: "po_id",
       headerName: "Po Ref No.",
       flex: 1,
+      renderCell: (params) => {
+        const poId = params.row.po_id;
+        return <div>{poId ? poId : "No PO ref"}</div>;
+      },
     },
     {
       field: "",
@@ -99,7 +106,7 @@ function GRNManagement() {
   const handlGetGRNList = async () => {
     try {
       let apiUrl;
-      apiUrl = `${API_URL}wp-json/custom-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
+      apiUrl = `${API_URL}wp-json/custom-get-grns-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       await dispatch(GetGRNList({ apiUrl })).then((response) => {
@@ -119,8 +126,8 @@ function GRNManagement() {
 
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
-    setStartDate("")
-    setEndDate("")
+    setStartDate("");
+    setEndDate("");
   };
 
   useEffect(() => {
@@ -168,8 +175,11 @@ function GRNManagement() {
                 </DemoContainer>
               </LocalizationProvider>
               {selectedDateRange[0] && selectedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
-                )}
+                <CancelIcon
+                  style={{ position: "absolute", right: "0", top: "39px" }}
+                  onClick={clearDateRange}
+                />
+              )}
             </Form.Group>
           </Col>
           <Col xs="auto" lg="3">
@@ -197,27 +207,25 @@ function GRNManagement() {
             <Loader />
           ) : (
             <>
-              {
-                grnList && grnList.length !== 0 ? (
-                  <div className="mt-2">
-                    <DataTable
-                      columns={columns}
-                      rows={grnList}
-                      page={page}
-                      pageSize={pageSize}
-                      totalPages={totalPages}
-                      handleChange={handleChange}
-                    />
-                  </div>
-                ) : (
-                  <Alert
-                    severity="warning"
-                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                  >
-                    Records is not Available for above filter
-                  </Alert>
-                )
-              }
+              {grnList && grnList.length !== 0 ? (
+                <div className="mt-2">
+                  <DataTable
+                    columns={columns}
+                    rows={grnList}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    handleChange={handleChange}
+                  />
+                </div>
+              ) : (
+                <Alert
+                  severity="warning"
+                  sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                >
+                  Records is not Available for above filter
+                </Alert>
+              )}
             </>
           )}
         </Card>

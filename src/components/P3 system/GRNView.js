@@ -21,7 +21,7 @@ const GRNView = () => {
   const loader = useSelector((state) => state?.managementSystem?.isGrnView);
 
   const fetchOrder = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-api/v1/view-grn-details/${id}`;
+    let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}`;
     await dispatch(GetGRNView({ apiUrl })).then((response) => {
       let data = response?.data?.map((v, i) => ({ ...v, id: i }));
       setPO_OrderList(data);
@@ -77,7 +77,7 @@ const GRNView = () => {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
-        console.log(value,'valueeeable')
+        console.log(value.row, "valueeeable row");
         return (
           <Link
             to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}/${value.row.variation_id}`}
@@ -108,7 +108,7 @@ const GRNView = () => {
     }
   };
   return (
-    <Container fluid className="px-5" >
+    <Container fluid className="px-5">
       <MDBRow className="my-3">
         <MDBCol
           md="5"
