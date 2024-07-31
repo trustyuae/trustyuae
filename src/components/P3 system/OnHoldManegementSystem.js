@@ -56,6 +56,8 @@ function OnHoldManegementSystem() {
 
   const [allPoIds, setAllPoIds] = useState([]);
 
+  const [poId, setPoId] = useState("");
+
   const [pageSize, setPageSize] = useState(10);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
@@ -418,9 +420,9 @@ function OnHoldManegementSystem() {
               placeholder="0"
               onChange={(e) => handleQtyChange(e, params.row)}
               style={{
-                textAlign: "center", 
-                height: "40px", 
-                lineHeight: "40px", 
+                textAlign: "center",
+                height: "40px",
+                lineHeight: "40px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -615,41 +617,67 @@ function OnHoldManegementSystem() {
 
   const handleSubmit = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
-    tableData.forEach((data) => {
-      if (data.variation_details && data.variation_values) {
-        const { variation_details, variation_values } = data;
-        const matchingKeys = Object.keys(variation_details).filter((key) => {
-          const detail = variation_details[key];
-          // Check if all properties in variation_values match with detail
-          return Object.keys(variation_values).every((prop) => {
-            return detail[prop] === variation_values[prop];
-          });
-        });
-        if (matchingKeys.length > 0) {
-          data.variation_id = Number(matchingKeys[0]);
-        }
-      }
+    // tableData.forEach((data) => {
+    //   if (data.variation_details && data.variation_values) {
+    //     const { variation_details, variation_values } = data;
+    //     const matchingKeys = Object.keys(variation_details).filter((key) => {
+    //       const detail = variation_details[key];
+    //       // Check if all properties in variation_values match with detail
+    //       return Object.keys(variation_values).every((prop) => {
+    //         return detail[prop] === variation_values[prop];
+    //       });
+    //     });
+    //     if (matchingKeys.length > 0) {
+    //       data.variation_id = Number(matchingKeys[0]);
+    //     }
+    //   }
+    // });
+    // const convertedData = tableData.map((item) => ({
+    //   product_id: parseInt(item.product_id),
+    //   product_name: item.product_name,
+    //   product_image: item.product_image,
+    //   variation_id: item.variation_id ? item.variation_id : 0,
+    //   variations: item.variation_values,
+    //   qty_remain: parseInt(item.Quantity),
+    //   updated_date: currentDate,
+    // }));
+
+    const variationIds = tableData.flatMap((item) => {
+      return Array.isArray(item.variation_id)
+        ? item.variation_id.map((id) => id.toString())
+        : [""];
     });
-    const convertedData = tableData.map((item) => ({
-      product_id: parseInt(item.product_id),
-      product_name: item.product_name,
-      product_image: item.product_image,
-      variation_id: item.variation_id ? item.variation_id : 0,
-      variations: item.variation_values,
-      qty_remain: parseInt(item.Quantity),
-      updated_date: currentDate,
-    }));
 
     const payload = {
-      created_date: date,
+      product_id: tableData.map((item) => item.product_id),
+      variation_id: variationIds,
+      received_qty: tableData.map((item) => item.Quantity),
+      created_date: currentDate,
       verified_by: userName,
       status: "Pending for process",
-      products: convertedData,
     };
     try {
       dispatch(AddGrn(payload, navigate));
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleCreateGrn = async () => {
+    const currentDate = new Date().toISOString().split("T")[0];
+    const payload = {
+      po_id: poId || "",
+      product_id: poTableData.map((item) => item.product_id),
+      variation_id: poTableData.map((item) => item.variation_id),
+      received_qty: poTableData.map((item) => item.received_quantity),
+      created_date: currentDate,
+      verified_by: userName || "",
+      status: "Processing",
+    };
+    try {
+      await dispatch(AddGrn(payload, navigate)); // Make sure dispatch is async if it returns a promise
+    } catch (error) {
+      console.error("Error submitting data:", error);
     }
   };
 
@@ -691,6 +719,7 @@ function OnHoldManegementSystem() {
 
       setPoTableData(data);
       setTotalPages(response.data.total_pages);
+      setPoId(response.data.po_id);
     } catch (error) {
       console.error("Error fetching PO product data:", error);
     }
@@ -717,7 +746,7 @@ function OnHoldManegementSystem() {
     if (selectedPOId) {
       fetchPoProductData();
     }
-  }, [selectedPOId, selectedFactory]);
+  }, [selectedPOId, selectedFactory, poId]);
 
   console.log(tableData, "tableData");
 
@@ -909,7 +938,7 @@ function OnHoldManegementSystem() {
                   variant="primary"
                   disabled={!isValid}
                   style={{ width: "130px" }}
-                  onClick={handleSubmit}
+                  onClick={handleCreateGrn}
                 >
                   Create GRN
                 </Button>
