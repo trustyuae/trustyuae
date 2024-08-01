@@ -30,16 +30,16 @@ const ReserveOrderdetailsInChina = () => {
     const [userName, setUserName] = useState(null);
     const [attachmentZoom, setAttachmentZoom] = useState(false);
   
-    const token = JSON.parse(localStorage.getItem("token"));
-    const headers = {
-      Authorization: `Live ${token}`,
-    };
+    // const token = JSON.parse(localStorage.getItem("token"));
+    // const headers = {
+    //   Authorization: `Live ${token}`,
+    // };
   
     useEffect(() => {
       const fetchUserName = async () => {
         try {
           const name = await axios.get(
-            `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,{headers}
+            `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`
           );
           setUserName(name.data);
         } catch (error) {

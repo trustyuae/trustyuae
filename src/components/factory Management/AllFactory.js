@@ -12,6 +12,7 @@ import { Alert, Box, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
 import Loader from "../../utils/Loader";
+import axiosInstance from '../../utils/AxiosInstance'
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -32,8 +33,8 @@ function AllFactory() {
   async function fetchFactories() {
     setLoading(true);
     try {
-      const token = await JSON.parse(localStorage.getItem("token"));
-      let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
+    
+      let apiUrl = `wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
       const params = {
         factory_name: factoryName,
         address: address,
@@ -42,11 +43,11 @@ function AllFactory() {
         contact_email: email,
       };
 
-      const headers = {
-        Authorization: `Live ${token}`,
-      };
+      // const headers = {
+      //   Authorization: `Live ${token}`,
+      // };
 
-      const response = await axios.get(apiUrl, { params, headers });
+      const response = await axiosInstance.get(apiUrl, { params});
       const factoryData = response.data.factories.map((item) => ({ ...item }));
       setFactories(factoryData);
       setTotalPages(response.data.total_pages);

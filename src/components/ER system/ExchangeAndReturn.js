@@ -26,6 +26,7 @@ import { MDBRow } from "mdb-react-ui-kit";
 import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../utils/AxiosInstance'
 
 function ExchangeAndReturn() {
   const navigate = useNavigate();
@@ -48,10 +49,10 @@ function ExchangeAndReturn() {
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
   const dispatch = useDispatch();
 
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
+  // const token = JSON.parse(localStorage.getItem("token"));
+  // const headers = {
+  //   Authorization: `Live ${token}`,
+  // };
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
@@ -260,9 +261,8 @@ function ExchangeAndReturn() {
 
   const selectPOType = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-er-api/v1/fetch-products-po/`,
-        { headers },
+      const response = await axiosInstance.get(
+        `wp-json/custom-er-api/v1/fetch-products-po/`,
         {
           params: {
             factory_id: selectedFactory,
@@ -283,9 +283,8 @@ function ExchangeAndReturn() {
   const selectPO = async (id) => {
     try {
       setSelectPOId(id);
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`,
-        { headers }
+      const response = await axiosInstance.get(
+        'wp-json/custom-er-po/v1/fetch-orders-po/${id}'
       );
       let data2 = [
         ...response.data.items_with_variations,
@@ -314,10 +313,9 @@ function ExchangeAndReturn() {
     };
 
     try {
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-er-generate/v1/create-er/`,
-        payload,
-        { headers }
+      const response = await axiosInstance.post(
+        'wp-json/custom-er-generate/v1/create-er/',
+        payload
       );
 
       if (response.data.message) {

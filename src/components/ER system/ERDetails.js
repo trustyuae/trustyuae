@@ -25,6 +25,7 @@ import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
+import axiosInstance from '../../utils/AxiosInstance';
 
 const ERDetails = () => {
   const params = useParams();
@@ -41,10 +42,10 @@ const ERDetails = () => {
   const [addNote, setNote] = useState("");
   const [lang, setLang] = useState("En");
 
-  const token = JSON.parse(localStorage.getItem('token'))
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
+  // const token = JSON.parse(localStorage.getItem('token'))
+  // const headers = {
+  //   Authorization: `Live ${token}`,
+  // };
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -322,9 +323,9 @@ const ERDetails = () => {
       variation_id: ERviewList.map((d) => d.variation_id),
     };
     try {
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-er-update/v1/update-er-item/`,
-        payload,{headers}
+      const response = await axiosInstance.post(
+        `wp-json/custom-er-update/v1/update-er-item/`,
+        payload
       );
       if (response.data.message) {
         const result = await ShowAlert(

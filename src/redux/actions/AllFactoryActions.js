@@ -14,15 +14,15 @@ import {
 } from "../constants/Constants";
 import axios from "axios";
 
-const token = JSON.parse(localStorage.getItem('token'))
-const headers = {
-  Authorization: `Live ${token}`,
-};
+// const token = JSON.parse(localStorage.getItem('token'))
+// const headers = {
+//   Authorization: `Live ${token}`,
+// };
 
 export const AllFactoryActions = () => async (dispatch) => {
   try {
     dispatch({ type: GET_All_FACTORY_REQUEST });
-    const response = await axios.get(`${API_URL}wp-json/custom-factory/v1/fetch-factories/`,{headers});
+    const response = await axios.get(`${API_URL}wp-json/custom-factory/v1/fetch-factories/`);
     dispatch({ type: GET_All_FACTORY_SUCCESS, payload: response.data });
   } catch (error) {
     console.error("Error fetching factories:", error.message);
@@ -39,7 +39,6 @@ export const FactoryEdit = (factoryId, data) => async (dispatch) => {
       data,
       {
         headers: {
-          Authorization: `Live ${token}`,
           "Content-Type": "application/json" // Corrected the syntax
         }
       }
@@ -60,7 +59,6 @@ export const FactoryAdd = (factData, navigate) => async (dispatch) => {
       factData,
       {
         headers: {
-          Authorization: `Live ${token}`,
           "Content-Type": "application/json" // Corrected the syntax
         }
       }

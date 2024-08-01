@@ -88,10 +88,10 @@ const PoDetails = () => {
     (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
   );
 
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
+  // const token = JSON.parse(localStorage.getItem("token"));
+  // const headers = {
+  //   Authorization: `Live ${token}`,
+  // };
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -145,8 +145,7 @@ const PoDetails = () => {
   const getMessages = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`,
-        { headers }
+        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`
       );
       setMessages(response.data);
     } catch (error) {
@@ -655,8 +654,7 @@ const PoDetails = () => {
 
       const response = await axios.post(
         `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
-        requestedMessage,
-        { headers }
+        requestedMessage
       );
       console.log(response.data);
 

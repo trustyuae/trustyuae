@@ -15,6 +15,7 @@ import { isValidEmail } from "../utils/validation";
 import styled from "styled-components";
 import { Box, CardContent } from "@mui/material";
 import { Card, Col, Row } from "react-bootstrap";
+import { getToken } from "../utils/StorageUtils";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -58,10 +59,23 @@ const Login = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    dispatch(loginUserWithToken(navigate, token));
+    const fetchTokenAndLogin = async () => {
+      try {
+        const token = await getToken();
+        if (token) {
+          dispatch(loginUserWithToken(navigate, token));
+        } else {
+          console.warn('No token found, user may need to log in.');
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+      }
+    };
+    fetchTokenAndLogin();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch, navigate]);
+
 
   const loading = useSelector((state) => state.loginUser.loading);
 

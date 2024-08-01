@@ -33,7 +33,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
-
+import axiosInstance from '../../utils/AxiosInstance'
 const OnHoldOrdersdetailsInChina = () => {
     const { id } = useParams();
     const fileInputRef = useRef({});
@@ -71,10 +71,10 @@ const OnHoldOrdersdetailsInChina = () => {
       (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
     );
   
-    const token = JSON.parse(localStorage.getItem("token"));
-    const headers = {
-      Authorization: `Live ${token}`,
-    };
+    // const token = JSON.parse(localStorage.getItem("token"));
+    // const headers = {
+    //   Authorization: `Live ${token}`,
+    // };
   
     const capture = useCallback(() => {
       const imageSrc = webcamRef.current.getScreenshot();
@@ -192,13 +192,12 @@ const OnHoldOrdersdetailsInChina = () => {
         cancelButtonText: "No",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          await axios.post(
-            `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
+          await axiosInstance.post(
+            'wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}',
             {
               variation_id: Number(e.variation_id),
               image_url: e.dispatch_image,
-            },
-            { headers }
+            }
           );
           fetchOrder();
         }
@@ -603,10 +602,9 @@ const OnHoldOrdersdetailsInChina = () => {
         result.toggle_status = 0;
         setToggleStatus(0);
       }
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
-        result,
-        { headers }
+      const response = await axiosInstance.post(
+        'wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/',
+        result
       );
       if (response) {
         fetchOrder();

@@ -44,7 +44,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
+import axiosInstance from '../../utils/AxiosInstance'
 function OrderDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
@@ -91,10 +91,10 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.isCustomOrder
   );
 
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
+  // const token = JSON.parse(localStorage.getItem("token"));
+  // const headers = {
+  //   Authorization: `Live ${token}`,
+  // };
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -238,13 +238,12 @@ function OrderDetails() {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await axios.post(
-          `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
+        await axiosInstance.post(
+         'wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}',
           {
             variation_id: e.variation_id,
             image_url: e.dispatch_image,
-          },
-          { headers }
+          }
         );
         fetchOrder();
       }

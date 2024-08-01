@@ -33,7 +33,8 @@ import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
-
+import { getUserData } from "../../utils/StorageUtils";
+import axiosInstance from '../../utils/AxiosInstance'
 function OnHoldOrdersDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
@@ -71,10 +72,10 @@ function OnHoldOrdersDetails() {
     (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
 
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
+  // const token = JSON.parse(localStorage.getItem("token"));
+  // const headers = {
+  //   Authorization: `Live ${token}`,
+  // };
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -100,10 +101,6 @@ function OnHoldOrdersDetails() {
 
   async function fetchOrder() {
     try {
-      // const response = await dispatch(OrderDetailsGet({ id: id }));
-      // const response = await axios.get(
-      //   `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
-      // );
       const response = await dispatch(OnHoldOrderDetailsGet(id));
 
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
@@ -162,7 +159,7 @@ function OnHoldOrdersDetails() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e, itemId,itemVariationId) => {
+  const handleFileInputChange = async (e, itemId, itemVariationId) => {
     if (e.target.files[0]) {
       const file = await CompressImage(e.target.files[0]);
       const fr = new FileReader();
@@ -192,13 +189,12 @@ function OnHoldOrdersDetails() {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await axios.post(
-          `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
+        await axiosInstance.post(
+          'wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}',
           {
             variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
-          },
-          { headers }
+          }
         );
         fetchOrder();
       }
@@ -208,6 +204,7 @@ function OnHoldOrdersDetails() {
   const handleSubmitAttachment = async () => {
     setLoader(true);
     try {
+      // const userData = await getUserData();
       const { user_id } = userData ?? {};
       if (selectedItemId) {
         await dispatch(
@@ -426,7 +423,7 @@ function OnHoldOrdersDetails() {
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId,itemVariationId);
+          handleFileInputChange(e, itemId, itemVariationId);
         };
 
         if (!fileInputRef.current) {
@@ -606,10 +603,9 @@ function OnHoldOrdersDetails() {
 
     console.log(result, "result");
 
-    const response = await axios.post(
-      `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
-      result,
-      { headers }
+    const response = await axiosInstance.post(
+      'wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/',
+      result
     );
     console.log(response, "response");
     if (response) {

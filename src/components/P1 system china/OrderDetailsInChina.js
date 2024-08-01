@@ -91,10 +91,10 @@ const OrderDetailsInChina = () => {
     (state) => state?.orderSystemData?.isCustomOrder
   );
 
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
+  // const token = JSON.parse(localStorage.getItem("token"));
+  // const headers = {
+  //   Authorization: `Live ${token}`,
+  // };
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -243,8 +243,7 @@ const OrderDetailsInChina = () => {
           {
             variation_id: e.variation_id,
             image_url: e.dispatch_image,
-          },
-          { headers }
+          }
         );
         fetchOrder();
       }

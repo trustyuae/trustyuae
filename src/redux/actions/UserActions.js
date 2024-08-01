@@ -11,11 +11,12 @@ import {
 } from "../constants/Constants";
 import { loginURL, logoutURL } from "../../utils/constants";
 import ShowAlert from "../../utils/ShowAlert";
+import { saveToken, saveUserData } from "../../utils/StorageUtils";
 
-const token = JSON.parse(localStorage.getItem('token'))
-const headers = {
-  Authorization: `Live ${token}`,
-};
+// const token = JSON.parse(localStorage.getItem('token'))
+// const headers = {
+//   Authorization: `Live ${token}`,
+// };
 
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
@@ -25,13 +26,12 @@ export const loginUser = (data, navigate) => async (dispatch) => {
       data,
       {
         headers: { 
-          Authorization: `Live ${token}`,
           "content-type": "application/json"},
       }
     );
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
-    localStorage.setItem("token", JSON.stringify(res?.data?.token));
-    localStorage.setItem("user_data", JSON.stringify(res?.data?.user_data));
+    await saveToken(res?.data?.token);
+    await saveUserData(res?.data?.user_data);
     if (res.data.token) {
       const result = await ShowAlert(
         "Success",
