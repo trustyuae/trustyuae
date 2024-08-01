@@ -23,6 +23,7 @@ import {
 } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
 import ShowAlert from "../../utils/ShowAlert";
+import ShowAlert2 from "../../utils/ShowAlert2";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -120,49 +121,86 @@ function OnHoldManagement() {
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
-        "please select products for fulfilling orders",
+        "Please select products for fulfilling orders",
         "",
         "error",
         false,
         false,
         "",
         "",
-        1000
+        "",
+        0
       );
-    } else {
-      const requestedDataP = {
-        product_id: params.id,
-        order_id: orderId,
-        quantity: quantity,
-        grn_no: params.grn_no,
-        variation_id: params.variation_id,
-      };
+      return;
+    }
 
-      try {
-        const response = await dispatch(AddProductOrderForPre(requestedDataP));
-        if (response?.data?.status_code === 200) {
-          ShowAlert(
-            response?.data?.Message,
-            "",
-            "",
-            false,
-            false,
-            "",
-            "",
-            3500
-          );
-          await fetchProductOrderDetails();
-          setProductData((prevProductData) =>
-            prevProductData.map((row) => ({ ...row, isSelected: false }))
-          );
-          setSelectedOrders([]);
-          if (selectedOrders.length === productData.length) {
-            setProductData([]);
-          }
+    const systemSelection = await ShowAlert2(
+      "Please select the system to send data",
+      "",
+      "info",
+      true,
+      false,
+      "P1 System UAE",
+      "P1 System China",
+      "Cancel",
+      0,
+      1,
+      2
+    );
+
+    if (!systemSelection || systemSelection === "Cancel") {
+      return;
+    }
+
+    const confirmation = await ShowAlert(
+      `Are you sure you? want to send the data to ${systemSelection}?`,
+      "",
+      "question",
+      true,
+      true,
+      "Yes",
+      "Cancel",
+      0
+    );
+
+    if (confirmation !== "Yes") {
+      return;
+    }
+
+    const requestedDataP = {
+      product_id: params.id,
+      order_id: orderId,
+      quantity: quantity,
+      grn_no: params.grn_no,
+      variation_id: params.variation_id,
+      warehouse: systemSelection === "P1 System UAE" ? "" : "China", // Include system selection in the data
+    };
+
+    try {
+      const response = await dispatch(AddProductOrderForPre(requestedDataP));
+      if (response?.data?.status_code === 200) {
+        await ShowAlert(
+          response?.data?.Message,
+          "",
+          "success", // Assuming success icon
+          false,
+          false,
+          "",
+          "",
+          "",
+          3500
+        );
+        await fetchProductOrderDetails();
+        setProductData((prevProductData) =>
+          prevProductData.map((row) => ({ ...row, isSelected: false }))
+        );
+        setSelectedOrders([]);
+        if (selectedOrders.length === productData.length) {
+          setProductData([]);
         }
-      } catch (error) {
-        console.error("Error occurred:", error);
       }
+    } catch (error) {
+      console.error("Error occurred:", error);
     }
   };
 

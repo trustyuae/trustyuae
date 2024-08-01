@@ -110,5 +110,43 @@
   }
 }
 
+.confirm-button {
+  background-color: #441fd9; 
+  color: #fff; 
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 0 10px; 
+  font-size: 16px;
+  cursor: pointer;
+}
 
-/* for checking git access */
+/* Style for the cancel button */
+.cancel-button {
+  background-color: #d62912; 
+  color: #fff; 
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 0 10px; 
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Style for the deny button */
+.deny-button {
+  background-color: #441fd9;
+  color: #fff; 
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 0 10px; 
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Apply spacing between buttons */
+.swal2-actions {
+  display: flex;
+  gap: 10px; /* Space between buttons */
+}
