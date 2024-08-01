@@ -171,8 +171,6 @@ const headers = {
     { field: "", headerName: t("POManagement.RMBPrice"), flex: 1.5,
       type: "html",
       renderCell: (value, row) => {
-        // console.log(value,'value');
-        // console.log((value.row.estimated_cost_aed*1.92).toFixed(2)        ,'row');
         return (value.row.estimated_cost_aed*1.92).toFixed(2)
       },
      },

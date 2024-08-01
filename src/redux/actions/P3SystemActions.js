@@ -38,7 +38,6 @@ export const GetProductManual =
     try {
       dispatch({ type: GET_PRODUCT_MANUAL_REQUEST });
       const response = await axios.get(apiUrl,{headers});
-      console.log(response, "response of order not available data");
       dispatch({ type: GET_PRODUCT_MANUAL_SUCCESS, payload: response?.data });
       return response;
     } catch (error) {
@@ -47,7 +46,6 @@ export const GetProductManual =
   };
 
 export const AddGrn = (payload, navigate) => async (dispatch) => {
-  console.log(payload,'payload for add grn')
   try {
     dispatch({ type: ADD_GRN_REQUEST });
     const response = await axios.post(
@@ -103,7 +101,6 @@ export const GetGRNView =
     try {
       dispatch({ type: GET_GRN_VIEW_REQUEST });
       const response = await axios.get(apiUrl,{headers});
-      console.log(response, "response of GetProductOrderDetails");
       dispatch({
         type: GET_GRN_VIEW_SUCCESS,
         payload: response?.data,
@@ -120,7 +117,6 @@ export const GetProductDetails =
     try {
       dispatch({ type: GET_PRODUCT_DETAILS_REQUEST });
       const response = await axios.get(apiUrl,{headers});
-      console.log(response, "response of GetProductDetails");
       dispatch({
         type: GET_PRODUCT_DETAILS_SUCCESS,
         payload: response?.data,
@@ -137,7 +133,6 @@ export const GetProductOrderDetails =
     try {
       dispatch({ type: GET_PRODUCT_ORDER_DETAILS_REQUEST });
       const response = await axios.get(apiUrl,{headers});
-      console.log(response, "response of GetProductOrderDetails");
       dispatch({
         type: GET_PRODUCT_ORDER_DETAILS_SUCCESS,
         payload: response?.data,

@@ -49,7 +49,6 @@ function OnHoldOrdersSystem() {
     let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
     if (searchOrderID)
       apiUrl += `&orderid=${searchOrderID}`;
-    console.log(searchOrderID,'searchOrderID');
     if (endDate)
       apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (dispatchType)

@@ -53,7 +53,6 @@ const headers = {
 export const OrderSystemGet =
   ({ apiUrl }) =>
   async (dispatch) => {
-    console.log(apiUrl, "apiUrl");
     try {
       dispatch({ type: GET_ORDER_SYSTEM_REQUEST });
 
@@ -68,7 +67,6 @@ export const OrderSystemGet =
 export const CompletedOrderSystemGet =
   ({ apiUrl }) =>
   async (dispatch) => {
-    console.log(apiUrl, "apiUrl");
     try {
       dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_REQUEST });
 
@@ -84,7 +82,6 @@ export const CompletedOrderSystemGet =
   };
 
 export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
-  console.log(id, "idueeeeeeee");
   try {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
 
@@ -105,7 +102,6 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
 };
 
 export const OnHoldOrderDetailsGet = (id) => async (dispatch) => {
-  console.log(id, "idueeeeeeee");
   try {
     dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST});
 
@@ -126,7 +122,6 @@ export const OnHoldOrderDetailsGet = (id) => async (dispatch) => {
 };
 
 export const ReserveOrderDetailsGet = (id) => async (dispatch) => {
-  console.log(id, "idueeeeeeee");
   try {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
 
@@ -155,7 +150,6 @@ export const OrderDetailsGet =
       const response = await axios.get(
         `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`,{headers}
       );
-      console.log(response, "response of OrderDetailsGet Api");
       dispatch({ type: GET_ORDER_DETAILS_SUCCESS, payload: response?.data });
       return response;
     } catch (error) {
@@ -229,7 +223,6 @@ export const AddMessage = (requestData) => async (dispatch) => {
 };
 
 export const InsertOrderPickup = (requestData) => async (dispatch) => {
-  // console.log(requestData, "requestData");
   try {
     dispatch({ type: INSERT_ORDER_PICKUP_REQUEST });
 
@@ -237,7 +230,6 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
       `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
       requestData,{headers}
     );
-    console.log(response, "InsertOrderPickup");
     dispatch({ type: INSERT_ORDER_PICKUP_SUCCESS, payload: response?.data });
     return response;
   } catch (error) {
@@ -246,7 +238,6 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
 };
 
 export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
-  // console.log(requestData, "requestData");
   try {
     dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_REQUEST });
 
@@ -254,7 +245,6 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
       `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/`,
       requestData,{headers}
     );
-    console.log(response, "InsertOrderPickup");
     dispatch({
       type: INSERT_ORDER_PICKUP_CANCEL_SUCCESS,
       payload: response?.data,
@@ -275,7 +265,6 @@ export const CustomOrderFinish =
       dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
       return response;
     } catch (error) {
-      console.log(error, "errrrypoooo");
       dispatch({ type: CUSTOM_ORDER_FINISH_FAIL, error: error.message });
     }
   };
@@ -293,7 +282,6 @@ export const CustomOrderOH = (result, navigate) => async (dispatch) => {
     }
     return response;
   } catch (error) {
-    console.log(error, "errrrypoooo");
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_FAIL, error: error.message });
   }
 };

@@ -105,7 +105,6 @@ export const QuantityPoDetails =
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_REQUEST });
         const response = await axios.post(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`,payload,{headers});
-        console.log(response, 'rsponse of quntity details')
         dispatch({
           type: GET_QUANTITY_DETAILS_SUCCESS,
           payload: response?.data,
@@ -119,12 +118,9 @@ export const QuantityPoDetails =
 export const QuantityPoDetailsForModalInView =
   (productId,variationId, poId) =>
     async (dispatch) => {
-      console.log(productId,variationId, poId,'productId,variationId, poId');
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST });
-        console.log(variationId,'variationId');
         const response = await axios.get(`${API_URL}wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}/${variationId}`,{headers});
-        console.log(response, 'rsponse of quntity details')
         dispatch({
           type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS,
           payload: response?.data,
@@ -144,7 +140,6 @@ export const AddPO = (payload, navigate) => async (dispatch) => {
     );
 
     if (response.data) {
-      console.log(response, 'response addPO')
       const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
       if (result.isConfirmed) {
         navigate("/PO_ManagementSystem");
@@ -219,7 +214,6 @@ export const UpdatePODetails =
           payload: response.data,
         });
 
-        console.log(response.data, "updatedData");
         return response.data;
       } catch (error) {
         dispatch({ type: UPDATE_PO_DETAILS_FAIL, error: error.message });
@@ -251,7 +245,6 @@ export const OrderNotAvailableData =
       try {
         dispatch({ type: GET_ORDER_NOT_AVAILABLE_REQUEST });
         const response = await axios.get(apiUrl,{headers});
-        console.log(response, "response of order not available data");
         dispatch({
           type: GET_ORDER_NOT_AVAILABLE_SUCCESS,
           payload: response?.data,
@@ -339,7 +332,6 @@ export const OrderNotAvailableRefund =
 
       return refunds;
     } catch (error) {
-      console.error(error);
       await ShowAlert("Error in refund process!", '', "error", false, false, '', '', 1000);
       dispatch({
         type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,

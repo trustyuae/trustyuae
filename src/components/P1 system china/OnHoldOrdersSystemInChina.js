@@ -49,7 +49,6 @@ const OnHoldOrdersSystemInChina = () => {
       let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
       if (searchOrderID)
         apiUrl += `&orderid=${searchOrderID}`;
-      console.log(searchOrderID,'searchOrderID');
       if (endDate)
         apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (dispatchType)
@@ -190,12 +189,9 @@ const OnHoldOrdersSystemInChina = () => {
       setPage(1);
     };
     const orderId=(e)=>{
-      // console.log(e,'e');
       if (e.key === "Enter") {
         console.log('hiiii');
         setSearchOrderID(e.target.value);
-        // setProductName("");
-        // fetchOrders();
       }
     }
     const clearDateRange = () => {

@@ -83,8 +83,6 @@ const OrderDetailsInChina = () => {
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
   );
 
-  console.log(orderDetailsDataOrderId, "orderDetailsDataOrderIdinnnnnnn");
-
   const AddInOnHold = useSelector(
     (state) => state?.orderSystemData?.isCustomOrderOnHold
   );
@@ -123,7 +121,6 @@ const OrderDetailsInChina = () => {
   async function fetchOrder() {
     try {
       const response = await dispatch(OrderDetailsGet({ id: id }));
-      console.log(response.data.orders, "response");
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
@@ -177,8 +174,6 @@ const OrderDetailsInChina = () => {
 
   const submitOH = async () => {
     try {
-      console.log(orderData, "orderData");
-      console.log(orderDetails, "orderDetails");
       const result = {
         order_id: parseInt(orderDetails.order_id, 10),
         item_id: [],

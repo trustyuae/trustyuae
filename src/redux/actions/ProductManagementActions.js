@@ -19,7 +19,6 @@ export const GetAllProductsList =
     try {
       dispatch({ type: GET_ALL_PRODUCTS_LIST_REQUEST });
       const response = await axios.get(apiUrl,{headers});
-      console.log(response, "response of GetAllProducts");
       dispatch({
         type: GET_ALL_PRODUCTS_LIST_SUCCESS,
         payload: response?.data,
@@ -44,7 +43,7 @@ export const EditProductsList = (formData, id) => async (dispatch) => {
         },
       }
     );
-    console.log(response, "response of GetAllProducts");
+   
     dispatch({
       type: EDIT_PRODUCT_LIST_SUCCESS,
       payload: response?.data,

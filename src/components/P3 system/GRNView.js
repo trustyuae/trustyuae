@@ -77,7 +77,6 @@ const GRNView = () => {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
-        console.log(value.row, "valueeeable row");
         return (
           <Link
             to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}/${value.row.variation_id}`}

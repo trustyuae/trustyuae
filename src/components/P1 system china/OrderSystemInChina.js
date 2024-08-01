@@ -63,7 +63,6 @@ const OrderSystemInChina = () => {
       )
         .then((response) => {
           let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-          console.log(response.data["total_count"], "consoled response.data");
           setOrders(data);
           setOverAllData({
             total_count: response.data.total_count,
@@ -99,7 +98,6 @@ const OrderSystemInChina = () => {
     const handlePrint = async (orderId) => {
       try {
         const response = await dispatch(OrderDetailsGet({ id: orderId }));
-        console.log(response.data.orders, "response");
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
         setOrderData(data);
         setShowModal(true);

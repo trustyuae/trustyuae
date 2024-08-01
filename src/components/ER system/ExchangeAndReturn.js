@@ -206,19 +206,15 @@ function ExchangeAndReturn() {
   };
 
   const handleDateChange = (index, event) => {
-    console.log(index, event, "======");
-    console.log(index.target.value, "======");
     const updatedData = orders.map((item) => {
       if (item.id === event.id) {
         return { ...item, expected_delivery_date: index.target.value };
       }
       return item;
     });
-    console.log(updatedData, "updatedData");
     setOrders(updatedData);
   };
   const handleAvailableQtyChange = (event, rowData) => {
-    console.log(event, rowData, "======");
     if (event.target.value >= 0 && event.target.value <= rowData.quantity) {
       const updatedData = orders.map((item) => {
         if (item.id === rowData.id) {
@@ -226,7 +222,6 @@ function ExchangeAndReturn() {
         }
         return item;
       });
-      console.log(updatedData, "updatedData");
       setOrders(updatedData);
     }
   };
@@ -275,7 +270,6 @@ function ExchangeAndReturn() {
           },
         }
       );
-      console.log(response.data, "response");
       setAllPoTypes(response.data);
       // selectPO(response.data[0])
       if (response.data.length === 0) {
@@ -287,21 +281,17 @@ function ExchangeAndReturn() {
   };
 
   const selectPO = async (id) => {
-    console.log(id, "e");
     try {
       setSelectPOId(id);
       const response = await axios.get(
         `${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`,
         { headers }
       );
-      console.log(response, "response");
       let data2 = [
         ...response.data.items_with_variations,
         ...response.data.items_without_variations,
       ];
-      console.log(data2, "data====");
       let data = data2.map((v, i) => ({ ...v, id: i }));
-      console.log(data, "data");
       setOrders(data);
     } catch (error) {
       console.error(error);
@@ -309,11 +299,10 @@ function ExchangeAndReturn() {
   };
 
   const submit = async () => {
-    console.log(selectedOrderIds, "selectedOrderIds");
+;
     const selectedOrders = orders.filter((order) =>
       selectedOrderIds.includes(order.id)
     );
-    console.log(selectedOrders.map((d) => d.return_type));
     const payload = {
       factory_id: Number(selectedFactory),
       po_id: selectPOId,
@@ -323,14 +312,14 @@ function ExchangeAndReturn() {
       expected_date: selectedOrders.map((d) => d.expected_delivery_date),
       variation_id: selectedOrders.map((d) => d.variation_id),
     };
-    console.log(payload, "payload");
+
     try {
       const response = await axios.post(
         `${API_URL}wp-json/custom-er-generate/v1/create-er/`,
         payload,
         { headers }
       );
-      console.log(response, "response");
+
       if (response.data.message) {
         const result = await ShowAlert(
           `${response.data.message} ${response.data.er_no}`,
@@ -346,7 +335,6 @@ function ExchangeAndReturn() {
       console.error(error);
     }
 
-    console.log(payload, "payload");
   };
 
   const ImageModule = (url) => {

@@ -116,8 +116,6 @@ function OnHoldManegementSystem() {
                 {variationArray.map((item, index) => {
                   const attributeName = Object.keys(item)[0];
                   const attributeValue = Object.values(item)[0];
-                  console.log(attributeValue, "attributeValue");
-                  console.log(typeof attributeValue, "attributeValue===");
                   return (
                     <React.Fragment key={index}>
                       <div
@@ -206,8 +204,6 @@ function OnHoldManegementSystem() {
             {variationArray.map((item, index) => {
               const attributeName = Object.keys(item)[0];
               const attributeValue = Object.values(item)[0];
-              console.log(attributeValue, "attributeValue");
-              console.log(typeof attributeValue, "attributeValue===");
 
               return (
                 <React.Fragment key={index}>
@@ -442,7 +438,6 @@ function OnHoldManegementSystem() {
     const updatedData = tableData.map((item) =>
       item.id === rowIndex.id ? { ...item, ...rowIndex } : item
     );
-    console.log(updatedData, "updatedData");
     setTableData(updatedData);
     validateForm(updatedData);
   }
@@ -510,7 +505,6 @@ function OnHoldManegementSystem() {
       if (productIDF) {
         setSelectedOption(null);
         const response = await dispatch(GetProductManual({ apiUrl }));
-        console.log(response, "response");
         const data = response.data.products.map((v, i) => ({ ...v, id: i }));
         const modifiedData = data.map((item) => ({
           ...item,
@@ -616,7 +610,6 @@ function OnHoldManegementSystem() {
     let dataa = data.filter(
       (o) => o.variation_values && Object.keys(o.variation_values).length > 0
     );
-    console.log(dataa, "dataa");
     const isAllVariationsString = data.every((item) => {
       const values = Object.values(item.variation_values);
       return values.every((value) => typeof value === "string");
@@ -720,7 +713,6 @@ function OnHoldManegementSystem() {
         `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`,
         { headers }
       );
-      console.log(response.data, "fetchPoProductData");
 
       // Ensure each row has a unique 'id'
       const data = response.data.line_items.map((item, i) => ({
@@ -758,8 +750,6 @@ function OnHoldManegementSystem() {
       fetchPoProductData();
     }
   }, [selectedPOId, selectedFactory, poId]);
-
-  console.log(tableData, "tableData");
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>

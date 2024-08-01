@@ -53,7 +53,6 @@ function AllFactory() {
       setLoading(false); // Stop loading
       return response.data;
     } catch (error) {
-      console.error("Error fetching factories:", error);
       setLoading(false); // Stop loading
       throw error;
     }

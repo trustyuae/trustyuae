@@ -118,8 +118,6 @@ const PoDetails = () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
-        console.log(response, "response");
-        console.log(response?.data?.total_count, "response?.data?.total_count");
         let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
         const row = [
@@ -150,7 +148,6 @@ const PoDetails = () => {
         `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`,
         { headers }
       );
-      console.log(response.data, "response");
       setMessages(response.data);
     } catch (error) {
       console.log(error);
@@ -312,7 +309,6 @@ const PoDetails = () => {
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    console.log(event, "event");
     if (index.target.value >= 0 && index.target.value <= event.quantity) {
       const updatedData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {

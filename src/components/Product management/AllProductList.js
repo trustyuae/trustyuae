@@ -133,7 +133,6 @@ function AllProductList() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
-        console.log(value);
         return (
           <Box
             className="h-100 w-100 d-flex align-items-center"

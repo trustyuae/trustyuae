@@ -109,10 +109,6 @@ const OnHoldOrdersdetailsInChina = () => {
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
         setOrderData(data);
         setOrderDetails(response.data.orders[0]);
-        console.log(
-          response.data.orders[0].toggle_status,
-          "response.data.orders[0].toggle_status"
-        );
         setToggleStatus(Number(response.data.orders[0].toggle_status));
         const order = response.data.orders[0];
         if (order) setOrderProcess(order.order_process);
@@ -187,7 +183,6 @@ const OnHoldOrdersdetailsInChina = () => {
       setShowAttachmentModal(false);
     };
     const handleCancelImg = async (e) => {
-      console.log(e.variation_id, "e.variation_id");
       Swal.fire({
         title: "Are you sure you want to delete this image?",
         icon: "question",
@@ -211,7 +206,6 @@ const OnHoldOrdersdetailsInChina = () => {
     };
   
     const handleSubmitAttachment = async () => {
-      console.log(selectedVariationId, "selectedVariationId akakki");
       setLoader(true);
       try {
         const { user_id } = userData ?? {};
@@ -579,7 +573,6 @@ const OnHoldOrdersdetailsInChina = () => {
     ];
   
     const handalswitch = async (e) => {
-      console.log(e, "e");
       setLoader(true);
       if (e) {
         // setToggleStatus(1)
@@ -588,12 +581,8 @@ const OnHoldOrdersdetailsInChina = () => {
         // setToggleStatus(0)
         handelSend(e);
       }
-      console.log(orderData, "orderData");
-      console.log(orderDetails, "orderDetails");
     };
     const handelSend = async (e) => {
-      console.log(e, "e=====");
-      console.log(toggleStatus, "toggleStatus");
       const result = {
         order_id: parseInt(orderDetails?.order_id, 10),
         item_id: [],
@@ -614,15 +603,11 @@ const OnHoldOrdersdetailsInChina = () => {
         result.toggle_status = 0;
         setToggleStatus(0);
       }
-  
-      console.log(result, "result");
-  
       const response = await axios.post(
         `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
         result,
         { headers }
       );
-      console.log(response, "response");
       if (response) {
         fetchOrder();
       }

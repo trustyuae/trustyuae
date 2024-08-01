@@ -29,7 +29,6 @@ export const loginUser = (data, navigate) => async (dispatch) => {
           "content-type": "application/json"},
       }
     );
-    console.log(res, "respuncee");
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
     localStorage.setItem("token", JSON.stringify(res?.data?.token));
     localStorage.setItem("user_data", JSON.stringify(res?.data?.user_data));
@@ -80,7 +79,6 @@ export const logoutUser = (navigate) => async (dispatch) => {
       `${API_URL}wp-json/custom-login/v1/logout`,
       null,
     );
-    console.log(res, "logout res");
     dispatch({ type: USER_LOGOUT_SUCCESS });
     localStorage.clear();
     const result = await ShowAlert(

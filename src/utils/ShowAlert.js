@@ -20,7 +20,6 @@ const ShowAlert = async (
     cancelButtonText: cancelButtonText,
     timer: timer,
   });
-  console.log(result, 'result')
   return result;
 };
 
