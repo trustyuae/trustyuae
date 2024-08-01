@@ -336,13 +336,25 @@ const PoDetails = () => {
     setPoDetailsModal(true);
   };
 
-  const variant2 = (variations) => {
-    console.log(variations.row.variation_value, "variations");
+  const variant2 = (params) => {
+    const variationValue = params.row.variation_value;
 
-    const variationArray = Object.entries(
-      JSON.parse(variations.row.variation_value)
-    ).map(([key, value]) => ({ [key]: value }));
-    console.log(variationArray, "variationArray");
+    let variationArray = [];
+    try {
+      if (variationValue) {
+        const parsedValue = JSON.parse(variationValue);
+  
+        if (typeof parsedValue === 'object' && parsedValue !== null) {
+          variationArray = Object.entries(parsedValue).map(([key, value]) => ({ [key]: value }));
+        } else {
+          console.error("Parsed value is not an object:", parsedValue);
+        }
+      } else {
+        console.error("Variation value is empty or not defined.");
+      }
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+    }
 
     return (
       <div className="container mt-4 mb-4">
