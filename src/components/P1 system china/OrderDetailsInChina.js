@@ -72,6 +72,9 @@ const OrderDetailsInChina = () => {
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
+
+  const [userData, setUserData] = useState(null);
+
   const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -92,8 +95,18 @@ const OrderDetailsInChina = () => {
     (state) => state?.orderSystemData?.isCustomOrder
   );
 
-  const UserData = getUserData();
-  const userData = UserData || {};
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
