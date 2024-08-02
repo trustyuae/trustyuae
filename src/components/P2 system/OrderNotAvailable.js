@@ -106,7 +106,7 @@ function OrderNotAvailable() {
   };
 
   async function fetchOrdersNotAvailableData() {
-    let apiUrl = `${API_URL}wp-json/custom-order-not/v1/order-not-available/?`;
+    let apiUrl = 'wp-json/custom-order-not/v1/order-not-available/?';
 
     await dispatch(
       OrderNotAvailableData({

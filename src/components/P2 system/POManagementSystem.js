@@ -27,6 +27,7 @@ import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
 import CancelIcon from "@mui/icons-material/Cancel";
+import axiosInstance from '../../utils/AxiosInstance'
 
 function POManagementSystem() {
   const inputRef = useRef(null);
@@ -63,11 +64,6 @@ function POManagementSystem() {
   useEffect(() => {
     dispatch(AllFactoryActions());
   }, [dispatch]);
-
-//   const token = JSON.parse(localStorage.getItem('token'))
-// const headers = {
-//   Authorization: `Live ${token}`,
-// };
 
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas.factories) {
@@ -236,8 +232,8 @@ function POManagementSystem() {
     );
     if (result.isConfirmed) {
       try {
-        const response = await axios.get(
-          `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`
+        const response = await axiosInstance.get(
+          'wp-json/delete-record/v1/delete-po-record/${id}'
         );
         if (response) {
           POM_system_products();

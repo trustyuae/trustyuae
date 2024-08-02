@@ -19,10 +19,12 @@ import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CompressImage } from "../../utils/CompressImage";
 import axios from "axios";
+import axiosInstance from '../../utils/AxiosInstance'
 
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+import { getUserData } from "../../utils/StorageUtils";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -64,11 +66,7 @@ function OnHoldManegementSystem() {
   const [totalPages, setTotalPages] = useState(1);
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
 
-  // const token = JSON.parse(localStorage.getItem("token"));
 
-  // const headers = {
-  //   Authorization: `Live ${token}`,
-  // };
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -79,8 +77,8 @@ function OnHoldManegementSystem() {
   );
 
   const getall = async () => {
-    let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
-    const response = await axios.get(url);
+    let url = 'wp-json/custom-api-product/v1/get-product/?';
+    const response = await axiosInstance.get(url);
     setoptionsArray(
       response.data.products.map((user) => ({
         label: user.product_name,
@@ -493,7 +491,7 @@ function OnHoldManegementSystem() {
   };
 
   const getAllProducts = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
+    let apiUrl = 'wp-json/custom-api-product/v1/get-product/?';
     if (productNameF && productIDF) {
       apiUrl += `product_name=${productNameF}&product_id=${productIDF}`;
     } else if (productNameF) {
@@ -544,7 +542,7 @@ function OnHoldManegementSystem() {
   }, [productNameF, productIDF, tableData]);
 
   useEffect(() => {
-    let info = JSON.parse(localStorage.getItem("user_data"));
+    let info = getUserData()
     setuserName(info.first_name + " " + info.last_name);
   }, []);
 
@@ -696,8 +694,8 @@ function OnHoldManegementSystem() {
 
   const selectPOId = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}wp-json/get-po-ids/v1/show-po-id/${selectedFactory}`
+      const response = await axiosInstance.get(
+        'wp-json/get-po-ids/v1/show-po-id/${selectedFactory}'
       );
       let data = response.data;
       setAllPoIds(data);
@@ -708,8 +706,8 @@ function OnHoldManegementSystem() {
 
   const fetchPoProductData = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`
+      const response = await axiosInstance.get(
+        'wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}'
       );
 
       // Ensure each row has a unique 'id'

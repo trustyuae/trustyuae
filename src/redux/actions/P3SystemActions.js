@@ -144,7 +144,7 @@ export const AddProductOrderForPre = (requestedDataP) => async (dispatch) => {
   try {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_PREP_REQUEST });
     const response = await axiosInstance.post(
-      `${API_URL}wp-json/order-preparation-api/v1/order-send-by-product/`,
+      'wp-json/order-preparation-api/v1/order-send-by-product/',
       requestedDataP
     );
     dispatch({

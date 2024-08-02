@@ -44,7 +44,7 @@ function OnHoldManagement() {
   );
 
   async function fetchProductDetails() {
-    let apiUrl = `${API_URL}wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
+    let apiUrl = 'wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}';
     await dispatch(
       GetProductDetails({
         apiUrl: `${apiUrl}`,
@@ -60,7 +60,7 @@ function OnHoldManagement() {
   }
 
   async function fetchProductOrderDetails() {
-    let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
+    let apiUrl = 'wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}';
     await dispatch(
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,

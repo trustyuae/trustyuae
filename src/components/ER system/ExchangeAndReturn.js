@@ -49,11 +49,6 @@ function ExchangeAndReturn() {
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
   const dispatch = useDispatch();
 
-  // const token = JSON.parse(localStorage.getItem("token"));
-  // const headers = {
-  //   Authorization: `Live ${token}`,
-  // };
-
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
     setPage(1);

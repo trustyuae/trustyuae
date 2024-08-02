@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
+import { getUserData } from "../utils/StorageUtils";
 
 const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Header = ({ onToggleSidebar }) => {
     }
   };
 
-  const userData = JSON.parse(localStorage.getItem("user_data"));
+  const userData = getUserData()
 
   return (
     <header id="header" className="header fixed-top d-flex align-items-center">

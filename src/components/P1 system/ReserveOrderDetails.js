@@ -30,11 +30,6 @@ function ReserveOrderDetails() {
   const [userName, setUserName] = useState(null);
   const [attachmentZoom, setAttachmentZoom] = useState(false);
 
-  // const token = JSON.parse(localStorage.getItem("token"));
-  // const headers = {
-  //   Authorization: `Live ${token}`,
-  // };
-
   useEffect(() => {
     const fetchUserName = async () => {
       try {

@@ -34,7 +34,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import { getUserData } from "../../utils/StorageUtils";
-import axiosInstance from '../../utils/AxiosInstance'
+import axiosInstance from "../../utils/AxiosInstance";
 function OnHoldOrdersDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
@@ -49,7 +49,6 @@ function OnHoldOrdersDetails() {
   const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
-  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
@@ -72,10 +71,8 @@ function OnHoldOrdersDetails() {
     (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
 
-  // const token = JSON.parse(localStorage.getItem("token"));
-  // const headers = {
-  //   Authorization: `Live ${token}`,
-  // };
+  const UserData = getUserData();
+  const userData = UserData || {};
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -190,7 +187,7 @@ function OnHoldOrdersDetails() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axiosInstance.post(
-          'wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}',
+          "wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}",
           {
             variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
@@ -604,7 +601,7 @@ function OnHoldOrdersDetails() {
     console.log(result, "result");
 
     const response = await axiosInstance.post(
-      'wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/',
+      "wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/",
       result
     );
     console.log(response, "response");

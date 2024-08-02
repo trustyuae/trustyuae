@@ -10,10 +10,6 @@ import {
 import axios from "axios";
 import axiosInstance from '../../utils/AxiosInstance'
 
-// const token = JSON.parse(localStorage.getItem('token'))
-// const headers = {
-//   Authorization: `Live ${token}`,
-// };
 export const GetAllProductsList =
   ({ apiUrl }) =>
   async (dispatch) => {

@@ -42,10 +42,6 @@ const ERDetails = () => {
   const [addNote, setNote] = useState("");
   const [lang, setLang] = useState("En");
 
-  // const token = JSON.parse(localStorage.getItem('token'))
-  // const headers = {
-  //   Authorization: `Live ${token}`,
-  // };
 
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
@@ -73,7 +69,7 @@ const ERDetails = () => {
 
   const fetchER = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/`;
+      let apiUrl = 'wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/';
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
         setStatus(response.data.er_status);
         setFactoryName(response.data.factory_id);

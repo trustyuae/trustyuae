@@ -2,11 +2,6 @@ import { API_URL } from "../redux/constants/Constants";
 import axios from "axios";
 import axiosInstance from '../utils/AxiosInstance'
 
-// const token = JSON.parse(localStorage.getItem('token'))
-// const headers = {
-//   Authorization: `Live ${token}`,
-// };
-
 const getFactoryNameById = async (factory_id) => {
   try {
     const response = await axiosInstance.get(

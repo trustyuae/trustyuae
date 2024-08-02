@@ -46,7 +46,7 @@ function OnHoldOrdersSystem() {
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
+    let apiUrl = 'wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}';
     if (searchOrderID)
       apiUrl += `&orderid=${searchOrderID}`;
     if (endDate)

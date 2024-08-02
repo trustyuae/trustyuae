@@ -44,6 +44,8 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import axiosInstance from "../../utils/AxiosInstance";
+import { getUserData } from "../../utils/StorageUtils";
 
 const OrderDetailsInChina = () => {
   const { id } = useParams();
@@ -60,7 +62,6 @@ const OrderDetailsInChina = () => {
   const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
-  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showMessageOHModal, setshowMessageOHModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -91,10 +92,8 @@ const OrderDetailsInChina = () => {
     (state) => state?.orderSystemData?.isCustomOrder
   );
 
-  // const token = JSON.parse(localStorage.getItem("token"));
-  // const headers = {
-  //   Authorization: `Live ${token}`,
-  // };
+  const UserData = getUserData();
+  const userData = UserData || {};
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -146,30 +145,28 @@ const OrderDetailsInChina = () => {
 
   const handleAddMessage = async (e) => {
     const orderId = parseInt(id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
+    let userID = getUserData();
     const requestedMessage = {
       message: message,
       order_id: orderId,
       name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(
-      async (response) => {
-        if (response.data) {
-          setMessage("");
-          setshowMessageModal(false);
-          const result = await ShowAlert(
-            "",
-            response.data,
-            "success",
-            null,
-            null,
-            null,
-            null,
-            2000
-          );
-        }
+    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+      if (response.data) {
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
       }
-    );
+    });
   };
 
   const submitOH = async () => {
@@ -238,8 +235,8 @@ const OrderDetailsInChina = () => {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await axios.post(
-          `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
+        await axiosInstance.post(
+          "wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}",
           {
             variation_id: e.variation_id,
             image_url: e.dispatch_image,
@@ -1288,6 +1285,6 @@ const OrderDetailsInChina = () => {
       </Container>
     </>
   );
-}
+};
 
-export default OrderDetailsInChina
+export default OrderDetailsInChina;

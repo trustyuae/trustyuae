@@ -47,11 +47,6 @@ import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
 import axiosInstance from '../../utils/AxiosInstance'
 
-// const token = JSON.parse(localStorage.getItem('token'))
-// const headers = {
-//   Authorization: `Live ${token}`,
-// };
-
 export const PoDetailsData =
   ({ apiUrl }) =>
     async (dispatch) => {
@@ -263,7 +258,7 @@ export const OrderNotAvailableDataPo = (requestData) => async (dispatch) => {
     } else {
       dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REQUEST });
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-so-create/v1/convert-so-order/`,
+        'wp-json/custom-so-create/v1/convert-so-order/',
         requestData
       );
       dispatch({
@@ -282,7 +277,7 @@ export const OrderNotAvailableDataStatus =
     try {
       dispatch({ type: UPDATE_ORDER_NOT_AVAILABLE_STATUS_REQUEST });
       const response = await axiosInstance.post(
-          `${API_URL}wp-json/order-not-update/v1/order-not-btn/`,
+          'wp-json/order-not-update/v1/order-not-btn/',
           requestedDataS
         )
         .then(async (response) => {

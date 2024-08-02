@@ -526,7 +526,7 @@ function OrderManagementSystem() {
 
   const fetchOrders = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}`;
+      let apiUrl = 'wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}';
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       await dispatch(PoDetailsData({ apiUrl })).then((response) => {
@@ -544,7 +544,7 @@ function OrderManagementSystem() {
 
   const manualPO = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
+      let apiUrl = 'wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}';
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
@@ -563,7 +563,7 @@ function OrderManagementSystem() {
 
   const scheduledPO = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
+      let apiUrl = 'wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}';
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 

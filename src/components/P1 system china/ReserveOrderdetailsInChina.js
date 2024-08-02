@@ -16,6 +16,8 @@ import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
+import axiosInstance from '../../utils/AxiosInstance'
+
 
 const ReserveOrderdetailsInChina = () => {
     const params = useParams();
@@ -30,16 +32,11 @@ const ReserveOrderdetailsInChina = () => {
     const [userName, setUserName] = useState(null);
     const [attachmentZoom, setAttachmentZoom] = useState(false);
   
-    // const token = JSON.parse(localStorage.getItem("token"));
-    // const headers = {
-    //   Authorization: `Live ${token}`,
-    // };
-  
     useEffect(() => {
       const fetchUserName = async () => {
         try {
-          const name = await axios.get(
-            `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`
+          const name = await axiosInstance.get(
+           'wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}'
           );
           setUserName(name.data);
         } catch (error) {

@@ -50,6 +50,8 @@ import { DatePicker } from "@mui/x-date-pickers-pro";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import axiosInstance from '../../utils/AxiosInstance'
+import { getUserData } from "../../utils/StorageUtils";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -88,10 +90,6 @@ const PoDetails = () => {
     (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
   );
 
-  // const token = JSON.parse(localStorage.getItem("token"));
-  // const headers = {
-  //   Authorization: `Live ${token}`,
-  // };
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -144,8 +142,8 @@ const PoDetails = () => {
 
   const getMessages = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`
+      const response = await axiosInstance.get(
+        'wp-json/custom-po-note/v1/get-po-notes/${id}'
       );
       setMessages(response.data);
     } catch (error) {
@@ -645,15 +643,15 @@ const PoDetails = () => {
     setAddMessageD(true);
     try {
       // const orderId = parseInt(id, 10);
-      let userID = JSON.parse(localStorage.getItem("user_data"));
+      let userID = getUserData()
       const requestedMessage = {
         po_note: message,
         po_id: id,
         user_id: userID.user_id,
       };
 
-      const response = await axios.post(
-        `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
+      const response = await axiosInstance.post(
+        'wp-json/custom-po-note/v1/add-po-note/',
         requestedMessage
       );
       console.log(response.data);

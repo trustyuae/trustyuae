@@ -13,11 +13,6 @@ import { loginURL, logoutURL } from "../../utils/constants";
 import ShowAlert from "../../utils/ShowAlert";
 import { saveToken, saveUserData } from "../../utils/StorageUtils";
 
-// const token = JSON.parse(localStorage.getItem('token'))
-// const headers = {
-//   Authorization: `Live ${token}`,
-// };
-
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
   try {

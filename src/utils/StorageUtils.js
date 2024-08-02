@@ -17,7 +17,7 @@ export const saveUserData = async (user_data) => {
 
 export const getToken = async () => {
   try {
-    return await localStorage.getItem('token');
+    return await JSON.parse(localStorage.getItem('token'));
   } catch (e) {
     console.error('Failed to fetch the token from storage', e);
     return null;
@@ -26,7 +26,7 @@ export const getToken = async () => {
 
 export const getUserData = async () => {
     try {
-      return await localStorage.getItem('user_data');
+      return await JSON.parse(localStorage.getItem('user_data'));
     } catch (e) {
       console.error('Failed to fetch the user_data from storage', e);
       return null;
