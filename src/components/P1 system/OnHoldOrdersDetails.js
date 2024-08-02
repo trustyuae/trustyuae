@@ -56,6 +56,8 @@ function OnHoldOrdersDetails() {
   const [toggleStatus, setToggleStatus] = useState(0);
 
   const [message, setMessage] = useState("");
+ const [userData, setUserData] = useState(null)
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
@@ -71,8 +73,20 @@ function OnHoldOrdersDetails() {
     (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
 
-  const UserData = getUserData();
-  const userData = UserData || {};
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      console.log(userdata,'userdata from header')
+      setUserData(userdata);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();

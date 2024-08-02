@@ -68,6 +68,9 @@ function OrderDetails() {
   const [selectedItemId, setSelectedItemId] = useState("");
   const [message, setMessage] = useState("");
   const [messageOH, setOHMessage] = useState("");
+
+  const [userData, setUserData] = useState(null);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
@@ -92,9 +95,18 @@ function OrderDetails() {
     (state) => state?.orderSystemData?.isCustomOrder
   );
 
-  const UserData = getUserData();
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
 
-  const userData = UserData || {};
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();

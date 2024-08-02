@@ -55,6 +55,8 @@ const OnHoldOrdersdetailsInChina = () => {
   const [selectedVariationId, setSelecetedVariationId] = useState("");
   const [toggleStatus, setToggleStatus] = useState(0);
 
+  const [userData, setUserData] = useState(null);
+
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -71,9 +73,19 @@ const OnHoldOrdersdetailsInChina = () => {
     (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
 
-  const UserData = getUserData();
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
 
-  const userData = UserData || {};
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();

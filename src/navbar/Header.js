@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/actions/UserActions";
@@ -8,8 +8,8 @@ import { getUserData } from "../utils/StorageUtils";
 const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const [userData, setUserData] = null;
+  
+  const [userData, setUserData] = useState(null);
 
   const handleLogOut = async () => {
     try {
