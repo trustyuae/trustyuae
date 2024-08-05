@@ -66,9 +66,9 @@ function ERManagement() {
     if (selectedDate) apiUrl += `&date=${selectedDate}`;
     await dispatch(GetErManagementData({ apiUrl }))
       .then((response) => {
-        let data = response.data.er_details.map((v, i) => ({ ...v, id: i }));
+        let data = response.payload.er_details.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
-        setTotalPages(response.data.total_pages);
+        setTotalPages(response.payload.total_pages);
       })
       .catch((error) => {
         console.error(error);

@@ -100,9 +100,9 @@ function POManagementSystem() {
         apiUrl: `${apiUrl}&${new URLSearchParams(params).toString()}`
       }));
 
-      const data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
+      const data = response.payload.pre_orders.map((v, i) => ({ ...v, id: i }));
       setOrderList(data);
-      setTotalPages(response.data.total_pages);
+      setTotalPages(response.payload.total_pages);
     } catch (error) {
       console.error("Error Products:", error);
       setOrderList([]);

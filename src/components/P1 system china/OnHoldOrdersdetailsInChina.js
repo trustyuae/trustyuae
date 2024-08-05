@@ -118,11 +118,11 @@ const OnHoldOrdersdetailsInChina = () => {
       // );
       const response = await dispatch(OnHoldOrderDetailsGet(id));
 
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      let data = response.payload.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      setToggleStatus(Number(response.data.orders[0].toggle_status));
-      const order = response.data.orders[0];
+      setOrderDetails(response.payload.orders[0]);
+      setToggleStatus(Number(response.payload.orders[0].toggle_status));
+      const order = response.payload.orders[0];
       if (order) setOrderProcess(order.order_process);
       if (data) {
         data.forEach((order, index) => {
@@ -150,8 +150,8 @@ const OnHoldOrdersdetailsInChina = () => {
       order_id: orderId,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        const result = await ShowAlert("", response.data, "success");
+      if (response.payload) {
+        const result = await ShowAlert("", response.payload, "success");
         if (result.isConfirmed) {
           setMessage("");
           setshowMessageModal(false);

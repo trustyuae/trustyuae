@@ -69,7 +69,7 @@ const ReserveOrderdetailsInChina = () => {
 payload
         .orders.map((v, i) => ({ ...v, id: i }));
         setOrderData(data);
-        setOrderDetails(response.data.orders[0]);
+        setOrderDetails(response.payload.orders[0]);
         if (data) {
           data.forEach((order, index) => {
             const newData = order.items.map((product, index1) => ({

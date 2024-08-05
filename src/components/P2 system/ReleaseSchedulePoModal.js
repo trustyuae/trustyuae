@@ -41,7 +41,7 @@ const ReleaseSchedulePoModal = ({
 
     await dispatch(OrderNotAvailableDataPo(requestData))
       .then(async (response) => {
-        if (response.data.message) {
+        if (response.payload.message) {
           const result = await ShowAlert(
             "Uploaded Successfully!",
             "",

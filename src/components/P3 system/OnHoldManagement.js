@@ -52,7 +52,7 @@ function OnHoldManagement() {
       })
     )
       .then((response) => {
-        let data = response.data;
+        let data = response.payload;
         setProductDetailsData(data);
       })
       .catch((error) => {
@@ -68,7 +68,7 @@ function OnHoldManagement() {
       })
     )
       .then((response) => {
-        let data = response.data.records.map((v, i) => ({
+        let data = response.payload.records.map((v, i) => ({
           ...v,
           id: i,
           isSelected: false,

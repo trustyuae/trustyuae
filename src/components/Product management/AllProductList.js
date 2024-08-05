@@ -58,9 +58,9 @@ function AllProductList() {
     if (searchName) apiUrl += `&product_name=${searchName}`;
     try {
       const response = await dispatch(GetAllProductsList({ apiUrl }));
-      if (response && response.data && response.data.products) {
-        setProducts(response.data.products);
-        setTotalPages(response.data.total_pages);
+      if (response && response.payload && response.payload.products) {
+        setProducts(response.payload.products);
+        setTotalPages(response.payload.total_pages);
       } else {
         console.error("No products found in the response");
       }

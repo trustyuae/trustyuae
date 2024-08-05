@@ -525,12 +525,12 @@ function OrderManagementSystem() {
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       await dispatch(PoDetailsData({ apiUrl })).then((response) => {
-        let data = response.data.pre_orders.map((v, i) => ({
+        let data = response.payload.pre_orders.map((v, i) => ({
           ...v,
           id: i + currentStartIndex,
         }));
         setOrders(data);
-        setTotalPages(response.data.total_pages);
+        setTotalPages(response.payload.total_pages);
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -584,7 +584,7 @@ function OrderManagementSystem() {
     let data;
     await dispatch(ManualOrScheduledPoDetailsData({ apiUrl })).then(
       (response) => {
-        data = response.data.products.map((v, i) => ({
+        data = response.payload.products.map((v, i) => ({
           ...v,
           id: i + currentStartIndex,
         }));
@@ -615,8 +615,8 @@ function OrderManagementSystem() {
           });
         }
 
-        if (response.data.products) {
-          setTotalPages(response.data.total_pages);
+        if (response.payload.products) {
+          setTotalPages(response.payload.total_pages);
           return data;
         }
       }

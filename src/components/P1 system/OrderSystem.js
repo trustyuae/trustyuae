@@ -64,14 +64,14 @@ function OrderSystem() {
     )
       .then((response) => {
         console.log(response,'response of order fullfillment')
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+        let data = response.payload.orders.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
         setOverAllData({
-          total_count: response.data.total_count,
-          total_dispatch_orders: response.data.total_dispatch_orders,
-          total_reserve_orders: response.data.total_reserve_orders,
+          total_count: response.payload.total_count,
+          total_dispatch_orders: response.payload.total_dispatch_orders,
+          total_reserve_orders: response.payload.total_reserve_orders,
         });
-        setTotalPages(response.data.total_pages);
+        setTotalPages(response.payload.total_pages);
       })
       .catch((error) => {
         console.error(error);
@@ -100,7 +100,7 @@ function OrderSystem() {
   const handlePrint = async (orderId) => {
     try {
       const response = await dispatch(OrderDetailsGet({ id: orderId }));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      let data = response.payload.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setShowModal(true);
     } catch (error) {

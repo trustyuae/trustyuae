@@ -82,7 +82,7 @@ function OnHoldManegementSystem() {
     let url = 'wp-json/custom-api-product/v1/get-product/?';
     const response = await axiosInstance.get(url);
     setoptionsArray(
-      response.data.products.map((user) => ({
+      response.payload.products.map((user) => ({
         label: user.product_name,
         value: user.product_id,
       }))
@@ -505,7 +505,7 @@ function OnHoldManegementSystem() {
       if (productIDF) {
         setSelectedOption(null);
         const response = await dispatch(GetProductManual({ apiUrl }));
-        const data = response.data.products.map((v, i) => ({ ...v, id: i }));
+        const data = response.payload.products.map((v, i) => ({ ...v, id: i }));
         const modifiedData = data.map((item) => ({
           ...item,
           variationColor: item.variation_values.length === 0 ? "" : "",
@@ -515,10 +515,10 @@ function OnHoldManegementSystem() {
         inputRef.current.value = "";
       } else if (productNameF && productIDF) {
         const response = await dispatch(GetProductManual({ apiUrl }));
-        if (response.data.products) {
+        if (response.payload.products) {
           setSelectedOption(null);
         }
-        const data = response.data.products.map((v, i) => ({ ...v, id: i }));
+        const data = response.payload.products.map((v, i) => ({ ...v, id: i }));
         const modifiedData = data.map((item) => ({
           ...item,
           variationColor: item.variation_values.length === 0 ? "" : "",
@@ -699,7 +699,7 @@ function OnHoldManegementSystem() {
       const response = await axiosInstance.get(
         'wp-json/get-po-ids/v1/show-po-id/${selectedFactory}'
       );
-      let data = response.data;
+      let data = response.payload;
       setAllPoIds(data);
     } catch (error) {
       console.error(error);
@@ -713,14 +713,14 @@ function OnHoldManegementSystem() {
       );
 
       // Ensure each row has a unique 'id'
-      const data = response.data.line_items.map((item, i) => ({
+      const data = response.payload.line_items.map((item, i) => ({
         ...item,
         id: i + currentStartIndex, // or use another unique property
       }));
 
       setPoTableData(data);
-      setTotalPages(response.data.total_pages);
-      setPoId(response.data.po_id);
+      setTotalPages(response.payload.total_pages);
+      setPoId(response.payload.po_id);
     } catch (error) {
       console.error("Error fetching PO product data:", error);
     }

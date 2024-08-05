@@ -111,9 +111,9 @@ function GRNManagement() {
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       await dispatch(GetGRNList({ apiUrl })).then((response) => {
-        let data = response.data.data.map((v, i) => ({ ...v, id: i }));
+        let data = response.payload.data.map((v, i) => ({ ...v, id: i }));
         setGrnList(data);
-        setTotalPages(response.data.total_pages);
+        setTotalPages(response.payload.total_pages);
       });
     } catch (error) {
       console.error(error);

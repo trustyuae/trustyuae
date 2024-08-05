@@ -124,10 +124,10 @@ const OrderDetailsInChina = () => {
   async function fetchOrder() {
     try {
       const response = await dispatch(OrderDetailsGet({ id: id }));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      let data = response.payload.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      const order = response.data.orders[0];
+      setOrderDetails(response.payload.orders[0]);
+      const order = response.payload.orders[0];
       if (order) setOrderProcess(order.order_process);
       if (data) {
         data.forEach((order, index) => {
@@ -156,12 +156,12 @@ const OrderDetailsInChina = () => {
       name: userID.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
+      if (response.payload) {
         setMessage("");
         setshowMessageModal(false);
         const result = await ShowAlert(
           "",
-          response.data,
+          response.payload,
           "success",
           null,
           null,
@@ -330,16 +330,16 @@ const OrderDetailsInChina = () => {
     try {
       const { user_id } = userData ?? {};
       const response = await dispatch(CustomOrderFinishOH(user_id, id, navigate));
-      if (response.data.status_code === 200) {
+      if (response.payload.status_code === 200) {
         await Swal.fire({
-          title: response.data.message,
+          title: response.payload.message,
           icon: "success",
           showConfirmButton: true,
         });
         navigate("/ordersystem");
       } else {
         Swal.fire({
-          title: response.data.message,
+          title: response.payload.message,
           icon: "error",
           showConfirmButton: true,
         });

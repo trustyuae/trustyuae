@@ -266,9 +266,9 @@ function ExchangeAndReturn() {
           },
         }
       );
-      setAllPoTypes(response.data);
-      // selectPO(response.data[0])
-      if (response.data.length === 0) {
+      setAllPoTypes(response.payload);
+      // selectPO(response.payload[0])
+      if (response.payload.length === 0) {
         setOrders([]);
       }
     } catch (error) {
@@ -283,8 +283,8 @@ function ExchangeAndReturn() {
         'wp-json/custom-er-po/v1/fetch-orders-po/${id}'
       );
       let data2 = [
-        ...response.data.items_with_variations,
-        ...response.data.items_without_variations,
+        ...response.payload.items_with_variations,
+        ...response.payload.items_without_variations,
       ];
       let data = data2.map((v, i) => ({ ...v, id: i }));
       setOrders(data);
@@ -314,9 +314,9 @@ function ExchangeAndReturn() {
         payload
       );
 
-      if (response.data.message) {
+      if (response.payload.message) {
         const result = await ShowAlert(
-          `${response.data.message} ${response.data.er_no}`,
+          `${response.payload.message} ${response.payload.er_no}`,
           "",
           "success",
           true,

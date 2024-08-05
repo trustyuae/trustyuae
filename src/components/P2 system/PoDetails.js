@@ -118,7 +118,7 @@ const PoDetails = () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
-        let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
+        let data = response.payload.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
         const row = [
           ...data,
@@ -131,10 +131,10 @@ const PoDetails = () => {
           },
         ];
         setPO_OrderList(row);
-        setERId(response.data.er_no);
-        setFactorieName(response.data.factory_id);
-        setPoStatus(response.data.po_status);
-        setPaymentStatus(response.data.payment_status);
+        setERId(response.payload.er_no);
+        setFactorieName(response.payload.factory_id);
+        setPoStatus(response.payload.po_status);
+        setPaymentStatus(response.payload.payment_status);
         setTotalPages(response?.data?.total_pages);
       });
     } catch {
@@ -147,7 +147,7 @@ const PoDetails = () => {
       const response = await axiosInstance.get(
         'wp-json/custom-po-note/v1/get-po-notes/${id}'
       );
-      setMessages(response.data);
+      setMessages(response.payload);
     } catch (error) {
       console.log(error);
     }
@@ -656,7 +656,7 @@ const PoDetails = () => {
         'wp-json/custom-po-note/v1/add-po-note/',
         requestedMessage
       );
-      console.log(response.data);
+      console.log(response.payload);
 
       setshowMessageModal(false);
       setMessage("");

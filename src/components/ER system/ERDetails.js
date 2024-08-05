@@ -72,10 +72,10 @@ const ERDetails = () => {
     try {
       let apiUrl = 'wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/';
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
-        setStatus(response.data.er_status);
-        setFactoryName(response.data.factory_id);
-        let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
-        setNote(response.data.er_note);
+        setStatus(response.payload.er_status);
+        setFactoryName(response.payload.factory_id);
+        let data = response.payload.line_items.map((v, i) => ({ ...v, id: i }));
+        setNote(response.payload.er_note);
         data = data.map((d) => {
           if (d.returned_qty == d.received_qty) {
             return {
@@ -324,9 +324,9 @@ const ERDetails = () => {
         `wp-json/custom-er-update/v1/update-er-item/`,
         payload
       );
-      if (response.data.message) {
+      if (response.payload.message) {
         const result = await ShowAlert(
-          response.data.message,
+          response.payload.message,
           "",
           "success",
           true,

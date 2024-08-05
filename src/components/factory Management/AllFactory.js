@@ -49,11 +49,12 @@ function AllFactory() {
       // };
 
       const response = await axiosInstance.get(apiUrl, { params});
+      console.log(response,'res to fetch all factories')
       const factoryData = response.data.factories.map((item) => ({ ...item }));
       setFactories(factoryData);
       setTotalPages(response.data.total_pages);
       setLoading(false); // Stop loading
-      return response.data;
+      return response.payload;
     } catch (error) {
       setLoading(false); // Stop loading
       throw error;

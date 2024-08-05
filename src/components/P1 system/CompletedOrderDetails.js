@@ -57,9 +57,9 @@ function CompletedOrderDetails() {
   async function fetchOrder() {
     try {
       const response = await dispatch(CompletedOrderDetailsGet(params.id));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      let data = response.payload.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
+      setOrderDetails(response.payload.orders[0]);
       if (data) {
         data.forEach((order, index) => {
           const newData = order.items.map((product, index1) => ({
