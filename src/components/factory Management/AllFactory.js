@@ -4,7 +4,7 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { useDispatch } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
-import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
+// import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
@@ -13,6 +13,7 @@ import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
 import Loader from "../../utils/Loader";
 import axiosInstance from '../../utils/AxiosInstance'
+import { factoryEdit } from "../../Redux2/slices/FactoriesSlice";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -95,7 +96,7 @@ function AllFactory() {
       bank_account_details: selectedFactory.bank_account_details,
     };
     try {
-      await dispatch(FactoryEdit(selectedFactory, data));
+      await dispatch(factoryEdit(selectedFactory, data));
       setFactories((prevFactories) => {
         return prevFactories.map((factory) => {
           if (factory.id === selectedFactory.id) {

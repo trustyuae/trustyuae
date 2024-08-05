@@ -15,15 +15,16 @@ import { Badge, Card, Col, Modal, Row } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import { API_URL } from "../../redux/constants/Constants";
-import {
-  AddProductOrderForPre,
-  AddProductOrderForStock,
-  GetProductDetails,
-  GetProductOrderDetails,
-} from "../../redux/actions/P3SystemActions";
+// import {
+//   AddProductOrderForPre,
+//   AddProductOrderForStock,
+//   GetProductDetails,
+//   GetProductOrderDetails,
+// } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
 import ShowAlert from "../../utils/ShowAlert";
 import ShowAlert2 from "../../utils/ShowAlert2";
+import { AddProductOrderForPre, AddProductOrderForStock, GetProductDetails, GetProductOrderDetails } from "../../Redux2/slices/P3SystemSlice";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -36,11 +37,11 @@ function OnHoldManagement() {
   const [productDetailsData, setProductDetailsData] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
   const loader = useSelector(
-    (state) => state?.managementSystem?.isProductOrderDetails
+    (state) => state?.p3System?.isLoading
   );
 
   const loader2 = useSelector(
-    (state) => state?.managementSystem?.isProductDetails
+    (state) => state?.p3System?.isLoading
   );
 
   async function fetchProductDetails() {

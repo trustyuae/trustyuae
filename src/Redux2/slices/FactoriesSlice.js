@@ -105,33 +105,33 @@ const factorySlice = createSlice({
       })
       .addCase(fetchAllFactories.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.factory = action.payload;
+        state.factory = action.data;
       })
       .addCase(fetchAllFactories.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(factoryEdit.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(factoryEdit.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editFactory = action.payload;
+        state.editFactory = action.data;
       })
       .addCase(factoryEdit.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(FactoryAdd.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(FactoryAdd.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(FactoryAdd.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       });
   },
 });

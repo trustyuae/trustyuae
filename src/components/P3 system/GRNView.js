@@ -10,15 +10,16 @@ import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { GetGRNView } from "../../redux/actions/P3SystemActions";
+// import { GetGRNView } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
+import { GetGRNView } from "../../Redux2/slices/P3SystemSlice";
 
 const GRNView = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
-  const loader = useSelector((state) => state?.managementSystem?.isGrnView);
+  const loader = useSelector((state) => state?.p3System?.isLoading);
 
   const fetchOrder = async () => {
     let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}`;

@@ -14,10 +14,11 @@ import DataTable from "../DataTable";
 import { API_URL } from "../../redux/constants/Constants";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { GetGRNList } from "../../redux/actions/P3SystemActions";
+// import { GetGRNList } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { GetGRNList } from "../../Redux2/slices/P3SystemSlice";
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ function GRNManagement() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [grnList, setGrnList] = useState([]);
-  const loader = useSelector((state) => state?.managementSystem?.isGrnList);
+  const loader = useSelector((state) => state?.p3System?.isLoading);
 
   const handleStatusChange = (e) => {
     setStatusFilter(e.target.value);

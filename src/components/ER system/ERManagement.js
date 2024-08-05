@@ -19,6 +19,7 @@ import { DatePicker } from "@mui/x-date-pickers-pro";
 import { GetErManagementData } from "../../redux/actions/ErManagementActions";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 function ERManagement() {
   const dispatch = useDispatch();
@@ -36,10 +37,10 @@ function ERManagement() {
   const [lang, setLang] = useState("En");
 
   const loader = useSelector(
-    (state) => state?.exchange_And_return_Data?.isErmanagementData
+    (state) => state?.erManagement?.isLoading
   );
   const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+    (state) => state?.factory?.isLoading
   );
 
   const radios = [
@@ -48,7 +49,7 @@ function ERManagement() {
   ];
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

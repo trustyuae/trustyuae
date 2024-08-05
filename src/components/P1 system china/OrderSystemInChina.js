@@ -16,10 +16,6 @@ import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  OrderDetailsGet,
-  OrderSystemGet,
-} from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
@@ -27,6 +23,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import OrderDetails from "./OrderDetailsInChina";
 import PrintModal from "./PrintModalInChina";
+import { CompletedOrderSystemGet, OnHoldOrderDetailsGet, OrderDetailsGet, OrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
 
 const OrderSystemInChina = () => {
     const inputRef = useRef(null);
@@ -48,7 +45,7 @@ const OrderSystemInChina = () => {
     });
     const [orderData, setOrderData] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const loader = useSelector((state) => state?.orderSystemData?.isOrders);
+    const loader = useSelector((state) => state?.orderSystem?.isLoading);
   
     const dispatch = useDispatch();
   
@@ -57,7 +54,7 @@ const OrderSystemInChina = () => {
       if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       await dispatch(
-        OrderSystemGet({
+        CompletedOrderSystemGet({
           apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
         })
       )
@@ -97,7 +94,7 @@ const OrderSystemInChina = () => {
   
     const handlePrint = async (orderId) => {
       try {
-        const response = await dispatch(OrderDetailsGet({ id: orderId }));
+        const response = await dispatch(OnHoldOrderDetailsGet({ id: orderId }));
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
         setOrderData(data);
         setShowModal(true);

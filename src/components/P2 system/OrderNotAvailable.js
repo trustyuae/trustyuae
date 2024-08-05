@@ -21,10 +21,12 @@ import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import ShowAlert from "../../utils/ShowAlert";
 import Form from "react-bootstrap/Form";
-import {
-  OrderNotAvailableData,
-  OrderNotAvailableDataStatus,
-} from "../../redux/actions/P2SystemActions";
+// import {
+//   OrderNotAvailableData,
+//   OrderNotAvailableDataStatus,
+// } from "../../redux/actions/P2SystemActions";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { OrderNotAvailableData, OrderNotAvailableDataStatus } from "../../Redux2/slices/P2SystemSlice";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -45,15 +47,15 @@ function OrderNotAvailable() {
   const [showEditModal, setShowEditModal] = useState(false);
 
   const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+    (state) => state?.factory?.isLoading
   );
 
   const orderNotAvailableLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isOrdersNotAvailable
+    (state) => state?.p2System?.isLoading
   );
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

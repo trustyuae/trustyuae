@@ -14,7 +14,7 @@ import {
 import DataTable from "../DataTable";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { AddGrn, GetProductManual } from "../../redux/actions/P3SystemActions";
+// import { AddGrn, GetProductManual } from "../../redux/actions/P3SystemActions";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CompressImage } from "../../utils/CompressImage";
@@ -25,6 +25,8 @@ import Select from "react-select";
 import Swal from "sweetalert2";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import { getUserData } from "../../utils/StorageUtils";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { AddGrn, GetProductManual } from "../../Redux2/slices/P3SystemSlice";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -69,11 +71,11 @@ function OnHoldManegementSystem() {
 
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+    (state) => state?.factory?.isLoading
   );
 
   const getall = async () => {

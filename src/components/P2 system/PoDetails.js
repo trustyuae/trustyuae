@@ -34,10 +34,10 @@ import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  PerticularPoDetails,
-  UpdatePODetails,
-} from "../../redux/actions/P2SystemActions";
+// import {
+//   PerticularPoDetails,
+//   UpdatePODetails,
+// } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import PoDetailsModalInView from "./PoDetailsModalInView";
@@ -52,6 +52,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import axiosInstance from '../../utils/AxiosInstance'
 import { getUserData } from "../../utils/StorageUtils";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { PerticularPoDetails, UpdatePODetails } from "../../Redux2/slices/P2SystemSlice";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -79,20 +81,20 @@ const PoDetails = () => {
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+    (state) => state?.factory?.isLoading
   );
 
   const PoUpdate = useSelector(
-    (state) => state?.orderNotAvailable?.isUpdatedPoDetails
+    (state) => state?.p2System?.isLoading
   );
 
   const perticularOrderDetailsLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
+    (state) => state?.p2System?.isLoading
   );
 
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

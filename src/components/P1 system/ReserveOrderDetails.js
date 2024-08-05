@@ -8,15 +8,16 @@ import { Avatar, Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  CompletedOrderDetailsGet,
-  ReserveOrderDetailsGet,
-} from "../../redux/actions/OrderSystemActions";
+// import {
+//   CompletedOrderDetailsGet,
+//   ReserveOrderDetailsGet,
+// } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import axiosInstance from '../../utils/AxiosInstance'
+import { ReserveOrderDetailsGet } from "../../Redux2/slices/OrderSystemSlice";
 function ReserveOrderDetails() {
   const params = useParams();
   const [orderData, setOrderData] = useState([]);
@@ -49,10 +50,10 @@ function ReserveOrderDetails() {
   }, [orderDetails]);
 
   const loader = useSelector(
-    (state) => state?.orderSystemData?.isCompletedOrderDetails
+    (state) => state?.orderSystem?.isLoading
   );
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.completedOrderDetails?.orders?.[0]
   );
 
   async function fetchOrder() {

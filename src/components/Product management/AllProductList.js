@@ -11,13 +11,15 @@ import { Alert, Avatar, Box, Typography } from "@mui/material";
 import { CompressImage } from "../../utils/CompressImage";
 import EditIcon from "@mui/icons-material/Edit";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  EditProductsList,
-  GetAllProductsList,
-} from "../../redux/actions/ProductManagementActions";
+// import {
+//   EditProductsList,
+//   GetAllProductsList,
+// } from "../../redux/actions/ProductManagementActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import defaultImage from "../../assets/default.png";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { EditProductsList, GetAllProductsList } from "../../Redux2/slices/ProductManagementSlice";
 
 function AllProductList() {
   const inputRef = useRef(null);
@@ -37,10 +39,10 @@ function AllProductList() {
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
   );
-  const loader = useSelector((state) => state?.allProducts?.isAllProducts);
+  const loader = useSelector((state) => state?.productManagement?.isLoading);
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

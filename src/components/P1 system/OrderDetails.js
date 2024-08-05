@@ -75,7 +75,7 @@ function OrderDetails() {
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
-  const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
   }
@@ -84,15 +84,15 @@ function OrderDetails() {
   ] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.orderDetails?.orders?.[0]
   );
 
   const AddInOnHold = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrderOnHold
+    (state) => state?.orderSystem?.isLoading
   );
 
   const Finished = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrder
+    (state) => state?.orderSystem?.isLoading
   );
 
   async function fetchUserData() {

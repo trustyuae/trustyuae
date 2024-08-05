@@ -68,22 +68,22 @@ const ProductManagementSlice = createSlice({
       })
       .addCase(GetAllProductsList.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.factory = action.payload;
+        state.factory = action.data;
       })
       .addCase(GetAllProductsList.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(EditProductsList.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(EditProductsList.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editFactory = action.payload;
+        state.editFactory = action.data;
       })
       .addCase(EditProductsList.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       });
   },
 });

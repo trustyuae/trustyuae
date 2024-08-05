@@ -15,11 +15,12 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
+// import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
 
 function ReserveOrderSystem() {
   const inputRef = useRef(null);
@@ -40,12 +41,12 @@ function ReserveOrderSystem() {
     null,
     null,
   ]);
-  const loader = useSelector((state) => state?.orderSystemData?.isCompletedOrders);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = 'wp-json/custom-reserved-orders/v1/reserved-orders/?&page=${page}&per_page=${pageSize}';
+    let apiUrl = `wp-json/custom-reserved-orders/v1/reserved-orders/?&page=${page}&per_page=${pageSize}`;
     if (searchOrderID)
       apiUrl += `&orderid=${searchOrderID}`;
     if (endDate)

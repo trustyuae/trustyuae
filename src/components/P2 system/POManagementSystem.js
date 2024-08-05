@@ -20,14 +20,16 @@ import DataTable from "../DataTable";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useDispatch, useSelector } from "react-redux";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import { PomSystemProductsDetails } from "../../redux/actions/P2SystemActions";
+// import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+// import { PomSystemProductsDetails } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
 import CancelIcon from "@mui/icons-material/Cancel";
 import axiosInstance from '../../utils/AxiosInstance'
+import { PomSystemProductsDetails } from "../../Redux2/slices/P2SystemSlice";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 function POManagementSystem() {
   const inputRef = useRef(null);
@@ -55,14 +57,14 @@ function POManagementSystem() {
   const [totalPages, setTotalPages] = useState(1);
   const [lang, setLang] = useState("En");
 
-  const allFactoryDatas = useSelector((state) => state?.allFactoryData?.factory);
+  const allFactoryDatas = useSelector((state) => state?.factory?.isLoading);
 
   const pomSystemProductDetailsLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isPomSystemProductDetails
+    (state) => state?.p2System?.isLoading
   );
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

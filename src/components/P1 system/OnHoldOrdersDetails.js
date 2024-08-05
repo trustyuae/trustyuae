@@ -13,17 +13,17 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  AttachmentFileUpload,
-  CustomOrderFinish,
-  CustomOrderFinishOH,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
-  OnHoldOrderDetailsGet,
-  OrderDetailsGet,
-  OverAllAttachmentFileUpload,
-} from "../../redux/actions/OrderSystemActions";
+// import {
+//   AddMessage,
+//   AttachmentFileUpload,
+//   CustomOrderFinish,
+//   CustomOrderFinishOH,
+//   InsertOrderPickup,
+//   InsertOrderPickupCancel,
+//   OnHoldOrderDetailsGet,
+//   OrderDetailsGet,
+//   OverAllAttachmentFileUpload,
+// } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -35,6 +35,7 @@ import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import { getUserData } from "../../utils/StorageUtils";
 import axiosInstance from "../../utils/AxiosInstance";
+import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
 function OnHoldOrdersDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
@@ -70,7 +71,7 @@ function OnHoldOrdersDetails() {
   fileInputRef.current[selectedItemId] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.onHoldOrderDetails?.orders?.[0]
   );
 
   async function fetchUserData() {

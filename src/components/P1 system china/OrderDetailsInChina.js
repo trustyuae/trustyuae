@@ -24,16 +24,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  AttachmentFileUpload,
-  CustomOrderFinish,
-  CustomOrderOH,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
-  OrderDetailsGet,
-  OverAllAttachmentFileUpload,
-} from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -46,6 +36,7 @@ import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axiosInstance from "../../utils/AxiosInstance";
 import { getUserData } from "../../utils/StorageUtils";
+import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, CustomOrderOH, InsertOrderPickup, InsertOrderPickupCancel, OrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
 
 const OrderDetailsInChina = () => {
   const { id } = useParams();
@@ -75,7 +66,7 @@ const OrderDetailsInChina = () => {
 
   const [userData, setUserData] = useState(null);
 
-  const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
   }
@@ -84,15 +75,15 @@ const OrderDetailsInChina = () => {
   ] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.orderDetails?.orders?.[0]
   );
 
   const AddInOnHold = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrderOnHold
+    (state) => state?.orderSystem?.isLoading
   );
 
   const Finished = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrder
+    (state) => state?.orderSystem?.isLoading
   );
 
   async function fetchUserData() {
@@ -338,7 +329,7 @@ const OrderDetailsInChina = () => {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
+      const response = await dispatch(CustomOrderFinishOH(user_id, id, navigate));
       if (response.data.status_code === 200) {
         await Swal.fire({
           title: response.data.message,

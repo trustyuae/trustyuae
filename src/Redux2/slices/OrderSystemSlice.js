@@ -305,154 +305,154 @@ const orderSystemSlice = createSlice({
       })
       .addCase(OrderSystemGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders = action.payload;
+        state.orders = action.data;
       })
       .addCase(OrderSystemGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(OrderDetailsGet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderDetails = action.payload;
+        state.orderDetails = action.data;
       })
       .addCase(OrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(CompletedOrderSystemGet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CompletedOrderSystemGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.completedOrders = action.payload;
+        state.completedOrders = action.data;
       })
       .addCase(CompletedOrderSystemGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(CompletedOrderDetailsGet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CompletedOrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.completedOrderDetails = action.payload;
+        state.completedOrderDetails = action.data;
       })
       .addCase(CompletedOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(OnHoldOrderDetailsGet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OnHoldOrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.onHoldOrderDetails = action.payload;
+        state.onHoldOrderDetails = action.data;
       })
       .addCase(OnHoldOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(ReserveOrderDetailsGet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(ReserveOrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.reserveOrderDetails = action.payload;
+        state.reserveOrderDetails = action.data;
       })
       .addCase(ReserveOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(AttachmentFileUpload.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AttachmentFileUpload.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.uploadAttachFile = action.payload;
+        state.uploadAttachFile = action.data;
       })
       .addCase(AttachmentFileUpload.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(OverAllAttachmentFileUpload.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OverAllAttachmentFileUpload.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.uploadOverAllAttachFile = action.payload;
+        state.uploadOverAllAttachFile = action.data;
       })
       .addCase(OverAllAttachmentFileUpload.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(AddMessage.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddMessage.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Message = action.payload;
+        state.Message = action.data;
       })
       .addCase(AddMessage.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(InsertOrderPickup.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(InsertOrderPickup.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderPickUp = action.payload;
+        state.orderPickUp = action.data;
       })
       .addCase(InsertOrderPickup.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(InsertOrderPickupCancel.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(InsertOrderPickupCancel.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderPickUpCancel = action.payload;
+        state.orderPickUpCancel = action.data;
       })
       .addCase(InsertOrderPickupCancel.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(CustomOrderFinish.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CustomOrderFinish.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.customOrderData = action.payload;
+        state.customOrderData = action.data;
       })
       .addCase(CustomOrderFinish.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(CustomOrderOH.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CustomOrderOH.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.customOrderOnHoldData = action.payload;
+        state.customOrderOnHoldData = action.data;
       })
       .addCase(CustomOrderOH.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(CustomOrderFinishOH.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CustomOrderFinishOH.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.customOrderOnHoldFinishData = action.payload;
+        state.customOrderOnHoldFinishData = action.data;
       })
       .addCase(CustomOrderFinishOH.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
   },
 });

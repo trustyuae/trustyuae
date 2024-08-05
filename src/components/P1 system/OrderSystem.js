@@ -27,6 +27,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import OrderDetails from "./OrderDetails";
 import PrintModal from "./PrintModal";
+import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
 
 function OrderSystem() {
   const inputRef = useRef(null);
@@ -48,7 +49,7 @@ function OrderSystem() {
   });
   const [orderData, setOrderData] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const loader = useSelector((state) => state?.orderSystemData?.isOrders);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
   const dispatch = useDispatch();
 
@@ -57,11 +58,12 @@ function OrderSystem() {
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     await dispatch(
-      OrderSystemGet({
+      CompletedOrderSystemGet({
         apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
       })
     )
       .then((response) => {
+        console.log(response,'response of order fullfillment')
         let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
         setOverAllData({

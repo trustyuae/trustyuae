@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Alert, Button, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { QuantityPoDetailsForModalInView } from "../../redux/actions/P2SystemActions";
+// import { QuantityPoDetailsForModalInView } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
+import { QuantityPoDetailsForModalInView } from "../../Redux2/slices/P2SystemSlice";
 
 const   PoDetailsModalInView = ({
   show,
@@ -15,7 +16,7 @@ const   PoDetailsModalInView = ({
   const dispatch = useDispatch();
   const [productData, setProductData] = useState([]);
   const loader = useSelector(
-    (state) => state?.orderNotAvailable?.isQuantityDetailsDataOnPoDetails
+    (state) => state?.p2System?.isLoading
   );
 
   useEffect(() => {

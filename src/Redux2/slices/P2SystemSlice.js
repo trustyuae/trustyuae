@@ -268,143 +268,143 @@ const P2SystemSlice = createSlice({
       })
       .addCase(PoDetailsData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.factory = action.payload;
+        state.factory = action.data;
       })
       .addCase(PoDetailsData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(ManualOrScheduledPoDetailsData.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(ManualOrScheduledPoDetailsData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editFactory = action.payload;
+        state.editFactory = action.data;
       })
       .addCase(ManualOrScheduledPoDetailsData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(PerticularPoDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(PerticularPoDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(PerticularPoDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(QuantityPoDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(QuantityPoDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(QuantityPoDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(QuantityPoDetailsForModalInView.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(QuantityPoDetailsForModalInView.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(QuantityPoDetailsForModalInView.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(AddPO.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddPO.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(AddPO.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(AddManualPO.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddManualPO.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(AddManualPO.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(AddSchedulePO.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddSchedulePO.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(AddSchedulePO.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(UpdatePODetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(UpdatePODetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(UpdatePODetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(PomSystemProductsDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(PomSystemProductsDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(PomSystemProductsDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(OrderNotAvailableData.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderNotAvailableData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(OrderNotAvailableData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(OrderNotAvailableDataPo.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderNotAvailableDataPo.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(OrderNotAvailableDataPo.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
       .addCase(OrderNotAvailableDataStatus.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderNotAvailableDataStatus.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.payload;
+        state.addFactory = action.data;
       })
       .addCase(OrderNotAvailableDataStatus.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       });
   },
 });

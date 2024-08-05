@@ -21,11 +21,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+// import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
 import axiosInstance from '../../utils/AxiosInstance';
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 const ERDetails = () => {
   const params = useParams();
@@ -44,10 +45,10 @@ const ERDetails = () => {
 
 
   const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+    (state) => state?.factory?.isLoading
   );
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

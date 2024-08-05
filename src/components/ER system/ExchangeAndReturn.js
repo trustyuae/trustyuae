@@ -27,6 +27,7 @@ import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
 import axiosInstance from '../../utils/AxiosInstance'
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 function ExchangeAndReturn() {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ function ExchangeAndReturn() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [lang, setLang] = useState("En");
 
-  const loader = useSelector((state) => state?.orderSystemData?.isOrders);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
   const dispatch = useDispatch();
 
   const handlePageSizeChange = (e) => {
@@ -240,11 +241,11 @@ function ExchangeAndReturn() {
     setSelectedFactory(e.target.value);
   };
   const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+    (state) => state?.factory?.isLoading
   );
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

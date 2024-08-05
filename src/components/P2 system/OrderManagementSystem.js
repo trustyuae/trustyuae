@@ -26,19 +26,14 @@ import {
 import { API_URL } from "../../redux/constants/Constants";
 import { Card, Tab, Tabs } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddManualPO,
-  AddPO,
-  AddSchedulePO,
-  ManualOrScheduledPoDetailsData,
-  PoDetailsData,
-} from "../../redux/actions/P2SystemActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import PoDetailsModal from "./PoDetailsModal";
 import ShowAlert from "../../utils/ShowAlert";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { AddManualPO, AddPO, AddSchedulePO, ManualOrScheduledPoDetailsData, PoDetailsData } from "../../Redux2/slices/P2SystemSlice";
 
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
@@ -91,15 +86,15 @@ function OrderManagementSystem() {
   const [isDisabled, setIsDisabled] = useState(false)
 
   const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+    (state) => state?.factory?.isLoading
   );
 
   const poLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isPoDetailsData
+    (state) => state?.p2System?.isLoading
   );
 
   const manualOrScheduledPoLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isManualOrScheduledPoDetailsData
+    (state) => state?.p2System?.isLoading
   );
 
   function handleAttributeChange(event, rowIndex, attributeName) {
@@ -514,7 +509,7 @@ function OrderManagementSystem() {
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {

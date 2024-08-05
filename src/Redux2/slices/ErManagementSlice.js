@@ -45,11 +45,11 @@ const erManagementSlice = createSlice({
       })
       .addCase(GetErManagementData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.erManagementData = action.payload;
+        state.erManagementData = action.data;
       })
       .addCase(GetErManagementData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.data;
       })
   },
 });
