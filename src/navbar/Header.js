@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../redux/actions/UserActions";
+// import { logoutUser } from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
-import { getUserData } from "../utils/StorageUtils";
+import { getUserData, removeToken } from "../utils/StorageUtils";
+import { logoutUser } from "../Redux2/slices/UserSlice";
 
 const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const [userData, setUserData] = useState(null);
 
   const handleLogOut = async () => {
     try {
-      dispatch(logoutUser(navigate));
+      const actionResult = await dispatch(logoutUser());
+      if (logoutUser.fulfilled.match(actionResult)) {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Logout error:", error);
     }

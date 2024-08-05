@@ -9,7 +9,7 @@ const initialState = {
 };
 
 export const GetErManagementData = createAsyncThunk(
-  "ErManagement/getErManagementData",
+  "ErManagement/GetErManagementData",
   async ({apiUrl}, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -32,10 +32,10 @@ const erManagementSlice = createSlice({
       state.SyncLoading = false;
     },
     clearstoredata: (state) => {
-      (state.isLoading = false),
-        (state.SyncLoading = false),
-        (state.erManagementData = []),
-        (state.error = null);
+      state.isLoading = false;
+      state.SyncLoading = false;
+      state.erManagementData = [];
+      state.error = null;
     },
   },
   extraReducers: (builder) => {

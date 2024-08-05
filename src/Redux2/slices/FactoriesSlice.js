@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/AxiosInstance";
+import ShowAlert from "../../utils/ShowAlert";
 
 const initialState = {
   isLoading: false,
@@ -11,7 +12,7 @@ const initialState = {
 };
 
 export const fetchAllFactories = createAsyncThunk(
-  "factory/getAllFactories",
+  "factory/fetchAllFactories",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -26,6 +27,7 @@ export const fetchAllFactories = createAsyncThunk(
 );
 
 export const factoryEdit = createAsyncThunk(
+  "factory/factoryEdit",
   async ({ factoryId, data }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -46,7 +48,7 @@ export const factoryEdit = createAsyncThunk(
 );
 
 export const FactoryAdd = createAsyncThunk(
-  "factory/addFactory",
+  "factory/FactoryAdd",
   async (factData, navigate, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -88,13 +90,13 @@ const factorySlice = createSlice({
       state.SyncLoading = false;
     },
     clearstoredata: (state) => {
-      (state.isLoading = false),
-        (state.SyncLoading = false),
-        (state.factory = []),
-        (state.editFactory = []),
-        (state.addFactory = []),
-        (state.error = null);
-    },
+      state.isLoading = false;
+      state.SyncLoading = false;
+      state.factory = [];
+      state.editFactory = [];
+      state.addFactory = [];
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/AxiosInstance";
+import Swal from "sweetalert2";
 
 const initialState = {
   isLoading: false,
@@ -24,7 +25,7 @@ const initialState = {
 };
 
 export const OrderSystemGet = createAsyncThunk(
-  "orderSystem/getOrders",
+  "orderSystem/OrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -37,7 +38,7 @@ export const OrderSystemGet = createAsyncThunk(
 );
 
 export const OrderDetailsGet = createAsyncThunk(
-    "orderSystem/getOrderDetails",
+    "orderSystem/OrderDetailsGet",
     async ({ id }, { rejectWithValue }) => {
       try {
         const response = await axiosInstance.get(
@@ -52,7 +53,7 @@ export const OrderDetailsGet = createAsyncThunk(
   );
 
 export const CompletedOrderSystemGet = createAsyncThunk(
-  "orderSystem/getCompletedOrders",
+  "orderSystem/CompletedOrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -65,7 +66,7 @@ export const CompletedOrderSystemGet = createAsyncThunk(
 );
 
 export const CompletedOrderDetailsGet = createAsyncThunk(
-  "orderSystem/getCompletedOrders",
+  "orderSystem/CompletedOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -80,7 +81,7 @@ export const CompletedOrderDetailsGet = createAsyncThunk(
 );
 
 export const OnHoldOrderDetailsGet = createAsyncThunk(
-  "orderSystem/getOnHoldOrders",
+  "orderSystem/OnHoldOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -95,7 +96,7 @@ export const OnHoldOrderDetailsGet = createAsyncThunk(
 );
 
 export const ReserveOrderDetailsGet = createAsyncThunk(
-  "orderSystem/getReserveOrder",
+  "orderSystem/ReserveOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -110,7 +111,7 @@ export const ReserveOrderDetailsGet = createAsyncThunk(
 );
 
 export const AttachmentFileUpload = createAsyncThunk(
-  "orderSystem/attachmentFileUpload",
+  "orderSystem/AttachmentFileUpload",
   async (
     { user_id, order_id, item_id, variation_id, selectedFile },
     { rejectWithValue }
@@ -119,7 +120,7 @@ export const AttachmentFileUpload = createAsyncThunk(
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axiosInstance.post(
-        "wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}",
+        `wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}`,
         requestData,
         {
           headers: {
@@ -136,7 +137,7 @@ export const AttachmentFileUpload = createAsyncThunk(
 );
 
 export const OverAllAttachmentFileUpload = createAsyncThunk(
-  "orderSystem/overAllAttachmentFileUpload",
+  "orderSystem/OverAllAttachmentFileUpload",
   async ({ order_id, order_dispatch_image }, { rejectWithValue }) => {
     try {
       const requestData = new FormData();
@@ -159,7 +160,7 @@ export const OverAllAttachmentFileUpload = createAsyncThunk(
 );
 
 export const AddMessage = createAsyncThunk(
-  "orderSystem/addMessage",
+  "orderSystem/AddMessage",
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -175,7 +176,7 @@ export const AddMessage = createAsyncThunk(
 );
 
 export const InsertOrderPickup = createAsyncThunk(
-  "orderSystem/insertOrderPickup",
+  "orderSystem/InsertOrderPickup",
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -191,7 +192,7 @@ export const InsertOrderPickup = createAsyncThunk(
 );
 
 export const InsertOrderPickupCancel = createAsyncThunk(
-  "orderSystem/insertOrderPickupCancel",
+  "orderSystem/InsertOrderPickupCancel",
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -208,7 +209,7 @@ export const InsertOrderPickupCancel = createAsyncThunk(
 
 export const CustomOrderFinish = createAsyncThunk(
   "orderSystem/CustomOrderFinish",
-  async ({ user_id, id, navigate }, { rejectWithValue }) => {
+  async ({ user_id, id}, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
@@ -238,7 +239,7 @@ export const CustomOrderOH = createAsyncThunk(
 );
 
 export const CustomOrderFinishOH = createAsyncThunk(
-  "orderSystem/CustomOrderFinish",
+  "orderSystem/CustomOrderFinishOH",
   async ({ user_id, id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -250,7 +251,6 @@ export const CustomOrderFinishOH = createAsyncThunk(
           icon: "success",
           showConfirmButton: true,
         });
-        navigate("/on_hold_orders_system");
       } else {
         Swal.fire({
           title: response.data.message,
@@ -277,26 +277,26 @@ const orderSystemSlice = createSlice({
       state.SyncLoading = false;
     },
     clearstoredata: (state) => {
-      (state.isLoading = false),
-        (state.SyncLoading = false),
-        (state.orders = []),
-        (state.orderDetails = []),
-        (state.completedOrders = []),
-        (state.completedOrderDetails = []),
-        (state.reserveOrders = []),
-        (state.reserveOrderDetails = []),
-        (state.onHoldOrders = []),
-        (state.onHoldOrderDetails = []),
-        (state.uploadAttachFile = []),
-        (state.uploadOverAllAttachFile = []),
-        (state.Message = []),
-        (state.orderPickUp = []),
-        (state.orderPickUpCancel = []),
-        (state.customOrderData = []),
-        (state.customOrderOnHoldData = []),
-        (state.customOrderOnHoldFinishData = []),
-        (state.error = null);
-    },
+      state.isLoading = false;
+      state.SyncLoading = false;
+      state.orders = [];
+      state.orderDetails = [];
+      state.completedOrders = [];
+      state.completedOrderDetails = [];
+      state.reserveOrders = [];
+      state.reserveOrderDetails = [];
+      state.onHoldOrders = [];
+      state.onHoldOrderDetails = [];
+      state.uploadAttachFile = [];
+      state.uploadOverAllAttachFile = [];
+      state.Message = [];
+      state.orderPickUp = [];
+      state.orderPickUpCancel = [];
+      state.customOrderData = [];
+      state.customOrderOnHoldData = [];
+      state.customOrderOnHoldFinishData = [];
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder

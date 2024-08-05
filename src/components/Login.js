@@ -9,13 +9,15 @@ import {
 } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, loginUserWithToken } from "../redux/actions/UserActions";
+// import { loginUser, loginUserWithToken } from "../redux/actions/UserActions";
 import { useNavigate } from "react-router-dom";
 import { isValidEmail } from "../utils/validation";
 import styled from "styled-components";
 import { Box, CardContent } from "@mui/material";
 import { Card, Col, Row } from "react-bootstrap";
 import { getToken } from "../utils/StorageUtils";
+import { loginUser, loginUserWithToken } from "../Redux2/slices/UserSlice";
+import ShowAlert from "../utils/ShowAlert";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let isValid = true;
 
     if (!username) {
@@ -54,7 +56,38 @@ const Login = () => {
     }
 
     if (isValid) {
-      dispatch(loginUser({ username, password }, navigate));
+      const actionResult = await dispatch(loginUser({ username, password }));
+      if (loginUser.fulfilled.match(actionResult)) {
+        const userRole = actionResult.payload.user_data.user_role;
+        switch (userRole) {
+          case "administrator":
+          case "packing_assistant":
+            navigate("/ordersystem");
+            break;
+          case "factory_coordinator":
+            navigate("/PO_ManagementSystem");
+            break;
+          case "customer_support":
+            navigate("/order_not_available");
+            break;
+          case "operation_assistant":
+            navigate("/On_Hold_Manegement_System");
+            break;
+          default:
+            break;
+        }
+      } else if (loginUser.rejected.match(actionResult)) {
+        await ShowAlert(
+          "Error",
+          actionResult.payload || "An error occurred",
+          "error",
+          false,
+          false,
+          "",
+          "",
+          1000
+        );
+      }
     }
   };
 
@@ -65,10 +98,10 @@ const Login = () => {
         if (token) {
           dispatch(loginUserWithToken(navigate, token));
         } else {
-          console.warn('No token found, user may need to log in.');
+          console.warn("No token found, user may need to log in.");
         }
       } catch (error) {
-        console.error('Error during login:', error);
+        console.error("Error during login:", error);
       }
     };
     fetchTokenAndLogin();
@@ -76,8 +109,7 @@ const Login = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, navigate]);
 
-
-  const loading = useSelector((state) => state.loginUser.loading);
+  const loading = useSelector((state) => state?.user?.isLoading);
 
   return (
     <MDBContainer style={{ height: "100vh" }} className="p-3">
