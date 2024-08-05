@@ -45,7 +45,7 @@ const ReserveOrderSystemInChina = () => {
     const dispatch = useDispatch();
   
     async function fetchOrders() {
-      let apiUrl = `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?&page=${page}&per_page=${pageSize}`;
+      let apiUrl = `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/??warehouse=China&page=${page}&per_page=${pageSize}`;
       if (searchOrderID)
         apiUrl += `&orderid=${searchOrderID}`;
       if (endDate)
