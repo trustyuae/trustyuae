@@ -667,6 +667,7 @@ function OnHoldOrdersDetails() {
               {loader ? (
                 <Loader />
               ) : (
+                <Box className="d-flex">
                 <Box>
                   <Typography className="fw-bold">Order# {id}</Typography>
                   <Typography
@@ -677,6 +678,22 @@ function OnHoldOrdersDetails() {
                   >
                     <Badge bg="success">{orderDetails?.order_status}</Badge>
                   </Typography>
+                </Box>
+                {orderDetails?.order_process == "started" && (
+                  <Box className="ms-5">
+                    <Typography className="fw-bold">
+                      {orderDetails?.user_name}
+                    </Typography>
+                    <Typography
+                      className=""
+                      sx={{
+                        fontSize: 14,
+                      }}
+                    >
+                      <Badge bg="success">Order Started By</Badge>
+                    </Typography>
+                  </Box>
+                )}
                 </Box>
               )}
             </Box>
