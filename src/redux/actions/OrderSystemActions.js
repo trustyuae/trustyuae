@@ -143,7 +143,7 @@ export const OrderDetailsGet =
       dispatch({ type: GET_ORDER_DETAILS_REQUEST });
 
       const response = await axiosInstance.get(
-        'wp-json/custom-orders-new/v1/orders/?orderid=${id}'
+        `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
       );
       dispatch({ type: GET_ORDER_DETAILS_SUCCESS, payload: response?.data });
       return response;

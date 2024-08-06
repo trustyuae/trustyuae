@@ -16,10 +16,10 @@ import { Badge } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  OrderDetailsGet,
-  OrderSystemGet,
-} from "../../redux/actions/OrderSystemActions";
+// import {
+//   OrderDetailsGet,
+//   OrderSystemGet,
+// } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
@@ -27,9 +27,13 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import OrderDetails from "./OrderDetails";
 import PrintModal from "./PrintModal";
-import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
+import {
+  OrderDetailsGet,
+  OrderSystemGet,
+} from "../../Redux2/slices/OrderSystemSlice";
 
 function OrderSystem() {
+  const dispatch = useDispatch();
   const inputRef = useRef(null);
   const [dispatchType, setDispatchType] = useState("all");
   const [orders, setOrders] = useState([]);
@@ -49,33 +53,43 @@ function OrderSystem() {
   });
   const [orderData, setOrderData] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
-  const dispatch = useDispatch();
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+  const ordersData = useSelector((state) => state?.orderSystem?.orders?.orders);
+  const otherData = useSelector((state) => state?.orderSystem?.orders);
+  const orderDetails = useSelector((state) => state?.orderSystem?.orderDetails);
+
+  console.log(orderDetails,'orderDetails from useSelector')
+
+  useEffect(() => {
+    if (ordersData) {
+      const oData = ordersData.map((v, i) => ({ ...v, id: i }));
+      setOrders(oData);
+      console.log(oData, "orderssss");
+    }
+    if (otherData) {
+      setOverAllData({
+        total_count: otherData?.total_count,
+        total_dispatch_orders: otherData?.total_dispatch_orders,
+        total_reserve_orders: otherData?.total_reserve_orders,
+      });
+      setTotalPages(otherData?.total_pages);
+    }
+  }, [ordersData, otherData]);
+
+  useEffect(() => {
+    // const oDetails = orderDetails.map((v, i) => ({ ...v, id: i }));
+  });
 
   async function fetchOrders() {
-    let apiUrl = 'wp-json/custom-orders-new/v1/orders/?';
+    let apiUrl = "wp-json/custom-orders-new/v1/orders/?";
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     await dispatch(
-      CompletedOrderSystemGet({
+      OrderSystemGet({
         apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
       })
-    )
-      .then((response) => {
-        console.log(response,'response of order fullfillment')
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setOverAllData({
-          total_count: response.data.total_count,
-          total_dispatch_orders: response.data.total_dispatch_orders,
-          total_reserve_orders: response.data.total_reserve_orders,
-        });
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleReset = () => {

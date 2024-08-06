@@ -24,16 +24,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  AttachmentFileUpload,
-  CustomOrderFinish,
-  CustomOrderOH,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
-  OrderDetailsGet,
-  OverAllAttachmentFileUpload,
-} from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -46,6 +36,16 @@ import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axiosInstance from "../../utils/AxiosInstance";
 import { getUserData } from "../../utils/StorageUtils";
+import {
+  AddMessage,
+  AttachmentFileUpload,
+  CustomOrderFinish,
+  CustomOrderOH,
+  InsertOrderPickup,
+  InsertOrderPickupCancel,
+  OrderDetailsGet,
+  OverAllAttachmentFileUpload,
+} from "../../Redux2/slices/OrderSystemSlice";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -83,17 +83,51 @@ function OrderDetails() {
     selectedVariationId ? selectedVariationId : selectedItemId
   ] = useRef(null);
 
+  const AddInOnHold = useSelector((state) => state?.orderSystem?.isLoading);
+
+  const Finished = useSelector((state) => state?.orderSystem?.isLoading);
+
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystem?.orderDetails?.orders?.[0]
   );
 
-  const AddInOnHold = useSelector(
-    (state) => state?.orderSystem?.isLoading
+  const orderDetailsData = useSelector(
+    (state) => state?.orderSystem?.orderDetails
   );
 
-  const Finished = useSelector(
-    (state) => state?.orderSystem?.isLoading
+  const messageData = useSelector((state) => state?.orderSystem?.message);
+
+  const customOrderDataa = useSelector(
+    (state) => state?.orderSystem?.customOrderData
   );
+
+  const CustomOrderOHDataa = useSelector(
+    (state) => state?.orderSystem?.customOrderOnHoldData
+  );
+  
+  console.log(CustomOrderOHDataa, "CustomOrderOHDataa");
+
+  useEffect(() => {
+    const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
+    setOrderData(oDetails);
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      setOrderProcess(orderDetailsDataOrderId.order_process);
+
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId.items.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsData, orderDetailsDataOrderId]);
 
   async function fetchUserData() {
     try {
@@ -132,21 +166,7 @@ function OrderDetails() {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(OrderDetailsGet({ id: id }));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      const order = response.data.orders[0];
-      if (order) setOrderProcess(order.order_process);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
-      }
+      dispatch(OrderDetailsGet({ id: id }));
     } catch (error) {
       console.error(error);
     }
@@ -164,22 +184,12 @@ function OrderDetails() {
       order_id: orderId,
       name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        setMessage("");
-        setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
-      }
-    });
+    await dispatch(AddMessage(requestedMessage));
+    if (messageData.status) {
+      setMessage("");
+      setshowMessageModal(false);
+      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
+    }
   };
 
   const submitOH = async () => {
@@ -199,6 +209,21 @@ function OrderDetails() {
         result.variation_id.push(parseInt(item.variation_id, 10));
       });
       dispatch(CustomOrderOH(result, navigate));
+      if (CustomOrderOHDataa.status === 200) {
+        setOHMessage("")
+        setshowMessageOHModal(false)
+        ShowAlert(
+          "",
+          CustomOrderOHDataa.data.message,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+        navigate("/on_hold_orders_system");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -207,7 +232,7 @@ function OrderDetails() {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setMessage, setTableData, setOrderData]);
+  }, [setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -249,7 +274,7 @@ function OrderDetails() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axiosInstance.post(
-          "wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}",
+          `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
             variation_id: e.variation_id,
             image_url: e.dispatch_image,
@@ -311,13 +336,8 @@ function OrderDetails() {
       end_time: "",
       order_status: "started",
     };
-    await dispatch(InsertOrderPickup(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    await dispatch(InsertOrderPickup(requestData));
+    fetchOrder();
   };
 
   const handleCancelOrderProcess = async () => {
@@ -326,29 +346,24 @@ function OrderDetails() {
       operation_id: orderDetails?.operation_user_id,
       order_status: "Cancelled",
     };
-    await dispatch(InsertOrderPickupCancel(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    dispatch(InsertOrderPickupCancel(requestData));
+    fetchOrder();
   };
 
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
-      if (response.data.status_code === 200) {
-        await Swal.fire({
-          title: response.data.message,
+      dispatch(CustomOrderFinish({ user_id, id }));
+      if (customOrderDataa?.status_code === 200) {
+        Swal.fire({
+          title: customOrderDataa.message,
           icon: "success",
           showConfirmButton: true,
         });
         navigate("/ordersystem");
       } else {
         Swal.fire({
-          title: response.data.message,
+          title: customOrderDataa.message,
           icon: "error",
           showConfirmButton: true,
         });

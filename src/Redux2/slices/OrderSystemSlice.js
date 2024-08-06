@@ -15,7 +15,7 @@ const initialState = {
   onHoldOrderDetails: [],
   uploadAttachFile: [],
   uploadOverAllAttachFile: [],
-  Message: [],
+  message: [],
   orderPickUp: [],
   orderPickUpCancel: [],
   customOrderData: [],
@@ -44,6 +44,7 @@ export const OrderDetailsGet = createAsyncThunk(
         const response = await axiosInstance.get(
           `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
         );
+        console.log(response,'response from redux')
         return response.data;
       } catch (error) {
         console.error("Error fetching factories:", error.message);
@@ -167,7 +168,7 @@ export const AddMessage = createAsyncThunk(
         `wp-json/custom-message-note/v1/order-note/`,
         requestData
       );
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);
@@ -209,14 +210,14 @@ export const InsertOrderPickupCancel = createAsyncThunk(
 
 export const CustomOrderFinish = createAsyncThunk(
   "orderSystem/CustomOrderFinish",
-  async ({ user_id, id}, { rejectWithValue }) => {
+  async ({ user_id, id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
       );
       return response.data;
     } catch (error) {
-      console.error("Error fetching factories:", error.message);
+      console.error("Error finishing custom order:", error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -230,7 +231,8 @@ export const CustomOrderOH = createAsyncThunk(
         `wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
         result
       );
-      return response.data;
+      console.log(response,'response of customOrderOh')
+      return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);
@@ -289,7 +291,7 @@ const orderSystemSlice = createSlice({
       state.onHoldOrderDetails = [];
       state.uploadAttachFile = [];
       state.uploadOverAllAttachFile = [];
-      state.Message = [];
+      state.message = [];
       state.orderPickUp = [];
       state.orderPickUpCancel = [];
       state.customOrderData = [];
@@ -305,33 +307,33 @@ const orderSystemSlice = createSlice({
       })
       .addCase(OrderSystemGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders = action.data;
+        state.orders = action.payload;
       })
       .addCase(OrderSystemGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(OrderDetailsGet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderDetails = action.data;
+        state.orderDetails = action.payload;
       })
       .addCase(OrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(CompletedOrderSystemGet.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CompletedOrderSystemGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.completedOrders = action.data;
+        state.completedOrders = action.payload;
       })
       .addCase(CompletedOrderSystemGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(CompletedOrderDetailsGet.pending, (state) => {
         state.isLoading = true;
@@ -342,7 +344,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(CompletedOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(OnHoldOrderDetailsGet.pending, (state) => {
         state.isLoading = true;
@@ -353,7 +355,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(OnHoldOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(ReserveOrderDetailsGet.pending, (state) => {
         state.isLoading = true;
@@ -364,7 +366,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(ReserveOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(AttachmentFileUpload.pending, (state) => {
         state.isLoading = true;
@@ -375,84 +377,84 @@ const orderSystemSlice = createSlice({
       })
       .addCase(AttachmentFileUpload.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(OverAllAttachmentFileUpload.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OverAllAttachmentFileUpload.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.uploadOverAllAttachFile = action.data;
+        state.uploadOverAllAttachFile = action.payload;
       })
       .addCase(OverAllAttachmentFileUpload.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(AddMessage.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddMessage.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Message = action.data;
+        state.message = action.payload;
       })
       .addCase(AddMessage.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(InsertOrderPickup.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(InsertOrderPickup.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderPickUp = action.data;
+        state.orderPickUp = action.payload;
       })
       .addCase(InsertOrderPickup.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(InsertOrderPickupCancel.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(InsertOrderPickupCancel.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderPickUpCancel = action.data;
+        state.orderPickUpCancel = action.payload;
       })
       .addCase(InsertOrderPickupCancel.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(CustomOrderFinish.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CustomOrderFinish.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.customOrderData = action.data;
+        state.customOrderData = action.payload;
       })
       .addCase(CustomOrderFinish.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(CustomOrderOH.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CustomOrderOH.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.customOrderOnHoldData = action.data;
+        state.customOrderOnHoldData = action.payload;
       })
       .addCase(CustomOrderOH.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(CustomOrderFinishOH.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(CustomOrderFinishOH.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.customOrderOnHoldFinishData = action.data;
+        state.customOrderOnHoldFinishData = action.payload;
       })
       .addCase(CustomOrderFinishOH.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
   },
 });
