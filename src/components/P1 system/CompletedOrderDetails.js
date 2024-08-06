@@ -2,9 +2,20 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { Alert, Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
+import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
-import { Avatar, Box, Typography } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  Box,
+  ListItem,
+  ListItemText,
+  Typography,
+  AccordionDetails,
+  List,
+  Accordion,
+  AccordionSummary,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,6 +24,7 @@ import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 function CompletedOrderDetails() {
   const params = useParams();
@@ -36,7 +48,8 @@ function CompletedOrderDetails() {
     const fetchUserName = async () => {
       try {
         const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,{headers}
+          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,
+          { headers }
         );
         setUserName(name.data);
       } catch (error) {
@@ -453,10 +466,70 @@ function CompletedOrderDetails() {
         <Alert variant={"info"}>
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
-        <Alert variant={"success"}>
-          <label>Meesage :-</label>{" "}
-          <Box>{orderDetailsDataOrderId?.operation_user_note}</Box>
-        </Alert>
+        {orderDetailsDataOrderId?.operation_user_note &&
+          orderDetailsDataOrderId?.operation_user_note.length > 0 && (
+            <Card className="p-3 mb-3">
+              <Box className="d-flex align-items-center justify-content-between">
+                <Box className="w-100">
+                  <Typography
+                    variant="h6"
+                    className="fw-bold mb-3"
+                  ></Typography>
+                  <Box className="d-flex justify-content-between">
+                    <div style={{ width: "100%" }}>
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel1-content"
+                          id="panel1-header"
+                        >
+                          <Typography variant="h6" className="fw-bold">
+                            Messages
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails
+                          style={{ maxHeight: "200px", overflowY: "auto" }}
+                        >
+                          <List>
+                            {Array.isArray(
+                              orderDetailsDataOrderId?.operation_user_note
+                            ) ? (
+                              orderDetailsDataOrderId.operation_user_note.map(
+                                (message, i) => (
+                                  <ListItem
+                                    key={i}
+                                    className="d-flex justify-content-start"
+                                  >
+                                    <ListItemText
+                                      primary={message.message}
+                                      secondary={message.user}
+                                      className="rounded p-2"
+                                      style={{
+                                        maxWidth: "70%",
+                                        minWidth: "50px",
+                                        backgroundColor: "#bfdffb",
+                                      }}
+                                    />
+                                  </ListItem>
+                                )
+                              )
+                            ) : (
+                              <ListItem>
+                                <ListItemText
+                                  primary="No messages available"
+                                  style={{ textAlign: "center" }}
+                                />
+                              </ListItem>
+                            )}
+                          </List>
+                        </AccordionDetails>
+                      </Accordion>
+                    </div>
+                  </Box>
+                </Box>
+              </Box>
+            </Card>
+          )}
         <Modal
           show={showEditModal}
           onHide={() => setShowEditModal(false)}
