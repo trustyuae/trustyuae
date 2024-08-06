@@ -4,7 +4,18 @@ import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModalInChina";
-import { Alert, Avatar, Box, Typography } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  Box,
+  ListItem,
+  ListItemText,
+  Typography,
+  AccordionDetails,
+  List,
+  Accordion,
+  AccordionSummary,
+} from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -33,6 +44,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const OnHoldOrdersdetailsInChina = () => {
     const { id } = useParams();
@@ -1000,11 +1012,59 @@ const OnHoldOrdersdetailsInChina = () => {
           <Alert variant={"info"}>
             <label>Customer Note :-</label> "There is a customer note!"
           </Alert>
-          <Alert variant={"success"}>
-            <label>Meesage :-</label>{" "}
-            {orderDetailsDataOrderId?.operation_user_note}
-            {/* <Box>{orderDetailsDataOrderId?.operation_user_note}</Box> */}
-          </Alert>
+          {orderDetailsDataOrderId?.operation_user_note &&
+          orderDetailsDataOrderId?.operation_user_note.length > 0 && (
+            <Card className="p-3 mb-3">
+              <Box className="d-flex align-items-center justify-content-between">
+                <Box className="w-100">
+                  <Typography
+                    variant="h6"
+                    className="fw-bold mb-3"
+                  ></Typography>
+                  <Box className="d-flex justify-content-between">
+                    <div style={{ width: "100%" }}>
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel1-content"
+                          id="panel1-header"
+                        >
+                          <Typography variant="h6" className="fw-bold">
+                            Messages
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails
+                          style={{ maxHeight: "200px", overflowY: "auto" }}
+                        >
+                          <List>
+                            {orderDetailsDataOrderId?.operation_user_note.map(
+                              (message, i) => (
+                                <ListItem
+                                  key={i}
+                                  className="d-flex justify-content-start"
+                                >
+                                  <ListItemText
+                                    primary={message.message}
+                                    secondary={message.user}
+                                    className="rounded p-2"
+                                    style={{
+                                      maxWidth: "70%",
+                                      minWidth: "50px",
+                                      backgroundColor: "#bfdffb",
+                                    }}
+                                  />
+                                </ListItem>
+                              )
+                            )}
+                          </List>
+                        </AccordionDetails>
+                      </Accordion>
+                    </div>
+                  </Box>
+                </Box>
+              </Box>
+            </Card>
+          )}
           <Alert variant={"success"}>
             <label>On Hold Meesage :-</label> {orderDetails?.onhold_note}
             {/* <Box>{orderDetails?.onhold_note}</Box> */}
