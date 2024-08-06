@@ -152,24 +152,22 @@ const OrderDetailsInChina = () => {
       order_id: orderId,
       name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(
-      async (response) => {
-        if (response.data) {
-          setMessage("");
-          setshowMessageModal(false);
-          const result = await ShowAlert(
-            "",
-            response.data,
-            "success",
-            null,
-            null,
-            null,
-            null,
-            2000
-          );
-        }
+    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+      if (response.data) {
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
       }
-    );
+    });
   };
 
   const submitOH = async () => {
@@ -1289,6 +1287,6 @@ const OrderDetailsInChina = () => {
       </Container>
     </>
   );
-}
+};
 
-export default OrderDetailsInChina
+export default OrderDetailsInChina;
