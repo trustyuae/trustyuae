@@ -260,7 +260,7 @@ export const CustomOrderFinish =
     dispatch({ type: CUSTOM_ORDER_FINISH_CHINA_REQUEST });
     try {
       const response = await axios.post(
-        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`,{headers}
+        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}/?warehouse="China"`,{headers}
       );
       dispatch({ type: CUSTOM_ORDER_FINISH_CHINA_SUCCESS, payload: response.data });
       return response;
@@ -273,7 +273,7 @@ export const CustomOrderOH = (result, navigate) => async (dispatch) => {
   dispatch({ type: CUSTOM_ORDER_ON_HOLD_CHINA_REQUEST });
   try {
     const response = await axios.post(
-      `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
+      `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/?warehouse="China"`,
       result,{headers}
     );
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_CHINA_SUCCESS, payload: response.data });
@@ -291,7 +291,7 @@ export const CustomOrderFinishOH =
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_FINISH_CHINA_REQUEST });
     try {
       const response = await axios.post(
-        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`,{headers}
+        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}/?warehouse="China"`,{headers}
       );
       dispatch({
         type: CUSTOM_ORDER_ON_HOLD_FINISH_CHINA_SUCCESS,
