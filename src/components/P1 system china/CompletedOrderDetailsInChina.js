@@ -19,12 +19,13 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
+// import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemchinaActions";
 
 const CompletedOrderDetailsInChina = () => {
   const params = useParams();
@@ -64,10 +65,10 @@ const CompletedOrderDetailsInChina = () => {
   }, [orderDetails]);
 
   const loader = useSelector(
-    (state) => state?.orderSystemData?.isCompletedOrderDetails
+    (state) => state?.orderSystemDataChina?.isCompletedOrderDetails
   );
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystemDataChina?.completedOrderDetails?.orders?.[0]
   );
 
   async function fetchOrder() {

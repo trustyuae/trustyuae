@@ -67,10 +67,10 @@ const ReserveOrderdetailsInChina = () => {
   }, [orderDetails]);
 
   const loader = useSelector(
-    (state) => state?.orderSystemData?.isCompletedOrderDetails
+    (state) => state?.orderSystemDataChina?.isCompletedOrderDetails
   );
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystemDataChina?.completedOrderDetails?.orders?.[0]
   );
 
   async function fetchOrder() {

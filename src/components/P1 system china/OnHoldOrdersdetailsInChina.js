@@ -24,17 +24,17 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  AttachmentFileUpload,
-  CustomOrderFinish,
-  CustomOrderFinishOH,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
-  OnHoldOrderDetailsGet,
-  OrderDetailsGet,
-  OverAllAttachmentFileUpload,
-} from "../../redux/actions/OrderSystemActions";
+// import {
+//   AddMessage,
+//   AttachmentFileUpload,
+//   CustomOrderFinish,
+//   CustomOrderFinishOH,
+//   InsertOrderPickup,
+//   InsertOrderPickupCancel,
+//   OnHoldOrderDetailsGet,
+//   OrderDetailsGet,
+//   OverAllAttachmentFileUpload,
+// } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -45,6 +45,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../redux/actions/OrderSystemchinaActions";
 
 const OnHoldOrdersdetailsInChina = () => {
   const { id } = useParams();
@@ -80,7 +81,7 @@ const OnHoldOrdersdetailsInChina = () => {
   fileInputRef.current[selectedItemId] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
+    (state) => state?.orderSystemDataChina?.onHoldOrderDetails?.orders?.[0]
   );
 
   const token = JSON.parse(localStorage.getItem("token"));

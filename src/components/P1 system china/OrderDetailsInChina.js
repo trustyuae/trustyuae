@@ -24,16 +24,16 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  AttachmentFileUpload,
-  CustomOrderFinish,
-  CustomOrderOH,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
-  OrderDetailsGet,
-  OverAllAttachmentFileUpload,
-} from "../../redux/actions/OrderSystemActions";
+// import {
+//   AddMessage,
+//   AttachmentFileUpload,
+//   CustomOrderFinish,
+//   CustomOrderOH,
+//   InsertOrderPickup,
+//   InsertOrderPickupCancel,
+//   OrderDetailsGet,
+//   OverAllAttachmentFileUpload,
+// } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -44,6 +44,16 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  AddMessage,
+  AttachmentFileUpload,
+  CustomOrderFinish,
+  CustomOrderOH,
+  InsertOrderPickup,
+  InsertOrderPickupCancel,
+  OrderDetailsGet,
+  OverAllAttachmentFileUpload,
+} from "../../redux/actions/OrderSystemchinaActions";
 
 const OrderDetailsInChina = () => {
   const { id } = useParams();
@@ -71,7 +81,9 @@ const OrderDetailsInChina = () => {
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
-  const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
+  const loader = useSelector(
+    (state) => state?.orderSystemDataChina?.isOrderDetails
+  );
   if (!fileInputRef.current) {
     fileInputRef.current = {};
   }
@@ -80,15 +92,15 @@ const OrderDetailsInChina = () => {
   ] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystemDataChina?.orderDetails?.orders?.[0]
   );
 
   const AddInOnHold = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrderOnHold
+    (state) => state?.orderSystemDataChina?.isCustomOrderOnHold
   );
 
   const Finished = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrder
+    (state) => state?.orderSystemDataChina?.isCustomOrder
   );
 
   const token = JSON.parse(localStorage.getItem("token"));

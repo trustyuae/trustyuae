@@ -15,11 +15,12 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
+// import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemchinaActions";
 
 const OnHoldOrdersSystemInChina = () => {
     const inputRef = useRef(null);
@@ -41,7 +42,7 @@ const OnHoldOrdersSystemInChina = () => {
       null,
       null,
     ]);
-    const loader = useSelector((state) => state?.orderSystemData?.isCompletedOrders);
+    const loader = useSelector((state) => state?.orderSystemDataChina?.isCompletedOrders);
   
     const dispatch = useDispatch();
   

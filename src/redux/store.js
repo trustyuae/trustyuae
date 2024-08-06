@@ -4,6 +4,7 @@ import { UserLoginReducer, UserLogoutReducer } from "./reducers/UserReducer";
 import { composeWithDevTools } from "redux-devtools-extension";
 import AllFactoryReducer from "./reducers/AllFactoryReducer";
 import OrderSystemReducer from "./reducers/OrderSystemReducer";
+import OrderSystemChinaReducer from "./reducers/OrderSystemChinaReducer";
 import OrderNotAvailableReducer from "./reducers/P2SystemReducer";
 import ManagementSystemReducer from "./reducers/P3SystemReducer";
 import ProductManagementReducer from "./reducers/ProductManagementReducer";
@@ -14,6 +15,7 @@ const reducer = combineReducers({
   logoutUser: UserLogoutReducer,
   allFactoryData: AllFactoryReducer,
   orderSystemData: OrderSystemReducer,
+  orderSystemDataChina: OrderSystemChinaReducer,
   orderNotAvailable: OrderNotAvailableReducer,
   managementSystem: ManagementSystemReducer,
   allProducts:ProductManagementReducer,
