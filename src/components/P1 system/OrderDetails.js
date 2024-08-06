@@ -184,14 +184,6 @@ function OrderDetails() {
       order_id: orderId,
       name: userID.first_name,
     };
-<<<<<<< HEAD
-    await dispatch(AddMessage(requestedMessage));
-    if (messageData.status) {
-      setMessage("");
-      setshowMessageModal(false);
-      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
-    }
-=======
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {
         setMessage("");
@@ -208,7 +200,6 @@ function OrderDetails() {
         );
       }
     });
->>>>>>> 2ea22f9465e5892d07076035b96103a791d8b804
   };
 
   const submitOH = async () => {

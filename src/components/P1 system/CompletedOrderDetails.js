@@ -24,6 +24,9 @@ import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
+import { CompletedOrderDetailsGet } from "../../Redux2/slices/OrderSystemSlice";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
 
 function CompletedOrderDetails() {
   const params = useParams();
@@ -43,7 +46,7 @@ function CompletedOrderDetails() {
     const fetchUserName = async () => {
       try {
         const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,{headers}
+          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,
         );
         setUserName(name.data);
       } catch (error) {

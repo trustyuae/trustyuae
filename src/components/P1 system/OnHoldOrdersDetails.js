@@ -44,14 +44,12 @@ import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
-<<<<<<< HEAD
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
 import { getUserData } from "../../utils/StorageUtils";
 import axiosInstance from "../../utils/AxiosInstance";
-import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
-=======
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+// import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
 
->>>>>>> 2ea22f9465e5892d07076035b96103a791d8b804
 function OnHoldOrdersDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});

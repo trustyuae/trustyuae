@@ -79,7 +79,7 @@ function OrderSystem() {
 
   useEffect(() => {
     if (orderDetails) {
-      const oDetails = orderDetails.orders.map((v, i) => ({ ...v, id: i }));
+      const oDetails = orderDetails?.orders?.map((v, i) => ({ ...v, id: i }));
       setOrderData(oDetails);
     }
   }, [orderDetails]);

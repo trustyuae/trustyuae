@@ -27,13 +27,10 @@ import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
-<<<<<<< HEAD
-import axiosInstance from '../../utils/AxiosInstance'
 import { ReserveOrderDetailsGet } from "../../Redux2/slices/OrderSystemSlice";
-=======
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
->>>>>>> 2ea22f9465e5892d07076035b96103a791d8b804
+
 function ReserveOrderDetails() {
   const params = useParams();
   const [orderData, setOrderData] = useState([]);
@@ -50,14 +47,8 @@ function ReserveOrderDetails() {
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-<<<<<<< HEAD
-        const name = await axiosInstance.get(
-          'wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}',
-=======
         const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,
-          { headers }
->>>>>>> 2ea22f9465e5892d07076035b96103a791d8b804
+          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`
         );
         setUserName(name.data);
       } catch (error) {
@@ -100,7 +91,7 @@ function ReserveOrderDetails() {
 
   useEffect(() => {
     fetchOrder();
-  }, []);
+  }, [fetchOrder]);
 
   const ImageModule = (url) => {
     setImageURL(url);
