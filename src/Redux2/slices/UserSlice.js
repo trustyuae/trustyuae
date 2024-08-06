@@ -32,42 +32,37 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // Show confirmation alert
-      const result = await ShowAlert(
-        'Do You Want to Log Out?',
-        '',
-        'question',
-        true,
-        true,
-        'Confirm',
-        'Cancel'
-      );
+      // const result = await ShowAlert(
+      //   'Do You Want to Log Out?',
+      //   '',
+      //   'question',
+      //   true,
+      //   true,
+      //   'Confirm',
+      //   'Cancel'
+      // );
 
-      if (result.isConfirmed) {
-        // Call the logout API
+      // if (result.isConfirmed) {
         const res = await axios.post(
           `${API_URL}wp-json/custom-login/v1/logout`,
           null
         );
-        // Clear local storage
         localStorage.clear();
-
-        // Show success alert
-        await ShowAlert(
-          'Success',
-          'You have been logged out successfully.',
-          'success',
-          false,
-          false,
-          'OK',
-          '',
-          1000
-        );
+        // await ShowAlert(
+        //   'Success',
+        //   'You have been logged out successfully.',
+        //   'success',
+        //   false,
+        //   false,
+        //   'OK',
+        //   '',
+        //   1000
+        // );
 
         return res.data; // Return response data for further handling if needed
-      } else {
-        // If user cancels, reject the promise
-        return rejectWithValue('Logout canceled');
-      }
+      // } else {
+      //   return rejectWithValue('Logout canceled');
+      // }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }

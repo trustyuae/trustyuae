@@ -184,12 +184,31 @@ function OrderDetails() {
       order_id: orderId,
       name: userID.first_name,
     };
+<<<<<<< HEAD
     await dispatch(AddMessage(requestedMessage));
     if (messageData.status) {
       setMessage("");
       setshowMessageModal(false);
       ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
     }
+=======
+    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+      if (response.data) {
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+      }
+    });
+>>>>>>> 2ea22f9465e5892d07076035b96103a791d8b804
   };
 
   const submitOH = async () => {
@@ -692,22 +711,21 @@ function OrderDetails() {
                       <Badge bg="success">{orderDetails?.order_status}</Badge>
                     </Typography>
                   </Box>
-                  {orderDetails?.operation_user_id != userData?.user_id &&
-                    orderDetails?.order_process == "started" && (
-                      <Box className="ms-5">
-                        <Typography className="fw-bold">
-                          {orderDetails?.user_name}
-                        </Typography>
-                        <Typography
-                          className=""
-                          sx={{
-                            fontSize: 14,
-                          }}
-                        >
-                          <Badge bg="success">Order Started By</Badge>
-                        </Typography>
-                      </Box>
-                    )}
+                  {orderDetails?.order_process == "started" && (
+                    <Box className="ms-5">
+                      <Typography className="fw-bold">
+                        {orderDetails?.user_name}
+                      </Typography>
+                      <Typography
+                        className=""
+                        sx={{
+                          fontSize: 14,
+                        }}
+                      >
+                        <Badge bg="success">Order Started By</Badge>
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               )}
             </Box>

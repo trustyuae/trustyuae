@@ -4,7 +4,18 @@ import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModal";
-import { Alert, Avatar, Box, Typography } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  Box,
+  ListItem,
+  ListItemText,
+  Typography,
+  AccordionDetails,
+  List,
+  Accordion,
+  AccordionSummary,
+} from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -33,9 +44,14 @@ import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
+<<<<<<< HEAD
 import { getUserData } from "../../utils/StorageUtils";
 import axiosInstance from "../../utils/AxiosInstance";
 import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
+=======
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
+>>>>>>> 2ea22f9465e5892d07076035b96103a791d8b804
 function OnHoldOrdersDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
@@ -140,19 +156,28 @@ function OnHoldOrdersDetails() {
     console.log(toggleStatus, "toggleStatus");
   }, [toggleStatus]);
 
-  const handleAddMessage = async () => {
+  const handleAddMessage = async (e) => {
     const orderId = parseInt(id, 10);
+    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
       order_id: orderId,
+      name: userID.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {
-        const result = await ShowAlert("", response.data, "success");
-        if (result.isConfirmed) {
-          setMessage("");
-          setshowMessageModal(false);
-        }
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
       }
     });
   };
@@ -664,16 +689,33 @@ function OnHoldOrdersDetails() {
               {loader ? (
                 <Loader />
               ) : (
-                <Box>
-                  <Typography className="fw-bold">Order# {id}</Typography>
-                  <Typography
-                    className=""
-                    sx={{
-                      fontSize: 14,
-                    }}
-                  >
-                    <Badge bg="success">{orderDetails?.order_status}</Badge>
-                  </Typography>
+                <Box className="d-flex">
+                  <Box>
+                    <Typography className="fw-bold">Order# {id}</Typography>
+                    <Typography
+                      className=""
+                      sx={{
+                        fontSize: 14,
+                      }}
+                    >
+                      <Badge bg="success">{orderDetails?.order_status}</Badge>
+                    </Typography>
+                  </Box>
+                  {orderDetails?.order_process == "started" && (
+                    <Box className="ms-5">
+                      <Typography className="fw-bold">
+                        {orderDetails?.user_name}
+                      </Typography>
+                      <Typography
+                        className=""
+                        sx={{
+                          fontSize: 14,
+                        }}
+                      >
+                        <Badge bg="success">Order Started By</Badge>
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               )}
             </Box>
@@ -1012,11 +1054,70 @@ function OnHoldOrdersDetails() {
         <Alert variant={"info"}>
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
-        <Alert variant={"success"}>
-          <label>Meesage :-</label>{" "}
-          {orderDetailsDataOrderId?.operation_user_note}
-          {/* <Box>{orderDetailsDataOrderId?.operation_user_note}</Box> */}
-        </Alert>
+        {orderDetailsDataOrderId?.operation_user_note &&
+          orderDetailsDataOrderId?.operation_user_note.length > 0 && (
+            <Card className="p-3 mb-3">
+              <Box className="d-flex align-items-center justify-content-between">
+                <Box className="w-100">
+                  <Typography
+                    variant="h6"
+                    className="fw-bold mb-3"
+                  ></Typography>
+                  <Box className="d-flex justify-content-between">
+                    <div style={{ width: "100%" }}>
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel1-content"
+                          id="panel1-header"
+                        >
+                          <Typography variant="h6" className="fw-bold">
+                            Messages
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails
+                          style={{ maxHeight: "200px", overflowY: "auto" }}
+                        >
+                          <List>
+                            {Array.isArray(
+                              orderDetailsDataOrderId?.operation_user_note
+                            ) ? (
+                              orderDetailsDataOrderId.operation_user_note.map(
+                                (message, i) => (
+                                  <ListItem
+                                    key={i}
+                                    className="d-flex justify-content-start"
+                                  >
+                                    <ListItemText
+                                      primary={message.message}
+                                      secondary={message.user}
+                                      className="rounded p-2"
+                                      style={{
+                                        maxWidth: "70%",
+                                        minWidth: "50px",
+                                        backgroundColor: "#bfdffb",
+                                      }}
+                                    />
+                                  </ListItem>
+                                )
+                              )
+                            ) : (
+                              <ListItem>
+                                <ListItemText
+                                  primary="No messages available"
+                                  style={{ textAlign: "center" }}
+                                />
+                              </ListItem>
+                            )}
+                          </List>
+                        </AccordionDetails>
+                      </Accordion>
+                    </div>
+                  </Box>
+                </Box>
+              </Box>
+            </Card>
+          )}
         <Alert variant={"success"}>
           <label>On Hold Meesage :-</label> {orderDetails?.onhold_note}
           {/* <Box>{orderDetails?.onhold_note}</Box> */}
