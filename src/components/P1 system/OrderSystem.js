@@ -59,7 +59,7 @@ function OrderSystem() {
   const otherData = useSelector((state) => state?.orderSystem?.orders);
   const orderDetails = useSelector((state) => state?.orderSystem?.orderDetails);
 
-  console.log(orderDetails,'orderDetails from useSelector')
+  console.log(orderDetails, "orderDetails from useSelector");
 
   useEffect(() => {
     if (ordersData) {
@@ -78,8 +78,11 @@ function OrderSystem() {
   }, [ordersData, otherData]);
 
   useEffect(() => {
-    // const oDetails = orderDetails.map((v, i) => ({ ...v, id: i }));
-  });
+    if (orderDetails) {
+      const oDetails = orderDetails.orders.map((v, i) => ({ ...v, id: i }));
+      setOrderData(oDetails);
+    }
+  }, [orderDetails]);
 
   async function fetchOrders() {
     let apiUrl = "wp-json/custom-orders-new/v1/orders/?";
@@ -114,8 +117,6 @@ function OrderSystem() {
   const handlePrint = async (orderId) => {
     try {
       const response = await dispatch(OrderDetailsGet({ id: orderId }));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
       setShowModal(true);
     } catch (error) {
       console.error(error);
