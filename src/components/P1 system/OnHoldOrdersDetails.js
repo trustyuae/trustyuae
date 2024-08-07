@@ -95,14 +95,14 @@ function OnHoldOrdersDetails() {
     (state) => state?.orderSystem?.customOrderOnHoldFinishData
   );
 
-  console.log(OnHoldOrderFinishData,"OnHoldOrderFinishData")
+  console.log(OnHoldOrderFinishData, "OnHoldOrderFinishData");
 
   useEffect(() => {
-      const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
-        ...v,
-        id: i,
-      }));
-      setOrderData(onHoldOrderData);
+    const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
+      ...v,
+      id: i,
+    }));
+    setOrderData(onHoldOrderData);
 
     if (orderDetailsDataOrderId) {
       setOrderDetails(orderDetailsDataOrderId);
@@ -158,7 +158,7 @@ function OnHoldOrdersDetails() {
 
   async function fetchOrder() {
     try {
-      dispatch(OnHoldOrderDetailsGet({id}));
+      dispatch(OnHoldOrderDetailsGet({ id }));
     } catch (error) {
       console.error(error);
     }
@@ -301,7 +301,21 @@ function OnHoldOrdersDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      dispatch(CustomOrderFinishOH(user_id, id, navigate));
+      dispatch(CustomOrderFinishOH({ user_id, id }));
+      if (OnHoldOrderFinishData.status_code === 200) {
+        await Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "success",
+          showConfirmButton: true,
+        });
+        navigate("/on_hold_orders_system");
+      } else {
+        Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
     } catch (error) {
       console.error("Error while finishing order:", error);
     }

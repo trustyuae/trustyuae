@@ -262,19 +262,6 @@ export const CustomOrderFinishOH = createAsyncThunk(
       const response = await axiosInstance.post(
         `wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`
       );
-      if (response.data.status_code === 200) {
-        await Swal.fire({
-          title: response.data.message,
-          icon: "success",
-          showConfirmButton: true,
-        });
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          icon: "error",
-          showConfirmButton: true,
-        });
-      }
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
