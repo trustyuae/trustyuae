@@ -114,7 +114,7 @@ export const AddManualPO = createAsyncThunk(
   async ({ payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        "wp-json/custom-manual-order/v1/post-order-manual/",
+        `wp-json/custom-manual-order/v1/post-order-manual/`,
         payload
       );
       return response.data;
