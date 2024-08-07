@@ -30,7 +30,6 @@ import { API_URL } from "../../redux/constants/Constants";
 import { ReserveOrderDetailsGet } from "../../Redux2/slices/OrderSystemSlice";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-
 function ReserveOrderDetails() {
   const params = useParams();
   const [orderData, setOrderData] = useState([]);
@@ -62,36 +61,48 @@ function ReserveOrderDetails() {
     }
   }, [orderDetails]);
 
-  const loader = useSelector(
-    (state) => state?.orderSystem?.isLoading
-  );
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystem?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.reserveOrderDetails?.orders?.[0]
   );
 
-  async function fetchOrder() {
-    try {
-      const response = await dispatch(ReserveOrderDetailsGet(params.id));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
+  const reserveOrderDetailsData = useSelector(
+    (state) => state?.orderSystem?.reserveOrderDetails
+  );
+
+  useEffect(() => {
+    if (reserveOrderDetailsData) {
+      const reserveOrderData = reserveOrderDetailsData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrderData(reserveOrderData);
+    }
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
             ...product,
             id: index1,
-          }));
-          setTableData(newData);
-        });
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
       }
-    } catch (error) {
-      console.error(error);
     }
+  }, [orderDetailsDataOrderId, reserveOrderDetailsData]);
+
+  async function fetchOrder() {
+    dispatch(ReserveOrderDetailsGet(params.id));
   }
 
   useEffect(() => {
     fetchOrder();
-  }, [fetchOrder]);
+  }, []);
 
   const ImageModule = (url) => {
     setImageURL(url);

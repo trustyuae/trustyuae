@@ -41,16 +41,16 @@ function CompletedOrderSystem() {
     null,
   ]);
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
-  
+
   const completedOrdersData = useSelector(
-    (state) => state?.orderSystem?.completedOrders?.orders
+    (state) => state?.orderSystem?.completedOrders
   );
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (completedOrdersData) {
-      const completedData = completedOrdersData.orders.map((v, i) => ({
+      const completedData = completedOrdersData?.orders?.map((v, i) => ({
         ...v,
         id: i,
       }));
