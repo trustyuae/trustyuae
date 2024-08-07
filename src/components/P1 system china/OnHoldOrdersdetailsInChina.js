@@ -626,7 +626,7 @@ const OnHoldOrdersdetailsInChina = () => {
       setToggleStatus(0);
     }
     const response = await axios.post(
-      `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/?warehouse="China"`,
+      `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/?warehouse=China`,
       result,
       { headers }
     );
