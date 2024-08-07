@@ -133,7 +133,7 @@ export const AddProductOrderForStock = createAsyncThunk(
   async ({ requestedData }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        "wp-json/custom-instock-api/v1/quantity-instock-api/",
+        `wp-json/custom-instock-api/v1/quantity-instock-api/`,
         requestedData
       );
       return response.data;

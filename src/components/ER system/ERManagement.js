@@ -60,7 +60,7 @@ function ERManagement() {
   }, [allFactoryDatas]);
 
   async function fetchOrders() {
-    let apiUrl ='wp-json/custom-er-fetch/v1/fetch-all-er/?per_page=${pageSize}&page=${page}';
+    let apiUrl =`wp-json/custom-er-fetch/v1/fetch-all-er/?per_page=${pageSize}&page=${page}`;
     if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
     if (dueDate) apiUrl += `&due_date=${dueDate}`;
     if (selectedDate) apiUrl += `&date=${selectedDate}`;

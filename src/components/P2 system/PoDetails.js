@@ -145,7 +145,7 @@ const PoDetails = () => {
   const getMessages = async () => {
     try {
       const response = await axiosInstance.get(
-        'wp-json/custom-po-note/v1/get-po-notes/${id}'
+        `wp-json/custom-po-note/v1/get-po-notes/${id}`
       );
       setMessages(response.data);
     } catch (error) {
@@ -653,7 +653,7 @@ const PoDetails = () => {
       };
 
       const response = await axiosInstance.post(
-        'wp-json/custom-po-note/v1/add-po-note/',
+        `wp-json/custom-po-note/v1/add-po-note/`,
         requestedMessage
       );
       console.log(response.data);

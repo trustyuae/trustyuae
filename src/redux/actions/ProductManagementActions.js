@@ -31,7 +31,7 @@ export const EditProductsList = (formData, id) => async (dispatch) => {
   try {
     dispatch({ type: EDIT_PRODUCT_LIST_REQUEST });
     const response = await axiosInstance.post(
-      'wp-json/custom-proimage-update/v1/update-product/${id}',
+      `wp-json/custom-proimage-update/v1/update-product/${id}`,
       formData,
       {
         headers: {

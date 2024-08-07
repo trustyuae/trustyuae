@@ -47,7 +47,7 @@ export const AddGrn = (payload, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_GRN_REQUEST });
     const response = await axiosInstance.post(
-      'wp-json/create-po-grn/v1/create-grn-by-po/',
+      `wp-json/create-po-grn/v1/create-grn-by-po/`,
       payload,
       {
         headers: {
@@ -144,7 +144,7 @@ export const AddProductOrderForPre = (requestedDataP) => async (dispatch) => {
   try {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_PREP_REQUEST });
     const response = await axiosInstance.post(
-      'wp-json/order-preparation-api/v1/order-send-by-product/',
+      `wp-json/order-preparation-api/v1/order-send-by-product/`,
       requestedDataP
     );
     dispatch({
@@ -161,7 +161,7 @@ export const AddProductOrderForStock = (requestedData) => async (dispatch) => {
   try {
     dispatch({ type: ADD_PRODUCT_ORDER_FOR_STOCK_REQUEST });
     const response = await axiosInstance.post(
-      'wp-json/custom-instock-api/v1/quantity-instock-api/',
+      `wp-json/custom-instock-api/v1/quantity-instock-api/`,
       requestedData
     );
     dispatch({

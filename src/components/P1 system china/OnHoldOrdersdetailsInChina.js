@@ -205,7 +205,7 @@ const OnHoldOrdersdetailsInChina = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axiosInstance.post(
-          "wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}",
+          `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
             variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
@@ -615,7 +615,7 @@ const OnHoldOrdersdetailsInChina = () => {
       setToggleStatus(0);
     }
     const response = await axiosInstance.post(
-      "wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/",
+      `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
       result
     );
     if (response) {

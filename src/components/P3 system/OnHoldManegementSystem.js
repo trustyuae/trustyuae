@@ -79,7 +79,7 @@ function OnHoldManegementSystem() {
   );
 
   const getall = async () => {
-    let url = 'wp-json/custom-api-product/v1/get-product/?';
+    let url = `wp-json/custom-api-product/v1/get-product/?`;
     const response = await axiosInstance.get(url);
     setoptionsArray(
       response.data.products.map((user) => ({
@@ -493,7 +493,7 @@ function OnHoldManegementSystem() {
   };
 
   const getAllProducts = async () => {
-    let apiUrl = 'wp-json/custom-api-product/v1/get-product/?';
+    let apiUrl = `wp-json/custom-api-product/v1/get-product/?`;
     if (productNameF && productIDF) {
       apiUrl += `product_name=${productNameF}&product_id=${productIDF}`;
     } else if (productNameF) {
@@ -697,7 +697,7 @@ function OnHoldManegementSystem() {
   const selectPOId = async () => {
     try {
       const response = await axiosInstance.get(
-        'wp-json/get-po-ids/v1/show-po-id/${selectedFactory}'
+        `wp-json/get-po-ids/v1/show-po-id/${selectedFactory}`
       );
       let data = response.data;
       setAllPoIds(data);
@@ -709,7 +709,7 @@ function OnHoldManegementSystem() {
   const fetchPoProductData = async () => {
     try {
       const response = await axiosInstance.get(
-        'wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}'
+        `wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`
       );
 
       // Ensure each row has a unique 'id'

@@ -50,7 +50,7 @@ const OrderSystemInChina = () => {
     const dispatch = useDispatch();
   
     async function fetchOrders() {
-      let apiUrl = 'wp-json/custom-orders-new/v1/orders/?warehouse=China';
+      let apiUrl = `wp-json/custom-orders-new/v1/orders/?warehouse=China`;
       if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       await dispatch(

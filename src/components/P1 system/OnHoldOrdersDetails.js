@@ -24,17 +24,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   AddMessage,
-//   AttachmentFileUpload,
-//   CustomOrderFinish,
-//   CustomOrderFinishOH,
-//   InsertOrderPickup,
-//   InsertOrderPickupCancel,
-//   OnHoldOrderDetailsGet,
-//   OrderDetailsGet,
-//   OverAllAttachmentFileUpload,
-// } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -42,13 +31,18 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
+import {
+  AddMessage,
+  AttachmentFileUpload,
+  CustomOrderFinishOH,
+  InsertOrderPickup,
+  InsertOrderPickupCancel,
+  OnHoldOrderDetailsGet,
+  OverAllAttachmentFileUpload,
+} from "../../Redux2/slices/OrderSystemSlice";
 import { getUserData } from "../../utils/StorageUtils";
 import axiosInstance from "../../utils/AxiosInstance";
-// import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
 
 function OnHoldOrdersDetails() {
   const { id } = useParams();
@@ -71,13 +65,12 @@ function OnHoldOrdersDetails() {
   const [toggleStatus, setToggleStatus] = useState(0);
 
   const [message, setMessage] = useState("");
- const [userData, setUserData] = useState(null)
+  const [userData, setUserData] = useState(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
-  // const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
-  const [loader, setLoader] = useState(true);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -88,20 +81,58 @@ function OnHoldOrdersDetails() {
     (state) => state?.orderSystem?.onHoldOrderDetails?.orders?.[0]
   );
 
+  const OnHoldOrderDetailsData = useSelector(
+    (state) => state?.orderSystem?.onHoldOrderDetails
+  );
+
+  const messageData = useSelector((state) => state?.orderSystem?.message);
+
+  const OnHoldCustomOrderDataa = useSelector(
+    (state) => state?.orderSystem?.customOrderData
+  );
+
+  const OnHoldOrderFinishData = useSelector(
+    (state) => state?.orderSystem?.customOrderOnHoldFinishData
+  );
+
+  console.log(OnHoldOrderFinishData,"OnHoldOrderFinishData")
+
+  useEffect(() => {
+      const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrderData(onHoldOrderData);
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      setToggleStatus(Number(orderDetailsDataOrderId.order_process));
+
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsDataOrderId, OnHoldOrderDetailsData]);
+
   async function fetchUserData() {
     try {
       const userdata = await getUserData();
-      console.log(userdata,'userdata from header')
       setUserData(userdata);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   }
-
   useEffect(() => {
     fetchUserData();
   }, []);
-
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -127,24 +158,7 @@ function OnHoldOrdersDetails() {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(OnHoldOrderDetailsGet(id));
-
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      setToggleStatus(Number(response.data.orders[0].toggle_status));
-      const order = response.data.orders[0];
-      if (order) setOrderProcess(order.order_process);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
-      }
-      setLoader(false);
+      dispatch(OnHoldOrderDetailsGet({id}));
     } catch (error) {
       console.error(error);
     }
@@ -162,22 +176,12 @@ function OnHoldOrdersDetails() {
       order_id: orderId,
       name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        setMessage("");
-        setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
-      }
-    });
+    dispatch(AddMessage(requestedMessage));
+    if (messageData) {
+      setMessage("");
+      setshowMessageModal(false);
+      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
+    }
   };
 
   useEffect(() => {
@@ -225,7 +229,7 @@ function OnHoldOrdersDetails() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axiosInstance.post(
-          "wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}",
+          `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
             variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
@@ -237,20 +241,11 @@ function OnHoldOrdersDetails() {
   };
 
   const handleSubmitAttachment = async () => {
-    setLoader(true);
     try {
-      // const userData = await getUserData();
       const { user_id } = userData ?? {};
       if (selectedItemId) {
-        await dispatch(
+        dispatch(
           AttachmentFileUpload({
-            // user_id: user_id,
-            // // order_id: orderDetailsDataOrderId?.order_id,
-            // order_id: id,
-            // item_id: selectedItemId,
-            // selectedFile: selectedFile,
-            // variation_id: selectedVariationId,
-
             user_id: user_id,
             order_id: orderDetailsDataOrderId?.order_id,
             item_id: selectedItemId,
@@ -259,9 +254,8 @@ function OnHoldOrdersDetails() {
           })
         );
       } else {
-        await dispatch(
+        dispatch(
           OverAllAttachmentFileUpload({
-            // order_id: orderDetailsDataOrderId?.order_id,
             order_id: id,
             order_dispatch_image: selectedFile,
           })
@@ -281,7 +275,7 @@ function OnHoldOrdersDetails() {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
-      setLoader(false);
+      // setLoader(false);
     } catch (error) {
       console.error(error);
     }
@@ -296,21 +290,6 @@ function OnHoldOrdersDetails() {
       order_status: "started",
     };
     await dispatch(InsertOrderPickup(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleCancelOrderProcess = async () => {
-    const requestData = {
-      order_id: parseInt(id, 10),
-      operation_id: orderDetails?.operation_user_id,
-      order_status: "Cancelled",
-    };
-    await dispatch(InsertOrderPickupCancel(requestData))
       .then((response) => {
         fetchOrder();
       })
@@ -605,7 +584,7 @@ function OnHoldOrdersDetails() {
   ];
 
   const handalswitch = async (e) => {
-    setLoader(true);
+    // setLoader(true);
     if (e) {
       // setToggleStatus(1)
       handelSend(e);
@@ -636,10 +615,8 @@ function OnHoldOrdersDetails() {
       setToggleStatus(0);
     }
 
-    console.log(result, "result");
-
     const response = await axiosInstance.post(
-      "wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/",
+      `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
       result
     );
     console.log(response, "response");
@@ -648,9 +625,6 @@ function OnHoldOrdersDetails() {
     }
   };
 
-  // useEffect(()=>{
-  //   handelSend()
-  // },[toggleStatus])
   return (
     <>
       <Container fluid className="px-5">
@@ -734,13 +708,6 @@ function OnHoldOrdersDetails() {
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
               orderProcess == "started" ? (
-                // <Button
-                //   variant="outline-danger"
-                //   className="p-1 me-2 bg-transparent text-danger"
-                //   onClick={handleCancelOrderProcess}
-                // >
-                //   <CancelIcon />
-                // </Button>
                 <Form.Check // prettier-ignore
                   type="switch"
                   id="custom-switch"

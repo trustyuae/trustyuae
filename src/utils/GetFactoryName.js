@@ -5,7 +5,7 @@ import axiosInstance from '../utils/AxiosInstance'
 const getFactoryNameById = async (factory_id) => {
   try {
     const response = await axiosInstance.get(
-      'wp-json/custom-factory-fetch/v1/fetch-factory/${factory_id}'
+      `wp-json/custom-factory-fetch/v1/fetch-factory/${factory_id}`
     );
     const factory = response.data;
     return factory ? factory.factory_name : "Factory Not Found";

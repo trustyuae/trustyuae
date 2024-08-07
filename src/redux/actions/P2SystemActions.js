@@ -100,7 +100,7 @@ export const QuantityPoDetails =
     async (dispatch) => {
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_REQUEST });
-        const response = await axiosInstance.post('wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}',payload);
+        const response = await axiosInstance.post(`wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`,payload);
         dispatch({
           type: GET_QUANTITY_DETAILS_SUCCESS,
           payload: response?.data,
@@ -131,7 +131,7 @@ export const AddPO = (payload, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_PO_REQUEST });
     const response = await axiosInstance.post(
-      'wp-json/custom-po-number/v1/po-id-generate/',
+      `wp-json/custom-po-number/v1/po-id-generate/`,
       payload
     );
 
@@ -158,7 +158,7 @@ export const AddManualPO = (payload, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_MANUAL_PO_REQUEST });
     const response = await axiosInstance.post(
-      'wp-json/custom-manual-order/v1/post-order-manual/',
+      `wp-json/custom-manual-order/v1/post-order-manual/`,
       payload
     );
     if (response.data) {
@@ -179,7 +179,7 @@ export const AddSchedulePO = (payload, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_SCHEDULE_PO_REQUEST });
     const response = await axiosInstance.post(
-      'wp-json/custom-schedule-order/v1/post-order-schedule/',
+      `wp-json/custom-schedule-order/v1/post-order-schedule/`,
       payload
     );
     if (response.data) {
@@ -258,7 +258,7 @@ export const OrderNotAvailableDataPo = (requestData) => async (dispatch) => {
     } else {
       dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REQUEST });
       const response = await axiosInstance.post(
-        'wp-json/custom-so-create/v1/convert-so-order/',
+        `wp-json/custom-so-create/v1/convert-so-order/`,
         requestData
       );
       dispatch({
@@ -277,7 +277,7 @@ export const OrderNotAvailableDataStatus =
     try {
       dispatch({ type: UPDATE_ORDER_NOT_AVAILABLE_STATUS_REQUEST });
       const response = await axiosInstance.post(
-          'wp-json/order-not-update/v1/order-not-btn/',
+          `wp-json/order-not-update/v1/order-not-btn/`,
           requestedDataS
         )
         .then(async (response) => {
@@ -309,7 +309,7 @@ export const OrderNotAvailableRefund =
       };
       const refundPromises = orderIds.map(async (id) => {
         const response = await axiosInstance.post(
-          '/wp-json/wc/v3/orders/${id}/refunds',
+          `/wp-json/wc/v3/orders/${id}/refunds`,
           requestedInfo,
           {
             auth: basicAuth,

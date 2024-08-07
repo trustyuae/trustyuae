@@ -37,7 +37,7 @@ const ReserveOrderdetailsInChina = () => {
       const fetchUserName = async () => {
         try {
           const name = await axiosInstance.get(
-           'wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}'
+           `wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`
           );
           setUserName(name.data);
         } catch (error) {

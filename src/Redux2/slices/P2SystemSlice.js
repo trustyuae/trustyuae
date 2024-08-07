@@ -82,7 +82,7 @@ export const QuantityPoDetailsForModalInView = createAsyncThunk(
   async ({ productId, variationId, poId }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        "wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}/${variationId}"
+        `wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}/${variationId}`
       );
       return response.data;
     } catch (error) {
@@ -208,7 +208,7 @@ export const OrderNotAvailableDataStatus = createAsyncThunk(
   async ({ requestedDataS }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance
-        .post("wp-json/order-not-update/v1/order-not-btn/", requestedDataS)
+        .post(`wp-json/order-not-update/v1/order-not-btn/`, requestedDataS)
         .then(async (response) => {
           await ShowAlert(
             "Status Updated Successfully!",

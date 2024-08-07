@@ -102,6 +102,7 @@ export const OnHoldOrderDetailsGet = createAsyncThunk(
       const response = await axiosInstance.get(
         `wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`
       );
+      console.log(response,'response of OnHoldOrderDetailsGet in slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -376,7 +377,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(OnHoldOrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.onHoldOrderDetails = action.data;
+        state.onHoldOrderDetails = action.payload;
       })
       .addCase(OnHoldOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
@@ -387,7 +388,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(ReserveOrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.reserveOrderDetails = action.data;
+        state.reserveOrderDetails = action.payload;
       })
       .addCase(ReserveOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
@@ -398,7 +399,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(AttachmentFileUpload.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.uploadAttachFile = action.data;
+        state.uploadAttachFile = action.payload;
       })
       .addCase(AttachmentFileUpload.rejected, (state, action) => {
         state.isLoading = false;

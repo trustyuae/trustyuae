@@ -235,7 +235,7 @@ function POManagementSystem() {
     if (result.isConfirmed) {
       try {
         const response = await axiosInstance.get(
-          'wp-json/delete-record/v1/delete-po-record/${id}'
+          `wp-json/delete-record/v1/delete-po-record/${id}`
         );
         if (response) {
           POM_system_products();

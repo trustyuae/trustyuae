@@ -53,7 +53,7 @@ function AllProductList() {
   }, [allFactoryDatas]);
 
   const fetchProducts = async () => {
-    let apiUrl = 'wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}';
+    let apiUrl = `wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
     if (searchId) apiUrl += `&product_id=${searchId}`;
     if (searchName) apiUrl += `&product_name=${searchName}`;
     try {

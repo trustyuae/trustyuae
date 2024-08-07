@@ -70,7 +70,7 @@ const ERDetails = () => {
 
   const fetchER = async () => {
     try {
-      let apiUrl = 'wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/';
+      let apiUrl = `wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/`;
       await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
         setStatus(response.data.er_status);
         setFactoryName(response.data.factory_id);

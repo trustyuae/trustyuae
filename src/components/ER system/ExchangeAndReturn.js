@@ -280,7 +280,7 @@ function ExchangeAndReturn() {
     try {
       setSelectPOId(id);
       const response = await axiosInstance.get(
-        'wp-json/custom-er-po/v1/fetch-orders-po/${id}'
+        `wp-json/custom-er-po/v1/fetch-orders-po/${id}`
       );
       let data2 = [
         ...response.data.items_with_variations,
@@ -310,7 +310,7 @@ function ExchangeAndReturn() {
 
     try {
       const response = await axiosInstance.post(
-        'wp-json/custom-er-generate/v1/create-er/',
+        `wp-json/custom-er-generate/v1/create-er/`,
         payload
       );
 
