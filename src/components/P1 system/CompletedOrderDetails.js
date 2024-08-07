@@ -27,7 +27,6 @@ import { API_URL } from "../../redux/constants/Constants";
 import { CompletedOrderDetailsGet } from "../../Redux2/slices/OrderSystemSlice";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-
 function CompletedOrderDetails() {
   const params = useParams();
   const [orderData, setOrderData] = useState([]);
@@ -41,12 +40,11 @@ function CompletedOrderDetails() {
   const [userName, setUserName] = useState(null);
   const [attachmentZoom, setAttachmentZoom] = useState(false);
 
-
   useEffect(() => {
     const fetchUserName = async () => {
       try {
         const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,
+          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`
         );
         setUserName(name.data);
       } catch (error) {
@@ -60,31 +58,44 @@ function CompletedOrderDetails() {
     }
   }, [orderDetails]);
 
-  const loader = useSelector(
-    (state) => state?.orderSystem?.isLoading
-  );
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystem?.completedOrderDetails?.orders?.[0]
   );
 
-  async function fetchOrder() {
-    try {
-      const response = await dispatch(CompletedOrderDetailsGet(params.id));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
+  const completedOrderDetailsData = useSelector(
+    (state) => state?.orderSystem?.completedOrderDetails
+  );
+
+  useEffect(() => {
+    if (completedOrderDetailsData) {
+      const completedOrderData = completedOrderDetailsData?.orders?.map(
+        (v, i) => ({
+          ...v,
+          id: i,
+        })
+      );
+      setOrderData(completedOrderData);
+    }
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
             ...product,
             id: index1,
-          }));
-          setTableData(newData);
-        });
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
       }
-    } catch (error) {
-      console.error(error);
     }
+  }, [orderDetailsDataOrderId, OnHoldOrderDetailsData]);
+
+  async function fetchOrder() {
+    dispatch(CompletedOrderDetailsGet(params.id));
   }
 
   useEffect(() => {

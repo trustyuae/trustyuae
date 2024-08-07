@@ -41,30 +41,35 @@ function CompletedOrderSystem() {
     null,
   ]);
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
+  
+  const completedOrdersData = useSelector(
+    (state) => state?.orderSystem?.completedOrders?.orders
+  );
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (completedOrdersData) {
+      const completedData = completedOrdersData.orders.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(completedData);
+      setTotalPages(completedOrdersData.total_pages);
+    }
+  }, [completedOrdersData]);
+
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?&page=${page}&per_page=${pageSize}`;
-    if (searchOrderID)
-      apiUrl += `&orderid=${searchOrderID}`;
-    if (endDate)
-      apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
+    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
       apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
-    await dispatch(
+    dispatch(
       CompletedOrderSystemGet({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleReset = () => {
@@ -75,8 +80,8 @@ function CompletedOrderSystem() {
     setEndDate("");
     setSelectedDateRange([null, null]);
     setTotalPages(1);
-    clearDateRange()
-    clearEndDateRange()
+    clearDateRange();
+    clearEndDateRange();
     if (isReset) {
       setIsReset(false);
     } else {
@@ -90,7 +95,12 @@ function CompletedOrderSystem() {
   };
 
   const columns = [
-    { field: "start_date", headerName: "Started Date", className: "order-system", flex: 1 },
+    {
+      field: "start_date",
+      headerName: "Started Date",
+      className: "order-system",
+      flex: 1,
+    },
     {
       field: "order_id",
       headerName: "Order ID",
@@ -118,7 +128,12 @@ function CompletedOrderSystem() {
       className: "order-system",
       type: "string",
     },
-    { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
+    {
+      field: "end_date",
+      headerName: "Completed Date",
+      className: "order-system",
+      flex: 1,
+    },
     {
       field: "view_item",
       headerName: "View Item",
@@ -189,7 +204,7 @@ function CompletedOrderSystem() {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
     }
-  }
+  };
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
     setStartDate("");
@@ -198,13 +213,13 @@ function CompletedOrderSystem() {
   const clearEndDateRange = () => {
     setSelectedCompletedDateRange([null, null]);
     setCompletedStartDate("");
-    setCompletedEndDate("")
+    setCompletedEndDate("");
   };
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
-  }, [pageSize, page, searchOrderID, isReset,setSearchOrderID]);
+  }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
 
   return (
     <Container fluid className="py-3">
@@ -255,7 +270,10 @@ function CompletedOrderSystem() {
                   </DemoContainer>
                 </LocalizationProvider>
                 {selectedDateRange[0] && selectedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                  <CancelIcon
+                    style={{ position: "absolute", right: "0", top: "39px" }}
+                    onClick={clearDateRange}
+                  />
                 )}
               </Form.Group>
             </Col>
@@ -285,9 +303,13 @@ function CompletedOrderSystem() {
                     />
                   </DemoContainer>
                 </LocalizationProvider>
-                {selectedCompletedDateRange[0] && selectedCompletedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "47px" }} onClick={clearEndDateRange} />
-                )}
+                {selectedCompletedDateRange[0] &&
+                  selectedCompletedDateRange[1] && (
+                    <CancelIcon
+                      style={{ position: "absolute", right: "0", top: "47px" }}
+                      onClick={clearEndDateRange}
+                    />
+                  )}
               </Form.Group>
             </Col>
           </Row>
@@ -312,7 +334,7 @@ function CompletedOrderSystem() {
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
-              onClick={(e)=>handleSearchFilter(e)}
+              onClick={(e) => handleSearchFilter(e)}
             >
               Search
             </Button>

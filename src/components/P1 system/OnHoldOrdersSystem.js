@@ -44,8 +44,7 @@ function OnHoldOrdersSystem() {
   const OnholdOrdersData = useSelector(
     (state) => state?.orderSystem?.onHoldOrders
   );
-  console.log(OnholdOrdersData, "OnholdOrdersData");
-
+  
   const dispatch = useDispatch();
 
   useEffect(() => {

@@ -342,7 +342,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(CompletedOrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.completedOrderDetails = action.data;
+        state.completedOrderDetails = action.payload;
       })
       .addCase(CompletedOrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
