@@ -5,7 +5,7 @@ import ShowAlert from "../../utils/ShowAlert";
 const initialState = {
   isLoading: false,
   SyncLoading: false,
-  factory: [],
+  factories: [],
   editFactory: [],
   addFactory: [],
   error: null,
@@ -92,7 +92,7 @@ const factorySlice = createSlice({
     clearstoredata: (state) => {
       state.isLoading = false;
       state.SyncLoading = false;
-      state.factory = [];
+      state.factories = [];
       state.editFactory = [];
       state.addFactory = [];
       state.error = null;
@@ -105,33 +105,33 @@ const factorySlice = createSlice({
       })
       .addCase(fetchAllFactories.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.factory = action.data;
+        state.factories = action.payload;
       })
       .addCase(fetchAllFactories.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(factoryEdit.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(factoryEdit.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editFactory = action.data;
+        state.editFactory = action.payload;
       })
       .addCase(factoryEdit.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(FactoryAdd.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(FactoryAdd.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.addFactory = action.payload;
       })
       .addCase(FactoryAdd.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       });
   },
 });

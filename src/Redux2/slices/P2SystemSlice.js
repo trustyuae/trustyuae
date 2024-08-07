@@ -18,7 +18,6 @@ const initialState = {
   ordersNotAvailable: [],
   ordersNotAvailablePo: [],
   ordersNotAvailableStatus: [],
-  ordersNotAvailableRefund: [],
   error: null,
 };
 
@@ -27,6 +26,7 @@ export const PoDetailsData = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
+      console.log(response,'response of PoDetailsData from slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -40,6 +40,7 @@ export const ManualOrScheduledPoDetailsData = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
+      console.log(response,'response from ManualOrScheduledPoDetailsData')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -268,143 +269,143 @@ const P2SystemSlice = createSlice({
       })
       .addCase(PoDetailsData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.factory = action.data;
+        state.poDetailsData = action.payload;
       })
       .addCase(PoDetailsData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(ManualOrScheduledPoDetailsData.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(ManualOrScheduledPoDetailsData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editFactory = action.data;
+        state.manualOrScheduledPoDetailsData = action.payload;
       })
       .addCase(ManualOrScheduledPoDetailsData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(PerticularPoDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(PerticularPoDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.perticularPoDetailsData = action.payload;
       })
       .addCase(PerticularPoDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(QuantityPoDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(QuantityPoDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.quantityDetailsData = action.payload;
       })
       .addCase(QuantityPoDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(QuantityPoDetailsForModalInView.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(QuantityPoDetailsForModalInView.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.quantityDetailsDataOnPoDetails = action.payload
       })
       .addCase(QuantityPoDetailsForModalInView.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(AddPO.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddPO.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.addedPoData = action.payload;
       })
       .addCase(AddPO.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(AddManualPO.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddManualPO.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.addedManualPoData = action.payload;
       })
       .addCase(AddManualPO.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(AddSchedulePO.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddSchedulePO.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.addedSchedulePoData = action.payload;
       })
       .addCase(AddSchedulePO.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(UpdatePODetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(UpdatePODetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.updatedPoDetails = action.payload;
       })
       .addCase(UpdatePODetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(PomSystemProductsDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(PomSystemProductsDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.pomSystemProductDetails = action.payload;
       })
       .addCase(PomSystemProductsDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(OrderNotAvailableData.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderNotAvailableData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.ordersNotAvailable = action.payload;
       })
       .addCase(OrderNotAvailableData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(OrderNotAvailableDataPo.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderNotAvailableDataPo.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.ordersNotAvailablePo = action.payload;
       })
       .addCase(OrderNotAvailableDataPo.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(OrderNotAvailableDataStatus.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(OrderNotAvailableDataStatus.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.ordersNotAvailableStatus = action.payload;
       })
       .addCase(OrderNotAvailableDataStatus.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       });
   },
 });
