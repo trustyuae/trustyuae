@@ -81,6 +81,20 @@ export const CompletedOrderDetailsGet = createAsyncThunk(
   }
 );
 
+export const OnHoldOrderSystemGet = createAsyncThunk(
+  "orderSystem/OnHoldOrderSystemGet",
+  async ({ apiUrl }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(apiUrl);
+      console.log(response,'response of OnHoldOrderSystemGet')
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const OnHoldOrderDetailsGet = createAsyncThunk(
   "orderSystem/OnHoldOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
@@ -343,6 +357,17 @@ const orderSystemSlice = createSlice({
         state.completedOrderDetails = action.data;
       })
       .addCase(CompletedOrderDetailsGet.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(OnHoldOrderSystemGet.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(OnHoldOrderSystemGet.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.onHoldOrders = action.payload;
+      })
+      .addCase(OnHoldOrderSystemGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

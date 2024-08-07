@@ -104,8 +104,6 @@ function OrderDetails() {
   const CustomOrderOHDataa = useSelector(
     (state) => state?.orderSystem?.customOrderOnHoldData
   );
-  
-  console.log(CustomOrderOHDataa, "CustomOrderOHDataa");
 
   useEffect(() => {
     const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
@@ -140,6 +138,7 @@ function OrderDetails() {
 
   useEffect(() => {
     fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const capture = useCallback(() => {
@@ -184,22 +183,12 @@ function OrderDetails() {
       order_id: orderId,
       name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        setMessage("");
-        setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
-      }
-    });
+    dispatch(AddMessage(requestedMessage));
+    if (messageData) {
+      setMessage("");
+      setshowMessageModal(false);
+      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
+    }
   };
 
   const submitOH = async () => {
@@ -218,10 +207,10 @@ function OrderDetails() {
         result.product_name.push(item.product_name);
         result.variation_id.push(parseInt(item.variation_id, 10));
       });
-      dispatch(CustomOrderOH(result, navigate));
+      dispatch(CustomOrderOH(result));
       if (CustomOrderOHDataa.status === 200) {
-        setOHMessage("")
-        setshowMessageOHModal(false)
+        setOHMessage("");
+        setshowMessageOHModal(false);
         ShowAlert(
           "",
           CustomOrderOHDataa.data.message,
@@ -242,7 +231,7 @@ function OrderDetails() {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setTableData, setOrderData]);
+  }, [setTableData, setOrderData,messageData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -300,7 +289,7 @@ function OrderDetails() {
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
-        await dispatch(
+        dispatch(
           AttachmentFileUpload({
             user_id: user_id,
             order_id: orderDetailsDataOrderId?.order_id,
@@ -346,7 +335,7 @@ function OrderDetails() {
       end_time: "",
       order_status: "started",
     };
-    await dispatch(InsertOrderPickup(requestData));
+    dispatch(InsertOrderPickup(requestData));
     fetchOrder();
   };
 
