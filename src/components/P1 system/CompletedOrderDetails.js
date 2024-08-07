@@ -92,7 +92,7 @@ function CompletedOrderDetails() {
         console.warn("orderDetailsDataOrderId.items is not an array");
       }
     }
-  }, [orderDetailsDataOrderId, OnHoldOrderDetailsData]);
+  }, [orderDetailsDataOrderId, completedOrderDetailsData]);
 
   async function fetchOrder() {
     dispatch(CompletedOrderDetailsGet(params.id));
