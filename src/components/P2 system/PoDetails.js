@@ -149,7 +149,7 @@ const PoDetails = () => {
         setTotalPages(response?.data?.total_pages);
       });
     } catch {
-      .error("Error fetching PO:");
+      console.error("Error fetching PO:");
     }
   };
 
