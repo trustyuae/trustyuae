@@ -59,11 +59,6 @@ function OrderNotAvailable() {
     (state) => state?.p2System?.ordersNotAvailable
   );
 
-  console.log(
-    ordersNotAvailableOverAllData,
-    "ordersNotAvailableOverAllData from redux toolkit"
-  );
-
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);

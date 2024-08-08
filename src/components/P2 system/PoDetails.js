@@ -50,10 +50,13 @@ import { DatePicker } from "@mui/x-date-pickers-pro";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import axiosInstance from '../../utils/AxiosInstance'
+import axiosInstance from "../../utils/AxiosInstance";
 import { getUserData } from "../../utils/StorageUtils";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
-import { PerticularPoDetails, UpdatePODetails } from "../../Redux2/slices/P2SystemSlice";
+import {
+  PerticularPoDetails,
+  UpdatePODetails,
+} from "../../Redux2/slices/P2SystemSlice";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -80,29 +83,39 @@ const PoDetails = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const navigate = useNavigate();
-  const allFactoryDatas = useSelector(
-    (state) => state?.factory?.isLoading
-  );
 
-  const PoUpdate = useSelector(
-    (state) => state?.p2System?.isLoading
-  );
+  const allFactoryDatas = useSelector((state) => state?.factory?.isLoading);
+
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
+  const PoUpdate = useSelector((state) => state?.p2System?.isLoading);
 
   const perticularOrderDetailsLoader = useSelector(
     (state) => state?.p2System?.isLoading
   );
 
+  const perticularPoDetailsDatas = useSelector(
+    (state) => state?.p2System?.perticularPoDetailsData
+  );
+
+  console.log(perticularPoDetailsDatas,'perticularPoDetailsDatas from redux toolkit')
 
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data);
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
+
+  useEffect(()=>{
+  // if(perticularPoDetailsDatas){
+  //   const perticularData = perticularPoDetailsDatas
+  // }
+  },[])
 
   const radios = [
     { name: "English", value: "En" },
@@ -338,9 +351,11 @@ const PoDetails = () => {
     try {
       if (variationValue) {
         const parsedValue = JSON.parse(variationValue);
-  
-        if (typeof parsedValue === 'object' && parsedValue !== null) {
-          variationArray = Object.entries(parsedValue).map(([key, value]) => ({ [key]: value }));
+
+        if (typeof parsedValue === "object" && parsedValue !== null) {
+          variationArray = Object.entries(parsedValue).map(([key, value]) => ({
+            [key]: value,
+          }));
         } else {
           console.error("Parsed value is not an object:", parsedValue);
         }
@@ -582,7 +597,7 @@ const PoDetails = () => {
               <DatePicker
                 format="YYYY-MM-DD"
                 value={dateValue} // Use determined value for DatePicker
-                onChange={(date) => handleDateChange(rowId,date)}
+                onChange={(date) => handleDateChange(rowId, date)}
                 sx={{
                   width: "80%",
                   "& .MuiInputBase-input": {
@@ -645,7 +660,7 @@ const PoDetails = () => {
     setAddMessageD(true);
     try {
       // const orderId = parseInt(id, 10);
-      let userID = getUserData()
+      let userID = getUserData();
       const requestedMessage = {
         po_note: message,
         po_id: id,
