@@ -79,6 +79,7 @@ export const GetGRNView = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
+      console.log(response,'response from getGrnView in slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);

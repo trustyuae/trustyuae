@@ -10,7 +10,6 @@ import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-// import { GetGRNView } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
 import { GetGRNView } from "../../Redux2/slices/P3SystemSlice";
 
@@ -20,19 +19,38 @@ const GRNView = () => {
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.p3System?.isLoading);
+  
+  const grnViewData = useSelector((state) => state?.p3System?.grnView);
+
+  console.group(grnViewData,'grnViewData in useSelector')
+
+  useEffect(()=>{
+    // if(grnViewData){
+    //   const grnvData = grnViewData?.
+    // }
+    },[])
 
   const fetchOrder = async () => {
     let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}`;
-    await dispatch(GetGRNView({ apiUrl })).then((response) => {
-      let data = response?.data?.map((v, i) => ({ ...v, id: i }));
-      setPO_OrderList(data);
-    });
+    try {
+      const response = await dispatch(GetGRNView({ apiUrl })).unwrap();
+      if (Array.isArray(response.data)) {
+        let data = response.data.map((v, i) => ({ ...v, id: i }));
+        setPO_OrderList(data);
+      } else {
+        console.error("Response data is not an array:", response.data);
+        setPO_OrderList([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch GRN view:", error);
+      setPO_OrderList([]);
+    }
   };
 
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [id]); // Added id as a dependency to refetch if id changes
 
   const columns = [
     {
@@ -45,16 +63,14 @@ const GRNView = () => {
       headerName: "Product images",
       flex: 2,
       type: "html",
-      renderCell: (value, row) => {
+      renderCell: (value) => {
         return (
-          <>
-            <img
-              src={value.row.product_image}
-              alt={value.row.product_name}
-              className="img-fluid "
-              width={100}
-            />
-          </>
+          <img
+            src={value.row.product_image}
+            alt={value.row.product_name}
+            className="img-fluid"
+            width={100}
+          />
         );
       },
     },
@@ -63,10 +79,10 @@ const GRNView = () => {
       headerName: "Variation",
       flex: 2,
       renderCell: (params) => {
-        if (params.row.variations != "") {
+        if (params.row.variations) {
           return formatVariations(params.row.variations);
         } else {
-          return "No any variations";
+          return "No variations";
         }
       },
     },
@@ -77,7 +93,7 @@ const GRNView = () => {
       headerName: "Action",
       flex: 1,
       type: "html",
-      renderCell: (value, row) => {
+      renderCell: (value) => {
         return (
           <Link
             to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}/${value.row.variation_id}`}
@@ -93,31 +109,35 @@ const GRNView = () => {
       },
     },
   ];
-  const handalBackButton = () => {
+
+  const handleBackButton = () => {
     navigate("/GRN_Management");
   };
 
   const formatVariations = (variations) => {
-    const data = JSON.parse(variations);
-    if (Object.keys(data).length === 0) {
-      return "No variations";
-    } else {
-      return Object.entries(data)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join(", ");
+    try {
+      const data = JSON.parse(variations);
+      if (Object.keys(data).length === 0) {
+        return "No variations";
+      } else {
+        return Object.entries(data)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(", ");
+      }
+    } catch (error) {
+      console.error("Failed to parse variations:", error);
+      return "Invalid variations format";
     }
   };
+
   return (
     <Container fluid className="px-5">
       <MDBRow className="my-3">
-        <MDBCol
-          md="5"
-          className="d-flex justify-content-start align-items-center"
-        >
+        <MDBCol md="5" className="d-flex justify-content-start align-items-center">
           <Button
             variant="outline-secondary"
             className="p-1 me-2 bg-transparent text-secondary"
-            onClick={handalBackButton}
+            onClick={handleBackButton}
           >
             <ArrowBackIcon className="me-1" />
           </Button>
@@ -144,9 +164,6 @@ const GRNView = () => {
               <DataTable
                 columns={columns}
                 rows={PO_OrderList}
-                // page={pageSO}
-                // pageSize={pageSizeSO}
-                // totalPages={totalPagesSO}
                 rowHeight={100}
               />
             </div>
@@ -156,4 +173,5 @@ const GRNView = () => {
     </Container>
   );
 };
+
 export default GRNView;
