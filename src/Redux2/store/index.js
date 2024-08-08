@@ -2,8 +2,6 @@ import {applyMiddleware, createStore} from 'redux';
 import {persistReducer, persistStore} from 'redux-persist';
 import thunk from 'redux-thunk';
 import storage from "redux-persist/lib/storage";
-// import {storage} from '../storage/Storage';
-// import {rootReducer} from './reducers/index';
 import {rootReducer} from '../reducers/index'
 
 const persistConfig = {

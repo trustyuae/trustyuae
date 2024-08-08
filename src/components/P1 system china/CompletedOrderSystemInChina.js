@@ -21,8 +21,9 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
+import { CompletedOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 
-const CompletedOrderSystemInChina = () => {
+function CompletedOrderSystemInChina() {
   const inputRef = useRef(null);
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
@@ -40,29 +41,36 @@ const CompletedOrderSystemInChina = () => {
     null,
     null,
   ]);
-  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
+
+  const completedOrdersData = useSelector(
+    (state) => state?.orderSystemChina?.completedOrders
+  );
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (completedOrdersData) {
+      const completedData = completedOrdersData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(completedData);
+      setTotalPages(completedOrdersData.total_pages);
+    }
+  }, [completedOrdersData]);
+
   async function fetchOrders() {
-    let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
+    let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?&page=${page}&per_page=${pageSize}`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
       apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
-    await dispatch(
-      CompletedOrderSystemGet({
+    dispatch(
+      CompletedOrderSystemChinaGet({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleReset = () => {
@@ -136,7 +144,7 @@ const CompletedOrderSystemInChina = () => {
       renderCell: (value, row) => {
         return (
           <Link
-            to={`/completed_order_details/${value?.row?.order_id}`}
+            to={`/completed_order_details_in_china/${value?.row?.order_id}`}
             className=" d-flex justify-content-center"
           >
             <Button
@@ -368,6 +376,6 @@ const CompletedOrderSystemInChina = () => {
       )}
     </Container>
   );
-};
+}
 
 export default CompletedOrderSystemInChina;

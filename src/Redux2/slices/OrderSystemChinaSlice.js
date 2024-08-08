@@ -24,7 +24,7 @@ const initialState = {
   error: null,
 };
 
-export const OrderSystemGet = createAsyncThunk(
+export const OrderSystemChinaGet = createAsyncThunk(
   "orderSystem/OrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
@@ -37,7 +37,7 @@ export const OrderSystemGet = createAsyncThunk(
   }
 );
 
-export const OrderDetailsGet = createAsyncThunk(
+export const OrderDetailsChinaGet = createAsyncThunk(
     "orderSystem/OrderDetailsGet",
     async ({ id }, { rejectWithValue }) => {
       try {
@@ -52,7 +52,7 @@ export const OrderDetailsGet = createAsyncThunk(
     }
   );
 
-export const CompletedOrderSystemGet = createAsyncThunk(
+export const CompletedOrderSystemChinaGet = createAsyncThunk(
   "orderSystem/CompletedOrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
@@ -65,7 +65,7 @@ export const CompletedOrderSystemGet = createAsyncThunk(
   }
 );
 
-export const CompletedOrderDetailsGet = createAsyncThunk(
+export const CompletedOrderDetailsChinaGet = createAsyncThunk(
   "orderSystem/CompletedOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
@@ -80,7 +80,7 @@ export const CompletedOrderDetailsGet = createAsyncThunk(
   }
 );
 
-export const OnHoldOrderSystemGet = createAsyncThunk(
+export const OnHoldOrderSystemChinaGet = createAsyncThunk(
   "orderSystem/OnHoldOrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
@@ -93,7 +93,7 @@ export const OnHoldOrderSystemGet = createAsyncThunk(
   }
 );
 
-export const OnHoldOrderDetailsGet = createAsyncThunk(
+export const OnHoldOrderDetailsChinaGet = createAsyncThunk(
   "orderSystem/OnHoldOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
@@ -108,7 +108,7 @@ export const OnHoldOrderDetailsGet = createAsyncThunk(
   }
 );
 
-export const ReserveOrderSystemGet = createAsyncThunk(
+export const ReserveOrderSystemChinaGet = createAsyncThunk(
   "orderSystem/ReserveOrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
@@ -121,7 +121,7 @@ export const ReserveOrderSystemGet = createAsyncThunk(
   }
 );
 
-export const ReserveOrderDetailsGet = createAsyncThunk(
+export const ReserveOrderDetailsChinaGet = createAsyncThunk(
   "orderSystem/ReserveOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
@@ -136,7 +136,7 @@ export const ReserveOrderDetailsGet = createAsyncThunk(
   }
 );
 
-export const AttachmentFileUpload = createAsyncThunk(
+export const AttachmentFileUploadChina = createAsyncThunk(
   "orderSystem/AttachmentFileUpload",
   async (
     { user_id, order_id, item_id, variation_id, selectedFile },
@@ -162,7 +162,7 @@ export const AttachmentFileUpload = createAsyncThunk(
   }
 );
 
-export const OverAllAttachmentFileUpload = createAsyncThunk(
+export const OverAllAttachmentFileUploadChina = createAsyncThunk(
   "orderSystem/OverAllAttachmentFileUpload",
   async ({ order_id, order_dispatch_image }, { rejectWithValue }) => {
     try {
@@ -185,7 +185,7 @@ export const OverAllAttachmentFileUpload = createAsyncThunk(
   }
 );
 
-export const AddMessage = createAsyncThunk(
+export const AddMessageChina = createAsyncThunk(
   "orderSystem/AddMessage",
   async (requestData, { rejectWithValue }) => {
     try {
@@ -201,7 +201,7 @@ export const AddMessage = createAsyncThunk(
   }
 );
 
-export const InsertOrderPickup = createAsyncThunk(
+export const InsertOrderPickupChina = createAsyncThunk(
   "orderSystem/InsertOrderPickup",
   async (requestData, { rejectWithValue }) => {
     try {
@@ -217,7 +217,7 @@ export const InsertOrderPickup = createAsyncThunk(
   }
 );
 
-export const InsertOrderPickupCancel = createAsyncThunk(
+export const InsertOrderPickupCancelChina = createAsyncThunk(
   "orderSystem/InsertOrderPickupCancel",
   async (requestData, { rejectWithValue }) => {
     try {
@@ -233,7 +233,7 @@ export const InsertOrderPickupCancel = createAsyncThunk(
   }
 );
 
-export const CustomOrderFinish = createAsyncThunk(
+export const CustomOrderFinishChina = createAsyncThunk(
   "orderSystem/CustomOrderFinish",
   async ({ user_id, id }, { rejectWithValue }) => {
     try {
@@ -248,7 +248,7 @@ export const CustomOrderFinish = createAsyncThunk(
   }
 );
 
-export const CustomOrderOH = createAsyncThunk(
+export const CustomOrderOHChina = createAsyncThunk(
   "orderSystem/CustomOrderOH",
   async (result, { rejectWithValue }) => {
     try {
@@ -264,7 +264,7 @@ export const CustomOrderOH = createAsyncThunk(
   }
 );
 
-export const CustomOrderFinishOH = createAsyncThunk(
+export const CustomOrderFinishOHChina = createAsyncThunk(
   "orderSystem/CustomOrderFinishOH",
   async ({ user_id, id }, { rejectWithValue }) => {
     try {
@@ -279,7 +279,7 @@ export const CustomOrderFinishOH = createAsyncThunk(
   }
 );
 
-const orderSystemSlice = createSlice({
+const orderSystemChinaSlice = createSlice({
   name: "orderSystem",
   initialState,
   reducers: {
@@ -313,179 +313,179 @@ const orderSystemSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(OrderSystemGet.pending, (state) => {
+      .addCase(OrderSystemChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(OrderSystemGet.fulfilled, (state, action) => {
+      .addCase(OrderSystemChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.orders = action.payload;
       })
-      .addCase(OrderSystemGet.rejected, (state, action) => {
+      .addCase(OrderSystemChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(OrderDetailsGet.pending, (state) => {
+      .addCase(OrderDetailsChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(OrderDetailsGet.fulfilled, (state, action) => {
+      .addCase(OrderDetailsChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.orderDetails = action.payload;
       })
-      .addCase(OrderDetailsGet.rejected, (state, action) => {
+      .addCase(OrderDetailsChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(CompletedOrderSystemGet.pending, (state) => {
+      .addCase(CompletedOrderSystemChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(CompletedOrderSystemGet.fulfilled, (state, action) => {
+      .addCase(CompletedOrderSystemChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.completedOrders = action.payload;
       })
-      .addCase(CompletedOrderSystemGet.rejected, (state, action) => {
+      .addCase(CompletedOrderSystemChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(CompletedOrderDetailsGet.pending, (state) => {
+      .addCase(CompletedOrderDetailsChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(CompletedOrderDetailsGet.fulfilled, (state, action) => {
+      .addCase(CompletedOrderDetailsChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.completedOrderDetails = action.payload;
       })
-      .addCase(CompletedOrderDetailsGet.rejected, (state, action) => {
+      .addCase(CompletedOrderDetailsChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(OnHoldOrderSystemGet.pending, (state) => {
+      .addCase(OnHoldOrderSystemChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(OnHoldOrderSystemGet.fulfilled, (state, action) => {
+      .addCase(OnHoldOrderSystemChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.onHoldOrders = action.payload;
       })
-      .addCase(OnHoldOrderSystemGet.rejected, (state, action) => {
+      .addCase(OnHoldOrderSystemChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(OnHoldOrderDetailsGet.pending, (state) => {
+      .addCase(OnHoldOrderDetailsChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(OnHoldOrderDetailsGet.fulfilled, (state, action) => {
+      .addCase(OnHoldOrderDetailsChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.onHoldOrderDetails = action.payload;
       })
-      .addCase(OnHoldOrderDetailsGet.rejected, (state, action) => {
+      .addCase(OnHoldOrderDetailsChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(ReserveOrderSystemGet.pending, (state) => {
+      .addCase(ReserveOrderSystemChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(ReserveOrderSystemGet.fulfilled, (state, action) => {
+      .addCase(ReserveOrderSystemChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.reserveOrders = action.payload;
       })
-      .addCase(ReserveOrderSystemGet.rejected, (state, action) => {
+      .addCase(ReserveOrderSystemChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(ReserveOrderDetailsGet.pending, (state) => {
+      .addCase(ReserveOrderDetailsChinaGet.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(ReserveOrderDetailsGet.fulfilled, (state, action) => {
+      .addCase(ReserveOrderDetailsChinaGet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.reserveOrderDetails = action.payload;
       })
-      .addCase(ReserveOrderDetailsGet.rejected, (state, action) => {
+      .addCase(ReserveOrderDetailsChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(AttachmentFileUpload.pending, (state) => {
+      .addCase(AttachmentFileUploadChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AttachmentFileUpload.fulfilled, (state, action) => {
+      .addCase(AttachmentFileUploadChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.uploadAttachFile = action.payload;
       })
-      .addCase(AttachmentFileUpload.rejected, (state, action) => {
+      .addCase(AttachmentFileUploadChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(OverAllAttachmentFileUpload.pending, (state) => {
+      .addCase(OverAllAttachmentFileUploadChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(OverAllAttachmentFileUpload.fulfilled, (state, action) => {
+      .addCase(OverAllAttachmentFileUploadChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.uploadOverAllAttachFile = action.payload;
       })
-      .addCase(OverAllAttachmentFileUpload.rejected, (state, action) => {
+      .addCase(OverAllAttachmentFileUploadChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(AddMessage.pending, (state) => {
+      .addCase(AddMessageChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddMessage.fulfilled, (state, action) => {
+      .addCase(AddMessageChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.message = action.payload;
       })
-      .addCase(AddMessage.rejected, (state, action) => {
+      .addCase(AddMessageChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(InsertOrderPickup.pending, (state) => {
+      .addCase(InsertOrderPickupChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(InsertOrderPickup.fulfilled, (state, action) => {
+      .addCase(InsertOrderPickupChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.orderPickUp = action.payload;
       })
-      .addCase(InsertOrderPickup.rejected, (state, action) => {
+      .addCase(InsertOrderPickupChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(InsertOrderPickupCancel.pending, (state) => {
+      .addCase(InsertOrderPickupCancelChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(InsertOrderPickupCancel.fulfilled, (state, action) => {
+      .addCase(InsertOrderPickupCancelChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.orderPickUpCancel = action.payload;
       })
-      .addCase(InsertOrderPickupCancel.rejected, (state, action) => {
+      .addCase(InsertOrderPickupCancelChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(CustomOrderFinish.pending, (state) => {
+      .addCase(CustomOrderFinishChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(CustomOrderFinish.fulfilled, (state, action) => {
+      .addCase(CustomOrderFinishChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.customOrderData = action.payload;
       })
-      .addCase(CustomOrderFinish.rejected, (state, action) => {
+      .addCase(CustomOrderFinishChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(CustomOrderOH.pending, (state) => {
+      .addCase(CustomOrderOHChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(CustomOrderOH.fulfilled, (state, action) => {
+      .addCase(CustomOrderOHChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.customOrderOnHoldData = action.payload;
       })
-      .addCase(CustomOrderOH.rejected, (state, action) => {
+      .addCase(CustomOrderOHChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(CustomOrderFinishOH.pending, (state) => {
+      .addCase(CustomOrderFinishOHChina.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(CustomOrderFinishOH.fulfilled, (state, action) => {
+      .addCase(CustomOrderFinishOHChina.fulfilled, (state, action) => {
         state.isLoading = false;
         state.customOrderOnHoldFinishData = action.payload;
       })
-      .addCase(CustomOrderFinishOH.rejected, (state, action) => {
+      .addCase(CustomOrderFinishOHChina.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
@@ -493,5 +493,5 @@ const orderSystemSlice = createSlice({
 });
 
 export const { clearstoredata, startSyncLoading, stopSyncLoading } =
-orderSystemSlice.actions;
-export default orderSystemSlice.reducer;
+orderSystemChinaSlice.actions;
+export default orderSystemChinaSlice.reducer;

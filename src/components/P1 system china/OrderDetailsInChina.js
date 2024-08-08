@@ -36,9 +36,19 @@ import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axiosInstance from "../../utils/AxiosInstance";
 import { getUserData } from "../../utils/StorageUtils";
-import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, CustomOrderOH, InsertOrderPickup, InsertOrderPickupCancel, OrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
+import {
+  AddMessage,
+  AttachmentFileUpload,
+  CustomOrderFinish,
+  CustomOrderOH,
+  InsertOrderPickup,
+  InsertOrderPickupCancel,
+  OrderDetailsGet,
+  OverAllAttachmentFileUpload,
+} from "../../Redux2/slices/OrderSystemSlice";
+import { AddMessageChina, AttachmentFileUploadChina, CustomOrderFinishChina, CustomOrderOHChina, InsertOrderPickupCancelChina, InsertOrderPickupChina, OverAllAttachmentFileUploadChina } from "../../Redux2/slices/OrderSystemChinaSlice";
 
-const OrderDetailsInChina = () => {
+function OrderDetailsInChina() {
   const { id } = useParams();
   const fileInputRef = useRef({});
   const [orderData, setOrderData] = useState([]);
@@ -59,14 +69,14 @@ const OrderDetailsInChina = () => {
   const [selectedItemId, setSelectedItemId] = useState("");
   const [message, setMessage] = useState("");
   const [messageOH, setOHMessage] = useState("");
+
+  const [userData, setUserData] = useState(null);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
-
-  const [userData, setUserData] = useState(null);
-
-  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
   }
@@ -74,17 +84,49 @@ const OrderDetailsInChina = () => {
     selectedVariationId ? selectedVariationId : selectedItemId
   ] = useRef(null);
 
+  const AddInOnHold = useSelector((state) => state?.orderSystemChina?.isLoading);
+
+  const Finished = useSelector((state) => state?.orderSystemChina?.isLoading);
+
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystem?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystemChina?.orderDetails?.orders?.[0]
   );
 
-  const AddInOnHold = useSelector(
-    (state) => state?.orderSystem?.isLoading
+  const orderDetailsData = useSelector(
+    (state) => state?.orderSystemChina?.orderDetails
   );
 
-  const Finished = useSelector(
-    (state) => state?.orderSystem?.isLoading
+  const messageData = useSelector((state) => state?.orderSystemChina?.message);
+
+  const customOrderDataa = useSelector(
+    (state) => state?.orderSystemChina?.customOrderData
   );
+
+  const CustomOrderOHDataa = useSelector(
+    (state) => state?.orderSystemChina?.customOrderOnHoldData
+  );
+
+  useEffect(() => {
+    const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
+    setOrderData(oDetails);
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      setOrderProcess(orderDetailsDataOrderId.order_process);
+
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId.items.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsData, orderDetailsDataOrderId]);
 
   async function fetchUserData() {
     try {
@@ -97,6 +139,7 @@ const OrderDetailsInChina = () => {
 
   useEffect(() => {
     fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const capture = useCallback(() => {
@@ -123,21 +166,7 @@ const OrderDetailsInChina = () => {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(OrderDetailsGet({ id: id }));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      const order = response.data.orders[0];
-      if (order) setOrderProcess(order.order_process);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
-      }
+      dispatch(OrderDetailsGet({ id: id }));
     } catch (error) {
       console.error(error);
     }
@@ -155,22 +184,12 @@ const OrderDetailsInChina = () => {
       order_id: orderId,
       name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        setMessage("");
-        setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
-      }
-    });
+    dispatch(AddMessageChina(requestedMessage));
+    if (messageData) {
+      setMessage("");
+      setshowMessageModal(false);
+      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
+    }
   };
 
   const submitOH = async () => {
@@ -189,7 +208,22 @@ const OrderDetailsInChina = () => {
         result.product_name.push(item.product_name);
         result.variation_id.push(parseInt(item.variation_id, 10));
       });
-      dispatch(CustomOrderOH(result, navigate));
+      dispatch(CustomOrderOHChina(result));
+      if (CustomOrderOHDataa.status === 200) {
+        setOHMessage("");
+        setshowMessageOHModal(false);
+        ShowAlert(
+          "",
+          CustomOrderOHDataa.data.message,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+        navigate("/on_hold_orders_system");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -198,7 +232,7 @@ const OrderDetailsInChina = () => {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setMessage, setTableData, setOrderData]);
+  }, [setTableData, setOrderData,messageData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -256,8 +290,8 @@ const OrderDetailsInChina = () => {
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
-        await dispatch(
-          AttachmentFileUpload({
+        dispatch(
+          AttachmentFileUploadChina({
             user_id: user_id,
             order_id: orderDetailsDataOrderId?.order_id,
             item_id: selectedItemId,
@@ -267,7 +301,7 @@ const OrderDetailsInChina = () => {
         );
       } else {
         dispatch(
-          OverAllAttachmentFileUpload({
+          OverAllAttachmentFileUploadChina({
             order_id: orderDetailsDataOrderId?.order_id,
             order_dispatch_image: selectedFile,
           })
@@ -302,13 +336,8 @@ const OrderDetailsInChina = () => {
       end_time: "",
       order_status: "started",
     };
-    await dispatch(InsertOrderPickup(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    dispatch(InsertOrderPickupChina(requestData));
+    fetchOrder();
   };
 
   const handleCancelOrderProcess = async () => {
@@ -317,29 +346,24 @@ const OrderDetailsInChina = () => {
       operation_id: orderDetails?.operation_user_id,
       order_status: "Cancelled",
     };
-    await dispatch(InsertOrderPickupCancel(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    dispatch(InsertOrderPickupCancelChina(requestData));
+    fetchOrder();
   };
 
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      const response = await dispatch(CustomOrderFinishOH(user_id, id, navigate));
-      if (response.data.status_code === 200) {
-        await Swal.fire({
-          title: response.data.message,
+      dispatch(CustomOrderFinishChina({ user_id, id }));
+      if (customOrderDataa?.status_code === 200) {
+        Swal.fire({
+          title: customOrderDataa.message,
           icon: "success",
           showConfirmButton: true,
         });
         navigate("/ordersystem");
       } else {
         Swal.fire({
-          title: response.data.message,
+          title: customOrderDataa.message,
           icon: "error",
           showConfirmButton: true,
         });
@@ -668,22 +692,21 @@ const OrderDetailsInChina = () => {
                       <Badge bg="success">{orderDetails?.order_status}</Badge>
                     </Typography>
                   </Box>
-                  {orderDetails?.operation_user_id != userData?.user_id &&
-                    orderDetails?.order_process == "started" && (
-                      <Box className="ms-5">
-                        <Typography className="fw-bold">
-                          {orderDetails?.user_name}
-                        </Typography>
-                        <Typography
-                          className=""
-                          sx={{
-                            fontSize: 14,
-                          }}
-                        >
-                          <Badge bg="success">Order Started By</Badge>
-                        </Typography>
-                      </Box>
-                    )}
+                  {orderDetails?.order_process == "started" && (
+                    <Box className="ms-5">
+                      <Typography className="fw-bold">
+                        {orderDetails?.user_name}
+                      </Typography>
+                      <Typography
+                        className=""
+                        sx={{
+                          fontSize: 14,
+                        }}
+                      >
+                        <Badge bg="success">Order Started By</Badge>
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               )}
             </Box>
@@ -1289,6 +1312,5 @@ const OrderDetailsInChina = () => {
       </Container>
     </>
   );
-};
-
+}
 export default OrderDetailsInChina;

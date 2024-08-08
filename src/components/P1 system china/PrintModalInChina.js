@@ -97,7 +97,7 @@ const PrintModalInChina = ({ show, handleClosePrintModal, orderData }) => {
     // doc.text(shippingMethodText, cardContentX, titleVe);
     let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
     let textLines = doc.splitTextToSize(shippingMethodText, cardWidth - 10);
-    let shippingTextHeight = textLines.length * 6;
+    let shippingTextHeight = textLines.length *6; 
     doc.text(textLines, cardContentX, titleY + 42 + shippingTextHeight);
 
     doc.setLineWidth(0.3); // Set line width for the separator

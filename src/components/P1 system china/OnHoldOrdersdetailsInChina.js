@@ -4,7 +4,18 @@ import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
 import PrintModal from "./PrintModalInChina";
-import { Alert, Avatar, Box, Typography } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  Box,
+  ListItem,
+  ListItemText,
+  Typography,
+  AccordionDetails,
+  List,
+  Accordion,
+  AccordionSummary,
+} from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -13,17 +24,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   AddMessage,
-//   AttachmentFileUpload,
-//   CustomOrderFinish,
-//   CustomOrderFinishOH,
-//   InsertOrderPickup,
-//   InsertOrderPickupCancel,
-//   OnHoldOrderDetailsGet,
-//   OrderDetailsGet,
-//   OverAllAttachmentFileUpload,
-// } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -31,12 +31,21 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { API_URL } from "../../redux/constants/Constants";
-import axiosInstance from "../../utils/AxiosInstance";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  AddMessage,
+  AttachmentFileUpload,
+  CustomOrderFinishOH,
+  InsertOrderPickup,
+  InsertOrderPickupCancel,
+  OnHoldOrderDetailsGet,
+  OverAllAttachmentFileUpload,
+} from "../../Redux2/slices/OrderSystemSlice";
 import { getUserData } from "../../utils/StorageUtils";
-import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../Redux2/slices/OrderSystemSlice";
-const OnHoldOrdersdetailsInChina = () => {
+import axiosInstance from "../../utils/AxiosInstance";
+import { AddMessageChina, AttachmentFileUploadChina, CustomOrderFinishOHChina, InsertOrderPickupChina, OnHoldOrderDetailsChinaGet, OverAllAttachmentFileUploadChina } from "../../Redux2/slices/OrderSystemChinaSlice";
+
+function OnHoldOrdersdetailsInChina() {
   const { id } = useParams();
   const fileInputRef = useRef({});
   const [orderData, setOrderData] = useState([]);
@@ -56,14 +65,13 @@ const OnHoldOrdersdetailsInChina = () => {
   const [selectedVariationId, setSelecetedVariationId] = useState("");
   const [toggleStatus, setToggleStatus] = useState(0);
 
+  const [message, setMessage] = useState("");
   const [userData, setUserData] = useState(null);
 
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
-  // const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
-  const [loader, setLoader] = useState(true);
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
 
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -71,22 +79,59 @@ const OnHoldOrdersdetailsInChina = () => {
   fileInputRef.current[selectedItemId] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
+    (state) => state?.orderSystemChina?.onHoldOrderDetails?.orders?.[0]
   );
+
+  const OnHoldOrderDetailsData = useSelector(
+    (state) => state?.orderSystemChina?.onHoldOrderDetails
+  );
+
+  const messageData = useSelector((state) => state?.orderSystemChina?.message);
+
+  const OnHoldCustomOrderDataa = useSelector(
+    (state) => state?.orderSystemChina?.customOrderData
+  );
+
+  const OnHoldOrderFinishData = useSelector(
+    (state) => state?.orderSystemChina?.customOrderOnHoldFinishData
+  );
+
+  useEffect(() => {
+    const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
+      ...v,
+      id: i,
+    }));
+    setOrderData(onHoldOrderData);
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      setToggleStatus(Number(orderDetailsDataOrderId.order_process));
+
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsDataOrderId, OnHoldOrderDetailsData]);
 
   async function fetchUserData() {
     try {
       const userdata = await getUserData();
-      setUserData(userdata || {});
+      setUserData(userdata);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   }
-
   useEffect(() => {
     fetchUserData();
   }, []);
-
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -112,28 +157,7 @@ const OnHoldOrdersdetailsInChina = () => {
 
   async function fetchOrder() {
     try {
-      // const response = await dispatch(OrderDetailsGet({ id: id }));
-      // const response = await axios.get(
-      //   `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
-      // );
-      const response = await dispatch(OnHoldOrderDetailsGet(id));
-
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      setToggleStatus(Number(response.data.orders[0].toggle_status));
-      const order = response.data.orders[0];
-      if (order) setOrderProcess(order.order_process);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
-      }
-      setLoader(false);
+      dispatch(OnHoldOrderDetailsChinaGet({ id }));
     } catch (error) {
       console.error(error);
     }
@@ -143,21 +167,20 @@ const OnHoldOrdersdetailsInChina = () => {
     console.log(toggleStatus, "toggleStatus");
   }, [toggleStatus]);
 
-  const handleAddMessage = async () => {
+  const handleAddMessage = async (e) => {
     const orderId = parseInt(id, 10);
+    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
       order_id: orderId,
+      name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        const result = await ShowAlert("", response.data, "success");
-        if (result.isConfirmed) {
-          setMessage("");
-          setshowMessageModal(false);
-        }
-      }
-    });
+    dispatch(AddMessageChina(requestedMessage));
+    if (messageData) {
+      setMessage("");
+      setshowMessageModal(false);
+      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
+    }
   };
 
   useEffect(() => {
@@ -217,19 +240,11 @@ const OnHoldOrdersdetailsInChina = () => {
   };
 
   const handleSubmitAttachment = async () => {
-    setLoader(true);
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
-        await dispatch(
-          AttachmentFileUpload({
-            // user_id: user_id,
-            // // order_id: orderDetailsDataOrderId?.order_id,
-            // order_id: id,
-            // item_id: selectedItemId,
-            // selectedFile: selectedFile,
-            // variation_id: selectedVariationId,
-
+        dispatch(
+          AttachmentFileUploadChina({
             user_id: user_id,
             order_id: orderDetailsDataOrderId?.order_id,
             item_id: selectedItemId,
@@ -238,9 +253,8 @@ const OnHoldOrdersdetailsInChina = () => {
           })
         );
       } else {
-        await dispatch(
-          OverAllAttachmentFileUpload({
-            // order_id: orderDetailsDataOrderId?.order_id,
+        dispatch(
+          OverAllAttachmentFileUploadChina({
             order_id: id,
             order_dispatch_image: selectedFile,
           })
@@ -260,7 +274,7 @@ const OnHoldOrdersdetailsInChina = () => {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
-      setLoader(false);
+      // setLoader(false);
     } catch (error) {
       console.error(error);
     }
@@ -274,22 +288,7 @@ const OnHoldOrdersdetailsInChina = () => {
       end_time: "",
       order_status: "started",
     };
-    await dispatch(InsertOrderPickup(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleCancelOrderProcess = async () => {
-    const requestData = {
-      order_id: parseInt(id, 10),
-      operation_id: orderDetails?.operation_user_id,
-      order_status: "Cancelled",
-    };
-    await dispatch(InsertOrderPickupCancel(requestData))
+    await dispatch(InsertOrderPickupChina(requestData))
       .then((response) => {
         fetchOrder();
       })
@@ -301,7 +300,21 @@ const OnHoldOrdersdetailsInChina = () => {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      dispatch(CustomOrderFinishOH(user_id, id, navigate));
+      dispatch(CustomOrderFinishOHChina({ user_id, id }));
+      if (OnHoldOrderFinishData.status_code === 200) {
+        await Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "success",
+          showConfirmButton: true,
+        });
+        navigate("/on_hold_orders_system");
+      } else {
+        Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
     } catch (error) {
       console.error("Error while finishing order:", error);
     }
@@ -584,7 +597,7 @@ const OnHoldOrdersdetailsInChina = () => {
   ];
 
   const handalswitch = async (e) => {
-    setLoader(true);
+    // setLoader(true);
     if (e) {
       // setToggleStatus(1)
       handelSend(e);
@@ -614,6 +627,7 @@ const OnHoldOrdersdetailsInChina = () => {
       result.toggle_status = 0;
       setToggleStatus(0);
     }
+
     const response = await axiosInstance.post(
       `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
       result
@@ -623,9 +637,6 @@ const OnHoldOrdersdetailsInChina = () => {
     }
   };
 
-  // useEffect(()=>{
-  //   handelSend()
-  // },[toggleStatus])
   return (
     <>
       <Container fluid className="px-5">
@@ -662,16 +673,33 @@ const OnHoldOrdersdetailsInChina = () => {
               {loader ? (
                 <Loader />
               ) : (
-                <Box>
-                  <Typography className="fw-bold">Order# {id}</Typography>
-                  <Typography
-                    className=""
-                    sx={{
-                      fontSize: 14,
-                    }}
-                  >
-                    <Badge bg="success">{orderDetails?.order_status}</Badge>
-                  </Typography>
+                <Box className="d-flex">
+                  <Box>
+                    <Typography className="fw-bold">Order# {id}</Typography>
+                    <Typography
+                      className=""
+                      sx={{
+                        fontSize: 14,
+                      }}
+                    >
+                      <Badge bg="success">{orderDetails?.order_status}</Badge>
+                    </Typography>
+                  </Box>
+                  {orderDetails?.order_process == "started" && (
+                    <Box className="ms-5">
+                      <Typography className="fw-bold">
+                        {orderDetails?.user_name}
+                      </Typography>
+                      <Typography
+                        className=""
+                        sx={{
+                          fontSize: 14,
+                        }}
+                      >
+                        <Badge bg="success">Order Started By</Badge>
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               )}
             </Box>
@@ -692,13 +720,6 @@ const OnHoldOrdersdetailsInChina = () => {
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
               orderProcess == "started" ? (
-                // <Button
-                //   variant="outline-danger"
-                //   className="p-1 me-2 bg-transparent text-danger"
-                //   onClick={handleCancelOrderProcess}
-                // >
-                //   <CancelIcon />
-                // </Button>
                 <Form.Check // prettier-ignore
                   type="switch"
                   id="custom-switch"
@@ -1010,11 +1031,70 @@ const OnHoldOrdersdetailsInChina = () => {
         <Alert variant={"info"}>
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
-        <Alert variant={"success"}>
-          <label>Meesage :-</label>{" "}
-          {orderDetailsDataOrderId?.operation_user_note}
-          {/* <Box>{orderDetailsDataOrderId?.operation_user_note}</Box> */}
-        </Alert>
+        {orderDetailsDataOrderId?.operation_user_note &&
+          orderDetailsDataOrderId?.operation_user_note.length > 0 && (
+            <Card className="p-3 mb-3">
+              <Box className="d-flex align-items-center justify-content-between">
+                <Box className="w-100">
+                  <Typography
+                    variant="h6"
+                    className="fw-bold mb-3"
+                  ></Typography>
+                  <Box className="d-flex justify-content-between">
+                    <div style={{ width: "100%" }}>
+                      <Accordion>
+                        <AccordionSummary
+                          expandIcon={<ExpandMoreIcon />}
+                          aria-controls="panel1-content"
+                          id="panel1-header"
+                        >
+                          <Typography variant="h6" className="fw-bold">
+                            Messages
+                          </Typography>
+                        </AccordionSummary>
+                        <AccordionDetails
+                          style={{ maxHeight: "200px", overflowY: "auto" }}
+                        >
+                          <List>
+                            {Array.isArray(
+                              orderDetailsDataOrderId?.operation_user_note
+                            ) ? (
+                              orderDetailsDataOrderId.operation_user_note.map(
+                                (message, i) => (
+                                  <ListItem
+                                    key={i}
+                                    className="d-flex justify-content-start"
+                                  >
+                                    <ListItemText
+                                      primary={message.message}
+                                      secondary={message.user}
+                                      className="rounded p-2"
+                                      style={{
+                                        maxWidth: "70%",
+                                        minWidth: "50px",
+                                        backgroundColor: "#bfdffb",
+                                      }}
+                                    />
+                                  </ListItem>
+                                )
+                              )
+                            ) : (
+                              <ListItem>
+                                <ListItemText
+                                  primary="No messages available"
+                                  style={{ textAlign: "center" }}
+                                />
+                              </ListItem>
+                            )}
+                          </List>
+                        </AccordionDetails>
+                      </Accordion>
+                    </div>
+                  </Box>
+                </Box>
+              </Box>
+            </Card>
+          )}
         <Alert variant={"success"}>
           <label>On Hold Meesage :-</label> {orderDetails?.onhold_note}
           {/* <Box>{orderDetails?.onhold_note}</Box> */}
@@ -1195,6 +1275,5 @@ const OnHoldOrdersdetailsInChina = () => {
       </Container>
     </>
   );
-};
-
+}
 export default OnHoldOrdersdetailsInChina;
