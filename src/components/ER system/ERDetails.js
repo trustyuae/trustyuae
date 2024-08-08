@@ -44,19 +44,21 @@ const ERDetails = () => {
   const [lang, setLang] = useState("En");
 
 
-  const allFactoryDatas = useSelector(
-    (state) => state?.factory?.isLoading
-  );
+  const allFactoryDatas = useSelector((state) => state?.factory?.isLoading);
+
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
+
 
   const radios = [
     { name: "English", value: "En" },
