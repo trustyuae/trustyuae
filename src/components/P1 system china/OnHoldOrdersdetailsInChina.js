@@ -629,7 +629,7 @@ function OnHoldOrdersdetailsInChina() {
     }
 
     const response = await axiosInstance.post(
-      `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
+      `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/?warehouse=China`,
       result
     );
     if (response) {

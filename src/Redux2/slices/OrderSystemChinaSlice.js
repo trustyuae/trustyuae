@@ -238,7 +238,7 @@ export const CustomOrderFinishChina = createAsyncThunk(
   async ({ user_id, id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
+        `wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}/?warehouse=China`
       );
       return response.data;
     } catch (error) {
@@ -253,7 +253,7 @@ export const CustomOrderOHChina = createAsyncThunk(
   async (result, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
+        `wp-json/custom-onhold-orders-convert/v1/update_onhold_note/?warehouse=China`,
         result
       );
       return response;
@@ -269,7 +269,7 @@ export const CustomOrderFinishOHChina = createAsyncThunk(
   async ({ user_id, id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`
+        `wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}/?warehouse=China`
       );
       return response.data;
     } catch (error) {

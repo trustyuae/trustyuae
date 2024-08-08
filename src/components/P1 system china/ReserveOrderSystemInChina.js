@@ -62,7 +62,7 @@ function ReserveOrderSystemInChina() {
   }, [reserveOrdersData]);
 
   async function fetchOrders() {
-    let apiUrl = `wp-json/custom-reserved-orders/v1/reserved-orders/?&page=${page}&per_page=${pageSize}`;
+    let apiUrl = `wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
