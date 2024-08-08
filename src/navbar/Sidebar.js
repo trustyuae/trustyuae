@@ -357,7 +357,9 @@ const Sidebar = () => {
                   to="/ordersystem_in_china"
                   className={
                     "nav-link underline" +
-                    (activeMenuItem === "/ordersystem_in_china" ? " active" : "")
+                    (activeMenuItem === "/ordersystem_in_china"
+                      ? " active"
+                      : "")
                   }
                 >
                   <i className="bi bi-circle"></i>
@@ -404,6 +406,39 @@ const Sidebar = () => {
                 >
                   <i className="bi bi-circle"></i>
                   <span>Reserve Orders System</span>
+                </Link>
+              </li>
+            </ul>
+          </li>
+
+          <li className="nav-item">
+            <a
+              className="nav-link collapsed"
+              data-bs-target="#icons-navv-missing"
+              data-bs-toggle="collapse"
+              href="/"
+            >
+              <i className="bi bi-menu-button-wide"></i>
+              <span>Missing Orders</span>
+              <i className="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul
+              id="icons-navv-missing"
+              className="nav-content collapse "
+              data-bs-parent="#sidebar-nav"
+            >
+              <li>
+                <Link
+                  to="/missing_orders_system"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/missing_orders_system"
+                      ? " active"
+                      : "")
+                  }
+                >
+                  <i className="bi bi-circle"></i>
+                  <span>Missing order System</span>
                 </Link>
               </li>
             </ul>
