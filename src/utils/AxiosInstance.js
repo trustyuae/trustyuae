@@ -1,5 +1,4 @@
 import axios from 'axios';
-// import { API_URL } from '../redux/constants/Constants';
 import { getToken } from './StorageUtils';
 import { API_URL } from '../redux/constants/Constants';
 
