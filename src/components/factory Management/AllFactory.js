@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
 // import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
@@ -12,8 +12,11 @@ import { Alert, Box, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
 import axios from "axios";
 import Loader from "../../utils/Loader";
-import axiosInstance from '../../utils/AxiosInstance'
-import { factoryEdit } from "../../Redux2/slices/FactoriesSlice";
+import axiosInstance from "../../utils/AxiosInstance";
+import {
+  factoryEdit,
+  fetchFactoriesByFilterParam,
+} from "../../Redux2/slices/FactoriesSlice";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -29,12 +32,24 @@ function AllFactory() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+
+  const loading = useSelector((state) => state?.factory?.isLoading);
+
+  const factoryData = useSelector(
+    (state) => state?.factory?.factoriesWithParams
+  );
+
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+      setTotalPages(factoryData.total_pages);
+    }
+  }, [factoryData]);
 
   async function fetchFactories() {
-    setLoading(true);
     try {
-    
       let apiUrl = `wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
       const params = {
         factory_name: factoryName,
@@ -43,19 +58,10 @@ function AllFactory() {
         contact_number: contactNumber,
         contact_email: email,
       };
-
-      // const headers = {
-      //   Authorization: `Live ${token}`,
-      // };
-
-      const response = await axiosInstance.get(apiUrl, { params});
-      const factoryData = response.data.factories.map((item) => ({ ...item }));
-      setFactories(factoryData);
-      setTotalPages(response.data.total_pages);
-      setLoading(false); // Stop loading
-      return response.data;
+      const response = dispatch(
+        fetchFactoriesByFilterParam({ apiUrl, params })
+      );
     } catch (error) {
-      setLoading(false); // Stop loading
       throw error;
     }
   }

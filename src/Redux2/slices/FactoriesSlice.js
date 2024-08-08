@@ -6,6 +6,7 @@ const initialState = {
   isLoading: false,
   SyncLoading: false,
   factories: [],
+  factoriesWithParams: [],
   editFactory: [],
   addFactory: [],
   error: null,
@@ -25,6 +26,21 @@ export const fetchAllFactories = createAsyncThunk(
     }
   }
 );
+
+export const fetchFactoriesByFilterParam = createAsyncThunk(
+  "factory/fetchFactoriesByFilterParam",
+  async ({ apiUrl, params }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(apiUrl, { params });
+      console.log(response, 'response from fetchFactoriesByFilterParam slice');
+      return response.data; // Ensure response.data has the expected structure
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.response?.data || error.message); // Provide more detailed error information if available
+    }
+  }
+);
+
 
 export const factoryEdit = createAsyncThunk(
   "factory/factoryEdit",
@@ -93,10 +109,11 @@ const factorySlice = createSlice({
       state.isLoading = false;
       state.SyncLoading = false;
       state.factories = [];
+      state.factoriesWithParams = [];
       state.editFactory = [];
       state.addFactory = [];
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -108,6 +125,17 @@ const factorySlice = createSlice({
         state.factories = action.payload;
       })
       .addCase(fetchAllFactories.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchFactoriesByFilterParam.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchFactoriesByFilterParam.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.factoriesWithParams = action.payload;
+      })
+      .addCase(fetchFactoriesByFilterParam.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
