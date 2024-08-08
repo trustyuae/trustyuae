@@ -32,7 +32,6 @@ export const fetchFactoriesByFilterParam = createAsyncThunk(
   async ({ apiUrl, params }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl, { params });
-      console.log(response, 'response from fetchFactoriesByFilterParam slice');
       return response.data; // Ensure response.data has the expected structure
     } catch (error) {
       console.error("Error fetching factories:", error.message);

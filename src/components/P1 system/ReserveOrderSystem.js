@@ -191,12 +191,8 @@ function ReserveOrderSystem() {
     fetchOrders();
   };
   const orderId = (e) => {
-    // console.log(e,'e');
     if (e.key === "Enter") {
-      console.log("hiiii");
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
   const clearDateRange = () => {

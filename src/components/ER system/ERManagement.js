@@ -42,7 +42,6 @@ function ERManagement() {
   const erManagementDataa = useSelector(
     (state) => state?.erManagement?.erManagementData
   );
-  console.log(erManagementDataa, "erManagementDataa thorugh redux toolkit");
 
   const radios = [
     { name: "English", value: "En" },

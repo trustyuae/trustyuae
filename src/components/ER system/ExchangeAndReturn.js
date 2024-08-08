@@ -31,6 +31,7 @@ import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 function ExchangeAndReturn() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [pageSize, setPageSize] = useState(10);
@@ -50,8 +51,6 @@ function ExchangeAndReturn() {
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
   const factoryData = useSelector((state) => state?.factory?.factories);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchAllFactories());

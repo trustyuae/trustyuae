@@ -95,8 +95,6 @@ function OnHoldOrdersDetails() {
     (state) => state?.orderSystem?.customOrderOnHoldFinishData
   );
 
-  console.log(OnHoldOrderFinishData, "OnHoldOrderFinishData");
-
   useEffect(() => {
     const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
       ...v,
@@ -633,7 +631,6 @@ function OnHoldOrdersDetails() {
       `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
       result
     );
-    console.log(response, "response");
     if (response) {
       fetchOrder();
     }

@@ -34,8 +34,6 @@ function GRNManagement() {
 
   const grnListData = useSelector((state) => state?.p3System?.grnList);
 
-  console.log(grnListData, "grnListData from redux toolkit");
-
   useEffect(() => {
     if (grnListData) {
       const grnData = grnListData.data.map((v, i) => ({ ...v, id: i }));

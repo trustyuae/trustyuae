@@ -5,7 +5,7 @@ const initialState = {
   isLoading: false,
   SyncLoading: false,
   allProducts: [],
-  EditProducts: [],
+  editProducts: [],
   error: null,
 };
 
@@ -57,7 +57,7 @@ const ProductManagementSlice = createSlice({
       (state.isLoading = false);
         (state.SyncLoading = false);
         (state.allProducts = []);
-        (state.EditProducts = []);
+        (state.editProducts = []);
         (state.error = null);
     },
   },
@@ -68,22 +68,22 @@ const ProductManagementSlice = createSlice({
       })
       .addCase(GetAllProductsList.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.factory = action.data;
+        state.allProducts = action.payload;
       })
       .addCase(GetAllProductsList.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(EditProductsList.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(EditProductsList.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editFactory = action.data;
+        state.editProducts = action.payload;
       })
       .addCase(EditProductsList.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       });
   },
 });

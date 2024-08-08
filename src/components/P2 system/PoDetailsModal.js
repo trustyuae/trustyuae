@@ -24,7 +24,6 @@ const PoDetailsModal = ({
   );
 
   useEffect(() => {
-    console.log(startD,endD,'date');
     const fetchData = async () => {
 
       const payload = {

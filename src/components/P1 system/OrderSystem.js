@@ -53,13 +53,10 @@ function OrderSystem() {
   const otherData = useSelector((state) => state?.orderSystem?.orders);
   const orderDetails = useSelector((state) => state?.orderSystem?.orderDetails);
 
-  console.log(orderDetails, "orderDetails from useSelector");
-
   useEffect(() => {
     if (ordersData) {
       const oData = ordersData.map((v, i) => ({ ...v, id: i }));
       setOrders(oData);
-      console.log(oData, "orderssss");
     }
     if (otherData) {
       setOverAllData({

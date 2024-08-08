@@ -40,9 +40,7 @@ const CompletedOrderSystemInChina = () => {
     null,
     null,
   ]);
-  const loader = useSelector(
-    (state) => state?.orderSystem?.isLoading
-  );
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
   const dispatch = useDispatch();
 
@@ -196,12 +194,8 @@ const CompletedOrderSystemInChina = () => {
     fetchOrders();
   };
   const orderId = (e) => {
-    // console.log(e,'e');
     if (e.key === "Enter") {
-      console.log("hiiii");
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
   const clearDateRange = () => {

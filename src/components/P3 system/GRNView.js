@@ -22,8 +22,6 @@ const GRNView = () => {
   
   const grnViewData = useSelector((state) => state?.p3System?.grnView);
 
-  console.group(grnViewData,'grnViewData in useSelector')
-
   useEffect(()=>{
     // if(grnViewData){
     //   const grnvData = grnViewData?.

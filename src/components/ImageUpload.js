@@ -24,7 +24,6 @@ const ImageUpload = () => {
 
       if (response.ok) {
         console.log('Image uploaded successfully');
-        // Optionally, you can do something after successful upload
       } else {
         console.error('Failed to upload image');
       }

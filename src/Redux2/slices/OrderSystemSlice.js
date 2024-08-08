@@ -44,7 +44,6 @@ export const OrderDetailsGet = createAsyncThunk(
         const response = await axiosInstance.get(
           `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
         );
-        console.log(response,'response from redux')
         return response.data;
       } catch (error) {
         console.error("Error fetching factories:", error.message);
@@ -86,7 +85,6 @@ export const OnHoldOrderSystemGet = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response of OnHoldOrderSystemGet')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -102,7 +100,6 @@ export const OnHoldOrderDetailsGet = createAsyncThunk(
       const response = await axiosInstance.get(
         `wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`
       );
-      console.log(response,'response of OnHoldOrderDetailsGet in slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -259,7 +256,6 @@ export const CustomOrderOH = createAsyncThunk(
         `wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
         result
       );
-      console.log(response,'response of customOrderOh')
       return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
