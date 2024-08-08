@@ -26,7 +26,7 @@ import { MDBRow } from "mdb-react-ui-kit";
 import axios from "axios";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
-import axiosInstance from '../../utils/AxiosInstance'
+import axiosInstance from "../../utils/AxiosInstance";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 function ExchangeAndReturn() {
@@ -48,7 +48,21 @@ function ExchangeAndReturn() {
   const [lang, setLang] = useState("En");
 
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
+
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAllFactories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+    }
+  }, [factoryData]);
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
@@ -240,20 +254,7 @@ function ExchangeAndReturn() {
   const handleFactoryChange = (e) => {
     setSelectedFactory(e.target.value);
   };
-  const allFactoryDatas = useSelector(
-    (state) => state?.factory?.isLoading
-  );
-
-  useEffect(() => {
-    dispatch(fetchAllFactories());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data);
-    }
-  }, [allFactoryDatas]);
+  const allFactoryDatas = useSelector((state) => state?.factory?.isLoading);
 
   const selectPOType = async () => {
     try {
@@ -294,7 +295,6 @@ function ExchangeAndReturn() {
   };
 
   const submit = async () => {
-;
     const selectedOrders = orders.filter((order) =>
       selectedOrderIds.includes(order.id)
     );
@@ -328,7 +328,6 @@ function ExchangeAndReturn() {
     } catch (error) {
       console.error(error);
     }
-
   };
 
   const ImageModule = (url) => {

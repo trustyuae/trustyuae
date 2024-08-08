@@ -10,16 +10,15 @@ import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { FaEye } from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers-pro";
-import { GetErManagementData } from "../../redux/actions/ErManagementActions";
+// import { GetErManagementData } from "../../redux/actions/ErManagementActions";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { GetErManagementData } from "../../Redux2/slices/ErManagementSlice";
 
 function ERManagement() {
   const dispatch = useDispatch();
@@ -36,12 +35,14 @@ function ERManagement() {
   const [totalPages, setTotalPages] = useState(1);
   const [lang, setLang] = useState("En");
 
-  const loader = useSelector(
-    (state) => state?.erManagement?.isLoading
+  const loader = useSelector((state) => state?.erManagement?.isLoading);
+
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
+  const erManagementDataa = useSelector(
+    (state) => state?.erManagement?.erManagementData
   );
-  const allFactoryDatas = useSelector(
-    (state) => state?.factory?.isLoading
-  );
+  console.log(erManagementDataa, "erManagementDataa thorugh redux toolkit");
 
   const radios = [
     { name: "English", value: "En" },
@@ -53,18 +54,29 @@ function ERManagement() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
+
+  useEffect(() => {
+    if (erManagementDataa) {
+      const data = erManagementDataa?.er_details?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(data);
+      setTotalPages(erManagementDataa.total_pages);
+    }
+  }, [erManagementDataa]);
 
   async function fetchOrders() {
-    let apiUrl =`wp-json/custom-er-fetch/v1/fetch-all-er/?per_page=${pageSize}&page=${page}`;
+    let apiUrl = `wp-json/custom-er-fetch/v1/fetch-all-er/?per_page=${pageSize}&page=${page}`;
     if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
     if (dueDate) apiUrl += `&due_date=${dueDate}`;
     if (selectedDate) apiUrl += `&date=${selectedDate}`;
-    await dispatch(GetErManagementData({ apiUrl }))
+    await dispatch(GetErManagementData(apiUrl))
       .then((response) => {
         let data = response.data.er_details.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
@@ -93,10 +105,9 @@ function ERManagement() {
   };
 
   const handleLanguageChange = async (language) => {
-    setLang(language); 
+    setLang(language);
     i18n.changeLanguage(language);
   };
-
 
   const columns = [
     {
@@ -198,32 +209,32 @@ function ERManagement() {
           {t("POManagement.ERManagement")}
         </Typography>
         <ButtonGroup>
-              {radios.map((radio, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`radio-${idx}`}
-                  type="radio"
-                  variant={idx % 2 ? "outline-success" : "outline-danger"}
-                  name="radio"
-                  value={radio.value}
-                  checked={lang === radio.value}
-                  onClick={() => handleLanguageChange(radio.value)}
-                >
-                  {radio.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
+          {radios.map((radio, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`radio-${idx}`}
+              type="radio"
+              variant={idx % 2 ? "outline-success" : "outline-danger"}
+              name="radio"
+              value={radio.value}
+              checked={lang === radio.value}
+              onClick={() => handleLanguageChange(radio.value)}
+            >
+              {radio.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group className="fw-semibold mb-0">
-                <Form.Label>{t('POManagement.DateFilter')}</Form.Label>
+                <Form.Label>{t("POManagement.DateFilter")}</Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     format="YYYY-MM-DD"
-                    value={dayjs(selectedDate)} 
+                    value={dayjs(selectedDate)}
                     onChange={(e) => handleDateChange(e)}
                     sx={{
                       display: "block",
@@ -244,7 +255,7 @@ function ERManagement() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group className="fw-semibold mb-0">
-                <Form.Label>{t('POManagement.FactoryFilter')}</Form.Label>
+                <Form.Label>{t("POManagement.FactoryFilter")}</Form.Label>
                 <Form.Control
                   as="select"
                   className="mr-sm-2"
@@ -264,14 +275,16 @@ function ERManagement() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">{t('POManagement.DuebyFilter')}</Form.Label>
+                <Form.Label className="fw-semibold">
+                  {t("POManagement.DuebyFilter")}
+                </Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
                   value={selectedDueType}
                   onChange={(e) => searchDueByFilter(e.target.value)}
                 >
                   <option disabled selected value="">
-                  {t("POManagement.Select")}...
+                    {t("POManagement.Select")}...
                   </option>
                   <option value="today">{t("POManagement.Today")}</option>
                   <option value="tomorrow">{t("POManagement.Tomorrow")}</option>
@@ -282,7 +295,7 @@ function ERManagement() {
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
               <Form.Label className="fw-semibold mb-0 me-2">
-               {t('POManagement.PageSize')}
+                {t("POManagement.PageSize")}
               </Form.Label>
               <Form.Control
                 as="select"
@@ -302,14 +315,14 @@ function ERManagement() {
               className="mr-2 mx-1 w-auto"
               onClick={handleSearchFilter}
             >
-              {t('POManagement.Search')}
+              {t("POManagement.Search")}
             </Button>
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
               onClick={handleReset}
             >
-              {t('POManagement.ResetFilter')}
+              {t("POManagement.ResetFilter")}
             </Button>
           </Box>
         </Form>
@@ -332,7 +345,7 @@ function ERManagement() {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-              {t('POManagement.NoExachangeandReturnManagementDataAvailable')}
+              {t("POManagement.NoExachangeandReturnManagementDataAvailable")}
             </Alert>
           )}
         </div>

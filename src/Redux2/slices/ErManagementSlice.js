@@ -10,9 +10,10 @@ const initialState = {
 
 export const GetErManagementData = createAsyncThunk(
   "ErManagement/GetErManagementData",
-  async ({apiUrl}, { rejectWithValue }) => {
+  async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
+      console.log(response,'response from redux toolkit in slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -45,11 +46,11 @@ const erManagementSlice = createSlice({
       })
       .addCase(GetErManagementData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.erManagementData = action.data;
+        state.erManagementData = action.payload;
       })
       .addCase(GetErManagementData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
   },
 });
