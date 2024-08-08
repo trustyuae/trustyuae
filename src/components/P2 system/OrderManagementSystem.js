@@ -33,8 +33,13 @@ import PoDetailsModal from "./PoDetailsModal";
 import ShowAlert from "../../utils/ShowAlert";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
-import { AddManualPO, AddPO, AddSchedulePO, ManualOrScheduledPoDetailsData, PoDetailsData } from "../../Redux2/slices/P2SystemSlice";
-
+import {
+  AddManualPO,
+  AddPO,
+  AddSchedulePO,
+  ManualOrScheduledPoDetailsData,
+  PoDetailsData,
+} from "../../Redux2/slices/P2SystemSlice";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -49,9 +54,13 @@ function OrderManagementSystem() {
   const [selectedOrderIdss, setSelectedOrderIdss] = useState([]);
   const [selectedManualOrderIds, setSelectedManualOrderIds] = useState([]);
   const [selectedScheduleOrderIds, setSelectedScheduleOrderIds] = useState([]);
-  const [selectedAgainstOrderDetails, setSelectedAgainstOrderDetails] = useState([]);
-  const [selectedManualOrderDetails, setSelectedManualOrderDetails] = useState([]);
-  const [selectedScheduledOrderDetails, setSelectedScheduledOrderDetails] = useState([]);
+  const [selectedAgainstOrderDetails, setSelectedAgainstOrderDetails] =
+    useState([]);
+  const [selectedManualOrderDetails, setSelectedManualOrderDetails] = useState(
+    []
+  );
+  const [selectedScheduledOrderDetails, setSelectedScheduledOrderDetails] =
+    useState([]);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -83,19 +92,41 @@ function OrderManagementSystem() {
 
   const [selectedMPOquantity, setSelectedMPOquantity] = useState([]);
   const [selectedSPOquantity, setSelectedSPOquantity] = useState([]);
-  const [isDisabled, setIsDisabled] = useState(false)
+  const [isDisabled, setIsDisabled] = useState(false);
 
-  const allFactoryDatas = useSelector(
-    (state) => state?.factory?.isLoading
-  );
+  const factoryData = useSelector((state) => state?.factory?.factories);
 
-  const poLoader = useSelector(
-    (state) => state?.p2System?.isLoading
-  );
+  const poLoader = useSelector((state) => state?.p2System?.isLoading);
 
   const manualOrScheduledPoLoader = useSelector(
     (state) => state?.p2System?.isLoading
   );
+
+  const poDetailsDataa = useSelector((state) => state?.p2System?.poDetailsData);
+
+  const manualOrScheduledPoDetailsDataa= useSelector((state) => state?.p2System?.manualOrScheduledPoDetailsData);
+
+  console.log(manualOrScheduledPoDetailsDataa, "manualOrScheduledPoDetailsDataa from redux toolkit");
+
+  useEffect(() => {
+    dispatch(fetchAllFactories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+    }
+  }, [factoryData]);
+
+  useEffect(() => {
+    let data = poDetailsDataa.pre_orders.map((v, i) => ({
+      ...v,
+      id: i + currentStartIndex,
+    }));
+    setOrders(data);
+    setTotalPages(poDetailsDataa.total_pages);
+  }, [poDetailsDataa]);
 
   function handleAttributeChange(event, rowIndex, attributeName) {
     const newValue = event.target.value;
@@ -133,8 +164,9 @@ function OrderManagementSystem() {
                   return (
                     <React.Fragment key={index}>
                       <div
-                        className={`row mb-${typeof attributeValue === "string" ? "3" : "4"
-                          }`}
+                        className={`row mb-${
+                          typeof attributeValue === "string" ? "3" : "4"
+                        }`}
                       >
                         <div className="col-6 d-flex  justify-content-end align-items-center">
                           <InputLabel
@@ -356,10 +388,9 @@ function OrderManagementSystem() {
               placeholder="0"
               onChange={(e) => {
                 if (e.target.value >= 0) {
-                  handleMOQtyChange(e, params.row)
+                  handleMOQtyChange(e, params.row);
                 }
-              }
-              }
+              }}
             />
           </Form.Group>
         );
@@ -379,9 +410,7 @@ function OrderManagementSystem() {
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               checked={selectedScheduleOrderIds.includes(params.row.id)}
-              onChange={() =>
-                handleOrderScheduleSelection(params.row)
-              }
+              onChange={() => handleOrderScheduleSelection(params.row)}
             />
           </FormGroup>
         );
@@ -443,10 +472,9 @@ function OrderManagementSystem() {
             placeholder="0"
             onChange={(e) => {
               if (e.target.value >= 0) {
-                handleSOQtyChange(e, params.row)
+                handleSOQtyChange(e, params.row);
               }
-            }
-            }
+            }}
           />
         </Form.Group>
       ),
@@ -508,30 +536,12 @@ function OrderManagementSystem() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
-  useEffect(() => {
-    dispatch(fetchAllFactories());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
-    }
-  }, [allFactoryDatas]);
-
   const fetchOrders = async () => {
     try {
       let apiUrl = `wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
-      await dispatch(PoDetailsData({ apiUrl })).then((response) => {
-        let data = response.data.pre_orders.map((v, i) => ({
-          ...v,
-          id: i + currentStartIndex,
-        }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      });
+      dispatch(PoDetailsData({ apiUrl }));
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -582,9 +592,10 @@ function OrderManagementSystem() {
     setTotalPagesFunction
   ) => {
     let data;
-    await dispatch(ManualOrScheduledPoDetailsData({ apiUrl })).then(
-      (response) => {
-        data = response.data.products.map((v, i) => ({
+    await dispatch(ManualOrScheduledPoDetailsData({ apiUrl }))
+    .then(
+      ({payload}) => {
+        data = payload.products.map((v, i) => ({
           ...v,
           id: i + currentStartIndex,
         }));
@@ -615,8 +626,8 @@ function OrderManagementSystem() {
           });
         }
 
-        if (response.data.products) {
-          setTotalPages(response.data.total_pages);
+        if (payload.products) {
+          setTotalPages(payload.total_pages);
           return data;
         }
       }
@@ -624,25 +635,31 @@ function OrderManagementSystem() {
     return data;
   };
 
+  
+
   const handleOrderSelection = (rowData) => {
     const filteredOrders = orders.filter((order) => order.id === rowData.id);
     const orderIds = filteredOrders.map((order) => order.order_ids);
     const selectedIndex = selectedOrderIds.indexOf(rowData.id);
-    const newSelected = selectedIndex !== -1
-      ? selectedOrderIds.filter((id) => id !== rowData.id)
-      : [...selectedOrderIds, rowData.id];
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedOrderIds.filter((id) => id !== rowData.id)
+        : [...selectedOrderIds, rowData.id];
 
     if (selectedIndex === -1) {
       setSelectedAgainstOrderDetails([...selectedAgainstOrderDetails, rowData]);
     } else {
-      setSelectedAgainstOrderDetails(selectedAgainstOrderDetails.filter(order => order.id !== rowData.id));
+      setSelectedAgainstOrderDetails(
+        selectedAgainstOrderDetails.filter((order) => order.id !== rowData.id)
+      );
     }
 
-    const newSelected2 = selectedIndex !== -1
-      ? selectedOrderIdss
-        .filter((id) => id !== rowData.id)
-        .flatMap((id) => id.split(","))
-      : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
+    const newSelected2 =
+      selectedIndex !== -1
+        ? selectedOrderIdss
+            .filter((id) => id !== rowData.id)
+            .flatMap((id) => id.split(","))
+        : [...selectedOrderIdss, ...orderIds.flatMap((str) => str.split(","))];
 
     setSelectedOrderIds(newSelected);
     setSelectedOrderIdss(newSelected2);
@@ -662,7 +679,9 @@ function OrderManagementSystem() {
     if (selectedIndex === -1) {
       setSelectedManualOrderDetails([...selectedManualOrderDetails, rowData]);
     } else {
-      setSelectedManualOrderDetails(selectedManualOrderDetails.filter(order => order.id !== rowData.id));
+      setSelectedManualOrderDetails(
+        selectedManualOrderDetails.filter((order) => order.id !== rowData.id)
+      );
     }
 
     if (selectedQtyIndex !== -1)
@@ -685,9 +704,14 @@ function OrderManagementSystem() {
     );
 
     if (selectedIndex === -1) {
-      setSelectedScheduledOrderDetails([...selectedScheduledOrderDetails, rowData]);
+      setSelectedScheduledOrderDetails([
+        ...selectedScheduledOrderDetails,
+        rowData,
+      ]);
     } else {
-      setSelectedScheduledOrderDetails(selectedScheduledOrderDetails.filter(order => order.id !== rowData.id));
+      setSelectedScheduledOrderDetails(
+        selectedScheduledOrderDetails.filter((order) => order.id !== rowData.id)
+      );
     }
 
     const newSelected =
@@ -759,14 +783,14 @@ function OrderManagementSystem() {
   const handlePoModal = (itemData) => {
     setProductId(itemData.item_id);
     setFactoryId(itemData.factory_id);
-    setVariationId(itemData.variation_id)
-    setProductName(itemData.product_name)
+    setVariationId(itemData.variation_id);
+    setProductName(itemData.product_name);
     setPoDetailsModal(true);
   };
 
   // PO Generate
   const handleGeneratePO = () => {
-    setIsDisabled(true)
+    setIsDisabled(true);
     if (activeKey === "against_PO") handleGenerateAgainstPO();
     else if (activeKey === "manual_PO") handleGenerateManualPO();
     else if (activeKey === "scheduled_PO") handleGenerateScheduledPO();
@@ -808,26 +832,28 @@ function OrderManagementSystem() {
         product_ids: selectedProductIds,
         factory_ids: factoryIds.join(","),
         order_ids: selectedOrderIdsStr,
-        variation_id:selectedAgainstOrderDetails.map((order)=>order.variation_id).join(",")||0
+        variation_id:
+          selectedAgainstOrderDetails
+            .map((order) => order.variation_id)
+            .join(",") || 0,
       };
       try {
         const response = await dispatch(AddPO(payload, navigate));
         if (response.status == 200) {
-          setIsDisabled(true)
+          setIsDisabled(true);
         }
       } catch (error) {
         console.error("Error generating PO IDs:", error);
-        setIsDisabled(true)
+        setIsDisabled(true);
       }
     } else {
       let errMessage =
         "Selected orders belong to different factories. Please select orders from the same factory.";
       ShowAlert("", errMessage, "error", false, false, "", "", 1000);
-      setIsDisabled(false)
+      setIsDisabled(false);
     }
   };
   const handleGenerateManualPO = async () => {
-
     const filteredOrders = getFilteredData(selectedManualOrderDetails);
     const factoryIds = [
       ...new Set(filteredOrders.map((order) => order.factory_id)),
@@ -847,11 +873,11 @@ function OrderManagementSystem() {
       try {
         const response = await dispatch(AddManualPO(payload, navigate));
         if (response.status == 200) {
-          setIsDisabled(true)
+          setIsDisabled(true);
         }
       } catch (error) {
         console.error("Error generating PO IDs:", error);
-        setIsDisabled(true)
+        setIsDisabled(true);
       }
     } else {
       await ShowAlert(
@@ -864,7 +890,7 @@ function OrderManagementSystem() {
         "",
         1000
       );
-      setIsDisabled(true)
+      setIsDisabled(true);
     }
   };
 
@@ -875,7 +901,9 @@ function OrderManagementSystem() {
         ...new Set(filteredOrders.map((order) => order.factory_id)),
       ];
       if (factoryIds.length === 1) {
-        const selectedquantities = filteredOrders.map((order) => order.Quantity);
+        const selectedquantities = filteredOrders.map(
+          (order) => order.Quantity
+        );
         const selectedOrderIdsStr = filteredOrders.map(
           (order) => order.product_id
         );
@@ -891,11 +919,11 @@ function OrderManagementSystem() {
         try {
           const response = await dispatch(AddSchedulePO(payload, navigate));
           if (response.status == 200) {
-            setIsDisabled(true)
+            setIsDisabled(true);
           }
         } catch (error) {
           console.error("Error generating PO IDs:", error);
-          setIsDisabled(true)
+          setIsDisabled(true);
         }
       } else {
         await ShowAlert(
@@ -908,7 +936,7 @@ function OrderManagementSystem() {
           "",
           1000
         );
-        setIsDisabled(true)
+        setIsDisabled(true);
       }
     } else {
       await ShowAlert(
@@ -922,7 +950,6 @@ function OrderManagementSystem() {
         1000
       );
     }
-
   };
 
   // variant
@@ -985,8 +1012,8 @@ function OrderManagementSystem() {
 
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
-    setStartDate("")
-    setEndDate("")
+    setStartDate("");
+    setEndDate("");
   };
 
   const productNamee = (e) => {
@@ -1097,7 +1124,14 @@ function OrderManagementSystem() {
                         </DemoContainer>
                       </LocalizationProvider>
                       {selectedDateRange[0] && selectedDateRange[1] && (
-                        <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                        <CancelIcon
+                          style={{
+                            position: "absolute",
+                            right: "0",
+                            top: "39px",
+                          }}
+                          onClick={clearDateRange}
+                        />
                       )}
                     </Form.Group>
                   </Col>
