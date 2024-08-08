@@ -65,6 +65,7 @@ export const GetGRNList = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
+      console.log(response.data,'response from getgrn list in slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -155,17 +156,17 @@ const P3SystemSlice = createSlice({
       state.SyncLoading = false;
     },
     clearstoredata: (state) => {
-      (state.isLoading = false);
-        (state.SyncLoading = false);
-        (state.productManual = []);
-        (state.grn = []);
-        (state.grnList = []);
-        (state.grnView = []);
-        (state.productDetails = []);
-        (state.productOrderDetails = []);
-        (state.productOrdersPrep = []);
-        (state.productOrdersStock = []);
-        (state.error = null);
+      state.isLoading = false;
+      state.SyncLoading = false;
+      state.productManual = [];
+      state.grn = [];
+      state.grnList = [];
+      state.grnView = [];
+      state.productDetails = [];
+      state.productOrderDetails = [];
+      state.productOrdersPrep = [];
+      state.productOrdersStock = [];
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -175,88 +176,88 @@ const P3SystemSlice = createSlice({
       })
       .addCase(GetProductManual.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.factory = action.data;
+        state.productManual = action.payload;
       })
       .addCase(GetProductManual.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload
       })
       .addCase(AddGrn.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddGrn.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editFactory = action.data;
+        state.grn = action.payload;
       })
       .addCase(AddGrn.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(GetGRNList.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(GetGRNList.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.grnList = action.payload;
       })
       .addCase(GetGRNList.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(GetGRNView.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(GetGRNView.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.grnView = action.payload;
       })
       .addCase(GetGRNView.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(GetProductDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(GetProductDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.productDetails = action.payload;
       })
       .addCase(GetProductDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(GetProductOrderDetails.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(GetProductOrderDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.productOrderDetails = action.payload;
       })
       .addCase(GetProductOrderDetails.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(AddProductOrderForPre.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddProductOrderForPre.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.productOrdersPrep = action.payload;
       })
       .addCase(AddProductOrderForPre.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       })
       .addCase(AddProductOrderForStock.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddProductOrderForStock.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.addFactory = action.data;
+        state.productOrdersStock = action.payload;
       })
       .addCase(AddProductOrderForStock.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.data;
+        state.error = action.payload;
       });
   },
 });

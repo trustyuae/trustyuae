@@ -32,6 +32,18 @@ function GRNManagement() {
   const [grnList, setGrnList] = useState([]);
   const loader = useSelector((state) => state?.p3System?.isLoading);
 
+  const grnListData = useSelector((state) => state?.p3System?.grnList);
+
+  console.log(grnListData, "grnListData from redux toolkit");
+
+  useEffect(() => {
+    if (grnListData) {
+      const grnData = grnListData.data.map((v, i) => ({ ...v, id: i }));
+      setGrnList(grnData);
+      setTotalPages(grnData.total_pages);
+    }
+  }, [grnListData]);
+
   const handleStatusChange = (e) => {
     setStatusFilter(e.target.value);
   };
@@ -110,11 +122,7 @@ function GRNManagement() {
       apiUrl = `${API_URL}wp-json/custom-get-grns-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
-      await dispatch(GetGRNList({ apiUrl })).then((response) => {
-        let data = response.data.data.map((v, i) => ({ ...v, id: i }));
-        setGrnList(data);
-        setTotalPages(response.data.total_pages);
-      });
+      dispatch(GetGRNList({ apiUrl }));
     } catch (error) {
       console.error(error);
       setGrnList([]);
