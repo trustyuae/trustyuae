@@ -49,7 +49,7 @@ function OnHoldOrdersSystem() {
 
   useEffect(() => {
     if (OnholdOrdersData) {
-      const onHoldData = OnholdOrdersData.orders.map((v, i) => ({
+      const onHoldData = OnholdOrdersData?.orders?.map((v, i) => ({
         ...v,
         id: i,
       }));
