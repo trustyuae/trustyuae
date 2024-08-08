@@ -14,8 +14,6 @@ import DataTable from "../DataTable";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import { Alert, Avatar, Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { API_URL } from "../../redux/constants/Constants";
-// import { PerticularPoDetails } from "../../redux/actions/P2SystemActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { GridActionsCellItem } from "@mui/x-data-grid";
