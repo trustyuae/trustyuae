@@ -739,13 +739,19 @@ function OnHoldManegementSystem() {
       verified_by: userName || "",
       status: "Processing",
     };
+
     try {
-      console.log(payload, "payload");
-      await dispatch(AddGrn(payload, navigate)); // Make sure dispatch is async if it returns a promise
+      await dispatch(AddGrn(payload, navigate));
+      const updatedPoTableData = poTableData.map((item) => ({
+        ...item,
+        received_quantity: 0,
+      }));
+      setPoTableData(updatedPoTableData);
     } catch (error) {
       console.error("Error submitting data:", error);
     }
   };
+
 
   const handleChange = (event, value) => {
     setPage(value);
