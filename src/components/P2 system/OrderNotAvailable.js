@@ -259,7 +259,7 @@ function OrderNotAvailable() {
     };
 
     dispatch(OrderNotAvailableDataStatus(requestedDataS))
-      .then((response) => {
+      .then(() => {
         setOrdersNotAvailableData((prevData) => {
           const newData = prevData.map((order) => {
             const isSelected = selectedOrderNotAvailable.some(

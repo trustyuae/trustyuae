@@ -109,11 +109,11 @@ const PoDetails = () => {
     }
   }, [factoryData]);
 
-  useEffect(()=>{
-  // if(perticularPoDetailsDatas){
-  //   const perticularData = perticularPoDetailsDatas
-  // }
-  },[])
+  useEffect(() => {
+    // if(perticularPoDetailsDatas){
+    //   const perticularData = perticularPoDetailsDatas
+    // }
+  }, []);
 
   const radios = [
     { name: "English", value: "En" },
@@ -128,25 +128,25 @@ const PoDetails = () => {
   const fetchPO = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
-      await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
-        let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
+      await dispatch(PerticularPoDetails({ apiUrl })).then(({ payload }) => {
+        let data = payload.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
         const row = [
           ...data,
           {
             id: "TAX",
             label: "Total:",
-            total_quantity: response?.data?.total_count || 0,
-            taxTotal: response?.data?.total_rmb_cost,
-            total_cost: response?.data?.total_cost || 0,
+            total_quantity: payload?.total_count || 0,
+            taxTotal: payload?.total_rmb_cost,
+            total_cost: payload?.total_cost || 0,
           },
         ];
         setPO_OrderList(row);
-        setERId(response.data.er_no);
-        setFactorieName(response.data.factory_id);
-        setPoStatus(response.data.po_status);
-        setPaymentStatus(response.data.payment_status);
-        setTotalPages(response?.data?.total_pages);
+        setERId(payload.er_no);
+        setFactorieName(payload.factory_id);
+        setPoStatus(payload.po_status);
+        setPaymentStatus(payload.payment_status);
+        setTotalPages(payload?.total_pages);
       });
     } catch {
       console.error("Error fetching PO:");
@@ -237,7 +237,7 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-  
+
     const updatedData = {
       po_number: id,
       request_quantity: updatelist.map((item) => item.available_quantity),
