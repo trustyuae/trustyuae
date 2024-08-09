@@ -472,21 +472,6 @@ function OnHoldManegementSystem() {
     validateForm(updatedData);
   };
 
-  const handleQtyChange = (index, event) => {
-    const newQuantity = parseFloat(event?.target?.value);
-    if (!isNaN(newQuantity) && index.target.value >= 0) {
-      const updatedRecivedQtyData = poTableData.map((item) => {
-        if (item?.product_id === event?.product_id) {
-          if (item.variation_id == event.variation_id) {
-            return { ...item, received_quantity: index?.target?.value };
-          }
-        }
-        return item;
-      });
-      setPoTableData(updatedRecivedQtyData);
-    }
-  };
-
   const handleDelete = (id) => {
     const updatedData = tableData.filter((item) => item.id !== id);
     setTableData(updatedData);
@@ -669,6 +654,7 @@ function OnHoldManegementSystem() {
 
   const handleCreateGrn = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
+    console.log(poTableData,'poTableData in console')
     const payload = {
       po_id: poId || "",
       product_id: poTableData.map((item) => item.product_id),
@@ -679,6 +665,7 @@ function OnHoldManegementSystem() {
       status: "Processing",
     };
     try {
+      console.log(payload,'payload')
       await dispatch(AddGrn(payload, navigate)); // Make sure dispatch is async if it returns a promise
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -727,6 +714,22 @@ function OnHoldManegementSystem() {
       console.error("Error fetching PO product data:", error);
     }
   };
+
+  const handleQtyChange = (index, event) => {
+    const newQuantity = parseFloat(event?.target?.value);
+    if (!isNaN(newQuantity) && index.target.value >= 0) {
+      const updatedRecivedQtyData = poTableData.map((item) => {
+        if (item?.product_id == event?.product_id) {
+          if (item.variation_id == event.variation_id) {
+            return { ...item, received_quantity: index?.target?.value };
+          }
+        }
+        return item;
+      });
+      setPoTableData(updatedRecivedQtyData);
+    }
+  };
+
 
   const handleChange = (event, value) => {
     setPage(value);
