@@ -47,7 +47,7 @@ const OnHoldOrdersSystemInChina = () => {
     const dispatch = useDispatch();
   
     async function fetchOrders() {
-      let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/??warehouse=China&page=${page}&per_page=${pageSize}`;
+      let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
       if (searchOrderID)
         apiUrl += `&orderid=${searchOrderID}`;
       if (endDate)

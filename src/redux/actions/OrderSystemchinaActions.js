@@ -86,7 +86,7 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`,{headers}
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
@@ -106,7 +106,7 @@ export const OnHoldOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_REQUEST});
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&orderid=${id}`,{headers}
     );
     dispatch({
       type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
@@ -126,7 +126,7 @@ export const ReserveOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&orderid=${id}`,{headers}
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
@@ -148,7 +148,7 @@ export const OrderDetailsGet =
       dispatch({ type: GET_ORDER_DETAILS_CHINA_REQUEST });
 
       const response = await axios.get(
-        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`,{headers}
+        `${API_URL}wp-json/custom-orders-new/v1/orders/?warehouse=China&orderid=${id}`,{headers}
       );
       dispatch({ type: GET_ORDER_DETAILS_CHINA_SUCCESS, payload: response?.data });
       return response;
@@ -165,7 +165,7 @@ export const AttachmentFileUpload =
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axios.post(
-        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}`,
+        `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}/?warehouse=China&`,
         requestData,
         {
           headers: {
@@ -189,7 +189,7 @@ export const OverAllAttachmentFileUpload =
       const requestData = new FormData();
       requestData.append("order_dispatch_image", order_dispatch_image);
       const response = await axios.post(
-        `${API_URL}wp-json/order-complete-attachment/v1/order-attachment/${order_id}`,
+        `${API_URL}wp-json/order-complete-attachment/v1/order-attachment/${order_id}/?warehouse=China`,
         requestData,
         {
           headers: {
@@ -212,7 +212,7 @@ export const AddMessage = (requestData) => async (dispatch) => {
   try {
     dispatch({ type: ADD_MESSAGE_CHINA_REQUEST });
     const response = await axios.post(
-      `${API_URL}wp-json/custom-message-note/v1/order-note/`,
+      `${API_URL}wp-json/custom-message-note/v1/order-note/?warehouse=China`,
       requestData,{headers}
     );
     dispatch({ type: ADD_MESSAGE_CHINA_SUCCESS, payload: response?.data });
@@ -227,7 +227,7 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
     dispatch({ type: INSERT_ORDER_PICKUP_CHINA_REQUEST });
 
     const response = await axios.post(
-      `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
+      `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/?warehouse=China`,
       requestData,{headers}
     );
     dispatch({ type: INSERT_ORDER_PICKUP_CHINA_SUCCESS, payload: response?.data });
@@ -242,7 +242,7 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
     dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_CHINA_REQUEST });
 
     const response = await axios.post(
-      `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/`,
+      `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/?warehouse=China`,
       requestData,{headers}
     );
     dispatch({
