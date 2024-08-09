@@ -26,7 +26,7 @@ export const PoDetailsData = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response of PoDetailsData from slice')
+      console.log(response, "response of PoDetailsData from slice");
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -40,7 +40,6 @@ export const ManualOrScheduledPoDetailsData = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response from ManualOrScheduledPoDetailsData')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -95,13 +94,13 @@ export const QuantityPoDetailsForModalInView = createAsyncThunk(
 
 export const AddPO = createAsyncThunk(
   "P2System/AddPO",
-  async ({ payload }, { rejectWithValue }) => {
+  async ({payload}, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-po-number/v1/po-id-generate/`,
         payload
       );
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);
@@ -313,7 +312,7 @@ const P2SystemSlice = createSlice({
       })
       .addCase(QuantityPoDetailsForModalInView.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.quantityDetailsDataOnPoDetails = action.payload
+        state.quantityDetailsDataOnPoDetails = action.payload;
       })
       .addCase(QuantityPoDetailsForModalInView.rejected, (state, action) => {
         state.isLoading = false;
