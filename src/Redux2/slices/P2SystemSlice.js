@@ -23,7 +23,7 @@ const initialState = {
 
 export const PoDetailsData = createAsyncThunk(
   "P2System/PoDetailsData",
-  async ({ apiUrl }, { rejectWithValue }) => {
+  async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
       console.log(response, "response of PoDetailsData from slice");
@@ -116,7 +116,7 @@ export const AddManualPO = createAsyncThunk(
         `wp-json/custom-manual-order/v1/post-order-manual/`,
         payload
       );
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);
@@ -132,7 +132,7 @@ export const AddSchedulePO = createAsyncThunk(
         `wp-json/custom-schedule-order/v1/post-order-schedule/`,
         payload
       );
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);
