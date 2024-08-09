@@ -741,7 +741,7 @@ function OnHoldManegementSystem() {
     };
     try {
       console.log(payload, "payload");
-      // await dispatch(AddGrn(payload, navigate)); // Make sure dispatch is async if it returns a promise
+      await dispatch(AddGrn(payload, navigate)); // Make sure dispatch is async if it returns a promise
     } catch (error) {
       console.error("Error submitting data:", error);
     }

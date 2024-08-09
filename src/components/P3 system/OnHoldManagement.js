@@ -26,8 +26,8 @@ import ShowAlert from "../../utils/ShowAlert";
 import ShowAlert2 from "../../utils/ShowAlert2";
 
 function OnHoldManagement() {
-  const params = useParams();
   const dispatch = useDispatch();
+  const params = useParams();
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -115,9 +115,131 @@ function OnHoldManagement() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setSelectedOrders, setProductData]);
 
+  // const handleOrderPerp = async () => {
+  //   // const dispatch = useDispatch(); // Initialize dispatch
+
+  //   const orderId = selectedOrders.map((order) => order.order_id);
+  //   const quantity = selectedOrders.map((order) => order.quantity);
+
+  //   if (selectedOrders.length === 0) {
+  //     await ShowAlert(
+  //       "Please select products for fulfilling orders",
+  //       "",
+  //       "error",
+  //       false,
+  //       false,
+  //       "",
+  //       "",
+  //       "",
+  //       0
+  //     );
+  //     return;
+  //   }
+
+  //   const systemSelection = await ShowAlert2(
+  //     "Please select the system to send data",
+  //     "",
+  //     "info",
+  //     true,
+  //     false,
+  //     "P1 System UAE",
+  //     "P1 System China",
+  //     "Cancel",
+  //     0,
+  //     1,
+  //     2
+  //   );
+
+  //   if (!systemSelection || systemSelection === "Cancel") {
+  //     return;
+  //   }
+
+  //   const confirmation = await ShowAlert(
+  //     `Are you sure you want to send the data to ${systemSelection}?`,
+  //     "",
+  //     "question",
+  //     true,
+  //     true,
+  //     "Yes",
+  //     "Cancel",
+  //     0
+  //   );
+
+  //   if (confirmation !== "Yes") {
+  //     return;
+  //   }
+
+  //   const requestedDataP = {
+  //     product_id: params.id,
+  //     order_id: orderId,
+  //     quantity: quantity,
+  //     grn_no: params.grn_no,
+  //     variation_id: params.variation_id,
+  //     warehouse: systemSelection === "P1 System UAE" ? "" : "China", // Correctly set warehouse based on selection
+  //   };
+
+  //   try {
+  //     console.log('Dispatching API call with data:', requestedDataP);
+  //     const response = await dispatch(AddProductOrderForPre(requestedDataP));
+  //     console.log('Response from API:', response);
+
+  //     if (response?.data?.status_code === 200) {
+  //       await ShowAlert(
+  //         response?.data?.Message,
+  //         "",
+  //         "success",
+  //         false,
+  //         false,
+  //         "",
+  //         "",
+  //         "",
+  //         3500
+  //       );
+
+  //       await fetchProductOrderDetails();
+
+  //       setProductData((prevProductData) =>
+  //         prevProductData.map((row) => ({ ...row, isSelected: false }))
+  //       );
+  //       setSelectedOrders([]);
+
+  //       if (selectedOrders.length === productData.length) {
+  //         setProductData([]);
+  //       }
+  //     } else {
+  //       await ShowAlert(
+  //         response?.data?.Message || "Failed to send data",
+  //         "",
+  //         "error",
+  //         false,
+  //         false,
+  //         "",
+  //         "",
+  //         "",
+  //         3500
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error("Error occurred:", error);
+  //     await ShowAlert(
+  //       "An error occurred while processing your request. Please try again.",
+  //       "",
+  //       "error",
+  //       false,
+  //       false,
+  //       "",
+  //       "",
+  //       "",
+  //       3500
+  //     );
+  //   }
+  // };
+
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
-    const quantity = selectedOrders.map((order) => order.quantity);
+    const quantity = selectedOrders.map((order) => order.qty_fullfilled);
+
+    console.log(quantity, "quantity from handleOrderPerp");
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
@@ -148,12 +270,12 @@ function OnHoldManagement() {
       2
     );
 
-    if (!systemSelection || systemSelection === "Cancel") {
+    if (systemSelection === "Cancel") {
       return;
     }
 
     const confirmation = await ShowAlert(
-      `Are you sure you? want to send the data to ${systemSelection}?`,
+      `Are you sure you want to send the data to ${systemSelection}?`,
       "",
       "question",
       true,
@@ -163,7 +285,7 @@ function OnHoldManagement() {
       0
     );
 
-    if (confirmation !== "Yes") {
+    if (confirmation === "Cancel") {
       return;
     }
 
@@ -173,16 +295,42 @@ function OnHoldManagement() {
       quantity: quantity,
       grn_no: params.grn_no,
       variation_id: params.variation_id,
-      warehouse: systemSelection === "P1 System UAE" ? "" : "China", // Include system selection in the data
+      warehouse: systemSelection === "P1 System UAE" ? "" : "China",
     };
 
     try {
+      console.log("Dispatching API call with data:", requestedDataP);
       const response = await dispatch(AddProductOrderForPre(requestedDataP));
-      if (response?.data?.status_code === 200) {
+      console.log("Response from API:", response);
+
+      if (response.status === 200) {
         await ShowAlert(
-          response?.data?.Message,
+          response?.data,
           "",
-          "success", // Assuming success icon
+          "success",
+          false,
+          false,
+          "",
+          "",
+          "",
+          1000
+        );
+
+        await fetchProductOrderDetails();
+
+        setProductData((prevProductData) =>
+          prevProductData.map((row) => ({ ...row, isSelected: false }))
+        );
+        setSelectedOrders([]);
+
+        if (selectedOrders.length === productData.length) {
+          setProductData([]);
+        }
+      } else {
+        await ShowAlert(
+          response?.data?.Message || "Failed to send data",
+          "",
+          "error",
           false,
           false,
           "",
@@ -190,14 +338,6 @@ function OnHoldManagement() {
           "",
           3500
         );
-        await fetchProductOrderDetails();
-        setProductData((prevProductData) =>
-          prevProductData.map((row) => ({ ...row, isSelected: false }))
-        );
-        setSelectedOrders([]);
-        if (selectedOrders.length === productData.length) {
-          setProductData([]);
-        }
       }
     } catch (error) {
       console.error("Error occurred:", error);
