@@ -310,8 +310,8 @@ function OnHoldManegementSystem() {
             step="1"
             value={params.row.Quantity || 0}
             placeholder="0"
-            onChange={(e) => handleQtyChange(params.row, e)}
-            style={{ width: "50%",textAlign: "center" }}
+            // onChange={(e) => handleQtyChange(params.row, e)}
+            style={{ width: "50%", textAlign: "center" }}
           />
         </Form.Group>
       ),
@@ -402,33 +402,35 @@ function OnHoldManegementSystem() {
       field: "received_quantity",
       headerName: "received quantity",
       flex: 1,
-      renderCell: (params) => (
-        <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <Form.Control
-              type="number"
-              value={params.row.Quantity}
-              placeholder="0"
-              onChange={(e) => handleQtyChange(e, params.row)}
+      renderCell: (params) => {
+        return (
+          <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+            <div
               style={{
-                textAlign: "center",
-                height: "40px",
-                lineHeight: "40px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                height: "100%",
               }}
-            />
-          </div>
-        </Form.Group>
-      ),
+            >
+              <Form.Control
+                type="number"
+                value={params.row.received_quantity}
+                placeholder="0"
+                onChange={(e) => handleRecievedQtyChange(e, params.row)}
+                style={{
+                  textAlign: "center",
+                  height: "40px",
+                  lineHeight: "40px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              />
+            </div>
+          </Form.Group>
+        );
+      },
     },
   ];
 
@@ -652,26 +654,6 @@ function OnHoldManegementSystem() {
     }
   };
 
-  const handleCreateGrn = async () => {
-    const currentDate = new Date().toISOString().split("T")[0];
-    console.log(poTableData,'poTableData in console')
-    const payload = {
-      po_id: poId || "",
-      product_id: poTableData.map((item) => item.product_id),
-      variation_id: poTableData.map((item) => item.variation_id),
-      received_qty: poTableData.map((item) => item.received_quantity),
-      created_date: currentDate,
-      verified_by: userName || "",
-      status: "Processing",
-    };
-    try {
-      console.log(payload,'payload')
-      await dispatch(AddGrn(payload, navigate)); // Make sure dispatch is async if it returns a promise
-    } catch (error) {
-      console.error("Error submitting data:", error);
-    }
-  };
-
   const handleFactoryChange = (e) => {
     setSelectedFactory(e.target.value);
   };
@@ -715,13 +697,28 @@ function OnHoldManegementSystem() {
     }
   };
 
-  const handleQtyChange = (index, event) => {
-    const newQuantity = parseFloat(event?.target?.value);
-    if (!isNaN(newQuantity) && index.target.value >= 0) {
+  // const handleQtyChange = (index, event) => {
+  //   const newQuantity = parseFloat(event?.target?.value);
+  //   if (!isNaN(newQuantity) && index.target.value >= 0) {
+  //     const updatedRecivedQtyData = poTableData.map((item) => {
+  //       if (item?.product_id == event?.product_id) {
+  //         if (item.variation_id == event.variation_id) {
+  //           return { ...item, received_quantity: index?.target?.value };
+  //         }
+  //       }
+  //       return item;
+  //     });
+  //     setPoTableData(updatedRecivedQtyData);
+  //   }
+  // };
+
+  const handleRecievedQtyChange = (index, event) => {
+    console.log(event, "event");
+    if (index.target.value >= 0) {
       const updatedRecivedQtyData = poTableData.map((item) => {
-        if (item?.product_id == event?.product_id) {
+        if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {
-            return { ...item, received_quantity: index?.target?.value };
+            return { ...item, received_quantity: index.target.value };
           }
         }
         return item;
@@ -730,6 +727,25 @@ function OnHoldManegementSystem() {
     }
   };
 
+  const handleCreateGrn = async () => {
+    const currentDate = new Date().toISOString().split("T")[0];
+    console.log(poTableData, "poTableData in console");
+    const payload = {
+      po_id: poId || "",
+      product_id: poTableData.map((item) => item.product_id),
+      variation_id: poTableData.map((item) => item.variation_id),
+      received_qty: poTableData.map((item) => item.received_quantity),
+      created_date: currentDate,
+      verified_by: userName || "",
+      status: "Processing",
+    };
+    try {
+      console.log(payload, "payload");
+      // await dispatch(AddGrn(payload, navigate)); // Make sure dispatch is async if it returns a promise
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
 
   const handleChange = (event, value) => {
     setPage(value);
