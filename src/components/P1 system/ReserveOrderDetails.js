@@ -228,7 +228,7 @@ function ReserveOrderDetails() {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, setTableData, setOrderData]);
+  }, [setMessage, setTableData, setOrderData]);
 
   return (
     <>
