@@ -20,6 +20,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  AddMessage,
   CompletedOrderDetailsGet,
   ReserveOrderDetailsGet,
 } from "../../redux/actions/OrderSystemActions";
@@ -28,6 +29,9 @@ import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
+import Form from "react-bootstrap/Form";
+import ShowAlert from "../../utils/ShowAlert";
 
 function ReserveOrderDetails() {
   const params = useParams();
@@ -41,6 +45,8 @@ function ReserveOrderDetails() {
   const dispatch = useDispatch();
   const [userName, setUserName] = useState(null);
   const [attachmentZoom, setAttachmentZoom] = useState(false);
+  const [message, setMessage] = useState("");
+  const [showMessageModal, setshowMessageModal] = useState(false);
 
   const token = JSON.parse(localStorage.getItem("token"));
   const headers = {
@@ -92,6 +98,32 @@ function ReserveOrderDetails() {
       console.error(error);
     }
   }
+
+  const handleAddMessage = async (e) => {
+    const orderId = parseInt(params.id, 10);
+    let userID = JSON.parse(localStorage.getItem("user_data"));
+    const requestedMessage = {
+      message: message,
+      order_id: orderId,
+      name: userID.first_name,
+    };
+    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+      if (response.data) {
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+      }
+    });
+  };
 
   useEffect(() => {
     fetchOrder();
@@ -222,6 +254,11 @@ function ReserveOrderDetails() {
     },
   ];
 
+  const handleChange = (e) => {
+    setMessage(e.target.value);
+  };
+
+
   return (
     <>
       <Container fluid className="px-5">
@@ -279,6 +316,13 @@ function ReserveOrderDetails() {
               )}
             </Box>
             <Box>
+              <Button
+                variant="outline-secondary"
+                className="p-1 me-3 bg-transparent text-secondary"
+                onClick={() => setshowMessageModal(true)}
+              >
+                <AddCommentOutlinedIcon />
+              </Button>
               <Button
                 variant="outline-primary"
                 className="p-1 me-3 bg-transparent text-primary"
@@ -555,6 +599,33 @@ function ReserveOrderDetails() {
           showModal={showModal}
           orderData={orderData}
         />
+        <Modal
+          show={showMessageModal}
+          onHide={() => setshowMessageModal(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Message</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Control
+              as="textarea"
+              placeholder="Enter your message here..."
+              rows={3}
+              value={message}
+              onChange={(e) => handleChange(e)}
+            />
+            <Box className="text-end my-3">
+              <Button
+                variant="secondary"
+                className="mt-2 fw-semibold"
+                onClick={handleAddMessage}
+              >
+                Add Message
+              </Button>
+            </Box>
+          </Modal.Body>
+        </Modal>
       </Container>
     </>
   );
