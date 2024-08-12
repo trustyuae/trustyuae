@@ -42,7 +42,6 @@ const ReserveOrderdetailsInChina = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [userName, setUserName] = useState(null);
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
@@ -51,25 +50,6 @@ const ReserveOrderdetailsInChina = () => {
   const headers = {
     Authorization: `Live ${token}`,
   };
-
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,
-          { headers }
-        );
-        setUserName(name.data);
-      } catch (error) {
-        console.error("Error fetching name:", error);
-        setUserName("Error fetching name");
-      }
-    };
-
-    if (orderDetails) {
-      fetchUserName();
-    }
-  }, [orderDetails]);
 
   const loader = useSelector(
     (state) => state?.orderSystemDataChina?.isCompletedOrderDetails
@@ -100,7 +80,7 @@ const ReserveOrderdetailsInChina = () => {
 
   useEffect(() => {
     fetchOrder();
-  }, []);
+  }, [message, setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -300,7 +280,7 @@ const ReserveOrderdetailsInChina = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold"># {userName}</Typography>
+                    <Typography className="fw-bold"># {orderDetails?.user_name}</Typography>
                     <Typography
                       className=""
                       sx={{

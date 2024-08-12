@@ -172,7 +172,7 @@ function OnHoldOrdersDetails() {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, setTableData, setOrderData]);
+  }, [message, tableData, orderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);

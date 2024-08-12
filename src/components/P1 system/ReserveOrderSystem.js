@@ -206,7 +206,6 @@ function ReserveOrderSystem() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
   }, [pageSize, page, searchOrderID, isReset]);
 
   return (

@@ -43,7 +43,6 @@ function ReserveOrderDetails() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [userName, setUserName] = useState(null);
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
@@ -52,25 +51,6 @@ function ReserveOrderDetails() {
   const headers = {
     Authorization: `Live ${token}`,
   };
-
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,
-          { headers }
-        );
-        setUserName(name.data);
-      } catch (error) {
-        console.error("Error fetching name:", error);
-        setUserName("Error fetching name");
-      }
-    };
-
-    if (orderDetails) {
-      fetchUserName();
-    }
-  }, [orderDetails]);
 
   const loader = useSelector(
     (state) => state?.orderSystemData?.isCompletedOrderDetails
@@ -127,7 +107,8 @@ function ReserveOrderDetails() {
 
   useEffect(() => {
     fetchOrder();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message,setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -254,11 +235,6 @@ function ReserveOrderDetails() {
     },
   ];
 
-  const handleChange = (e) => {
-    setMessage(e.target.value);
-  };
-
-
   return (
     <>
       <Container fluid className="px-5">
@@ -302,7 +278,9 @@ function ReserveOrderDetails() {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold"># {userName}</Typography>
+                    <Typography className="fw-bold">
+                      # {orderDetails?.user_name}
+                    </Typography>
                     <Typography
                       className=""
                       sx={{
@@ -613,7 +591,7 @@ function ReserveOrderDetails() {
               placeholder="Enter your message here..."
               rows={3}
               value={message}
-              onChange={(e) => handleChange(e)}
+              onChange={(e) => setMessage(e.target.value)}
             />
             <Box className="text-end my-3">
               <Button
