@@ -15,6 +15,7 @@ const OrderDetailsPrintModal = ({
   factoryName,
   poId,
 }) => {
+  console.log(PO_OrderList, "PO_OrderList from excell sheet");
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
   const handleExport = async () => {
@@ -229,12 +230,16 @@ const OrderDetailsPrintModal = ({
   const handleExportExcel = (e) => {
     const wb = XLSX.utils.book_new();
     const data = PO_OrderList.map((item) => {
+      console.log(item, "PO_OrderList for showing in excelsheet");
       if (item?.id !== "TAX") {
         return {
+          "Product ID": item?.product_id || "N/A",
+          "variation ID": item?.variation_id || "N/A",
           "Product Name": item?.product_name || "N/A",
           "Quantity Ordered": item?.quantity || 0,
           "Image URL": item?.image || "N/A",
-          "order ids": item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
+          "order ids":
+            item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
         };
       }
     }).filter((item) => item !== undefined);
@@ -379,7 +384,7 @@ const OrderDetailsPrintModal = ({
           <Button variant="primary" onClick={handleExport}>
             {isDownloadPdf ? "Downloading..." : "Download PDF"}
           </Button>
-          <Button variant="success" onClick={(e)=>handleExportExcel(e)}>
+          <Button variant="success" onClick={(e) => handleExportExcel(e)}>
             Download Excel
           </Button>
         </Modal.Footer>
