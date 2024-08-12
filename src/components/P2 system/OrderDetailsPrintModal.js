@@ -235,8 +235,11 @@ const OrderDetailsPrintModal = ({
   const handleExportExcel = (e) => {
     const wb = XLSX.utils.book_new();
     const data = PO_OrderList.map((item) => {
+      console.log(item, "PO_OrderList for showing in excelsheet");
       if (item?.id !== "TAX") {
         return {
+          "Product ID": item?.product_id || "N/A",
+          "variation ID": item?.variation_id || "N/A",
           "Product Name": item?.product_name || "N/A",
           "Quantity Ordered": item?.quantity || 0,
           "Image URL": item?.image || "N/A",
