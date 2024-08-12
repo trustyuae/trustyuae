@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
-import { Card } from "react-bootstrap";
+import { Badge, Card } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -124,10 +124,16 @@ const GRNView = () => {
         </MDBCol>
       </MDBRow>
       <Card className="p-3 mb-3">
-        <Box className="d-flex align-items-center justify-content-between">
+        <Box className="d-flex align-items-center">
           <Box>
-            <Typography variant="h6" className="fw-bold mb-3">
+            <Typography variant="h6" className="fw-bold">
               GRN View
+            </Typography>
+          </Box>
+          <Box className="ms-5">
+            <Typography className="fw-bold">#verified by</Typography>
+            <Typography>
+              <Badge bg="success">Verified by</Badge>
             </Typography>
           </Box>
         </Box>

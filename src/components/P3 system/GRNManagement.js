@@ -62,7 +62,7 @@ function GRNManagement() {
   const columns = [
     { field: "grn_no", headerName: "GRN NO", flex: 1 },
     { field: "created_date", headerName: "Date Created", flex: 1 },
-    { field: "verified_by", headerName: "Created By", flex: 1 },
+    // { field: "verified_by", headerName: "Created By", flex: 1 },
     {
       field: "total_qty",
       headerName: "Total Items",
@@ -82,6 +82,12 @@ function GRNManagement() {
         const poId = params.row.po_id;
         return <div>{poId ? poId : "No PO ref"}</div>;
       },
+    },
+    {
+      field: "message",
+      headerName: "Remark",
+      flex: 1,
+      type: "string",
     },
     {
       field: "",

@@ -23,6 +23,8 @@ import axios from "axios";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
+import { AddMessage } from "../../redux/actions/OrderSystemActions";
+import ShowAlert from "../../utils/ShowAlert";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -63,6 +65,8 @@ function OnHoldManegementSystem() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
+  const [showMessageModal, setshowMessageModal] = useState(false);
+  const [message, setMessage] = useState("");
 
   const token = JSON.parse(localStorage.getItem("token"));
 
@@ -520,6 +524,11 @@ function OnHoldManegementSystem() {
     }
   };
 
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(1);
+  };
+
   useEffect(() => {
     handalADDProduct();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -697,21 +706,6 @@ function OnHoldManegementSystem() {
     }
   };
 
-  // const handleQtyChange = (index, event) => {
-  //   const newQuantity = parseFloat(event?.target?.value);
-  //   if (!isNaN(newQuantity) && index.target.value >= 0) {
-  //     const updatedRecivedQtyData = poTableData.map((item) => {
-  //       if (item?.product_id == event?.product_id) {
-  //         if (item.variation_id == event.variation_id) {
-  //           return { ...item, received_quantity: index?.target?.value };
-  //         }
-  //       }
-  //       return item;
-  //     });
-  //     setPoTableData(updatedRecivedQtyData);
-  //   }
-  // };
-
   const handleRecievedQtyChange = (index, event) => {
     console.log(event, "event");
     if (index.target.value >= 0) {
@@ -725,6 +719,32 @@ function OnHoldManegementSystem() {
       });
       setPoTableData(updatedRecivedQtyData);
     }
+  };
+
+  const handleAddRemark = async (e) => {
+    // const orderId = parseInt(id, 10);
+    let userID = JSON.parse(localStorage.getItem("user_data"));
+    const requestedMessage = {
+      message: message,
+      // order_id: orderId,
+      // name: userID.first_name,
+    };
+    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+      if (response.data) {
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+      }
+    });
   };
 
   const handleCreateGrn = async () => {
@@ -751,7 +771,6 @@ function OnHoldManegementSystem() {
       console.error("Error submitting data:", error);
     }
   };
-
 
   const handleChange = (event, value) => {
     setPage(value);
@@ -857,9 +876,9 @@ function OnHoldManegementSystem() {
                   as="select"
                   className="w-auto"
                   value={pageSize}
-                  // onChange={handlePageSizeChange}
+                  onChange={handlePageSizeChange}
                 >
-                  {pageSizeOptions.map((size) => (
+                  {pageSizeOptions?.map((size) => (
                     <option key={size} value={size}>
                       {size}
                     </option>
@@ -902,7 +921,7 @@ function OnHoldManegementSystem() {
                     as="select"
                     className="w-auto"
                     value={pageSize}
-                    // onChange={handlePageSizeChange}
+                    onChange={handlePageSizeChange}
                   >
                     {pageSizeOptions.map((size) => (
                       <option key={size} value={size}>
@@ -932,11 +951,20 @@ function OnHoldManegementSystem() {
                   rowHeight="auto"
                 />
               </div>
-              <MDBRow className="justify-content-end px-3">
+              <MDBRow className="justify-content-end px-1">
+                <Button
+                  variant="secondary"
+                  disabled={!isValid}
+                  style={{ width: "130px", marginRight: "5px" }}
+                  // onClick={handleAddRemark}
+                  onClick={() => setshowMessageModal(true)}
+                >
+                  Add Remark
+                </Button>
                 <Button
                   variant="primary"
                   disabled={!isValid}
-                  style={{ width: "100px" }}
+                  style={{ width: "130px" }}
                   onClick={handleSubmit}
                 >
                   submit
@@ -989,6 +1017,33 @@ function OnHoldManegementSystem() {
               alt="Product"
             />
           </Card>
+        </Modal.Body>
+      </Modal>
+      <Modal
+        show={showMessageModal}
+        onHide={() => setshowMessageModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Message</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Control
+            as="textarea"
+            placeholder="Enter your message here..."
+            rows={3}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <Box className="text-end my-3">
+            <Button
+              variant="secondary"
+              className="mt-2 fw-semibold"
+              onClick={handleAddRemark}
+            >
+              Add Message
+            </Button>
+          </Box>
         </Modal.Body>
       </Modal>
     </Container>
