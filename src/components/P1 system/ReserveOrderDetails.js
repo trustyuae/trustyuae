@@ -47,11 +47,6 @@ function ReserveOrderDetails() {
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
 
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
-
   const loader = useSelector(
     (state) => state?.orderSystemData?.isCompletedOrderDetails
   );
@@ -104,11 +99,6 @@ function ReserveOrderDetails() {
       }
     });
   };
-
-  useEffect(() => {
-    fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message,setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -234,6 +224,11 @@ function ReserveOrderDetails() {
       ),
     },
   ];
+
+  useEffect(() => {
+    fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message, setTableData, setOrderData]);
 
   return (
     <>

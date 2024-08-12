@@ -58,6 +58,10 @@ const ReserveOrderdetailsInChina = () => {
     (state) => state?.orderSystemDataChina?.completedOrderDetails?.orders?.[0]
   );
 
+  useEffect(() => {
+    fetchOrder();
+  }, [setMessage, setTableData, setOrderData]);
+
   async function fetchOrder() {
     try {
       const response = await dispatch(ReserveOrderDetailsGet(params.id));
@@ -77,10 +81,6 @@ const ReserveOrderdetailsInChina = () => {
       console.error(error);
     }
   }
-
-  useEffect(() => {
-    fetchOrder();
-  }, [message, setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
