@@ -167,7 +167,7 @@ const OrderSystemInChina = () => {
       renderCell: (value, row) => {
         return (
           <Link
-            to={`/order_details/${value?.row?.order_id}`}
+            to={`/order_details_in_china/${value?.row?.order_id}`}
             className=" d-flex "
           >
             <Button

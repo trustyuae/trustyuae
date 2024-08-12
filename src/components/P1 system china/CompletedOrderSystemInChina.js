@@ -138,7 +138,7 @@ const CompletedOrderSystemInChina = () => {
       renderCell: (value, row) => {
         return (
           <Link
-            to={`/completed_order_details/${value?.row?.order_id}`}
+            to={`/completed_order_details_in_china/${value?.row?.order_id}`}
             className=" d-flex justify-content-center"
           >
             <Button
