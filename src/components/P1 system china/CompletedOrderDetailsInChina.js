@@ -25,7 +25,11 @@ import Loader from "../../utils/Loader";
 import axios from "axios";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemchinaActions";
+import { AddMessage, CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemchinaActions";
+import Form from "react-bootstrap/Form";
+import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
+// import { AddMessage } from "../../redux/actions/OrderSystemActions";
+import ShowAlert from "../../utils/ShowAlert";
 
 const CompletedOrderDetailsInChina = () => {
   const params = useParams();
@@ -37,32 +41,14 @@ const CompletedOrderDetailsInChina = () => {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [userName, setUserName] = useState(null);
   const [attachmentZoom, setAttachmentZoom] = useState(false);
+  const [message, setMessage] = useState("");
+  const [showMessageModal, setshowMessageModal] = useState(false);
 
   const token = JSON.parse(localStorage.getItem("token"));
   const headers = {
     Authorization: `Live ${token}`,
   };
-
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const name = await axios.get(
-          `${API_URL}wp-json/custom-user/v1/get-name-by-id/${orderDetails?.operation_user_id}`,
-          { headers }
-        );
-        setUserName(name.data);
-      } catch (error) {
-        console.error("Error fetching name:", error);
-        setUserName("Error fetching name");
-      }
-    };
-
-    if (orderDetails) {
-      fetchUserName();
-    }
-  }, [orderDetails]);
 
   const loader = useSelector(
     (state) => state?.orderSystemDataChina?.isCompletedOrderDetails
@@ -115,6 +101,32 @@ const CompletedOrderDetailsInChina = () => {
     } else {
       return "Variant data not available";
     }
+  };
+
+  const handleAddMessage = async (e) => {
+    const orderId = parseInt(params.id, 10);
+    let userID = JSON.parse(localStorage.getItem("user_data"));
+    const requestedMessage = {
+      message: message,
+      order_id: orderId,
+      name: userID.first_name,
+    };
+    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
+      if (response.data) {
+        setMessage("");
+        setshowMessageModal(false);
+        const result = await ShowAlert(
+          "",
+          response.data,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+      }
+    });
   };
 
   const columns = [
@@ -263,7 +275,7 @@ const CompletedOrderDetailsInChina = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold"># {userName}</Typography>
+                    <Typography className="fw-bold"># {orderDetails?.user_name}</Typography>
                     <Typography
                       className=""
                       sx={{
@@ -277,6 +289,13 @@ const CompletedOrderDetailsInChina = () => {
               )}
             </Box>
             <Box>
+            <Button
+                variant="outline-secondary"
+                className="p-1 me-3 bg-transparent text-secondary"
+                onClick={() => setshowMessageModal(true)}
+              >
+                <AddCommentOutlinedIcon />
+              </Button>
               <Button
                 variant="outline-primary"
                 className="p-1 me-3 bg-transparent text-primary"
@@ -542,6 +561,33 @@ const CompletedOrderDetailsInChina = () => {
           showModal={showModal}
           orderData={orderData}
         />
+          <Modal
+          show={showMessageModal}
+          onHide={() => setshowMessageModal(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Message</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Control
+              as="textarea"
+              placeholder="Enter your message here..."
+              rows={3}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <Box className="text-end my-3">
+              <Button
+                variant="secondary"
+                className="mt-2 fw-semibold"
+                onClick={handleAddMessage}
+              >
+                Add Message
+              </Button>
+            </Box>
+          </Modal.Body>
+        </Modal>
       </Container>
     </>
   );
