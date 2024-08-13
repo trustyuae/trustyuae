@@ -15,6 +15,9 @@ import {
   List,
   Accordion,
   AccordionSummary,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -67,6 +70,10 @@ function OnHoldOrdersDetails() {
   const [selectedVariationId, setSelecetedVariationId] = useState("");
   const [toggleStatus, setToggleStatus] = useState(0);
 
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
+  const [selectedItemIdss, setSelectedItemIdss] = useState([]);
+
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -110,34 +117,56 @@ function OnHoldOrdersDetails() {
     setSelectedFileUrl(null);
   };
 
-  async function fetchOrder() {
-    try {
-      // const response = await dispatch(OrderDetailsGet({ id: id }));
-      // const response = await axios.get(
-      //   `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
-      // );
-      const response = await dispatch(OnHoldOrderDetailsGet(id));
+  // async function fetchOrder() {
+  //   try {
+  //     const response = await dispatch(OnHoldOrderDetailsGet(id));
 
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+  //     let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+  //     setOrderData(data);
+  //     setOrderDetails(response.data.orders[0]);
+  //     setToggleStatus(Number(response.data.orders[0].toggle_status));
+  //     const order = response.data.orders[0];
+  //     if (order) setOrderProcess(order.order_process);
+  //     if (data) {
+  //       data.forEach((order, index) => {
+  //         const newData = order.items.map((product, index1) => ({
+  //           ...product,
+  //           id: index1,
+  //         }));
+  //         setTableData(newData);
+  //       });
+  //     }
+  //     setLoader(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
+
+  const fetchOrder = useCallback(async () => {
+    try {
+      const response = await dispatch(OnHoldOrderDetailsGet(id));
+      const data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
       setToggleStatus(Number(response.data.orders[0].toggle_status));
       const order = response.data.orders[0];
       if (order) setOrderProcess(order.order_process);
       if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
+        const newData = data.flatMap((order) =>
+          order.items.map((product, index1) => ({ ...product, id: index1 }))
+        );
+        setTableData(newData);
       }
       setLoader(false);
     } catch (error) {
       console.error(error);
     }
-  }
+  }, [dispatch, id]);
+
+  // Effect to call fetchOrder only when id changes
+  useEffect(() => {
+    if (id) fetchOrder();
+  }, [fetchOrder, id]);
 
   useEffect(() => {
     console.log(toggleStatus, "toggleStatus");
@@ -169,10 +198,10 @@ function OnHoldOrdersDetails() {
     });
   };
 
-  useEffect(() => {
-    fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, tableData, orderData]);
+  // useEffect(() => {
+  //   fetchOrder();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [message, tableData, orderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -276,6 +305,33 @@ function OnHoldOrdersDetails() {
     }
   };
 
+  const handleItemSelection = (rowData) => {
+    const filteredItems = tableData.filter((item) => item.id === rowData.id);
+    console.log(filteredItems, "filteredItems from handleItemSelection");
+    const itemIds = filteredItems.map((item) => item.order_ids);
+    const selectedIndex = selectedItemIds.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIds.filter((id) => id !== rowData.id)
+        : [...selectedItemIds, rowData.id];
+
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, rowData]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+    }
+
+    const newSelected2 =
+      selectedIndex !== -1
+        ? selectedItemIdss
+            .filter((id) => id !== rowData?.id)
+            .flatMap((id) => id?.split(","))
+        : [...selectedItemIdss, ...itemIds?.flatMap((str) => str?.split(","))];
+
+    setSelectedItemIds(newSelected);
+    setSelectedItemIdss(newSelected2);
+  };
+
   const handleStartOrderProcess = async () => {
     const requestData = {
       order_id: Number(id),
@@ -317,6 +373,14 @@ function OnHoldOrdersDetails() {
     }
   };
 
+  const handleSendToP2ButtonClick = async () => {
+    try {
+      dispatch(CustomItemSendToP2(id, navigate));
+    } catch (error) {
+      console.error("Error while sending order to p2 system:", error);
+    }
+  };
+
   const variant = (variations) => {
     const matches = variations.match(
       /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
@@ -351,6 +415,24 @@ function OnHoldOrdersDetails() {
   };
 
   const columns = [
+    {
+      field: "select",
+      headerName: "Select",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={<Checkbox />}
+              style={{ justifyContent: "center" }}
+              checked={selectedItemIds.includes(params.row.id)}
+              onChange={(event) => handleItemSelection(params.row)}
+            />
+          </FormGroup>
+        );
+      },
+    },
     {
       field: "item_id",
       headerName: "Item Id",
@@ -1119,6 +1201,14 @@ function OnHoldOrdersDetails() {
                 <Button
                   variant="danger"
                   disabled={orderDetails.toggle_status == 1 ? false : true}
+                  onClick={handleSendToP2ButtonClick}
+                  className="ms-3"
+                >
+                  Send to P2 System
+                </Button>
+                <Button
+                  variant="danger"
+                  disabled={orderDetails.toggle_status == 1 ? false : true}
                   onClick={handleFinishButtonClick}
                 >
                   Finish
@@ -1131,7 +1221,18 @@ function OnHoldOrdersDetails() {
                   disabled={
                     orderProcess != "started" ||
                     userData?.user_id != orderDetails?.operation_user_id ||
-                    // orderDetails.toggle_status==1?true:false||
+                    tableData?.some((data) => data.dispatch_image == "")
+                  }
+                  onClick={handleSendToP2ButtonClick}
+                  className="me-3"
+                >
+                  Send to P2 System
+                </Button>
+                <Button
+                  variant="danger"
+                  disabled={
+                    orderProcess != "started" ||
+                    userData?.user_id != orderDetails?.operation_user_id ||
                     tableData?.some((data) => data.dispatch_image == "")
                   }
                   onClick={handleFinishButtonClick}

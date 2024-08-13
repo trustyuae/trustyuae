@@ -39,6 +39,9 @@ import {
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_FAIL,
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS,
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST,
+  CUSTOM_ORDER_ON_HOLD_SEND_P2_FAIL,
+  CUSTOM_ORDER_ON_HOLD_SEND_P2_SUCCESS,
+  CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST,
 } from "../constants/Constants";
 
 const initialState = {
@@ -68,6 +71,8 @@ const initialState = {
   isCustomOrderOnHold: false,
   customOrderOnHoldFinishData: [],
   isCustomOrderOnHoldFinish: false,
+  customOrderOnHoldSendToP2Data: [],
+  isCustomOrderOnHoldSendToP2: false,
   error: null,
 };
 
@@ -113,7 +118,7 @@ const OrderSystemReducer = (state = initialState, action) => {
     case GET_ORDER_DETAILS_FAIL:
       return { ...state, isOrderDetails: false, error: action.payload };
 
-      case GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST:
+    case GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST:
       return { ...state, isOnHoldOrderDetails: true };
     case GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS:
       return {
@@ -139,7 +144,7 @@ const OrderSystemReducer = (state = initialState, action) => {
     case UPLOAD_ATTACH_FILE_FAIL:
       return { ...state, isUploadAttachFile: false, error: action.payload };
 
-      case UPLOAD_OVERALL_ATTACH_FILE_REQUEST:
+    case UPLOAD_OVERALL_ATTACH_FILE_REQUEST:
       return { ...state, isUploadOverAllAttachFile: true };
     case UPLOAD_OVERALL_ATTACH_FILE_SUCCESS:
       return {
@@ -148,7 +153,11 @@ const OrderSystemReducer = (state = initialState, action) => {
         uploadOverAllAttachFile: action.payload,
       };
     case UPLOAD_OVERALL_ATTACH_FILE_FAIL:
-      return { ...state, isUploadOverAllAttachFile: false, error: action.payload };
+      return {
+        ...state,
+        isUploadOverAllAttachFile: false,
+        error: action.payload,
+      };
 
     case ADD_MESSAGE_REQUEST:
       return { ...state, isMessage: true };
@@ -186,7 +195,7 @@ const OrderSystemReducer = (state = initialState, action) => {
     case CUSTOM_ORDER_FINISH_FAIL:
       return { ...state, isCustomOrder: false, error: action.payload };
 
-      case CUSTOM_ORDER_ON_HOLD_REQUEST:
+    case CUSTOM_ORDER_ON_HOLD_REQUEST:
       return { ...state, isCustomOrderOnHold: true };
     case CUSTOM_ORDER_ON_HOLD_SUCCESS:
       return {
@@ -197,7 +206,7 @@ const OrderSystemReducer = (state = initialState, action) => {
     case CUSTOM_ORDER_ON_HOLD_FAIL:
       return { ...state, isCustomOrderOnHold: false, error: action.payload };
 
-      case CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST:
+    case CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST:
       return { ...state, isCustomOrderOnHoldFinish: true };
     case CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS:
       return {
@@ -206,7 +215,26 @@ const OrderSystemReducer = (state = initialState, action) => {
         customOrderOnHoldFinishData: action.payload,
       };
     case CUSTOM_ORDER_ON_HOLD_FINISH_FAIL:
-      return { ...state, isCustomOrderOnHoldFinish: false, error: action.payload };
+      return {
+        ...state,
+        isCustomOrderOnHoldFinish: false,
+        error: action.payload,
+      };
+
+    case CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST:
+      return { ...state, isCustomOrderOnHoldSendToP2: true };
+    case CUSTOM_ORDER_ON_HOLD_SEND_P2_SUCCESS:
+      return {
+        ...state,
+        isCustomOrderOnHoldSendToP2: false,
+        customOrderOnHoldSendToP2Data: action.payload,
+      };
+    case CUSTOM_ORDER_ON_HOLD_SEND_P2_FAIL:
+      return {
+        ...state,
+        isCustomOrderOnHoldSendToP2: false,
+        error: action.payload,
+      };
 
     case CLEAR_ERRORS:
       return { ...state, error: null };

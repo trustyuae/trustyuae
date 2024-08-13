@@ -41,6 +41,9 @@ import {
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS,
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_FAIL,
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST,
+  CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST,
+  CUSTOM_ORDER_ON_HOLD_SEND_P2_SUCCESS,
+  CUSTOM_ORDER_ON_HOLD_SEND_P2_FAIL,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -319,3 +322,39 @@ export const CustomOrderFinishOH =
       });
     }
   };
+
+
+  export const CustomItemSendToP2 =
+  (id, navigate) => async (dispatch) => {
+    dispatch({ type: CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST });
+    try {
+      const response = await axios.post(
+        `${API_URL}wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,{headers}
+      );
+      dispatch({
+        type: CUSTOM_ORDER_ON_HOLD_SEND_P2_SUCCESS,
+        payload: response.data,
+      });
+      if (response.data.status_code === 200) {
+        await Swal.fire({
+          title: response.data.message,
+          icon: "success",
+          showConfirmButton: true,
+        });
+        navigate("/on_hold_orders_system");
+      } else {
+        Swal.fire({
+          title: response.data.message,
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
+      return response;
+    } catch (error) {
+      dispatch({
+        type: CUSTOM_ORDER_ON_HOLD_SEND_P2_FAIL,
+        error: error.message,
+      });
+    }
+  };
+
