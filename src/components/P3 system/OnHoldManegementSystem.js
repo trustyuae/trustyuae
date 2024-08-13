@@ -793,7 +793,7 @@ function OnHoldManegementSystem() {
     if (selectedPOId) {
       fetchPoProductData();
     }
-  }, [selectedPOId, selectedFactory, poId]);
+  }, [selectedPOId, selectedFactory, poId, pageSize, page]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>

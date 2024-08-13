@@ -145,7 +145,7 @@ function GRNManagement() {
   useEffect(() => {
     handlGetGRNList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endDate, selectedDateRange, statusFilter, page]);
+  }, [endDate, selectedDateRange, statusFilter, page,pageSize]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
