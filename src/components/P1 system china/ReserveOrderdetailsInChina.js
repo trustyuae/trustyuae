@@ -244,7 +244,7 @@ const ReserveOrderdetailsInChina = () => {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/reserve_orders_system")}
+              onClick={() => navigate("/reserve_orders_system_in_china")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>

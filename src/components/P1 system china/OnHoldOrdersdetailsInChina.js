@@ -649,7 +649,7 @@ const OnHoldOrdersdetailsInChina = () => {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/on_hold_orders_system")}
+              onClick={() => navigate("/on_hold_orders_system_in_china")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>

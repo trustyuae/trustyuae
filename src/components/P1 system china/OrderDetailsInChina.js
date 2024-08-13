@@ -47,6 +47,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   AddMessage,
   AttachmentFileUpload,
+  CustomItemSendToUAE,
   CustomOrderFinish,
   CustomOrderOH,
   InsertOrderPickup,
@@ -180,6 +181,14 @@ const OrderDetailsInChina = () => {
         );
       }
     });
+  };
+
+  const handleSendToUAESystem = async () => {
+    try {
+     await dispatch(CustomItemSendToUAE(id));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const submitOH = async () => {
@@ -642,7 +651,7 @@ const OrderDetailsInChina = () => {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/ordersystem")}
+              onClick={() => navigate("/ordersystem_in_china")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
@@ -697,7 +706,7 @@ const OrderDetailsInChina = () => {
                 </Box>
               )}
             </Box>
-            <Box>
+            <Box className="d-flex">
               <Button
                 variant="outline-secondary"
                 className="p-1 me-3 bg-transparent text-secondary"
@@ -714,26 +723,46 @@ const OrderDetailsInChina = () => {
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
               orderProcess == "started" ? (
-                <Button
-                  variant="outline-danger"
-                  className="p-1 me-2 bg-transparent text-danger"
-                  onClick={handleCancelOrderProcess}
-                >
-                  <CancelIcon />
-                </Button>
+                <Box>
+                  <Button
+                    variant="outline-danger"
+                    className="p-1 me-2 bg-transparent text-danger"
+                    onClick={handleCancelOrderProcess}
+                  >
+                    <CancelIcon />
+                  </Button>{" "}
+                  <Button
+                    variant="primary"
+                    // disabled
+                    onClick={handleSendToUAESystem}
+                  >
+                    Send To UAE
+                  </Button>
+                </Box>
               ) : orderProcess == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
-                <Button variant="success" disabled>
-                  Start
-                </Button>
+                <Box>
+                  <Button variant="success" disabled className="me-3">
+                    Start
+                  </Button>
+                  <Button variant="primary" disabled>
+                    Send To UAE
+                  </Button>
+                </Box>
               ) : (
-                <Button
-                  variant="success"
-                  // disabled
-                  onClick={handleStartOrderProcess}
-                >
-                  Start
-                </Button>
+                <Box>
+                  <Button
+                    variant="success"
+                    // disabled
+                    onClick={handleStartOrderProcess}
+                    className="me-3"
+                  >
+                    Start
+                  </Button>
+                  <Button variant="primary" disabled>
+                    Send To UAE
+                  </Button>
+                </Box>
               )}
             </Box>
           </Box>

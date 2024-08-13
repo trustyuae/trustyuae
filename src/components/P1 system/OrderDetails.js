@@ -27,6 +27,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AddMessage,
   AttachmentFileUpload,
+  CustomItemSendToChina,
+  // CustomItemSendToChina,
   CustomOrderFinish,
   CustomOrderOH,
   InsertOrderPickup,
@@ -168,6 +170,14 @@ function OrderDetails() {
         );
       }
     });
+  };
+
+  const handleSendToChinaSystem = async () => {
+    try {
+     await dispatch(CustomItemSendToChina(id));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const submitOH = async () => {
@@ -712,7 +722,7 @@ function OrderDetails() {
                   <Button
                     variant="primary"
                     // disabled
-                    //  onClick={handleStartOrderProcess}
+                    onClick={handleSendToChinaSystem}
                   >
                     Send To China
                   </Button>
@@ -723,11 +733,7 @@ function OrderDetails() {
                   <Button variant="success" disabled className="me-3">
                     Start
                   </Button>
-                  <Button
-                    variant="primary"
-                    disabled
-                    //  onClick={handleStartOrderProcess}
-                  >
+                  <Button variant="primary" disabled>
                     Send To China
                   </Button>
                 </Box>
@@ -737,8 +743,12 @@ function OrderDetails() {
                     variant="success"
                     // disabled
                     onClick={handleStartOrderProcess}
+                    className="me-3"
                   >
                     Start
+                  </Button>
+                  <Button variant="primary" disabled>
+                    Send To China
                   </Button>
                 </Box>
               )}

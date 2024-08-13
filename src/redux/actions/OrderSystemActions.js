@@ -44,6 +44,9 @@ import {
   CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST,
   CUSTOM_ORDER_ON_HOLD_SEND_P2_SUCCESS,
   CUSTOM_ORDER_ON_HOLD_SEND_P2_FAIL,
+  CUSTOM_ORDER_SEND_CHINA_FAIL,
+  CUSTOM_ORDER_SEND_CHINA_SUCCESS,
+  CUSTOM_ORDER_SEND_CHINA_REQUEST,
 } from "../constants/Constants";
 import axios from "axios";
 
@@ -371,3 +374,42 @@ export const CustomItemSendToP2 =
       });
     }
   };
+
+export const CustomItemSendToChina = (id,navigate) => async (dispatch) => {
+  dispatch({ type: CUSTOM_ORDER_SEND_CHINA_REQUEST });
+
+  try {
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}/?warehouse=China`,{},
+      { headers }
+    );
+
+    dispatch({
+      type: CUSTOM_ORDER_SEND_CHINA_SUCCESS,
+      payload: response.data,
+    });
+
+    console.log(response,'response from CustomItemSendToChina')
+
+    if (response.status === 200) {
+      await Swal.fire({
+        title: response.data,
+        icon: "success",
+        showConfirmButton: true,
+      });
+      navigate("/ordersystem_in_china");
+    } else {
+      Swal.fire({
+        title: response.data,
+        icon: "error",
+        showConfirmButton: true,
+      });
+    }
+    return response;
+  } catch (error) {
+    dispatch({
+      type: CUSTOM_ORDER_SEND_CHINA_FAIL,
+      error: error.message,
+    });
+  }
+};

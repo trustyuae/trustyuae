@@ -41,11 +41,13 @@ import {
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_FAIL,
   GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_REQUEST,
+  CUSTOM_ORDER_SEND_UAE_REQUEST,
+  CUSTOM_ORDER_SEND_UAE_FAIL,
+  CUSTOM_ORDER_SEND_UAE_SUCCESS,
 } from "../constants/Constants";
 import axios from "axios";
 
-
-const token = JSON.parse(localStorage.getItem('token'))
+const token = JSON.parse(localStorage.getItem("token"));
 const headers = {
   Authorization: `Live ${token}`,
 };
@@ -56,8 +58,11 @@ export const OrderSystemGet =
     try {
       dispatch({ type: GET_ORDER_SYSTEM_CHINA_REQUEST });
 
-      const response = await axios.get(apiUrl,{headers});
-      dispatch({ type: GET_ORDER_SYSTEM_CHINA_SUCCESS, payload: response?.data });
+      const response = await axios.get(apiUrl, { headers });
+      dispatch({
+        type: GET_ORDER_SYSTEM_CHINA_SUCCESS,
+        payload: response?.data,
+      });
       return response;
     } catch (error) {
       dispatch({ type: GET_ORDER_SYSTEM_CHINA_FAIL, error: error.message });
@@ -70,14 +75,17 @@ export const CompletedOrderSystemGet =
     try {
       dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_CHINA_REQUEST });
 
-      const response = await axios.get(apiUrl,{headers});
+      const response = await axios.get(apiUrl, { headers });
       dispatch({
         type: GET_COMPLETED_ORDER_SYSTEM_CHINA_SUCCESS,
         payload: response?.data,
       });
       return response;
     } catch (error) {
-      dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_CHINA_FAIL, error: error.message });
+      dispatch({
+        type: GET_COMPLETED_ORDER_SYSTEM_CHINA_FAIL,
+        error: error.message,
+      });
     }
   };
 
@@ -86,7 +94,8 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`,
+      { headers }
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
@@ -103,10 +112,11 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
 
 export const OnHoldOrderDetailsGet = (id) => async (dispatch) => {
   try {
-    dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_REQUEST});
+    dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&orderid=${id}`,
+      { headers }
     );
     dispatch({
       type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
@@ -126,7 +136,8 @@ export const ReserveOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&orderid=${id}`,
+      { headers }
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
@@ -148,9 +159,13 @@ export const OrderDetailsGet =
       dispatch({ type: GET_ORDER_DETAILS_CHINA_REQUEST });
 
       const response = await axios.get(
-        `${API_URL}wp-json/custom-orders-new/v1/orders/?warehouse=China&orderid=${id}`,{headers}
+        `${API_URL}wp-json/custom-orders-new/v1/orders/?warehouse=China&orderid=${id}`,
+        { headers }
       );
-      dispatch({ type: GET_ORDER_DETAILS_CHINA_SUCCESS, payload: response?.data });
+      dispatch({
+        type: GET_ORDER_DETAILS_CHINA_SUCCESS,
+        payload: response?.data,
+      });
       return response;
     } catch (error) {
       dispatch({ type: GET_ORDER_DETAILS_CHINA_FAIL, error: error.message });
@@ -174,7 +189,10 @@ export const AttachmentFileUpload =
           },
         }
       );
-      dispatch({ type: UPLOAD_ATTACH_FILE_CHINA_SUCCESS, payload: response?.data });
+      dispatch({
+        type: UPLOAD_ATTACH_FILE_CHINA_SUCCESS,
+        payload: response?.data,
+      });
       return response;
     } catch (error) {
       dispatch({ type: UPLOAD_ATTACH_FILE_CHINA_FAIL, error: error.message });
@@ -204,7 +222,10 @@ export const OverAllAttachmentFileUpload =
       });
       return response;
     } catch (error) {
-      dispatch({ type: UPLOAD_OVERALL_ATTACH_FILE_CHINA_FAIL, error: error.message });
+      dispatch({
+        type: UPLOAD_OVERALL_ATTACH_FILE_CHINA_FAIL,
+        error: error.message,
+      });
     }
   };
 
@@ -213,7 +234,8 @@ export const AddMessage = (requestData) => async (dispatch) => {
     dispatch({ type: ADD_MESSAGE_CHINA_REQUEST });
     const response = await axios.post(
       `${API_URL}wp-json/custom-message-note/v1/order-note/?warehouse=China`,
-      requestData,{headers}
+      requestData,
+      { headers }
     );
     dispatch({ type: ADD_MESSAGE_CHINA_SUCCESS, payload: response?.data });
     return response;
@@ -228,9 +250,13 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
 
     const response = await axios.post(
       `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/?warehouse=China`,
-      requestData,{headers}
+      requestData,
+      { headers }
     );
-    dispatch({ type: INSERT_ORDER_PICKUP_CHINA_SUCCESS, payload: response?.data });
+    dispatch({
+      type: INSERT_ORDER_PICKUP_CHINA_SUCCESS,
+      payload: response?.data,
+    });
     return response;
   } catch (error) {
     dispatch({ type: INSERT_ORDER_PICKUP_CHINA_FAIL, error: error.message });
@@ -243,7 +269,8 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
 
     const response = await axios.post(
       `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/?warehouse=China`,
-      requestData,{headers}
+      requestData,
+      { headers }
     );
     dispatch({
       type: INSERT_ORDER_PICKUP_CANCEL_CHINA_SUCCESS,
@@ -251,7 +278,10 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
     });
     return response;
   } catch (error) {
-    dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_CHINA_FAIL, error: error.message });
+    dispatch({
+      type: INSERT_ORDER_PICKUP_CANCEL_CHINA_FAIL,
+      error: error.message,
+    });
   }
 };
 
@@ -260,9 +290,13 @@ export const CustomOrderFinish =
     dispatch({ type: CUSTOM_ORDER_FINISH_CHINA_REQUEST });
     try {
       const response = await axios.post(
-        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}/?warehouse=China`,{headers}
+        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}/?warehouse=China`,
+        { headers }
       );
-      dispatch({ type: CUSTOM_ORDER_FINISH_CHINA_SUCCESS, payload: response.data });
+      dispatch({
+        type: CUSTOM_ORDER_FINISH_CHINA_SUCCESS,
+        payload: response.data,
+      });
       return response;
     } catch (error) {
       dispatch({ type: CUSTOM_ORDER_FINISH_CHINA_FAIL, error: error.message });
@@ -274,9 +308,13 @@ export const CustomOrderOH = (result, navigate) => async (dispatch) => {
   try {
     const response = await axios.post(
       `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/?warehouse=China`,
-      result,{headers}
+      result,
+      { headers }
     );
-    dispatch({ type: CUSTOM_ORDER_ON_HOLD_CHINA_SUCCESS, payload: response.data });
+    dispatch({
+      type: CUSTOM_ORDER_ON_HOLD_CHINA_SUCCESS,
+      payload: response.data,
+    });
     if (response.status === 200) {
       navigate("/on_hold_orders_system");
     }
@@ -291,7 +329,8 @@ export const CustomOrderFinishOH =
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_FINISH_CHINA_REQUEST });
     try {
       const response = await axios.post(
-        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}/?warehouse=China`,{headers}
+        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}/?warehouse=China`,
+        { headers }
       );
       dispatch({
         type: CUSTOM_ORDER_ON_HOLD_FINISH_CHINA_SUCCESS,
@@ -319,3 +358,41 @@ export const CustomOrderFinishOH =
       });
     }
   };
+
+export const CustomItemSendToUAE = (id, navigate) => async (dispatch) => {
+  dispatch({ type: CUSTOM_ORDER_SEND_UAE_REQUEST });
+
+  try {
+    const response = await axios.post(
+      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}`,
+      { headers }
+    );
+
+    dispatch({
+      type: CUSTOM_ORDER_SEND_UAE_SUCCESS,
+      payload: response.data,
+    });
+
+    // if (response.status === 200) {
+    //   await Swal.fire({
+    //     title: response.data.message,
+    //     icon: "success",
+    //     showConfirmButton: true,
+    //   });
+    //   navigate("/on_hold_orders_system");
+    // } else {
+    //   Swal.fire({
+    //     title: response.data.message,
+    //     icon: "error",
+    //     showConfirmButton: true,
+    //   });
+    // }
+
+    return response;
+  } catch (error) {
+    dispatch({
+      type: CUSTOM_ORDER_SEND_UAE_FAIL,
+      error: error.message,
+    });
+  }
+};

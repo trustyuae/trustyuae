@@ -42,6 +42,9 @@ import {
   CUSTOM_ORDER_ON_HOLD_SEND_P2_FAIL,
   CUSTOM_ORDER_ON_HOLD_SEND_P2_SUCCESS,
   CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST,
+  CUSTOM_ORDER_SEND_CHINA_REQUEST,
+  CUSTOM_ORDER_SEND_CHINA_SUCCESS,
+  CUSTOM_ORDER_SEND_CHINA_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -73,6 +76,8 @@ const initialState = {
   isCustomOrderOnHoldFinish: false,
   customOrderOnHoldSendToP2Data: [],
   isCustomOrderOnHoldSendToP2: false,
+  customOrderSendToChinaData: [],
+  isCustomOrderSendToChina: false,
   error: null,
 };
 
@@ -233,6 +238,21 @@ const OrderSystemReducer = (state = initialState, action) => {
       return {
         ...state,
         isCustomOrderOnHoldSendToP2: false,
+        error: action.payload,
+      };
+
+    case CUSTOM_ORDER_SEND_CHINA_REQUEST:
+      return { ...state, isCustomOrderSendToChina: true };
+    case CUSTOM_ORDER_SEND_CHINA_SUCCESS:
+      return {
+        ...state,
+        isCustomOrderSendToChina: false,
+        customOrderSendToChinaData: action.payload,
+      };
+    case CUSTOM_ORDER_SEND_CHINA_FAIL:
+      return {
+        ...state,
+        isCustomOrderSendToChina: false,
         error: action.payload,
       };
 

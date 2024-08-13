@@ -243,7 +243,7 @@ const CompletedOrderDetailsInChina = () => {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/completed_order_system")}
+              onClick={() => navigate("/completed_order_system_in_china")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
