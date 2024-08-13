@@ -1166,7 +1166,7 @@ function OnHoldOrdersDetails() {
                   variant="danger"
                   disabled={orderDetails.toggle_status == 1 ? false : true}
                   onClick={handleSendToP2ButtonClick}
-                  className="ms-3"
+                  className="me-3"
                 >
                   Send to P2 System
                 </Button>

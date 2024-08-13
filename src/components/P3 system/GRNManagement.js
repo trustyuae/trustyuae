@@ -26,6 +26,7 @@ function GRNManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [grnList, setGrnList] = useState([]);
@@ -116,9 +117,9 @@ function GRNManagement() {
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       await dispatch(GetGRNList({ apiUrl })).then((response) => {
-        let data = response.data.data.map((v, i) => ({ ...v, id: i }));
+        let data = response?.data?.data?.map((v, i) => ({ ...v, id: i }));
         setGrnList(data);
-        setTotalPages(response.data.total_pages);
+        setTotalPages(response?.data?.total_pages);
       });
     } catch (error) {
       console.error(error);
@@ -128,6 +129,11 @@ function GRNManagement() {
 
   const handleChange = (event, value) => {
     setPage(value);
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    // setPage(e.target.value);
   };
 
   const clearDateRange = () => {
@@ -203,6 +209,25 @@ function GRNManagement() {
                   </option>
                 ))}
               </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col xs="auto" lg="1">
+            <Form.Group>
+              <Form.Label>
+                PageSize{" "}
+              </Form.Label>
+              <Form.Control
+                as="select"
+                className="w-auto"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
           </Col>
         </Row>

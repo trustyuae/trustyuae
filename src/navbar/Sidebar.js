@@ -307,7 +307,7 @@ const Sidebar = () => {
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
-                data-bs-target="#charts-nav"
+                data-bs-target="#charts-nav2"
                 data-bs-toggle="collapse"
                 href="/"
               >
@@ -316,7 +316,7 @@ const Sidebar = () => {
                 <i className="bi bi-chevron-down ms-auto"></i>
               </a>
               <ul
-                id="charts-nav"
+                id="charts-nav2"
                 className="nav-content collapse "
                 data-bs-parent="#sidebar-nav"
               >

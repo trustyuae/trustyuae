@@ -23,8 +23,15 @@ const GRNView = () => {
   const fetchOrder = async () => {
     let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}`;
     await dispatch(GetGRNView({ apiUrl })).then((response) => {
-      let data = response?.data?.map((v, i) => ({ ...v, id: i }));
-      setPO_OrderList(data);
+      if (response?.data) {
+        let data = response.data.map((v, i) => ({ ...v, id: i }));
+        setPO_OrderList(data);
+      } else {
+        setPO_OrderList([]);
+      }
+    }).catch(error => {
+      console.error("Error fetching order:", error);
+      setPO_OrderList([]);
     });
   };
 
@@ -106,6 +113,7 @@ const GRNView = () => {
         .join(", ");
     }
   };
+  
   return (
     <Container fluid className="px-5">
       <MDBRow className="my-3">

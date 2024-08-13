@@ -989,6 +989,15 @@ function OnHoldManegementSystem() {
               </div>
               <MDBRow className="justify-content-end px-3">
                 <Button
+                  variant="secondary"
+                  disabled={!isValid}
+                  style={{ width: "130px", marginRight: "5px" }}
+                  // onClick={handleAddRemark}
+                  onClick={() => setshowMessageModal(true)}
+                >
+                  Add Remark
+                </Button>
+                <Button
                   variant="primary"
                   disabled={!isValid}
                   style={{ width: "130px" }}

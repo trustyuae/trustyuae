@@ -684,7 +684,7 @@ function OrderDetails() {
                 </Box>
               )}
             </Box>
-            <Box>
+            <Box className="d-flex">
               <Button
                 variant="outline-secondary"
                 className="p-1 me-3 bg-transparent text-secondary"
@@ -701,26 +701,46 @@ function OrderDetails() {
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
               orderProcess == "started" ? (
-                <Button
-                  variant="outline-danger"
-                  className="p-1 me-2 bg-transparent text-danger"
-                  onClick={handleCancelOrderProcess}
-                >
-                  <CancelIcon />
-                </Button>
+                <Box className="d-flex">
+                  <Button
+                    variant="outline-danger"
+                    className="p-1 me-2 bg-transparent text-danger"
+                    onClick={handleCancelOrderProcess}
+                  >
+                    <CancelIcon />
+                  </Button>
+                  <Button
+                    variant="primary"
+                    // disabled
+                    //  onClick={handleStartOrderProcess}
+                  >
+                    Send To China
+                  </Button>
+                </Box>
               ) : orderProcess == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
-                <Button variant="success" disabled>
-                  Start
-                </Button>
+                <Box>
+                  <Button variant="success" disabled className="me-3">
+                    Start
+                  </Button>
+                  <Button
+                    variant="primary"
+                    disabled
+                    //  onClick={handleStartOrderProcess}
+                  >
+                    Send To China
+                  </Button>
+                </Box>
               ) : (
-                <Button
-                  variant="success"
-                  // disabled
-                  onClick={handleStartOrderProcess}
-                >
-                  Start
-                </Button>
+                <Box className="d-flex">
+                  <Button
+                    variant="success"
+                    // disabled
+                    onClick={handleStartOrderProcess}
+                  >
+                    Start
+                  </Button>
+                </Box>
               )}
             </Box>
           </Box>

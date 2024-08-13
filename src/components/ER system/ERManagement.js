@@ -84,7 +84,6 @@ function ERManagement() {
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
-    setPage(e.target.value);
   };
 
   const handleFactoryChange = (e) => {
