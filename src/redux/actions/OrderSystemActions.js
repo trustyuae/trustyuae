@@ -47,8 +47,7 @@ import {
 } from "../constants/Constants";
 import axios from "axios";
 
-
-const token = JSON.parse(localStorage.getItem('token'))
+const token = JSON.parse(localStorage.getItem("token"));
 const headers = {
   Authorization: `Live ${token}`,
 };
@@ -59,7 +58,7 @@ export const OrderSystemGet =
     try {
       dispatch({ type: GET_ORDER_SYSTEM_REQUEST });
 
-      const response = await axios.get(apiUrl,{headers});
+      const response = await axios.get(apiUrl, { headers });
       dispatch({ type: GET_ORDER_SYSTEM_SUCCESS, payload: response?.data });
       return response;
     } catch (error) {
@@ -73,7 +72,7 @@ export const CompletedOrderSystemGet =
     try {
       dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_REQUEST });
 
-      const response = await axios.get(apiUrl,{headers});
+      const response = await axios.get(apiUrl, { headers });
       dispatch({
         type: GET_COMPLETED_ORDER_SYSTEM_SUCCESS,
         payload: response?.data,
@@ -89,7 +88,8 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`,
+      { headers }
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
@@ -106,10 +106,11 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
 
 export const OnHoldOrderDetailsGet = (id) => async (dispatch) => {
   try {
-    dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST});
+    dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,
+      { headers }
     );
     dispatch({
       type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS,
@@ -129,7 +130,8 @@ export const ReserveOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
 
     const response = await axios.get(
-      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`,{headers}
+      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`,
+      { headers }
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
@@ -151,7 +153,8 @@ export const OrderDetailsGet =
       dispatch({ type: GET_ORDER_DETAILS_REQUEST });
 
       const response = await axios.get(
-        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`,{headers}
+        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`,
+        { headers }
       );
       dispatch({ type: GET_ORDER_DETAILS_SUCCESS, payload: response?.data });
       return response;
@@ -216,7 +219,8 @@ export const AddMessage = (requestData) => async (dispatch) => {
     dispatch({ type: ADD_MESSAGE_REQUEST });
     const response = await axios.post(
       `${API_URL}wp-json/custom-message-note/v1/order-note/`,
-      requestData,{headers}
+      requestData,
+      { headers }
     );
     dispatch({ type: ADD_MESSAGE_SUCCESS, payload: response?.data });
     return response;
@@ -231,7 +235,8 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
 
     const response = await axios.post(
       `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
-      requestData,{headers}
+      requestData,
+      { headers }
     );
     dispatch({ type: INSERT_ORDER_PICKUP_SUCCESS, payload: response?.data });
     return response;
@@ -246,7 +251,8 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
 
     const response = await axios.post(
       `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/`,
-      requestData,{headers}
+      requestData,
+      { headers }
     );
     dispatch({
       type: INSERT_ORDER_PICKUP_CANCEL_SUCCESS,
@@ -263,7 +269,8 @@ export const CustomOrderFinish =
     dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
     try {
       const response = await axios.post(
-        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`,{headers}
+        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`,
+        { headers }
       );
       dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
       return response;
@@ -277,7 +284,8 @@ export const CustomOrderOH = (result, navigate) => async (dispatch) => {
   try {
     const response = await axios.post(
       `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
-      result,{headers}
+      result,
+      { headers }
     );
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_SUCCESS, payload: response.data });
     if (response.status === 200) {
@@ -294,7 +302,8 @@ export const CustomOrderFinishOH =
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST });
     try {
       const response = await axios.post(
-        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`,{headers}
+        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`,
+        { headers }
       );
       dispatch({
         type: CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS,
@@ -323,19 +332,23 @@ export const CustomOrderFinishOH =
     }
   };
 
-
-  export const CustomItemSendToP2 =
-  (id, navigate) => async (dispatch) => {
+export const CustomItemSendToP2 =
+  (id, payload, navigate) => async (dispatch) => {
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST });
+
     try {
       const response = await axios.post(
-        `${API_URL}wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,{headers}
+        `${API_URL}wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,
+        payload,
+        { headers }
       );
+
       dispatch({
         type: CUSTOM_ORDER_ON_HOLD_SEND_P2_SUCCESS,
         payload: response.data,
       });
-      if (response.data.status_code === 200) {
+
+      if (response.status === 200) {
         await Swal.fire({
           title: response.data.message,
           icon: "success",
@@ -349,6 +362,7 @@ export const CustomOrderFinishOH =
           showConfirmButton: true,
         });
       }
+
       return response;
     } catch (error) {
       dispatch({
@@ -357,4 +371,3 @@ export const CustomOrderFinishOH =
       });
     }
   };
-

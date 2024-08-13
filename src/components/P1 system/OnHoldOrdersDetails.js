@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AddMessage,
   AttachmentFileUpload,
+  CustomItemSendToP2,
   CustomOrderFinish,
   CustomOrderFinishOH,
   InsertOrderPickup,
@@ -117,31 +118,6 @@ function OnHoldOrdersDetails() {
     setSelectedFileUrl(null);
   };
 
-  // async function fetchOrder() {
-  //   try {
-  //     const response = await dispatch(OnHoldOrderDetailsGet(id));
-
-  //     let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-  //     setOrderData(data);
-  //     setOrderDetails(response.data.orders[0]);
-  //     setToggleStatus(Number(response.data.orders[0].toggle_status));
-  //     const order = response.data.orders[0];
-  //     if (order) setOrderProcess(order.order_process);
-  //     if (data) {
-  //       data.forEach((order, index) => {
-  //         const newData = order.items.map((product, index1) => ({
-  //           ...product,
-  //           id: index1,
-  //         }));
-  //         setTableData(newData);
-  //       });
-  //     }
-  //     setLoader(false);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
   const fetchOrder = useCallback(async () => {
     try {
       const response = await dispatch(OnHoldOrderDetailsGet(id));
@@ -163,7 +139,6 @@ function OnHoldOrdersDetails() {
     }
   }, [dispatch, id]);
 
-  // Effect to call fetchOrder only when id changes
   useEffect(() => {
     if (id) fetchOrder();
   }, [fetchOrder, id]);
@@ -198,10 +173,10 @@ function OnHoldOrdersDetails() {
     });
   };
 
-  // useEffect(() => {
-  //   fetchOrder();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [message, tableData, orderData]);
+  useEffect(() => {
+    fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setMessage, setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -262,13 +237,6 @@ function OnHoldOrdersDetails() {
       if (selectedItemId) {
         await dispatch(
           AttachmentFileUpload({
-            // user_id: user_id,
-            // // order_id: orderDetailsDataOrderId?.order_id,
-            // order_id: id,
-            // item_id: selectedItemId,
-            // selectedFile: selectedFile,
-            // variation_id: selectedVariationId,
-
             user_id: user_id,
             order_id: orderDetailsDataOrderId?.order_id,
             item_id: selectedItemId,
@@ -306,9 +274,6 @@ function OnHoldOrdersDetails() {
   };
 
   const handleItemSelection = (rowData) => {
-    const filteredItems = tableData.filter((item) => item.id === rowData.id);
-    console.log(filteredItems, "filteredItems from handleItemSelection");
-    const itemIds = filteredItems.map((item) => item.order_ids);
     const selectedIndex = selectedItemIds.indexOf(rowData.id);
     const newSelected =
       selectedIndex !== -1
@@ -320,16 +285,23 @@ function OnHoldOrdersDetails() {
     } else {
       setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
     }
-
-    const newSelected2 =
-      selectedIndex !== -1
-        ? selectedItemIdss
-            .filter((id) => id !== rowData?.id)
-            .flatMap((id) => id?.split(","))
-        : [...selectedItemIdss, ...itemIds?.flatMap((str) => str?.split(","))];
-
     setSelectedItemIds(newSelected);
-    setSelectedItemIdss(newSelected2);
+  };
+
+  const handleSendToP2ButtonClick = async () => {
+    const selectedProductIds = selectedItems.map((item) => item.item_id);
+    const selectedVariationIds = selectedItems.map((item) => item.variation_id);
+
+    const payload = {
+      product_id: selectedProductIds,
+      variation_id: selectedVariationIds,
+    };
+
+    try {
+      dispatch(CustomItemSendToP2(id, payload, navigate));
+    } catch (error) {
+      console.error("Error sending items to p2 system:", error);
+    }
   };
 
   const handleStartOrderProcess = async () => {
@@ -370,14 +342,6 @@ function OnHoldOrdersDetails() {
       dispatch(CustomOrderFinishOH(user_id, id, navigate));
     } catch (error) {
       console.error("Error while finishing order:", error);
-    }
-  };
-
-  const handleSendToP2ButtonClick = async () => {
-    try {
-      dispatch(CustomItemSendToP2(id, navigate));
-    } catch (error) {
-      console.error("Error while sending order to p2 system:", error);
     }
   };
 
