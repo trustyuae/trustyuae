@@ -184,7 +184,7 @@ function OrderDetails() {
 
   const handleSendToChinaSystem = async () => {
     try {
-     await dispatch(CustomItemSendToChina(id));
+     await dispatch(CustomItemSendToChina(id,navigate));
     } catch (error) {
       console.log(error);
     }

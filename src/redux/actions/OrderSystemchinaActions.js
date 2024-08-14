@@ -89,7 +89,7 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_REQUEST });
 
     const response = await axiosInstance.get(
-      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`,
+      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_CHINA_SUCCESS,
@@ -276,7 +276,7 @@ export const CustomOrderFinish =
     dispatch({ type: CUSTOM_ORDER_FINISH_CHINA_REQUEST });
     try {
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}/?warehouse=China`,
+        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}/?warehouse=China`
       );
       dispatch({
         type: CUSTOM_ORDER_FINISH_CHINA_SUCCESS,
@@ -313,7 +313,7 @@ export const CustomOrderFinishOH =
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_FINISH_CHINA_REQUEST });
     try {
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}/?warehouse=China`,
+        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}/?warehouse=China`
       );
       dispatch({
         type: CUSTOM_ORDER_ON_HOLD_FINISH_CHINA_SUCCESS,
@@ -347,7 +347,7 @@ export const CustomItemSendToUAE = (id, navigate) => async (dispatch) => {
 
   try {
     const response = await axiosInstance.post(
-      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}`
+      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}/?warehouse=China`
     );
 
     dispatch({
@@ -355,20 +355,25 @@ export const CustomItemSendToUAE = (id, navigate) => async (dispatch) => {
       payload: response.data,
     });
 
-    // if (response.status === 200) {
-    //   await Swal.fire({
-    //     title: response.data.message,
-    //     icon: "success",
-    //     showConfirmButton: true,
-    //   });
-    //   navigate("/on_hold_orders_system");
-    // } else {
-    //   Swal.fire({
-    //     title: response.data.message,
-    //     icon: "error",
-    //     showConfirmButton: true,
-    //   });
-    // }
+    console.log(response, "response from CustomItemSendToUAE");
+
+    if (response.status === 200) {
+      const result = await Swal.fire({
+        title: response.data,
+        icon: "success",
+        showConfirmButton: true,
+      });
+      if (result.isConfirmed) {
+        // Navigate only after the alert is confirmed
+        navigate("/ordersystem");
+      }
+    } else {
+      Swal.fire({
+        title: response.data.message,
+        icon: "error",
+        showConfirmButton: true,
+      });
+    }
 
     return response;
   } catch (error) {

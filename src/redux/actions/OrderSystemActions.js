@@ -225,7 +225,7 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
 
     const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
-      requestData,
+      requestData
     );
     dispatch({ type: INSERT_ORDER_PICKUP_SUCCESS, payload: response?.data });
     return response;
@@ -240,7 +240,7 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
 
     const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/`,
-      requestData,
+      requestData
     );
     dispatch({
       type: INSERT_ORDER_PICKUP_CANCEL_SUCCESS,
@@ -257,7 +257,7 @@ export const CustomOrderFinish =
     dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
     try {
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`,
+        `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`
       );
       dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
       return response;
@@ -271,7 +271,7 @@ export const CustomOrderOH = (result, navigate) => async (dispatch) => {
   try {
     const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
-      result,
+      result
     );
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_SUCCESS, payload: response.data });
     if (response.status === 200) {
@@ -288,7 +288,7 @@ export const CustomOrderFinishOH =
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST });
     try {
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`,
+        `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`
       );
       dispatch({
         type: CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS,
@@ -324,7 +324,7 @@ export const CustomItemSendToP2 =
     try {
       const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,
-        payload,
+        payload
       );
 
       dispatch({
@@ -356,12 +356,12 @@ export const CustomItemSendToP2 =
     }
   };
 
-export const CustomItemSendToChina = (id,navigate) => async (dispatch) => {
+export const CustomItemSendToChina = (id, navigate) => async (dispatch) => {
   dispatch({ type: CUSTOM_ORDER_SEND_CHINA_REQUEST });
 
   try {
     const response = await axiosInstance.post(
-      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}/?warehouse=China`,
+      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}`
     );
 
     dispatch({
@@ -369,15 +369,17 @@ export const CustomItemSendToChina = (id,navigate) => async (dispatch) => {
       payload: response.data,
     });
 
-    console.log(response,'response from CustomItemSendToChina')
+    console.log(response, "response from CustomItemSendToChina");
 
     if (response.status === 200) {
-      await Swal.fire({
+      const result = await Swal.fire({
         title: response.data,
         icon: "success",
         showConfirmButton: true,
       });
-      navigate("/ordersystem_in_china");
+      if (result.isConfirmed) {
+        navigate("/ordersystem_in_china");
+      }
     } else {
       Swal.fire({
         title: response.data,

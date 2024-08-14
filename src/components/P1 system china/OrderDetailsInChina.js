@@ -195,7 +195,7 @@ const OrderDetailsInChina = () => {
 
   const handleSendToUAESystem = async () => {
     try {
-     await dispatch(CustomItemSendToUAE(id));
+     await dispatch(CustomItemSendToUAE(id,navigate));
     } catch (error) {
       console.log(error);
     }
