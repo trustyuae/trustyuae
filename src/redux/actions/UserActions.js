@@ -12,6 +12,7 @@ import {
 import { loginURL, logoutURL } from "../../utils/constants";
 import ShowAlert from "../../utils/ShowAlert";
 import axiosInstance from "../../utils/AxiosInstance";
+import { saveToken, saveUserData } from "../../utils/StorageUtils";
 
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
@@ -25,8 +26,8 @@ export const loginUser = (data, navigate) => async (dispatch) => {
       }
     );
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
-    localStorage.setItem("token", JSON.stringify(res?.data?.token));
-    localStorage.setItem("user_data", JSON.stringify(res?.data?.user_data));
+    await saveToken();
+    await saveUserData();
     if (res.data.token) {
       const result = await ShowAlert(
         "Success",

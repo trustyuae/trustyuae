@@ -1,8 +1,9 @@
 import React from "react";
 import {Outlet, Navigate } from "react-router-dom";
+import { getUserData } from "../StorageUtils";
 
-const CustomerSupportRoute = () => {
-    const storedUser = JSON.parse(localStorage.getItem("user_data"));
+const CustomerSupportRoute = async() => {
+    const storedUser = await getUserData();
   const userType = storedUser ? storedUser.user_role : null;
   return userType === "administrator" || userType === "customer_support" ? (
     <Outlet />
@@ -13,18 +14,3 @@ const CustomerSupportRoute = () => {
 
 export default CustomerSupportRoute
 
-
-
-
-// const OperationAssistantRoute = () => {
-//   const storedUser = JSON.parse(localStorage.getItem("user_data"));
-//   const userType = storedUser ? storedUser.user_role : null;
-
-//   return userType === "subscriber" || userType === "operation_assistant" ? (
-//     <Outlet />
-//   ) : (
-//     <Navigate to="/PageNotFound" />
-//   );
-// };
-
-// export default OperationAssistantRoute;

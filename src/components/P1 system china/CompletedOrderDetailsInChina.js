@@ -28,6 +28,7 @@ import Form from "react-bootstrap/Form";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 // import { AddMessage } from "../../redux/actions/OrderSystemActions";
 import ShowAlert from "../../utils/ShowAlert";
+import { getUserData } from "../../utils/StorageUtils";
 
 const CompletedOrderDetailsInChina = () => {
   const params = useParams();
@@ -98,11 +99,11 @@ const CompletedOrderDetailsInChina = () => {
 
   const handleAddMessage = async (e) => {
     const orderId = parseInt(params.id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
+    let userData = await getUserData();
     const requestedMessage = {
       message: message,
       order_id: orderId,
-      name: userID.first_name,
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {

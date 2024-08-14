@@ -158,12 +158,12 @@ function OnHoldOrdersDetails() {
   }, [toggleStatus]);
 
   const handleAddMessage = async (e) => {
+    console.log(userData,'userData from handle Add message')
     const orderId = parseInt(id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
       order_id: orderId,
-      name: userID.first_name,
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {

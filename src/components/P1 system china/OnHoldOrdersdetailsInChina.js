@@ -61,7 +61,7 @@ const OnHoldOrdersdetailsInChina = () => {
   const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
-  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
+  const [userData, setUserData] = useState(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
@@ -83,6 +83,20 @@ const OnHoldOrdersdetailsInChina = () => {
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemDataChina?.onHoldOrderDetails?.orders?.[0]
   );
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -137,11 +151,10 @@ const OnHoldOrdersdetailsInChina = () => {
 
   const handleAddMessage = async (e) => {
     const orderId = parseInt(id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
       order_id: orderId,
-      name: userID.first_name,
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {

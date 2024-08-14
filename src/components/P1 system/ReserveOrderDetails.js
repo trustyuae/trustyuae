@@ -30,6 +30,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import Form from "react-bootstrap/Form";
 import ShowAlert from "../../utils/ShowAlert";
+import { getUserData } from "../../utils/StorageUtils";
 
 function ReserveOrderDetails() {
   const params = useParams();
@@ -74,11 +75,11 @@ function ReserveOrderDetails() {
 
   const handleAddMessage = async (e) => {
     const orderId = parseInt(params.id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
+    let userData = await getUserData();
     const requestedMessage = {
       message: message,
       order_id: orderId,
-      name: userID.first_name,
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {
