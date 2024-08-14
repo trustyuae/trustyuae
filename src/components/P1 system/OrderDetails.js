@@ -46,6 +46,7 @@ import Swal from "sweetalert2";
 import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { getUserData } from "../../utils/StorageUtils";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -62,7 +63,7 @@ function OrderDetails() {
   const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
-  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
+  const [userData, setUserData] = useState(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showMessageOHModal, setshowMessageOHModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -92,6 +93,20 @@ function OrderDetails() {
   const Finished = useSelector(
     (state) => state?.orderSystemData?.isCustomOrder
   );
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();

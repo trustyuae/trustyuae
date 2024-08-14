@@ -1,18 +1,32 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useLocation } from "react-router-dom";
+import { getUserData } from "../utils/StorageUtils";
 const Sidebar = () => {
   const location = useLocation();
   const [activeMenuItem, setActiveMenuItem] = useState("");
+  const [userType, setUserType] = useState(null);
 
   useEffect(() => {
     const currentPath = location.pathname;
     setActiveMenuItem(currentPath);
   }, [location]);
 
-  const userdata = JSON.parse(localStorage.getItem("user_data"));
-  console.log(userdata, "akkiss");
-  const userType = userdata ? userdata.user_role : null;
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      const role = userdata ? userdata.user_role : null;
+      setUserType(role);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUserType(null);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   return (
     <>
       <aside id="sidebar" className="sidebar" style={{ left: "0" }}>
