@@ -59,6 +59,7 @@ import {
 const OrderDetailsInChina = () => {
   const { id } = useParams();
   const fileInputRef = useRef({});
+  const [userData, setUserData] = useState(null);
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [selectedVariationId, setSelectedVariationId] = useState("");
@@ -71,7 +72,6 @@ const OrderDetailsInChina = () => {
   const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
-  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showMessageOHModal, setshowMessageOHModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -103,6 +103,20 @@ const OrderDetailsInChina = () => {
   const Finished = useSelector(
     (state) => state?.orderSystemDataChina?.isCustomOrder
   );
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();

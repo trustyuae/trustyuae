@@ -96,7 +96,7 @@ function OrderDetails() {
   async function fetchUserData() {
     try {
       const userdata = await getUserData();
-      setUserData(userdata);
+      setUserData(userdata || {});
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -104,6 +104,7 @@ function OrderDetails() {
 
   useEffect(() => {
     fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const capture = useCallback(() => {

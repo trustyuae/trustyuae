@@ -49,10 +49,12 @@ import Swal from "sweetalert2";
 import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { getUserData } from "../../utils/StorageUtils";
 
 function OnHoldOrdersDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
+  const [userData, setUserData] = useState(null);
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -64,7 +66,7 @@ function OnHoldOrdersDetails() {
   const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
-  const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
+  // const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
@@ -90,6 +92,20 @@ function OnHoldOrdersDetails() {
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
