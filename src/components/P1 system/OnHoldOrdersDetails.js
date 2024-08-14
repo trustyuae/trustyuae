@@ -391,7 +391,7 @@ function OnHoldOrdersDetails() {
     {
       field: "select",
       headerName: "Select",
-      flex: 1,
+      flex: 0.5,
       renderCell: (params) => {
         return (
           <FormGroup>
@@ -410,7 +410,7 @@ function OnHoldOrdersDetails() {
       field: "item_id",
       headerName: "Item Id",
       className: "order-details",
-      flex: 0.5,
+      flex: 1,
     },
     {
       field: "product_name",
@@ -422,7 +422,7 @@ function OnHoldOrdersDetails() {
       field: "variant_details",
       headerName: "Variant Details",
       className: "order-details",
-      flex: 1.5,
+      flex: 1,
       renderCell: (params) => {
         if (
           params.row.variations &&
@@ -456,8 +456,8 @@ function OnHoldOrdersDetails() {
             src={params.value || require("../../assets/default.png")}
             alt="Product Image"
             sx={{
-              height: "45px",
-              width: "45px",
+              height: "70px",
+              width: "75px",
               borderRadius: "2px",
               margin: "0 auto",
               "& .MuiAvatar-img": {

@@ -287,7 +287,7 @@ function OnHoldManegementSystem() {
               borderRadius: "2px",
               margin: "0 auto",
               "& .MuiAvatar-img": {
-                height: "100%",
+                height: "90%",
                 width: "100%",
                 borderRadius: "2px",
               },
@@ -363,7 +363,7 @@ function OnHoldManegementSystem() {
               borderRadius: "2px",
               margin: "0 auto",
               "& .MuiAvatar-img": {
-                height: "100%",
+                height: "90%",
                 width: "100%",
                 borderRadius: "2px",
               },
