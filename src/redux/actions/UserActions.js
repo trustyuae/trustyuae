@@ -12,7 +12,7 @@ import {
 import { loginURL, logoutURL } from "../../utils/constants";
 import ShowAlert from "../../utils/ShowAlert";
 import axiosInstance from "../../utils/AxiosInstance";
-import { saveToken, saveUserData } from "../../utils/StorageUtils";
+import { getUserData, saveToken, saveUserData } from "../../utils/StorageUtils";
 
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
@@ -26,9 +26,9 @@ export const loginUser = (data, navigate) => async (dispatch) => {
       }
     );
     dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data });
-    await saveToken();
-    await saveUserData();
-    if (res.data.token) {
+    await saveToken(res.data.token);
+    await saveUserData(res.data.user_data);
+    if (res.status === 200) {
       const result = await ShowAlert(
         "Success",
         res?.data?.message,
@@ -38,15 +38,16 @@ export const loginUser = (data, navigate) => async (dispatch) => {
         "OK"
       );
       if (result.isConfirmed) {
-        if (res.data.user_data.user_role === "administrator") {
+        const userData = await getUserData()
+        if (userData.user_role === "administrator") {
           navigate("/ordersystem");
-        } else if (res.data.user_data.user_role === "packing_assistant") {
+        } else if (userData.user_role === "packing_assistant") {
           navigate("/ordersystem");
-        } else if (res.data.user_data.user_role === "factory_coordinator") {
+        } else if (userData.user_role === "factory_coordinator") {
           navigate("/PO_ManagementSystem");
-        } else if (res.data.user_data.user_role === "customer_support") {
+        } else if (userData.user_role === "customer_support") {
           navigate("/order_not_available");
-        } else if (res.data.user_data.user_role === "operation_assistant") {
+        } else if (userData.user_role === "operation_assistant") {
           navigate("/On_Hold_Manegement_System");
         }
       }
