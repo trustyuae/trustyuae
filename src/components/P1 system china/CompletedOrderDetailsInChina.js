@@ -22,8 +22,6 @@ import { useDispatch, useSelector } from "react-redux";
 // import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
-import axios from "axios";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { AddMessage, CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemchinaActions";
 import Form from "react-bootstrap/Form";
@@ -44,11 +42,6 @@ const CompletedOrderDetailsInChina = () => {
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
-
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
 
   const loader = useSelector(
     (state) => state?.orderSystemDataChina?.isCompletedOrderDetails

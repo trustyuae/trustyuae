@@ -22,7 +22,7 @@ import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
 
@@ -322,9 +322,9 @@ const ERDetails = () => {
       variation_id: ERviewList.map((d) => d.variation_id),
     };
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-er-update/v1/update-er-item/`,
-        payload,{headers}
+        payload,
       );
       if (response.data.message) {
         const result = await ShowAlert(

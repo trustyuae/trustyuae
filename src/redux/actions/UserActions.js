@@ -11,21 +11,16 @@ import {
 } from "../constants/Constants";
 import { loginURL, logoutURL } from "../../utils/constants";
 import ShowAlert from "../../utils/ShowAlert";
-
-const token = JSON.parse(localStorage.getItem('token'))
-const headers = {
-  Authorization: `Live ${token}`,
-};
+import axiosInstance from "../../utils/AxiosInstance";
 
 export const loginUser = (data, navigate) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST });
   try {
-    const res = await axios.post(
+    const res = await axiosInstance.post(
       `${API_URL}wp-json/custom-login/v1/login`,
       data,
       {
         headers: { 
-          Authorization: `Live ${token}`,
           "content-type": "application/json"},
       }
     );

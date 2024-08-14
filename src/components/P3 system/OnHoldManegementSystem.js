@@ -18,7 +18,7 @@ import { AddGrn, GetProductManual } from "../../redux/actions/P3SystemActions";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { CompressImage } from "../../utils/CompressImage";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 
 import Select from "react-select";
 import Swal from "sweetalert2";
@@ -68,12 +68,6 @@ function OnHoldManegementSystem() {
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
 
-  const token = JSON.parse(localStorage.getItem("token"));
-
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
-
   useEffect(() => {
     dispatch(AllFactoryActions());
   }, [dispatch]);
@@ -84,7 +78,7 @@ function OnHoldManegementSystem() {
 
   const getall = async () => {
     let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
-    const response = await axios.get(url, { headers });
+    const response = await axiosInstance.get(url);
     setoptionsArray(
       response.data.products.map((user) => ({
         label: user.product_name,
@@ -674,9 +668,8 @@ function OnHoldManegementSystem() {
 
   const selectPOId = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_URL}wp-json/get-po-ids/v1/show-po-id/${selectedFactory}`,
-        { headers }
       );
       let data = response.data;
       setAllPoIds(data);
@@ -687,9 +680,8 @@ function OnHoldManegementSystem() {
 
   const fetchPoProductData = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`,
-        { headers }
+      const response = await axiosInstance.get(
+        `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`
       );
 
       // Ensure each row has a unique 'id'

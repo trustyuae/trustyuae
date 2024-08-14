@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -63,11 +63,6 @@ function POManagementSystem() {
   useEffect(() => {
     dispatch(AllFactoryActions());
   }, [dispatch]);
-
-  const token = JSON.parse(localStorage.getItem('token'))
-const headers = {
-  Authorization: `Live ${token}`,
-};
 
   useEffect(() => {
     if (allFactoryDatas && allFactoryDatas.factories) {
@@ -236,8 +231,8 @@ const headers = {
     );
     if (result.isConfirmed) {
       try {
-        const response = await axios.get(
-          `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`,{headers}
+        const response = await axiosInstance.get(
+          `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`
         );
         if (response) {
           POM_system_products();

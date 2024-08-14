@@ -1,5 +1,4 @@
 import Swal from "sweetalert2";
-import ShowAlert from "../../utils/ShowAlert";
 import {
   GET_ORDER_SYSTEM_REQUEST,
   GET_ORDER_SYSTEM_SUCCESS,
@@ -48,12 +47,7 @@ import {
   CUSTOM_ORDER_SEND_CHINA_SUCCESS,
   CUSTOM_ORDER_SEND_CHINA_REQUEST,
 } from "../constants/Constants";
-import axios from "axios";
-
-const token = JSON.parse(localStorage.getItem("token"));
-const headers = {
-  Authorization: `Live ${token}`,
-};
+import axiosInstance from "../../utils/AxiosInstance";
 
 export const OrderSystemGet =
   ({ apiUrl }) =>
@@ -61,7 +55,7 @@ export const OrderSystemGet =
     try {
       dispatch({ type: GET_ORDER_SYSTEM_REQUEST });
 
-      const response = await axios.get(apiUrl, { headers });
+      const response = await axiosInstance.get(apiUrl);
       dispatch({ type: GET_ORDER_SYSTEM_SUCCESS, payload: response?.data });
       return response;
     } catch (error) {
@@ -75,7 +69,7 @@ export const CompletedOrderSystemGet =
     try {
       dispatch({ type: GET_COMPLETED_ORDER_SYSTEM_REQUEST });
 
-      const response = await axios.get(apiUrl, { headers });
+      const response = await axiosInstance.get(apiUrl);
       dispatch({
         type: GET_COMPLETED_ORDER_SYSTEM_SUCCESS,
         payload: response?.data,
@@ -90,9 +84,8 @@ export const CompletedOrderDetailsGet = (id) => async (dispatch) => {
   try {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
 
-    const response = await axios.get(
-      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`,
-      { headers }
+    const response = await axiosInstance.get(
+      `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
@@ -111,9 +104,8 @@ export const OnHoldOrderDetailsGet = (id) => async (dispatch) => {
   try {
     dispatch({ type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_REQUEST });
 
-    const response = await axios.get(
-      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,
-      { headers }
+    const response = await axiosInstance.get(
+      `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`
     );
     dispatch({
       type: GET_ON_HOLD_ORDER_DETAILS_SYSTEM_SUCCESS,
@@ -132,9 +124,8 @@ export const ReserveOrderDetailsGet = (id) => async (dispatch) => {
   try {
     dispatch({ type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_REQUEST });
 
-    const response = await axios.get(
-      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`,
-      { headers }
+    const response = await axiosInstance.get(
+      `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`
     );
     dispatch({
       type: GET_COMPLETED_ORDER_DETAILS_SYSTEM_SUCCESS,
@@ -155,9 +146,8 @@ export const OrderDetailsGet =
     try {
       dispatch({ type: GET_ORDER_DETAILS_REQUEST });
 
-      const response = await axios.get(
-        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`,
-        { headers }
+      const response = await axiosInstance.get(
+        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`
       );
       dispatch({ type: GET_ORDER_DETAILS_SUCCESS, payload: response?.data });
       return response;
@@ -173,12 +163,11 @@ export const AttachmentFileUpload =
       dispatch({ type: UPLOAD_ATTACH_FILE_REQUEST });
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}`,
         requestData,
         {
           headers: {
-            Authorization: `Live ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -197,12 +186,11 @@ export const OverAllAttachmentFileUpload =
       dispatch({ type: UPLOAD_OVERALL_ATTACH_FILE_REQUEST });
       const requestData = new FormData();
       requestData.append("order_dispatch_image", order_dispatch_image);
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/order-complete-attachment/v1/order-attachment/${order_id}`,
         requestData,
         {
           headers: {
-            Authorization: `Live ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -220,10 +208,9 @@ export const OverAllAttachmentFileUpload =
 export const AddMessage = (requestData) => async (dispatch) => {
   try {
     dispatch({ type: ADD_MESSAGE_REQUEST });
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-message-note/v1/order-note/`,
-      requestData,
-      { headers }
+      requestData
     );
     dispatch({ type: ADD_MESSAGE_SUCCESS, payload: response?.data });
     return response;
@@ -236,10 +223,9 @@ export const InsertOrderPickup = (requestData) => async (dispatch) => {
   try {
     dispatch({ type: INSERT_ORDER_PICKUP_REQUEST });
 
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-order-pick/v1/insert-order-pickup/`,
       requestData,
-      { headers }
     );
     dispatch({ type: INSERT_ORDER_PICKUP_SUCCESS, payload: response?.data });
     return response;
@@ -252,10 +238,9 @@ export const InsertOrderPickupCancel = (requestData) => async (dispatch) => {
   try {
     dispatch({ type: INSERT_ORDER_PICKUP_CANCEL_REQUEST });
 
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-order-cancel/v1/insert-order-cancel/`,
       requestData,
-      { headers }
     );
     dispatch({
       type: INSERT_ORDER_PICKUP_CANCEL_SUCCESS,
@@ -271,9 +256,8 @@ export const CustomOrderFinish =
   (user_id, id, navigate) => async (dispatch) => {
     dispatch({ type: CUSTOM_ORDER_FINISH_REQUEST });
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-order-finish/v1/finish-order/${user_id}/${id}`,
-        { headers }
       );
       dispatch({ type: CUSTOM_ORDER_FINISH_SUCCESS, payload: response.data });
       return response;
@@ -285,10 +269,9 @@ export const CustomOrderFinish =
 export const CustomOrderOH = (result, navigate) => async (dispatch) => {
   dispatch({ type: CUSTOM_ORDER_ON_HOLD_REQUEST });
   try {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-onhold-orders-convert/v1/update_onhold_note/`,
       result,
-      { headers }
     );
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_SUCCESS, payload: response.data });
     if (response.status === 200) {
@@ -304,9 +287,8 @@ export const CustomOrderFinishOH =
   (user_id, id, navigate) => async (dispatch) => {
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_FINISH_REQUEST });
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-onhold-order-finish/v1/onhold-finish-order/${user_id}/${id}`,
-        { headers }
       );
       dispatch({
         type: CUSTOM_ORDER_ON_HOLD_FINISH_SUCCESS,
@@ -340,10 +322,9 @@ export const CustomItemSendToP2 =
     dispatch({ type: CUSTOM_ORDER_ON_HOLD_SEND_P2_REQUEST });
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,
         payload,
-        { headers }
       );
 
       dispatch({
@@ -379,9 +360,8 @@ export const CustomItemSendToChina = (id,navigate) => async (dispatch) => {
   dispatch({ type: CUSTOM_ORDER_SEND_CHINA_REQUEST });
 
   try {
-    const response = await axios.post(
-      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}/?warehouse=China`,{},
-      { headers }
+    const response = await axiosInstance.post(
+      `${API_URL}wp-json/custom-push-order/v1/push-order-china/${id}/?warehouse=China`,
     );
 
     dispatch({

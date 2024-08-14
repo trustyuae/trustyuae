@@ -22,8 +22,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddMessage, CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
-import axios from "axios";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShowAlert from "../../utils/ShowAlert";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
@@ -42,11 +40,6 @@ function CompletedOrderDetails() {
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
-
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
 
   const loader = useSelector(
     (state) => state?.orderSystemData?.isCompletedOrderDetails

@@ -26,8 +26,6 @@ import {
 } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
-import axios from "axios";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import Form from "react-bootstrap/Form";

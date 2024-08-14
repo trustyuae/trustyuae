@@ -44,7 +44,7 @@ import PoDetailsModalInView from "./PoDetailsModalInView";
 import { useTranslation } from "react-i18next";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 import defaulImage from "../../../src/assets/default.png";
 import { DatePicker } from "@mui/x-date-pickers-pro";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -87,11 +87,6 @@ const PoDetails = () => {
   const perticularOrderDetailsLoader = useSelector(
     (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
   );
-
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
 
   useEffect(() => {
     dispatch(AllFactoryActions());
@@ -144,9 +139,8 @@ const PoDetails = () => {
 
   const getMessages = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`,
-        { headers }
       );
       setMessages(response.data);
     } catch (error) {
@@ -653,10 +647,9 @@ const PoDetails = () => {
         user_id: userID.user_id,
       };
 
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
         requestedMessage,
-        { headers }
       );
       console.log(response.data);
 

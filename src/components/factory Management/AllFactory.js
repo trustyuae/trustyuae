@@ -10,7 +10,7 @@ import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
 import { Alert, Box, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 import Loader from "../../utils/Loader";
 
 function AllFactory() {
@@ -42,11 +42,7 @@ function AllFactory() {
         contact_email: email,
       };
 
-      const headers = {
-        Authorization: `Live ${token}`,
-      };
-
-      const response = await axios.get(apiUrl, { params, headers });
+      const response = await axiosInstance.get(apiUrl, { params});
       const factoryData = response.data.factories.map((item) => ({ ...item }));
       setFactories(factoryData);
       setTotalPages(response.data.total_pages);

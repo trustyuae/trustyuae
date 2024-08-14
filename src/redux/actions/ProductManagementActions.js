@@ -7,18 +7,15 @@ import {
   GET_ALL_PRODUCTS_LIST_REQUEST,
   GET_ALL_PRODUCTS_LIST_SUCCESS,
 } from "../constants/Constants";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 
-const token = JSON.parse(localStorage.getItem('token'))
-const headers = {
-  Authorization: `Live ${token}`,
-};
+
 export const GetAllProductsList =
   ({ apiUrl }) =>
   async (dispatch) => {
     try {
       dispatch({ type: GET_ALL_PRODUCTS_LIST_REQUEST });
-      const response = await axios.get(apiUrl,{headers});
+      const response = await axiosInstance.get(apiUrl);
       dispatch({
         type: GET_ALL_PRODUCTS_LIST_SUCCESS,
         payload: response?.data,
@@ -33,12 +30,11 @@ export const GetAllProductsList =
 export const EditProductsList = (formData, id) => async (dispatch) => {
   try {
     dispatch({ type: EDIT_PRODUCT_LIST_REQUEST });
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-proimage-update/v1/update-product/${id}`,
       formData,
       {
         headers: {
-          Authorization: `Live ${token}`,
           "Content-Type": "multipart/form-data",
         },
       }

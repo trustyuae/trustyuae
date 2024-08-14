@@ -46,7 +46,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -90,11 +90,6 @@ function OnHoldOrdersDetails() {
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
   );
-
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -217,13 +212,12 @@ function OnHoldOrdersDetails() {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await axios.post(
+        await axiosInstance.post(
           `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
             variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
-          },
-          { headers }
+          }
         );
         fetchOrder();
       }
@@ -673,10 +667,9 @@ function OnHoldOrdersDetails() {
 
     console.log(result, "result");
 
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
-      result,
-      { headers }
+      result
     );
     console.log(response, "response");
     if (response) {

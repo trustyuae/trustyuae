@@ -43,7 +43,7 @@ import {
   GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS,
   GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST,
 } from "../constants/Constants";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 import ShowAlert from "../../utils/ShowAlert";
 
 const token = JSON.parse(localStorage.getItem('token'))
@@ -56,7 +56,7 @@ export const PoDetailsData =
     async (dispatch) => {
       try {
         dispatch({ type: GET_PO_DETAILS_REQUEST });
-        const response = await axios.get(apiUrl,{headers});
+        const response = await axiosInstance.get(apiUrl);
         dispatch({
           type: GET_PO_DETAILS_SUCCESS,
           payload: response?.data,
@@ -72,7 +72,7 @@ export const ManualOrScheduledPoDetailsData =
     async (dispatch) => {
       try {
         dispatch({ type: GET_MANUAL_OR_SCHEDULED_PO_DETAILS_REQUEST });
-        const response = await axios.get(apiUrl,{headers});
+        const response = await axiosInstance.get(apiUrl);
         dispatch({
           type: GET_MANUAL_OR_SCHEDULED_PO_DETAILS_SUCCESS,
           payload: response?.data,
@@ -88,7 +88,7 @@ export const PerticularPoDetails =
     async (dispatch) => {
       try {
         dispatch({ type: GET_PERTICULAR_PO_DETAILS_REQUEST });
-        const response = await axios.get(apiUrl,{headers});
+        const response = await axiosInstance.get(apiUrl);
         dispatch({
           type: GET_PERTICULAR_PO_DETAILS_SUCCESS,
           payload: response?.data,
@@ -104,7 +104,7 @@ export const QuantityPoDetails =
     async (dispatch) => {
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_REQUEST });
-        const response = await axios.post(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`,payload,{headers});
+        const response = await axiosInstance.post(`${API_URL}wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`,payload);
         dispatch({
           type: GET_QUANTITY_DETAILS_SUCCESS,
           payload: response?.data,
@@ -120,7 +120,7 @@ export const QuantityPoDetailsForModalInView =
     async (dispatch) => {
       try {
         dispatch({ type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_REQUEST });
-        const response = await axios.get(`${API_URL}wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}/${variationId}`,{headers});
+        const response = await axiosInstance.get(`${API_URL}wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}/${variationId}`);
         dispatch({
           type: GET_QUANTITY_DETAILS_ON_PO_DETAILS_SUCCESS,
           payload: response?.data,
@@ -134,9 +134,9 @@ export const QuantityPoDetailsForModalInView =
 export const AddPO = (payload, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_PO_REQUEST });
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-po-number/v1/po-id-generate/`,
-      payload,{headers}
+      payload
     );
 
     if (response.data) {
@@ -161,9 +161,9 @@ export const AddPO = (payload, navigate) => async (dispatch) => {
 export const AddManualPO = (payload, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_MANUAL_PO_REQUEST });
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-manual-order/v1/post-order-manual/`,
-      payload,{headers}
+      payload
     );
     if (response.data) {
       const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
@@ -182,9 +182,9 @@ export const AddManualPO = (payload, navigate) => async (dispatch) => {
 export const AddSchedulePO = (payload, navigate) => async (dispatch) => {
   try {
     dispatch({ type: ADD_SCHEDULE_PO_REQUEST });
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-schedule-order/v1/post-order-schedule/`,
-      payload,{headers}
+      payload
     );
     if (response.data) {
       const result = await ShowAlert('Success', response.data, "success", true, false, 'OK');
@@ -205,7 +205,7 @@ export const UpdatePODetails =
     async (dispatch) => {
       try {
         dispatch({ type: UPDATE_PO_DETAILS_REQUEST });
-        const response = await axios.post(apiUrl, payload,{headers});
+        const response = await axiosInstance.post(apiUrl, payload);
         const result = await ShowAlert(response.data.message, '', "success", true, false, 'OK');
         if (result.isConfirmed) navigate("/PO_ManagementSystem");
 
@@ -225,7 +225,7 @@ export const PomSystemProductsDetails =
     async (dispatch) => {
       try {
         dispatch({ type: GET_POM_SYSTEM_PRODUCTS_DETAILS_REQUEST });
-        const response = await axios.get(apiUrl,{headers});
+        const response = await axiosInstance.get(apiUrl);
         dispatch({
           type: GET_POM_SYSTEM_PRODUCTS_DETAILS_SUCCESS,
           payload: response?.data,
@@ -244,7 +244,7 @@ export const OrderNotAvailableData =
     async (dispatch) => {
       try {
         dispatch({ type: GET_ORDER_NOT_AVAILABLE_REQUEST });
-        const response = await axios.get(apiUrl,{headers});
+        const response = await axiosInstance.get(apiUrl);
         dispatch({
           type: GET_ORDER_NOT_AVAILABLE_SUCCESS,
           payload: response?.data,
@@ -261,9 +261,9 @@ export const OrderNotAvailableDataPo = (requestData) => async (dispatch) => {
       await ShowAlert("Please select a reminder date!", '', "error", false, false, '', '', 1000);
     } else {
       dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REQUEST });
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_URL}wp-json/custom-so-create/v1/convert-so-order/`,
-        requestData,{headers}
+        requestData
       );
       dispatch({
         type: ADD_ORDER_NOT_AVAILABLE_SUCCESS,
@@ -280,10 +280,10 @@ export const OrderNotAvailableDataStatus =
   (requestedDataS) => async (dispatch) => {
     try {
       dispatch({ type: UPDATE_ORDER_NOT_AVAILABLE_STATUS_REQUEST });
-      const response = await axios
+      const response = await axiosInstance
         .post(
           `${API_URL}wp-json/order-not-update/v1/order-not-btn/`,
-          requestedDataS,{headers}
+          requestedDataS
         )
         .then(async (response) => {
           await ShowAlert("Status Updated Successfully!", '', "success", false, false, '', '', 1000);
@@ -301,42 +301,5 @@ export const OrderNotAvailableDataStatus =
         type: UPDATE_ORDER_NOT_AVAILABLE_STATUS_FAIL,
         error: error.message,
       });
-    }
-  };
-
-export const OrderNotAvailableRefund =
-  (requestedInfo, orderIds, username, password) => async (dispatch) => {
-    try {
-      dispatch({ type: ADD_ORDER_NOT_AVAILABLE_REFUND_REQUEST });
-      const basicAuth = {
-        username: username,
-        password: password,
-      };
-      const refundPromises = orderIds.map(async (id) => {
-        const response = await axios.post(
-          `${API_URL}/wp-json/wc/v3/orders/${id}/refunds`,
-          requestedInfo,
-          {
-            auth: basicAuth,
-          }
-        );
-        return response.data;
-      });
-
-      const refunds = await Promise.all(refundPromises);
-      await ShowAlert("Refund process completed successfully!", '', "success", false, false, '', '', 1000);
-      dispatch({
-        type: ADD_ORDER_NOT_AVAILABLE_REFUND_SUCCESS,
-        payload: refunds,
-      });
-
-      return refunds;
-    } catch (error) {
-      await ShowAlert("Error in refund process!", '', "error", false, false, '', '', 1000);
-      dispatch({
-        type: ADD_ORDER_NOT_AVAILABLE_REFUND_FAIL,
-        error: error.message,
-      });
-      throw error;
     }
   };
