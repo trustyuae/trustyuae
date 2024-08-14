@@ -3,7 +3,7 @@ import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
-import PrintModal from "./PrintModal";
+import PrintModal from "./MissingPrintModal";
 import {
   Alert,
   Avatar,
@@ -46,7 +46,7 @@ import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getUserData } from "../../utils/StorageUtils";
 
-function OrderDetails() {
+function MissingOrderDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
   const [userData, setUserData] = useState(null);
@@ -1297,4 +1297,4 @@ function OrderDetails() {
     </>
   );
 }
-export default OrderDetails;
+export default MissingOrderDetails;

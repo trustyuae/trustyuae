@@ -4,7 +4,6 @@ import Login from "./components/Login";
 // import Dashboard from "./components/Dashboardd";
 import { Layout } from "./routes/Layout";
 import OrderSystem from "./components/P1 system/OrderSystem";
-import MissingOrderSystem from "./components/Missing Orders System/OrderSystem";
 import FactoryForm from "./components/factory Management/FactoryForm";
 import OrderManagementSystem from "./components/P2 system/OrderManagementSystem";
 import PoDetails from "./components/P2 system/PoDetails";
@@ -13,7 +12,6 @@ import AllProductList from "./components/Product management/AllProductList";
 import OrderNotAvailable from "./components/P2 system/OrderNotAvailable";
 import ImageUpload from "./components/ImageUpload";
 import OrderDetails from "./components/P1 system/OrderDetails";
-import MissingOrderDetails from "./components/Missing Orders System/OrderDetails";
 import AllFactory from "./components/factory Management/AllFactory";
 import POManagementSystem from "./components/P2 system/POManagementSystem";
 import GRNManagement from "./components/P3 system/GRNManagement";
@@ -44,6 +42,8 @@ import ReserveOrderSystemInChina from "./components/P1 system china/ReserveOrder
 import OnHoldOrdersSystemInChina from "./components/P1 system china/OnHoldOrdersSystemInChina";
 import ReserveOrderdetailsInChina from "./components/P1 system china/ReserveOrderdetailsInChina";
 import OnHoldOrdersdetailsInChina from "./components/P1 system china/OnHoldOrdersdetailsInChina";
+import MissingOrderSystem from "./components/Missing Orders System/MissingOrderSystem";
+import MissingOrderDetails from "./components/Missing Orders System/MissingOrderDetails";
 
 function App() {
   return (

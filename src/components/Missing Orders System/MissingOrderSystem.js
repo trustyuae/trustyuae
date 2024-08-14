@@ -24,7 +24,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-function OrderSystem() {
+function MissingOrderSystem() {
   const inputRef = useRef(null);
   const [dispatchType, setDispatchType] = useState("all");
   const [orders, setOrders] = useState([]);
@@ -391,4 +391,4 @@ function OrderSystem() {
   );
 }
 
-export default OrderSystem;
+export default MissingOrderSystem;
