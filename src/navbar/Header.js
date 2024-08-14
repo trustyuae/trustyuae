@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
+import { getUserData } from "../utils/StorageUtils";
 
 const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [userData, setUserData] = useState(null);
   const handleLogOut = async () => {
     try {
       dispatch(logoutUser(navigate));
@@ -15,7 +17,18 @@ const Header = ({ onToggleSidebar }) => {
     }
   };
 
-  const userData = JSON.parse(localStorage.getItem("user_data"));
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   return (
     <header id="header" className="header fixed-top d-flex align-items-center">
@@ -34,10 +47,9 @@ const Header = ({ onToggleSidebar }) => {
           onClick={onToggleSidebar}
         ></i>
       </div>
-     
+
       <nav className="header-nav ms-auto">
         <ul className="d-flex align-items-center">
-         
           <li className="nav-item dropdown pe-3">
             <a
               className="nav-link nav-profile d-block text-center pe-0"
@@ -49,7 +61,7 @@ const Header = ({ onToggleSidebar }) => {
                   src={userData?.user_image_url}
                   alt="Profile"
                   className="rounded-circle"
-                  style={{marginTop:'2px'}} 
+                  style={{ marginTop: "2px" }}
                 />
                 <span className="d-none d-md-block">
                   {userData?.first_name} {userData?.last_name}
