@@ -45,6 +45,12 @@ import {
   CUSTOM_ORDER_SEND_CHINA_REQUEST,
   CUSTOM_ORDER_SEND_CHINA_SUCCESS,
   CUSTOM_ORDER_SEND_CHINA_FAIL,
+  GET_MISSING_ORDER_SYSTEM_REQUEST,
+  GET_MISSING_ORDER_SYSTEM_SUCCESS,
+  GET_MISSING_ORDER_SYSTEM_FAIL,
+  GET_MISSING_ORDER_DETAILS_REQUEST,
+  GET_MISSING_ORDER_DETAILS_SUCCESS,
+  GET_MISSING_ORDER_DETAILS_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -78,6 +84,10 @@ const initialState = {
   isCustomOrderOnHoldSendToP2: false,
   customOrderSendToChinaData: [],
   isCustomOrderSendToChina: false,
+  missingOrders: [],
+  isMissingOrders: false,
+  missingOrderDetails: [],
+  isMissingOrderDetails: false,
   error: null,
 };
 
@@ -137,6 +147,28 @@ const OrderSystemReducer = (state = initialState, action) => {
         isOnHoldOrderDetails: false,
         error: action.payload,
       };
+
+    case GET_MISSING_ORDER_SYSTEM_REQUEST:
+      return { ...state, isMissingOrders: true };
+    case GET_MISSING_ORDER_SYSTEM_SUCCESS:
+      return {
+        ...state,
+        isMissingOrders: false,
+        missingOrders: action.payload,
+      };
+    case GET_MISSING_ORDER_SYSTEM_FAIL:
+      return { ...state, isMissingOrders: false, error: action.payload };
+
+    case GET_MISSING_ORDER_DETAILS_REQUEST:
+      return { ...state, isMissingOrderDetails: true };
+    case GET_MISSING_ORDER_DETAILS_SUCCESS:
+      return {
+        ...state,
+        isMissingOrderDetails: false,
+        missingOrderDetails: action.payload,
+      };
+    case GET_MISSING_ORDER_DETAILS_FAIL:
+      return { ...state, isMissingOrderDetails: false, error: action.payload };
 
     case UPLOAD_ATTACH_FILE_REQUEST:
       return { ...state, isUploadAttachFile: true };

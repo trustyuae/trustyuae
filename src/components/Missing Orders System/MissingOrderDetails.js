@@ -31,6 +31,7 @@ import {
   CustomOrderOH,
   InsertOrderPickup,
   InsertOrderPickupCancel,
+  MissingOrderDetailsGet,
   OrderDetailsGet,
   OverAllAttachmentFileUpload,
 } from "../../redux/actions/OrderSystemActions";
@@ -131,7 +132,7 @@ function MissingOrderDetails() {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(OrderDetailsGet({ id: id }));
+      const response = await dispatch(MissingOrderDetailsGet({ id: id }));
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);

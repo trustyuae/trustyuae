@@ -46,6 +46,12 @@ import {
   CUSTOM_ORDER_SEND_CHINA_FAIL,
   CUSTOM_ORDER_SEND_CHINA_SUCCESS,
   CUSTOM_ORDER_SEND_CHINA_REQUEST,
+  GET_MISSING_ORDER_SYSTEM_REQUEST,
+  GET_MISSING_ORDER_SYSTEM_SUCCESS,
+  GET_MISSING_ORDER_SYSTEM_FAIL,
+  GET_MISSING_ORDER_DETAILS_REQUEST,
+  GET_MISSING_ORDER_DETAILS_SUCCESS,
+  GET_MISSING_ORDER_DETAILS_FAIL,
 } from "../constants/Constants";
 import axiosInstance from "../../utils/AxiosInstance";
 
@@ -153,6 +159,42 @@ export const OrderDetailsGet =
       return response;
     } catch (error) {
       dispatch({ type: GET_ORDER_DETAILS_FAIL, error: error.message });
+    }
+  };
+
+export const MissingOrderSystemGet =
+  ({ apiUrl }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_MISSING_ORDER_SYSTEM_REQUEST });
+
+      const response = await axiosInstance.get(apiUrl);
+      dispatch({
+        type: GET_MISSING_ORDER_SYSTEM_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_MISSING_ORDER_SYSTEM_FAIL, error: error.message });
+    }
+  };
+
+export const MissingOrderDetailsGet =
+  ({ id }) =>
+  async (dispatch) => {
+    try {
+      dispatch({ type: GET_MISSING_ORDER_DETAILS_REQUEST });
+
+      const response = await axiosInstance.get(
+        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`
+      );
+      dispatch({
+        type: GET_MISSING_ORDER_DETAILS_SUCCESS,
+        payload: response?.data,
+      });
+      return response;
+    } catch (error) {
+      dispatch({ type: GET_MISSING_ORDER_DETAILS_FAIL, error: error.message });
     }
   };
 

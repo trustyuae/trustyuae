@@ -17,7 +17,7 @@ import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  OrderSystemGet,
+  MissingOrderSystemGet
 } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
@@ -47,11 +47,11 @@ function MissingOrderSystem() {
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders/?`;
+    let apiUrl = `${API_URL}/wp-json/custom-missing-orders/v1/missing-orders/?`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     await dispatch(
-      OrderSystemGet({
+      MissingOrderSystemGet({
         apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
       })
     )

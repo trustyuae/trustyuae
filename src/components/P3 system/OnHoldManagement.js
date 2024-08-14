@@ -11,7 +11,7 @@ import {
   FormGroup,
   Typography,
 } from "@mui/material";
-import { Badge, Card, Col, Modal, Row } from "react-bootstrap";
+import { Badge, Card, Col, Form, Modal, Row } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import { API_URL } from "../../redux/constants/Constants";
@@ -28,9 +28,10 @@ import ShowAlert2 from "../../utils/ShowAlert2";
 function OnHoldManagement() {
   const dispatch = useDispatch();
   const params = useParams();
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [productData, setProductData] = useState([]);
   const [productDetailsData, setProductDetailsData] = useState([]);
@@ -60,7 +61,7 @@ function OnHoldManagement() {
   }
 
   async function fetchProductOrderDetails() {
-    let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
+    let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}/?&per_page=${pageSize}&page=${page}`;
     await dispatch(
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
@@ -114,126 +115,6 @@ function OnHoldManagement() {
     fetchProductOrderDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setSelectedOrders, setProductData]);
-
-  // const handleOrderPerp = async () => {
-  //   // const dispatch = useDispatch(); // Initialize dispatch
-
-  //   const orderId = selectedOrders.map((order) => order.order_id);
-  //   const quantity = selectedOrders.map((order) => order.quantity);
-
-  //   if (selectedOrders.length === 0) {
-  //     await ShowAlert(
-  //       "Please select products for fulfilling orders",
-  //       "",
-  //       "error",
-  //       false,
-  //       false,
-  //       "",
-  //       "",
-  //       "",
-  //       0
-  //     );
-  //     return;
-  //   }
-
-  //   const systemSelection = await ShowAlert2(
-  //     "Please select the system to send data",
-  //     "",
-  //     "info",
-  //     true,
-  //     false,
-  //     "P1 System UAE",
-  //     "P1 System China",
-  //     "Cancel",
-  //     0,
-  //     1,
-  //     2
-  //   );
-
-  //   if (!systemSelection || systemSelection === "Cancel") {
-  //     return;
-  //   }
-
-  //   const confirmation = await ShowAlert(
-  //     `Are you sure you want to send the data to ${systemSelection}?`,
-  //     "",
-  //     "question",
-  //     true,
-  //     true,
-  //     "Yes",
-  //     "Cancel",
-  //     0
-  //   );
-
-  //   if (confirmation !== "Yes") {
-  //     return;
-  //   }
-
-  //   const requestedDataP = {
-  //     product_id: params.id,
-  //     order_id: orderId,
-  //     quantity: quantity,
-  //     grn_no: params.grn_no,
-  //     variation_id: params.variation_id,
-  //     warehouse: systemSelection === "P1 System UAE" ? "" : "China", // Correctly set warehouse based on selection
-  //   };
-
-  //   try {
-  //     console.log('Dispatching API call with data:', requestedDataP);
-  //     const response = await dispatch(AddProductOrderForPre(requestedDataP));
-  //     console.log('Response from API:', response);
-
-  //     if (response?.data?.status_code === 200) {
-  //       await ShowAlert(
-  //         response?.data?.Message,
-  //         "",
-  //         "success",
-  //         false,
-  //         false,
-  //         "",
-  //         "",
-  //         "",
-  //         3500
-  //       );
-
-  //       await fetchProductOrderDetails();
-
-  //       setProductData((prevProductData) =>
-  //         prevProductData.map((row) => ({ ...row, isSelected: false }))
-  //       );
-  //       setSelectedOrders([]);
-
-  //       if (selectedOrders.length === productData.length) {
-  //         setProductData([]);
-  //       }
-  //     } else {
-  //       await ShowAlert(
-  //         response?.data?.Message || "Failed to send data",
-  //         "",
-  //         "error",
-  //         false,
-  //         false,
-  //         "",
-  //         "",
-  //         "",
-  //         3500
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Error occurred:", error);
-  //     await ShowAlert(
-  //       "An error occurred while processing your request. Please try again.",
-  //       "",
-  //       "error",
-  //       false,
-  //       false,
-  //       "",
-  //       "",
-  //       "",
-  //       3500
-  //     );
-  //   }
-  // };
 
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
@@ -412,6 +293,11 @@ function OnHoldManagement() {
     setPage(value);
   };
 
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(e.target.value);
+  };
+
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -495,9 +381,28 @@ function OnHoldManagement() {
       <MDBRow className="px-3">
         <MDBCol col="10" md="12" sm="12"></MDBCol>
         <Card className="py-3">
-          <Typography variant="h6" className="fw-bold mb-3">
-            Order Details
-          </Typography>
+          <Box className="d-flex justify-content-between">
+            <Typography variant="h6" className="fw-bold mb-3">
+              Order Details
+            </Typography>
+            <Box className='me-3'>
+              <Form.Group className="d-flex align-items-center justify-content-center justify-content-between">
+                <Form.Label className="me-3 mt-2 fw-bold">PageSize </Form.Label>
+                <Form.Control
+                  as="select"
+                  className="w-auto fw-bold"
+                  value={pageSize}
+                  onChange={handlePageSizeChange}
+                >
+                  {pageSizeOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+            </Box>
+          </Box>
           {loader ? (
             <div className="loader-container">
               <Loader className="loader" />

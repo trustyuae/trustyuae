@@ -19,26 +19,35 @@ const GRNView = () => {
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.managementSystem?.isGrnView);
+  const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [verifiedName, setVerifiedName] =useState("");
 
   const fetchOrder = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}`;
-    await dispatch(GetGRNView({ apiUrl })).then((response) => {
-      if (response?.data) {
-        let data = response.data.map((v, i) => ({ ...v, id: i }));
-        setPO_OrderList(data);
-      } else {
+    let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}/?&per_page=${pageSize}&page=${page}`;
+    await dispatch(GetGRNView({ apiUrl }))
+      .then((response) => {
+        console.log(response,'response from fetchorders in grn view')
+        if (response?.data) {
+          let data = response.data.data.map((v, i) => ({ ...v, id: i }));
+          setPO_OrderList(data);
+          setVerifiedName(response.data.verified_by)
+        } else {
+          setPO_OrderList([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching order:", error);
         setPO_OrderList([]);
-      }
-    }).catch(error => {
-      console.error("Error fetching order:", error);
-      setPO_OrderList([]);
-    });
+      });
   };
 
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pageSize,totalPages]);
 
   const columns = [
     {
@@ -102,6 +111,14 @@ const GRNView = () => {
   const handalBackButton = () => {
     navigate("/GRN_Management");
   };
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(e.target.value);
+  };
 
   const formatVariations = (variations) => {
     const data = JSON.parse(variations);
@@ -113,7 +130,7 @@ const GRNView = () => {
         .join(", ");
     }
   };
-  
+
   return (
     <Container fluid className="px-5">
       <MDBRow className="my-3">
@@ -139,7 +156,7 @@ const GRNView = () => {
             </Typography>
           </Box>
           <Box className="ms-5">
-            <Typography className="fw-bold">#verified by</Typography>
+            <Typography className="fw-bold">#{verifiedName}</Typography>
             <Typography>
               <Badge bg="success">Verified by</Badge>
             </Typography>
@@ -157,9 +174,10 @@ const GRNView = () => {
               <DataTable
                 columns={columns}
                 rows={PO_OrderList}
-                // page={pageSO}
-                // pageSize={pageSizeSO}
-                // totalPages={totalPagesSO}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
                 rowHeight={100}
               />
             </div>
