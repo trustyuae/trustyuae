@@ -69,6 +69,9 @@ const PoDetails = () => {
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [imageURL, setImageURL] = useState("");
+  const [imageId, setImageId] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const navigate = useNavigate();
   const allFactoryDatas = useSelector(
@@ -156,7 +159,7 @@ const PoDetails = () => {
     fetchPO();
     // getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, page,]);
+  }, [pageSize, page]);
 
   useEffect(() => {
     // fetchPO();
@@ -287,6 +290,18 @@ const PoDetails = () => {
     setPoDetailsModal(true);
   };
 
+  const ImageModule = (rowData) => {
+    setImageURL(
+      rowData.factory_image
+        ? rowData.factory_image
+        : rowData.image
+        ? rowData.image
+        : defaulImage
+    );
+    setImageId(rowData.product_id);
+    setShowEditModal(true);
+  };
+
   const variant2 = (variations) => {
     console.log(variations.row.variation_value, "variations");
 
@@ -348,7 +363,11 @@ const PoDetails = () => {
       type: "html",
       renderCell: (value, row) => {
         return (
-          <>
+          <Box
+            onClick={() => {
+              ImageModule(value.row);
+            }}
+          >
             <img
               src={
                 value.row.factory_image
@@ -361,7 +380,7 @@ const PoDetails = () => {
               className="img-fluid"
               width={100}
             />
-          </>
+          </Box>
         );
       },
     },
@@ -876,6 +895,21 @@ const PoDetails = () => {
           poId={id}
         />
       )}
+      <Modal
+        show={showEditModal}
+        // onHide={handleCloseEditModal}
+        onHide={() => setShowEditModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Product ID - {imageId}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card className="factory-card">
+            <img src={imageURL} alt="Product" />
+          </Card>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };
