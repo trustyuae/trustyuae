@@ -21,8 +21,6 @@ import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlin
 import { useDispatch, useSelector } from "react-redux";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
-import axios from "axios";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShowAlert from "../../utils/ShowAlert";
 import Form from "react-bootstrap/Form";
@@ -41,11 +39,6 @@ const ReserveOrderdetailsInChina = () => {
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
-
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
 
   const loader = useSelector(
     (state) => state?.orderSystemDataChina?.isCompletedOrderDetails

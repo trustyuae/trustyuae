@@ -42,7 +42,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
-import axios from "axios";
+import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { AddMessage, AttachmentFileUpload, CustomOrderFinishOH, InsertOrderPickup, InsertOrderPickupCancel, OnHoldOrderDetailsGet, OverAllAttachmentFileUpload } from "../../redux/actions/OrderSystemchinaActions";
@@ -84,11 +84,6 @@ const OnHoldOrdersdetailsInChina = () => {
     (state) => state?.orderSystemDataChina?.onHoldOrderDetails?.orders?.[0]
   );
 
-  const token = JSON.parse(localStorage.getItem("token"));
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
-
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setSelectedFileUrl(imageSrc);
@@ -113,10 +108,6 @@ const OnHoldOrdersdetailsInChina = () => {
 
   async function fetchOrder() {
     try {
-      // const response = await dispatch(OrderDetailsGet({ id: id }));
-      // const response = await axios.get(
-      //   `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`,{headers}
-      // );
       const response = await dispatch(OnHoldOrderDetailsGet(id));
 
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
@@ -214,13 +205,12 @@ const OnHoldOrdersdetailsInChina = () => {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await axios.post(
+        await axiosInstance.post(
           `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
             variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
-          },
-          { headers }
+          }
         );
         fetchOrder();
       }
@@ -625,10 +615,9 @@ const OnHoldOrdersdetailsInChina = () => {
       result.toggle_status = 0;
       setToggleStatus(0);
     }
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/?warehouse=China`,
-      result,
-      { headers }
+      result
     );
     if (response) {
       fetchOrder();

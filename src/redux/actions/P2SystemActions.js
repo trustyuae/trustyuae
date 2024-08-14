@@ -46,11 +46,6 @@ import {
 import axiosInstance from "../../utils/AxiosInstance";
 import ShowAlert from "../../utils/ShowAlert";
 
-const token = JSON.parse(localStorage.getItem('token'))
-const headers = {
-  Authorization: `Live ${token}`,
-};
-
 export const PoDetailsData =
   ({ apiUrl }) =>
     async (dispatch) => {

@@ -41,11 +41,6 @@ const ERDetails = () => {
   const [addNote, setNote] = useState("");
   const [lang, setLang] = useState("En");
 
-  const token = JSON.parse(localStorage.getItem('token'))
-  const headers = {
-    Authorization: `Live ${token}`,
-  };
-
   const allFactoryDatas = useSelector(
     (state) => state?.allFactoryData?.factory
   );
