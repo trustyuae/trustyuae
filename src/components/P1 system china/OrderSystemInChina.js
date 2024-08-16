@@ -12,7 +12,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge } from "react-bootstrap";
+import { Badge, ButtonGroup, ToggleButton } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,11 +29,14 @@ import OrderDetails from "./OrderDetailsInChina";
 import PrintModal from "./PrintModalInChina";
 import {
   OrderDetailsGet,
-  OrderSystemGet
+  OrderSystemGet,
 } from "../../redux/actions/OrderSystemchinaActions";
+import { useTranslation } from "react-i18next";
 
 const OrderSystemInChina = () => {
   const inputRef = useRef(null);
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = useState("En");
   const [dispatchType, setDispatchType] = useState("all");
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
@@ -111,22 +114,22 @@ const OrderSystemInChina = () => {
   };
 
   const columns = [
-    { field: "date", headerName: "Date", className: "order-system", flex: 1 },
+    { field: "date", headerName: t("POManagement.Date"), className: "order-system", flex: 1 },
     {
       field: "order_id",
-      headerName: "Order ID",
+      headerName: t("P1ChinaSystem.OrderId"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "customer_name",
-      headerName: "Customer Name",
+      headerName: t("P1ChinaSystem.CustomerName"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "shipping_country",
-      headerName: "Shipping Country",
+      headerName:t("P1ChinaSystem.ShippingCountry"),
       type: "string",
       className: "order-system",
       flex: 1,
@@ -134,14 +137,14 @@ const OrderSystemInChina = () => {
     },
     {
       field: "order_status",
-      headerName: "Order Status",
+      headerName: t("P1ChinaSystem.OrderStatus"),
       flex: 1,
       className: "order-system",
       type: "string",
     },
     {
       field: "",
-      headerName: "print pdf",
+      headerName: t("P1ChinaSystem.printpdf"),
       flex: 0.5,
       className: "order-system",
       type: "html",
@@ -160,7 +163,7 @@ const OrderSystemInChina = () => {
     },
     {
       field: "view_item",
-      headerName: "View Item",
+      headerName: t("POManagement.ViewItem"),
       flex: 1,
       className: "order-system",
       type: "html",
@@ -200,6 +203,21 @@ const OrderSystemInChina = () => {
   const handleChange = (event, value) => {
     setPage(value);
   };
+
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
+
+  const handleLanguageChange = async (language) => {
+    setLang(language);
+    i18n.changeLanguage(language);
+  };
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
 
   const handleDateChange = async (newDateRange) => {
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
@@ -257,20 +275,36 @@ const OrderSystemInChina = () => {
 
   return (
     <Container fluid className="py-3">
-      <Box className="mb-4">
+      <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-          Order Fulfillment System In China
+          {t("P1ChinaSystem.OrderFulfillmentSystemInChina")}
         </Typography>
+        <ButtonGroup>
+          {radios.map((radio, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`radio-${idx}`}
+              type="radio"
+              variant={idx % 2 ? "outline-success" : "outline-danger"}
+              name="radio"
+              value={radio.value}
+              checked={lang === radio.value}
+              onClick={() => handleLanguageChange(radio.value)}
+            >
+              {radio.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">Order Id:</Form.Label>
+                <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter Order ID"
+                  placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
                   // value={searchOrderID}
                   onKeyDown={handleKeyDown}
@@ -281,7 +315,7 @@ const OrderSystemInChina = () => {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
-                  Date filter:
+                {t("P1ChinaSystem.Datefilter")}:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -313,14 +347,14 @@ const OrderSystemInChina = () => {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">Dispatch type:</Form.Label>
+                <Form.Label className="fw-semibold">{t("P1ChinaSystem.Dispatchtype")}:</Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
                   onChange={(e) => searchDispatchTypeFilter(e.target.value)}
                 >
-                  <option value="all">All</option>
-                  <option value="dispatch">Dispatch</option>
-                  <option value="reserve">Reserve</option>
+                  <option value="all">{t("POManagement.All")}</option>
+                  <option value="dispatch">{t("P1ChinaSystem.dispatch")}</option>
+                  <option value="reserve">{t("P1ChinaSystem.dispatch")}</option>
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -329,7 +363,7 @@ const OrderSystemInChina = () => {
             <Box className="d-flex">
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
-                  Total Orders:
+                {t("P1ChinaSystem.TotalOrders")}:
                 </Form.Label>
                 <Form.Control
                   as="input"
@@ -342,7 +376,7 @@ const OrderSystemInChina = () => {
               </Form.Group>
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
-                  Dispatch Orders:
+                {t("P1ChinaSystem.DispatchOrders")}:
                 </Form.Label>
                 <Form.Control
                   as="input"
@@ -355,7 +389,7 @@ const OrderSystemInChina = () => {
               </Form.Group>
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
-                  Reserve Orders:
+                {t("P1ChinaSystem.ReserveOrders")}:
                 </Form.Label>
                 <Form.Control
                   as="input"
@@ -370,7 +404,7 @@ const OrderSystemInChina = () => {
             <Box className="d-flex">
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
-                  Page Size:
+                {t("P1ChinaSystem.PageSize")}:
                 </Form.Label>
                 <Form.Control
                   as="select"
@@ -390,14 +424,14 @@ const OrderSystemInChina = () => {
                 className="mr-2 mx-1 w-auto"
                 onClick={handleSearchFilter}
               >
-                Search
+                {t("P1ChinaSystem.Search")}:
               </Button>
               <Button
                 type="button"
                 className="mr-2 mx-1 w-auto"
                 onClick={handleReset}
               >
-                Reset filter
+                {t("P1ChinaSystem.ResetFilter")}:
               </Button>
             </Box>
           </Box>
@@ -423,7 +457,7 @@ const OrderSystemInChina = () => {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-              Records is not Available for above filter
+             {t("P1ChinaSystem.RecordsIsNotAlert")}:
             </Alert>
           )}
         </>

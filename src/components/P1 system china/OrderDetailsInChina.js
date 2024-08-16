@@ -2,7 +2,16 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  ButtonGroup,
+  Card,
+  Col,
+  Modal,
+  Row,
+  ToggleButton,
+} from "react-bootstrap";
 import PrintModal from "./PrintModalInChina";
 import {
   Alert,
@@ -56,10 +65,13 @@ import {
   OverAllAttachmentFileUpload,
 } from "../../redux/actions/OrderSystemchinaActions";
 import { getUserData } from "../../utils/StorageUtils";
+import { useTranslation } from "react-i18next";
 
 const OrderDetailsInChina = () => {
   const { id } = useParams();
   const fileInputRef = useRef({});
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = useState("En");
   const [userData, setUserData] = useState(null);
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
@@ -167,6 +179,21 @@ const OrderDetailsInChina = () => {
     setMessage(e.target.value);
   };
 
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
+
+  const handleLanguageChange = async (language) => {
+    setLang(language);
+    i18n.changeLanguage(language);
+  };
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   const handleAddMessage = async (e) => {
     const orderId = parseInt(id, 10);
     let userID = JSON.parse(localStorage.getItem("user_data"));
@@ -195,7 +222,7 @@ const OrderDetailsInChina = () => {
 
   const handleSendToUAESystem = async () => {
     try {
-     await dispatch(CustomItemSendToUAE(id,navigate));
+      await dispatch(CustomItemSendToUAE(id, navigate));
     } catch (error) {
       console.log(error);
     }
@@ -413,19 +440,19 @@ const OrderDetailsInChina = () => {
   const columns = [
     {
       field: "item_id",
-      headerName: "Item Id",
+      headerName: t("P1ChinaSystem.ItemId"),
       className: "order-details",
       flex: 0.5,
     },
     {
       field: "product_name",
-      headerName: "Name",
+      headerName: t("P1ChinaSystem.Name"),
       className: "order-details",
       flex: 1.5,
     },
     {
       field: "variant_details",
-      headerName: "Variant Details",
+      headerName: t("P1ChinaSystem.VariantDetails"),
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
@@ -446,7 +473,7 @@ const OrderDetailsInChina = () => {
     },
     {
       field: "product_image",
-      headerName: "Image",
+      headerName: t("POManagement.Image"),
       flex: 1,
       className: "order-details",
       renderCell: (params) => (
@@ -477,25 +504,25 @@ const OrderDetailsInChina = () => {
     },
     {
       field: "quantity",
-      headerName: "QTY",
+      headerName: t("P1ChinaSystem.QTY"),
       flex: 0.5,
       className: "order-details",
     },
     {
       field: "avl_quantity",
-      headerName: "Avl QTY",
+      headerName: t("P1ChinaSystem.AvlQTY"),
       flex: 0.5,
     },
     {
       field: "dispatch_type",
-      headerName: "Status",
+      headerName: t("POManagement.Status"),
       flex: 0.5,
       className: "order-details",
       type: "string",
     },
     {
       field: "dispatch_image",
-      headerName: "Attachment",
+      headerName: t("P1ChinaSystem.Attachment"),
       flex: 1.5,
       className: "order-details",
       type: "html",
@@ -653,10 +680,7 @@ const OrderDetailsInChina = () => {
     <>
       <Container fluid className="px-5">
         <MDBRow className="my-3">
-          <MDBCol
-            md="5"
-            className="d-flex justify-content-start align-items-center"
-          >
+          <MDBCol className="d-flex justify-content-between">
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
@@ -664,13 +688,28 @@ const OrderDetailsInChina = () => {
             >
               <ArrowBackIcon className="me-1" />
             </Button>
-            <Box></Box>
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
           </MDBCol>
           {orderDetails?.operation_user_id != userData?.user_id &&
             orderDetails?.order_process == "started" && (
               <MDBCol md="7" className="d-flex justify-content-end">
                 <Alert variant={"danger"}>
-                  This order has already been taken by another user!
+                  {t("P1ChinaSystem.ThisOrderTakenBy")}:
                 </Alert>
               </MDBCol>
             )}
@@ -679,14 +718,16 @@ const OrderDetailsInChina = () => {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                Order Details
+                {t("P1ChinaSystem.OrderDetails")}:
               </Typography>
               {loader ? (
                 <Loader />
               ) : (
                 <Box className="d-flex">
                   <Box>
-                    <Typography className="fw-bold">Order# {id}</Typography>
+                    <Typography className="fw-bold">
+                      #{t("P1ChinaSystem.Order")} {id}
+                    </Typography>
                     <Typography
                       className=""
                       sx={{
@@ -745,17 +786,17 @@ const OrderDetailsInChina = () => {
                     // disabled
                     onClick={handleSendToUAESystem}
                   >
-                    Send To UAE
+                    {t("P1ChinaSystem.SendToUAE")}
                   </Button>
                 </Box>
               ) : orderProcess == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
                 <Box>
                   <Button variant="success" disabled className="me-3">
-                    Start
+                    {t("P1ChinaSystem.Start")}
                   </Button>
                   <Button variant="primary" disabled>
-                    Send To UAE
+                    {t("P1ChinaSystem.SendToUAE")}
                   </Button>
                 </Box>
               ) : (
@@ -766,10 +807,10 @@ const OrderDetailsInChina = () => {
                     onClick={handleStartOrderProcess}
                     className="me-3"
                   >
-                    Start
+                    {t("P1ChinaSystem.Start")}
                   </Button>
                   <Button variant="primary" disabled>
-                    Send To UAE
+                    {t("P1ChinaSystem.SendToUAE")}
                   </Button>
                 </Box>
               )}
@@ -783,7 +824,7 @@ const OrderDetailsInChina = () => {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-                Customer & Order
+                {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -798,7 +839,7 @@ const OrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Name
+                        {t("P1ChinaSystem.Name")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -823,7 +864,7 @@ const OrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Phone
+                        {t("P1ChinaSystem.Phone")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -848,7 +889,7 @@ const OrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Customer shipping address
+                        {t("P1ChinaSystem.CustomerShippingAddress")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -873,7 +914,7 @@ const OrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Order Process
+                        {t("P1ChinaSystem.OrderProcess")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -1015,7 +1056,7 @@ const OrderDetailsInChina = () => {
         </Row>
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-            Order Details
+            {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -1051,7 +1092,7 @@ const OrderDetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                            Messages
+                          {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
@@ -1100,7 +1141,7 @@ const OrderDetailsInChina = () => {
                   className=" mx-2"
                   onClick={() => setshowMessageOHModal(true)}
                 >
-                  On Hold
+                  {t("P1ChinaSystem.OnHold")}
                 </Button>
                 {Finished ? (
                   <Button
@@ -1108,11 +1149,11 @@ const OrderDetailsInChina = () => {
                     disabled
                     onClick={handleFinishButtonClick}
                   >
-                    Finish
+                    {t("P1ChinaSystem.Finish")}
                   </Button>
                 ) : (
                   <Button variant="danger" onClick={handleFinishButtonClick}>
-                    Finish
+                    {t("P1ChinaSystem.Finish")}
                   </Button>
                 )}
               </>
@@ -1128,7 +1169,7 @@ const OrderDetailsInChina = () => {
                   }
                   onClick={() => setshowMessageOHModal(true)}
                 >
-                  On Hold
+                  {t("P1ChinaSystem.OnHold")}
                 </Button>
                 {Finished ? (
                   <Button
@@ -1136,7 +1177,7 @@ const OrderDetailsInChina = () => {
                     disabled
                     onClick={handleFinishButtonClick}
                   >
-                    Finish
+                    {t("P1ChinaSystem.Finish")}
                   </Button>
                 ) : (
                   <Button
@@ -1148,7 +1189,7 @@ const OrderDetailsInChina = () => {
                     }
                     onClick={handleFinishButtonClick}
                   >
-                    Finish
+                    {t("P1ChinaSystem.Finish")}
                   </Button>
                 )}
               </>

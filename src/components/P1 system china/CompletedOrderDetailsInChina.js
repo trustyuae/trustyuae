@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
+import { Badge, Button, ButtonGroup, Card, Col, Modal, Row, ToggleButton } from "react-bootstrap";
 import PrintModal from "./PrintModalInChina";
 import {
   Alert,
@@ -23,15 +23,21 @@ import { useDispatch, useSelector } from "react-redux";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { AddMessage, CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemchinaActions";
+import {
+  AddMessage,
+  CompletedOrderDetailsGet,
+} from "../../redux/actions/OrderSystemchinaActions";
 import Form from "react-bootstrap/Form";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 // import { AddMessage } from "../../redux/actions/OrderSystemActions";
 import ShowAlert from "../../utils/ShowAlert";
 import { getUserData } from "../../utils/StorageUtils";
+import { useTranslation } from "react-i18next";
 
 const CompletedOrderDetailsInChina = () => {
   const params = useParams();
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = useState("En");
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -84,6 +90,21 @@ const CompletedOrderDetailsInChina = () => {
     setShowModal(true);
   };
 
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
+
+  const handleLanguageChange = async (language) => {
+    setLang(language);
+    i18n.changeLanguage(language);
+  };
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   const variant = (variations) => {
     const matches = variations.match(
       /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
@@ -126,19 +147,19 @@ const CompletedOrderDetailsInChina = () => {
   const columns = [
     {
       field: "item_id",
-      headerName: "Item Id",
+      headerName: t("P1ChinaSystem.ItemId"),
       className: "order-details",
       flex: 1,
     },
     {
       field: "product_name",
-      headerName: "Name",
+      headerName: t("P1ChinaSystem.Name"),
       className: "order-details",
       flex: 2,
     },
     {
       field: "variant_details",
-      headerName: "Variant Details",
+      headerName:t("P1ChinaSystem.VariantDetails"),
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
@@ -151,7 +172,7 @@ const CompletedOrderDetailsInChina = () => {
     },
     {
       field: "product_image",
-      headerName: "Product Image",
+      headerName: t("POManagement.Image"),
       flex: 1,
       className: "order-details",
       renderCell: (params) => (
@@ -182,20 +203,20 @@ const CompletedOrderDetailsInChina = () => {
     },
     {
       field: "quantity",
-      headerName: "QTY",
+      headerName: t("P1ChinaSystem.QTY"),
       flex: 0.5,
       className: "order-details",
     },
     {
       field: "dispatch_type",
-      headerName: "Status",
+      headerName: t("POManagement.Status"),
       flex: 1,
       className: "order-details",
       type: "string",
     },
     {
       field: "dispatch_image",
-      headerName: "Attachment",
+      headerName: t("P1ChinaSystem.Attachment"),
       flex: 1,
       className: "order-details",
       renderCell: (params) => (
@@ -231,8 +252,7 @@ const CompletedOrderDetailsInChina = () => {
       <Container fluid className="px-5">
         <MDBRow className="my-3">
           <MDBCol
-            md="5"
-            className="d-flex justify-content-start align-items-center"
+            className="d-flex justify-content-between"
           >
             <Button
               variant="outline-secondary"
@@ -241,7 +261,22 @@ const CompletedOrderDetailsInChina = () => {
             >
               <ArrowBackIcon className="me-1" />
             </Button>
-            <Box></Box>
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
           </MDBCol>
         </MDBRow>
 
@@ -249,7 +284,7 @@ const CompletedOrderDetailsInChina = () => {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                Completed Order Details
+              {t("P1ChinaSystem.OrderDetails")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -257,7 +292,7 @@ const CompletedOrderDetailsInChina = () => {
                 <Box className="d-flex justify-content-between">
                   <Box>
                     <Typography className="fw-bold">
-                      Order# {params.id}
+                    {t("P1ChinaSystem.Order")}# {params.id}
                     </Typography>
                     <Typography
                       className=""
@@ -269,7 +304,9 @@ const CompletedOrderDetailsInChina = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold"># {orderDetails?.user_name}</Typography>
+                    <Typography className="fw-bold">
+                      # {orderDetails?.user_name}
+                    </Typography>
                     <Typography
                       className=""
                       sx={{
@@ -283,7 +320,7 @@ const CompletedOrderDetailsInChina = () => {
               )}
             </Box>
             <Box>
-            <Button
+              <Button
                 variant="outline-secondary"
                 className="p-1 me-3 bg-transparent text-secondary"
                 onClick={() => setshowMessageModal(true)}
@@ -307,7 +344,7 @@ const CompletedOrderDetailsInChina = () => {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-                Customer & Order
+              {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -322,7 +359,7 @@ const CompletedOrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Name
+                        {t("P1ChinaSystem.Name")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -347,7 +384,7 @@ const CompletedOrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Phone
+                       {t("P1ChinaSystem.Phone")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -372,7 +409,7 @@ const CompletedOrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Customer shipping address
+                        {t("P1ChinaSystem.CustomerShippingAddress")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -397,7 +434,7 @@ const CompletedOrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Order Process
+                        {t("P1ChinaSystem.OrderProcess")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -459,7 +496,7 @@ const CompletedOrderDetailsInChina = () => {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-            Order Details
+          {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -498,7 +535,7 @@ const CompletedOrderDetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                            Messages
+                          {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
@@ -555,7 +592,7 @@ const CompletedOrderDetailsInChina = () => {
           showModal={showModal}
           orderData={orderData}
         />
-          <Modal
+        <Modal
           show={showMessageModal}
           onHide={() => setshowMessageModal(false)}
           centered

@@ -21,9 +21,13 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemchinaActions";
+import { useTranslation } from "react-i18next";
+import { ButtonGroup, ToggleButton } from "react-bootstrap";
 
 const CompletedOrderSystemInChina = () => {
   const inputRef = useRef(null);
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = useState("En");
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -157,6 +161,21 @@ const CompletedOrderSystemInChina = () => {
     setPage(value);
   };
 
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
+
+  const handleLanguageChange = async (language) => {
+    setLang(language);
+    i18n.changeLanguage(language);
+  };
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   const handleDateChange = async (newDateRange) => {
     if (newDateRange[0]?.$d && newDateRange[1]?.$d) {
       setSelectedDateRange(newDateRange);
@@ -222,20 +241,36 @@ const CompletedOrderSystemInChina = () => {
 
   return (
     <Container fluid className="py-3">
-      <Box className="mb-4">
+      <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-          Completed Order System In China
+        {t("P1ChinaSystem.CompletedOrderSystemInChina")}
         </Typography>
+        <ButtonGroup>
+          {radios.map((radio, idx) => (
+            <ToggleButton
+              key={idx}
+              id={`radio-${idx}`}
+              type="radio"
+              variant={idx % 2 ? "outline-success" : "outline-danger"}
+              name="radio"
+              value={radio.value}
+              checked={lang === radio.value}
+              onClick={() => handleLanguageChange(radio.value)}
+            >
+              {radio.name}
+            </ToggleButton>
+          ))}
+        </ButtonGroup>
       </Box>
       <Row className="mb-4 mt-4">
         <Form inline>
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">Order Id:</Form.Label>
+                <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter Order ID"
+                  placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
                   // value={searchOrderID}
                   onKeyDown={(e) => orderId(e)}
@@ -246,7 +281,7 @@ const CompletedOrderSystemInChina = () => {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
-                  Start Date Filter:
+                {t("P1ChinaSystem.StartDateFilter")}:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -280,7 +315,7 @@ const CompletedOrderSystemInChina = () => {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold">
-                  Completed Date Filter:
+                {t("P1ChinaSystem.CompleteDateFilter")}:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -315,7 +350,7 @@ const CompletedOrderSystemInChina = () => {
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
               <Form.Label className="fw-semibold mb-0 me-2">
-                Page Size:
+              {t("POManagement.PageSize")}:
               </Form.Label>
               <Form.Control
                 as="select"
@@ -335,14 +370,14 @@ const CompletedOrderSystemInChina = () => {
               className="mr-2 mx-1 w-auto"
               onClick={(e) => handleSearchFilter(e)}
             >
-              Search
+              {t("POManagement.Search")}
             </Button>
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
               onClick={handleReset}
             >
-              Reset filter
+              {t("POManagement.ResetFilter")}
             </Button>
           </Box>
         </Form>
@@ -367,7 +402,7 @@ const CompletedOrderSystemInChina = () => {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-              Records is not Available for above filter
+             {t("P1ChinaSystem.RecordsIsNotAlert")}
             </Alert>
           )}
         </>
