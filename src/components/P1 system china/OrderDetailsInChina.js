@@ -1092,7 +1092,7 @@ const OrderDetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                          {t("P1ChinaSystem.Messages")}
+                            {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails

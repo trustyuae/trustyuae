@@ -96,25 +96,25 @@ const CompletedOrderSystemInChina = () => {
   const columns = [
     {
       field: "start_date",
-      headerName: "Started Date",
+      headerName:  t("POManagement.StartedDate"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "order_id",
-      headerName: "Order ID",
+      headerName: t("P1ChinaSystem.OrderId"),
       className: "order-system",
       flex: 0.5,
     },
     {
       field: "customer_name",
-      headerName: "Customer Name",
+      headerName:t("P1ChinaSystem.CustomerName"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "shipping_country",
-      headerName: "Shipping Country",
+      headerName: t("P1ChinaSystem.ShippingCountry"),
       type: "string",
       className: "order-system",
       flex: 1,
@@ -122,20 +122,20 @@ const CompletedOrderSystemInChina = () => {
     },
     {
       field: "order_status",
-      headerName: "Order Status",
+      headerName: t("P1ChinaSystem.OrderStatus"),
       flex: 1,
       className: "order-system",
       type: "string",
     },
     {
       field: "end_date",
-      headerName: "Completed Date",
+      headerName: t("P1ChinaSystem.EndDate"),
       className: "order-system",
       flex: 1,
     },
     {
       field: "view_item",
-      headerName: "View Item",
+      headerName: t("POManagement.ViewItem"),
       flex: 0.5,
       className: "order-system",
       type: "html",

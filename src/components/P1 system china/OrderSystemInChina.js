@@ -354,7 +354,7 @@ const OrderSystemInChina = () => {
                 >
                   <option value="all">{t("POManagement.All")}</option>
                   <option value="dispatch">{t("P1ChinaSystem.dispatch")}</option>
-                  <option value="reserve">{t("P1ChinaSystem.dispatch")}</option>
+                  <option value="reserve">{t("P1ChinaSystem.reserve")}</option>
                 </Form.Select>
               </Form.Group>
             </Col>

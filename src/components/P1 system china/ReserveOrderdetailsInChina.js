@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Button, Card, Col, Modal, Row } from "react-bootstrap";
+import { Badge, Button, ButtonGroup, Card, Col, Modal, Row, ToggleButton } from "react-bootstrap";
 import PrintModal from "./PrintModalInChina";
 import {
   Alert,
@@ -24,10 +24,16 @@ import Loader from "../../utils/Loader";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShowAlert from "../../utils/ShowAlert";
 import Form from "react-bootstrap/Form";
-import { AddMessage, ReserveOrderDetailsGet } from "../../redux/actions/OrderSystemchinaActions";
+import {
+  AddMessage,
+  ReserveOrderDetailsGet,
+} from "../../redux/actions/OrderSystemchinaActions";
+import { useTranslation } from "react-i18next";
 
 const ReserveOrderdetailsInChina = () => {
   const params = useParams();
+  const { t, i18n } = useTranslation();
+  const [lang, setLang] = useState("En");
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -96,19 +102,19 @@ const ReserveOrderdetailsInChina = () => {
   const columns = [
     {
       field: "item_id",
-      headerName: "Item Id",
+      headerName: t("P1ChinaSystem.ItemId"),
       className: "order-details",
       flex: 1,
     },
     {
       field: "product_name",
-      headerName: "Name",
+      headerName: t("P1ChinaSystem.Name"),
       className: "order-details",
       flex: 2,
     },
     {
       field: "variant_details",
-      headerName: "Variant Details",
+      headerName: t("P1ChinaSystem.VariantDetails"),
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
@@ -121,7 +127,7 @@ const ReserveOrderdetailsInChina = () => {
     },
     {
       field: "product_image",
-      headerName: "Product Image",
+      headerName: t("POManagement.Image"),
       flex: 1,
       className: "order-details",
       renderCell: (params) => (
@@ -152,20 +158,20 @@ const ReserveOrderdetailsInChina = () => {
     },
     {
       field: "quantity",
-      headerName: "QTY",
+      headerName: t("P1ChinaSystem.QTY"),
       flex: 0.5,
       className: "order-details",
     },
     {
       field: "dispatch_type",
-      headerName: "Status",
+      headerName: t("POManagement.Status"),
       flex: 1,
       className: "order-details",
       type: "string",
     },
     {
       field: "dispatch_image",
-      headerName: "Attachment",
+      headerName: t("P1ChinaSystem.Attachment"),
       flex: 1,
       className: "order-details",
       renderCell: (params) => (
@@ -200,6 +206,21 @@ const ReserveOrderdetailsInChina = () => {
     setMessage(e.target.value);
   };
 
+  const radios = [
+    { name: "English", value: "En" },
+    { name: "中國人", value: "Zn" },
+  ];
+
+  const handleLanguageChange = async (language) => {
+    setLang(language);
+    i18n.changeLanguage(language);
+  };
+
+  useEffect(() => {
+    // Set the initial language to 'En' when component mounts
+    i18n.changeLanguage(lang);
+  }, []);
+
   const handleAddMessage = async (e) => {
     const orderId = parseInt(params.id, 10);
     let userID = JSON.parse(localStorage.getItem("user_data"));
@@ -230,10 +251,7 @@ const ReserveOrderdetailsInChina = () => {
     <>
       <Container fluid className="px-5">
         <MDBRow className="my-3">
-          <MDBCol
-            md="5"
-            className="d-flex justify-content-start align-items-center"
-          >
+          <MDBCol className="d-flex justify-content-between">
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
@@ -241,7 +259,22 @@ const ReserveOrderdetailsInChina = () => {
             >
               <ArrowBackIcon className="me-1" />
             </Button>
-            <Box></Box>
+            <ButtonGroup>
+              {radios.map((radio, idx) => (
+                <ToggleButton
+                  key={idx}
+                  id={`radio-${idx}`}
+                  type="radio"
+                  variant={idx % 2 ? "outline-success" : "outline-danger"}
+                  name="radio"
+                  value={radio.value}
+                  checked={lang === radio.value}
+                  onClick={() => handleLanguageChange(radio.value)}
+                >
+                  {radio.name}
+                </ToggleButton>
+              ))}
+            </ButtonGroup>
           </MDBCol>
         </MDBRow>
 
@@ -249,7 +282,7 @@ const ReserveOrderdetailsInChina = () => {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                Reserve Order Details
+              {t("P1ChinaSystem.OrderDetails")}:
               </Typography>
               {loader ? (
                 <Loader />
@@ -257,7 +290,7 @@ const ReserveOrderdetailsInChina = () => {
                 <Box className="d-flex justify-content-between">
                   <Box>
                     <Typography className="fw-bold">
-                      Order# {params.id}
+                    {t("P1ChinaSystem.Order")}# {params.id}
                     </Typography>
                     <Typography
                       className=""
@@ -269,7 +302,9 @@ const ReserveOrderdetailsInChina = () => {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold"># {orderDetails?.user_name}</Typography>
+                    <Typography className="fw-bold">
+                      # {orderDetails?.user_name}
+                    </Typography>
                     <Typography
                       className=""
                       sx={{
@@ -300,7 +335,7 @@ const ReserveOrderdetailsInChina = () => {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-                Customer & Order
+              {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -315,7 +350,7 @@ const ReserveOrderdetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Name
+                         {t("P1ChinaSystem.Name")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -340,7 +375,7 @@ const ReserveOrderdetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Phone
+                       {t("P1ChinaSystem.Phone")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -365,7 +400,7 @@ const ReserveOrderdetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Customer shipping address
+                        {t("P1ChinaSystem.CustomerShippingAddress")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -390,7 +425,7 @@ const ReserveOrderdetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                        Order Process
+                         {t("P1ChinaSystem.OrderProcess")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -452,7 +487,7 @@ const ReserveOrderdetailsInChina = () => {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-            Order Details
+          {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -491,7 +526,7 @@ const ReserveOrderdetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                            Messages
+                          {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
@@ -548,7 +583,7 @@ const ReserveOrderdetailsInChina = () => {
           showModal={showModal}
           orderData={orderData}
         />
-         <Modal
+        <Modal
           show={showMessageModal}
           onHide={() => setshowMessageModal(false)}
           centered
