@@ -12,8 +12,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge } from "react-bootstrap";
-import { FaEye,FaEdit} from "react-icons/fa";
+import { FaEye} from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import { MissingOrderSystemGet } from "../../redux/actions/OrderSystemActions";
@@ -124,7 +123,6 @@ function MissingOrderSystem() {
       type: "html",
       renderCell: (value, row) => {
         return (
-          <Box className="d-flex">
             <Link
               to={`/missing_order_details/${value?.row?.order_id}`}
               className=" d-flex "
@@ -136,15 +134,6 @@ function MissingOrderSystem() {
                 <FaEye className="mb-1" />
               </Button>
             </Link>
-            <Box>
-              <Button
-                type="button"
-                className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-              >
-                <FaEdit className="mb-1" />
-              </Button>
-            </Box>
-          </Box>
         );
       },
     },
@@ -185,14 +174,6 @@ function MissingOrderSystem() {
   const searchDispatchTypeFilter = (e) => {
     setDispatchType(e);
     setPage(1);
-  };
-
-  const orderId = (e) => {
-    if (e.key === "Enter") {
-      setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
-    }
   };
 
   const clearDateRange = () => {

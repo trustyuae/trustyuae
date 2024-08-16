@@ -27,27 +27,22 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AddMessage,
   AttachmentFileUpload,
-  CustomOrderFinish,
   CustomOrderOH,
-  CustomOrderPush,
   CustomOrderPushToUAE,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
   MissingOrderDetailsGet,
-  OrderDetailsGet,
-  OverAllAttachmentFileUpload,
 } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
-import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getUserData } from "../../utils/StorageUtils";
+import { OverAllAttachmentFileUpload } from "../../redux/actions/OrderSystemchinaActions";
+import { FaEdit } from "react-icons/fa";
 
 function MissingOrderDetails() {
   const { id } = useParams();
@@ -65,7 +60,6 @@ function MissingOrderDetails() {
   const [selectedFile, setSelectedFile] = useState("");
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
-  // const userData = JSON.parse(localStorage.getItem("user_data")) ?? {};
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showMessageOHModal, setshowMessageOHModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -90,10 +84,6 @@ function MissingOrderDetails() {
 
   const AddInOnHold = useSelector(
     (state) => state?.orderSystemData?.isCustomOrderOnHold
-  );
-
-  const Finished = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrder
   );
 
   async function fetchUserData() {
@@ -228,146 +218,6 @@ function MissingOrderDetails() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e, itemId, itemVariationId) => {
-    if (e.target.files[0]) {
-      const file = await CompressImage(e.target.files[0]);
-      const fr = new FileReader();
-      fr.onload = function () {
-        setSelectedFileUrl(fr.result);
-        setSelectedFile(file);
-        setShowAttachmentModal(true);
-        setSelectedItemId(itemId);
-        setSelectedVariationId(itemVariationId);
-      };
-      fr.readAsDataURL(file);
-    }
-  };
-
-  const handleCancel = () => {
-    setSelectedFileUrl(null);
-    setSelectedFile(null);
-    setShowAttachmentModal(false);
-  };
-  const handleCancelImg = async (e) => {
-    Swal.fire({
-      title: "Are you sure you want to delete this image?",
-      icon: "question",
-      showConfirmButton: true,
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await axiosInstance.post(
-          `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
-          {
-            variation_id: e.variation_id,
-            image_url: e.dispatch_image,
-          }
-        );
-        fetchOrder();
-      }
-    });
-  };
-
-  const handleSubmitAttachment = async () => {
-    setAttachmentsubmitbtn(true);
-    try {
-      const { user_id } = userData ?? {};
-      if (selectedItemId) {
-        await dispatch(
-          AttachmentFileUpload({
-            user_id: user_id,
-            order_id: orderDetailsDataOrderId?.order_id,
-            item_id: selectedItemId,
-            variation_id: selectedVariationId,
-            selectedFile: selectedFile,
-          })
-        );
-      } else {
-        dispatch(
-          OverAllAttachmentFileUpload({
-            order_id: orderDetailsDataOrderId?.order_id,
-            order_dispatch_image: selectedFile,
-          })
-        );
-      }
-      setShowAttachmentModal(false);
-      setSelectedFile(null);
-      const result = await ShowAlert(
-        "",
-        "Uploaded Successfully!",
-        "success",
-        null,
-        null,
-        null,
-        null,
-        2000
-      );
-      if (result.isConfirmed) handleCancel();
-      fetchOrder();
-      setAttachmentsubmitbtn(false);
-    } catch (error) {
-      console.error(error);
-      setAttachmentsubmitbtn(false);
-    }
-  };
-
-  const handleStartOrderProcess = async () => {
-    const requestData = {
-      order_id: Number(id),
-      user_id: userData.user_id,
-      start_time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-      end_time: "",
-      order_status: "started",
-    };
-    await dispatch(InsertOrderPickup(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleCancelOrderProcess = async () => {
-    const requestData = {
-      order_id: parseInt(id, 10),
-      operation_id: orderDetails?.operation_user_id,
-      order_status: "Cancelled",
-    };
-    await dispatch(InsertOrderPickupCancel(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleFinishButtonClick = async () => {
-    try {
-      const { user_id } = userData ?? {};
-      const response = await dispatch(CustomOrderFinish(user_id, id, navigate));
-      if (response.data.status_code === 200) {
-        await Swal.fire({
-          title: response.data.message,
-          icon: "success",
-          showConfirmButton: true,
-        });
-        navigate("/ordersystem");
-      } else {
-        Swal.fire({
-          title: response.data.message,
-          icon: "error",
-          showConfirmButton: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error while finishing order:", error);
-    }
-  };
-
   const variant = (variations) => {
     const matches = variations.match(
       /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
@@ -401,6 +251,18 @@ function MissingOrderDetails() {
     return details.join(", ");
   };
 
+  const handleStatusChange = (value, event) => {
+    const updatedData = tableData.map((item) => {
+      if (item.product_id === event.product_id) {
+        if (item.variation_id == event.variation_id) {
+          return { ...item, availability_status: value };
+        }
+      }
+      return item;
+    });
+    setTableData(updatedData);
+  };
+
   const columns = [
     {
       field: "item_id",
@@ -412,13 +274,13 @@ function MissingOrderDetails() {
       field: "product_name",
       headerName: "Name",
       className: "order-details",
-      flex: 1.5,
+      flex: 1,
     },
     {
       field: "variant_details",
       headerName: "Variant Details",
       className: "order-details",
-      flex: 1.5,
+      flex: 1,
       renderCell: (params) => {
         if (
           params.row.variations &&
@@ -438,7 +300,7 @@ function MissingOrderDetails() {
     {
       field: "product_image",
       headerName: "Image",
-      flex: 1,
+      flex: 0.5,
       className: "order-details",
       renderCell: (params) => (
         <Box
@@ -452,8 +314,8 @@ function MissingOrderDetails() {
             src={params.value || require("../../assets/default.png")}
             alt="Product Image"
             sx={{
-              height: "45px",
-              width: "45px",
+              height: "60px",
+              width: "60px",
               borderRadius: "2px",
               margin: "0 auto",
               "& .MuiAvatar-img": {
@@ -479,163 +341,71 @@ function MissingOrderDetails() {
     },
     {
       field: "dispatch_type",
-      headerName: "Status",
+      headerName: "Dispatch Type",
       flex: 0.5,
       className: "order-details",
       type: "string",
     },
     {
-      field: "dispatch_image",
-      headerName: "Attachment",
-      flex: 1.5,
+      field: "order_status",
+      headerName: "Order Status",
+      flex: 0.5,
       className: "order-details",
+      type: "string",
+    },
+    {
+      field: "stock_status",
+      headerName: "Stock Status",
+      flex: 0.8,
+      className: "order-details",
+      type: "string",
+      renderCell: (params) => {
+        const rowId = params.row.id;
+        const currentStatus =
+          params.row.availability_status !== "" &&
+          params.row.availability_status !== "0"
+            ? params.row.availability_status
+            : params.row.estimated_production_time;
+
+        return (
+          <select
+            id={`customer-status-${rowId}`}
+            value={currentStatus}
+            onChange={(event) =>
+              handleStatusChange(event.target.value, params.row)
+            }
+            style={{
+              height: "30px",
+              fontSize: "0.875rem",
+              width: "100%",
+            }}
+          >
+            <option value="" disabled>
+              Select...
+            </option>
+            <option value="In Stock">In Stock</option>
+            <option value="Out Of Stock">Out of Stock</option>
+          </select>
+        );
+      },
+    },
+    {
+      field: "update item",
+      headerName: "Update Item",
+      flex: 0.5,
+      className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        const itemId = value && value.row.item_id ? value.row.item_id : null;
-        const itemVariationId =
-          value && value.row.variation_id ? value.row.variation_id : null;
-        const qty = value.row.quantity;
-        const avl_qty = value.row.avl_quantity;
-        const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId, itemVariationId);
-        };
-
-        if (!fileInputRef.current) {
-          fileInputRef.current = {};
-        }
-        if (value && value.row.dispatch_image) {
-          const isDisabled = orderDetails.order_process !== "started";
-          return (
-            <Row className={`${"justify-content-center"} h-100`}>
-              <Col
-                md={12}
-                className={`d-flex align-items-center justify-content-center my-1`}
-              >
-                <Box className="h-100 w-100 d-flex align-items-center justify-content-center position-relative">
-                  <Avatar
-                    src={value.row.dispatch_image}
-                    alt="Product Image"
-                    sx={{
-                      height: "45px",
-                      width: "45px",
-                      borderRadius: "2px",
-                      margin: "0 auto",
-                      "& .MuiAvatar-img": {
-                        height: "100%",
-                        width: "100%",
-                        borderRadius: "2px",
-                      },
-                    }}
-                    onClick={() => {
-                      ImageModule(value.row.dispatch_image);
-                      setAttachmentZoom(true);
-                    }}
-                  />
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" && (
-                      <CancelIcon
-                        sx={{
-                          position: "relative",
-                          top: "-30px",
-                          right: "8px",
-                          cursor: "pointer",
-                          color: "red",
-                          zIndex: 1,
-                          // disabled=isDisabled
-                          opacity: isDisabled ? 0.5 : 1,
-                          pointerEvents: isDisabled ? "none" : "auto",
-                          cursor: isDisabled ? "not-allowed" : "pointer",
-                        }}
-                        onClick={(e) => {
-                          if (!isDisabled) {
-                            handleCancelImg(value.row);
-                          }
-                        }}
-                      />
-                    )}
-                </Box>
-              </Col>
-            </Row>
-          );
-        } else {
-          return (
-            <Row className={`${"justify-content-center"} h-100`}>
-              <Col
-                md={12}
-                className={`d-flex align-items-center justify-content-center my-1`}
-              >
-                <Card className="factory-card me-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" &&
-                  qty == avl_qty ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      onClick={() =>
-                        fileInputRef.current[
-                          selectedVariationId ? selectedVariationId : itemId
-                        ]?.click()
-                      }
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                      <input
-                        type="file"
-                        ref={(input) =>
-                          (fileInputRef.current[
-                            selectedVariationId ? selectedVariationId : itemId
-                          ] = input)
-                        }
-                        style={{ display: "none" }}
-                        onChange={handleFileInputChangeForRow}
-                      />
-                    </Button>
-                  ) : (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                    </Button>
-                  )}
-                </Card>
-                <Card className="factory-card ms-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" &&
-                  qty == avl_qty ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      onClick={() => {
-                        setShowAttachModal(true);
-                        setSelectedItemId(itemId);
-                        setSelectedVariationId(itemVariationId);
-                      }}
-                    >
-                      <CameraAltIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Camera
-                      </Typography>
-                    </Button>
-                  ) : (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
-                    >
-                      <CameraAltIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Camera
-                      </Typography>
-                    </Button>
-                  )}
-                </Card>
-              </Col>
-            </Row>
-          );
-        }
+        return (
+          <Box>
+            <Button
+              type="button"
+              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+            >
+              <FaEdit className="mb-1" />
+            </Button>
+          </Box>
+        );
       },
     },
   ];
@@ -720,50 +490,9 @@ function MissingOrderDetails() {
               >
                 <LocalPrintshopOutlinedIcon />
               </Button>
-              {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
-                <Button
-                  variant="outline-danger"
-                  className="p-1 me-2 bg-transparent text-danger"
-                  onClick={handleCancelOrderProcess}
-                >
-                  <CancelIcon />
-                  <Button
-                    variant="primary"
-                    // disabled
-                    onClick={handlePushToOrders}
-                  >
-                    Push To Orders
-                  </Button>
-                </Button>
-              ) : orderProcess == "started" &&
-                userData?.user_id != orderDetails?.operation_user_id ? (
-                <>
-                  <Button variant="success" disabled className="me-2">
-                    Start
-                  </Button>
-                  <Button
-                    variant="primary"
-                    disabled
-                  >
-                    Push To Orders
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="success"
-                    // disabled
-                    onClick={handleStartOrderProcess}
-                    className="me-2"
-                  >
-                    Start
-                  </Button>
-                  <Button variant="primary" onClick={handlePushToOrders}>
-                    Push To Orders
-                  </Button>
-                </>
-              )}
+              <Button variant="primary" onClick={handlePushToOrders}>
+                Push To Orders
+              </Button>
             </Box>
           </Box>
         </Card>
@@ -887,122 +616,6 @@ function MissingOrderDetails() {
               )}
             </Card>
           </Col>
-          {tableData.some((data) => data.status_change === "1") ? (
-            <Col sm={12} md={6}>
-              <Card className="p-3 h-100">
-                <Typography variant="h6" className="fw-bold mb-3">
-                  Attachment
-                </Typography>
-                {loader ? (
-                  <Loader />
-                ) : (
-                  <>
-                    <Row className={`${"justify-content-center"} h-100`}>
-                      <Col
-                        md={12}
-                        className={`d-flex align-items-center justify-content-center my-1`}
-                      >
-                        {tableData.some(
-                          (data) => data.dispatch_image === ""
-                        ) ? (
-                          <Alert
-                            severity="warning"
-                            sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                          >
-                            Please upload attachment for all the products in
-                            below order table!
-                          </Alert>
-                        ) : orderDetailsDataOrderId?.overall_order_dis_image !=
-                          "" ? (
-                          <Avatar
-                            src={
-                              orderDetailsDataOrderId?.overall_order_dis_image
-                            }
-                            alt="Product Image"
-                            sx={{
-                              height: "150px",
-                              width: "100%",
-                              borderRadius: "2px",
-                              margin: "0 auto",
-                              "& .MuiAvatar-img": {
-                                height: "100%",
-                                width: "100%",
-                                borderRadius: "2px",
-                              },
-                            }}
-                          />
-                        ) : (
-                          <>
-                            <Card className="factory-card me-1 shadow-sm mb-0">
-                              {userData?.user_id ==
-                                orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
-                                <>
-                                  <Button
-                                    className="bg-transparent border-0 text-black"
-                                    onClick={() =>
-                                      fileInputRef?.current?.click()
-                                    }
-                                  >
-                                    <CloudUploadIcon />
-                                    <Typography style={{ fontSize: "14px" }}>
-                                      Device
-                                    </Typography>
-                                  </Button>
-                                  <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    style={{ display: "none" }}
-                                    onChange={handleFileInputChange}
-                                  />
-                                </>
-                              ) : (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  disabled
-                                >
-                                  <CloudUploadIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Device
-                                  </Typography>
-                                </Button>
-                              )}
-                            </Card>
-
-                            <Card className="factory-card ms-1 shadow-sm mb-0">
-                              {userData?.user_id ==
-                                orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  onClick={() => setShowAttachModal(true)}
-                                >
-                                  <CameraAltIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Camera
-                                  </Typography>
-                                </Button>
-                              ) : (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  disabled
-                                >
-                                  <CameraAltIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Camera
-                                  </Typography>
-                                </Button>
-                              )}
-                            </Card>
-                          </>
-                        )}
-                      </Col>
-                    </Row>
-                  </>
-                )}
-              </Card>
-            </Col>
-          ) : null}
         </Row>
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
@@ -1080,102 +693,6 @@ function MissingOrderDetails() {
         <Alert variant={"info"}>
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
-        <MDBRow>
-          <MDBCol md="12" className="d-flex justify-content-end">
-            {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" &&
-            tableData?.some((data) => data.dispatch_image != "") ? (
-              <>
-                <Button
-                  variant="success"
-                  className=" mx-2"
-                  onClick={() => setshowMessageOHModal(true)}
-                >
-                  On Hold
-                </Button>
-                {Finished ? (
-                  <Button
-                    variant="danger"
-                    disabled
-                    onClick={handleFinishButtonClick}
-                  >
-                    Finish
-                  </Button>
-                ) : (
-                  <Button variant="danger" onClick={handleFinishButtonClick}>
-                    Finish
-                  </Button>
-                )}
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="success"
-                  className=" mx-2"
-                  disabled={
-                    orderProcess != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id
-                    // tableData?.some((data) => data.dispatch_image == "")
-                  }
-                  onClick={() => setshowMessageOHModal(true)}
-                >
-                  On Hold
-                </Button>
-                {Finished ? (
-                  <Button
-                    variant="danger"
-                    disabled
-                    onClick={handleFinishButtonClick}
-                  >
-                    Finish
-                  </Button>
-                ) : (
-                  <Button
-                    variant="danger"
-                    disabled={
-                      orderProcess != "started" ||
-                      userData?.user_id != orderDetails?.operation_user_id ||
-                      tableData?.some((data) => data.dispatch_image == "")
-                    }
-                    onClick={handleFinishButtonClick}
-                  >
-                    Finish
-                  </Button>
-                )}
-              </>
-            )}
-          </MDBCol>
-        </MDBRow>
-        <Modal
-          show={showAttachModal}
-          onHide={() => setShowAttachModal(false)}
-          centered
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Select Attachment From</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="p-3">
-            <Box className="d-flex justify-content-center my-5">
-              <Box className="">
-                {selectedFileUrl ? (
-                  <img src={selectedFileUrl} alt="webcam" />
-                ) : (
-                  <Webcam
-                    style={{ width: "100%", height: "100%" }}
-                    ref={webcamRef}
-                  />
-                )}
-                <Box className="btn-container">
-                  {selectedFileUrl ? (
-                    <Button onClick={retake}>Retake photo</Button>
-                  ) : (
-                    <Button onClick={capture}>Capture photo</Button>
-                  )}
-                </Box>
-              </Box>
-            </Box>
-          </Modal.Body>
-        </Modal>
         <Modal
           show={showEditModal}
           // onHide={handleCloseEditModal}
@@ -1224,105 +741,6 @@ function MissingOrderDetails() {
                 Add Message
               </Button>
             </Box>
-          </Modal.Body>
-        </Modal>
-        <Modal
-          show={showMessageOHModal}
-          onHide={() => setshowMessageOHModal(false)}
-          centered
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>On Hold Reason </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form.Control
-              as="textarea"
-              placeholder="Enter your reason here..."
-              rows={3}
-              value={messageOH}
-              onChange={(e) => setOHMessage(e.target.value)}
-            />
-            <Box className="text-end my-3">
-              {AddInOnHold ? (
-                <Button
-                  variant="secondary"
-                  className="mt-2 fw-semibold"
-                  onClick={submitOH}
-                  disabled
-                >
-                  Submit
-                </Button>
-              ) : (
-                <Button
-                  variant="secondary"
-                  className="mt-2 fw-semibold"
-                  disabled={messageOH == "" ? true : false}
-                  onClick={submitOH}
-                >
-                  Submit
-                </Button>
-              )}
-            </Box>
-          </Modal.Body>
-        </Modal>
-        <Modal
-          show={showAttachmentModal}
-          onHide={() => setShowAttachmentModal(false)}
-          centered
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Attachment</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="py-4">
-            <Row className="justify-content-center">
-              <Col md={10}>
-                <Box
-                  className="mx-auto mb-4 border border-secondary rounded-4"
-                  sx={{
-                    height: "150px",
-                    width: "100%",
-                    position: "relative",
-                  }}
-                >
-                  <CancelIcon
-                    sx={{
-                      position: "absolute",
-                      top: "-9px",
-                      right: "-9px",
-                      cursor: "pointer",
-                    }}
-                    onClick={handleCancel}
-                  />
-                  <img
-                    style={{ objectFit: "cover" }}
-                    className="h-100 w-100 rounded-4"
-                    alt=""
-                    src={selectedFileUrl}
-                  />
-                </Box>
-                <Box className="text-end">
-                  {selectedItemId ? (
-                    <Button
-                      variant="primary"
-                      className=""
-                      onClick={handleSubmitAttachment}
-                      disabled={attachmentsubmitbtn}
-                    >
-                      Submit
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      className=""
-                      onClick={handleSubmitAttachment}
-                      disabled={attachmentsubmitbtn}
-                    >
-                      Submitt
-                    </Button>
-                  )}
-                </Box>
-              </Col>
-            </Row>
           </Modal.Body>
         </Modal>
       </Container>
