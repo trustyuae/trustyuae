@@ -186,7 +186,7 @@ export const MissingOrderDetailsGet =
       dispatch({ type: GET_MISSING_ORDER_DETAILS_REQUEST });
 
       const response = await axiosInstance.get(
-        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}`
+        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}&warehouse=China`
       );
       dispatch({
         type: GET_MISSING_ORDER_DETAILS_SUCCESS,
