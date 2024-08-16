@@ -680,14 +680,24 @@ const OnHoldOrdersdetailsInChina = () => {
     <>
       <Container fluid className="px-5">
         <MDBRow className="my-3">
-          <MDBCol className="d-flex justify-content-between">
+          <MDBCol className="d-flex justify-content-start">
             <Button
               variant="outline-secondary"
-              className="p-1 me-2 bg-transparent text-secondary"
+              className="me-2 bg-transparent text-secondary"
               onClick={() => navigate("/on_hold_orders_system_in_china")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
+          </MDBCol>
+          {orderDetails?.operation_user_id != userData?.user_id &&
+            orderDetails?.order_process == "started" && (
+              <MDBCol md="7" className="d-flex justify-content-center">
+                <Alert variant={"danger"}>
+                  This order has already been taken by another user!
+                </Alert>
+              </MDBCol>
+            )}
+          <MDBCol className="d-flex justify-content-end">
             <ButtonGroup>
               {radios.map((radio, idx) => (
                 <ToggleButton
@@ -705,14 +715,6 @@ const OnHoldOrdersdetailsInChina = () => {
               ))}
             </ButtonGroup>
           </MDBCol>
-          {orderDetails?.operation_user_id != userData?.user_id &&
-            orderDetails?.order_process == "started" && (
-              <MDBCol md="7" className="d-flex justify-content-end">
-                <Alert variant={"danger"}>
-                  This order has already been taken by another user!
-                </Alert>
-              </MDBCol>
-            )}
         </MDBRow>
 
         <Card className="p-3 mb-3">
@@ -1051,7 +1053,7 @@ const OnHoldOrdersdetailsInChina = () => {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-          {t("P1ChinaSystem.OrderDetails")}
+            {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -1090,7 +1092,7 @@ const OnHoldOrdersdetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                          {t("P1ChinaSystem.Messages")}
+                            {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
@@ -1155,7 +1157,7 @@ const OnHoldOrdersdetailsInChina = () => {
                   }
                   onClick={handleFinishButtonClick}
                 >
-                   {t("P1ChinaSystem.Finish")}
+                  {t("P1ChinaSystem.Finish")}
                 </Button>
               </>
             )}

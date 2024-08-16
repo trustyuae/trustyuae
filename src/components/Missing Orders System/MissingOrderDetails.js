@@ -29,6 +29,8 @@ import {
   AttachmentFileUpload,
   CustomOrderFinish,
   CustomOrderOH,
+  CustomOrderPush,
+  CustomOrderPushToUAE,
   InsertOrderPickup,
   InsertOrderPickupCancel,
   MissingOrderDetailsGet,
@@ -180,6 +182,14 @@ function MissingOrderDetails() {
         );
       }
     });
+  };
+
+  const handlePushToOrders = async () => {
+    try {
+      await dispatch(CustomOrderPushToUAE(id, navigate));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const submitOH = async () => {
@@ -641,7 +651,7 @@ function MissingOrderDetails() {
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
-              onClick={() => navigate("/ordersystem")}
+              onClick={() => navigate("/missing_orders_system")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
@@ -660,7 +670,7 @@ function MissingOrderDetails() {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                Order Details
+                Missing Order Details
               </Typography>
               {loader ? (
                 <Loader />
@@ -718,20 +728,41 @@ function MissingOrderDetails() {
                   onClick={handleCancelOrderProcess}
                 >
                   <CancelIcon />
+                  <Button
+                    variant="primary"
+                    // disabled
+                    onClick={handlePushToOrders}
+                  >
+                    Push To Orders
+                  </Button>
                 </Button>
               ) : orderProcess == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
-                <Button variant="success" disabled>
-                  Start
-                </Button>
+                <>
+                  <Button variant="success" disabled className="me-2">
+                    Start
+                  </Button>
+                  <Button
+                    variant="primary"
+                    disabled
+                  >
+                    Push To Orders
+                  </Button>
+                </>
               ) : (
-                <Button
-                  variant="success"
-                  // disabled
-                  onClick={handleStartOrderProcess}
-                >
-                  Start
-                </Button>
+                <>
+                  <Button
+                    variant="success"
+                    // disabled
+                    onClick={handleStartOrderProcess}
+                    className="me-2"
+                  >
+                    Start
+                  </Button>
+                  <Button variant="primary" onClick={handlePushToOrders}>
+                    Push To Orders
+                  </Button>
+                </>
               )}
             </Box>
           </Box>

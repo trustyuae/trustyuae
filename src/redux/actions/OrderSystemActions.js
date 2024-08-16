@@ -52,6 +52,12 @@ import {
   GET_MISSING_ORDER_DETAILS_REQUEST,
   GET_MISSING_ORDER_DETAILS_SUCCESS,
   GET_MISSING_ORDER_DETAILS_FAIL,
+  CUSTOM_ORDER_PUSH_UAE_REQUEST,
+  CUSTOM_ORDER_PUSH_UAE_SUCCESS,
+  CUSTOM_ORDER_PUSH_UAE_FAIL,
+  CUSTOM_MISSING_ORDER_UPDATE_REQUEST,
+  CUSTOM_MISSING_ORDER_UPDATE_SUCCESS,
+  CUSTOM_MISSING_ORDER_UPDATE_FAIL,
 } from "../constants/Constants";
 import axiosInstance from "../../utils/AxiosInstance";
 
@@ -186,7 +192,7 @@ export const MissingOrderDetailsGet =
       dispatch({ type: GET_MISSING_ORDER_DETAILS_REQUEST });
 
       const response = await axiosInstance.get(
-        `${API_URL}wp-json/custom-orders-new/v1/orders/?orderid=${id}&warehouse=China`
+        `${API_URL}wp-json/custom-missing-orders/v1/missing-orders/?orderid=${id}`
       );
       dispatch({
         type: GET_MISSING_ORDER_DETAILS_SUCCESS,
@@ -433,6 +439,88 @@ export const CustomItemSendToChina = (id, navigate) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: CUSTOM_ORDER_SEND_CHINA_FAIL,
+      error: error.message,
+    });
+  }
+};
+
+
+export const CustomOrderPushToUAE = (id, navigate) => async (dispatch) => {
+  dispatch({ type: CUSTOM_ORDER_PUSH_UAE_REQUEST });
+
+  try {
+    const response = await axiosInstance.post(
+      `${API_URL}wp-json/custom-push-missingorder/v1/push-missing-order/${id}`
+    );
+
+    dispatch({
+      type: CUSTOM_ORDER_PUSH_UAE_SUCCESS,
+      payload: response.data,
+    });
+
+    console.log(response, "response from CustomItemSendToChina");
+
+    if (response.status === 200) {
+      const result = await Swal.fire({
+        title: response.data,
+        icon: "success",
+        showConfirmButton: true,
+      });
+      if (result.isConfirmed) {
+        navigate("/ordersystem");
+      }
+    } else {
+      Swal.fire({
+        title: response.data,
+        icon: "error",
+        showConfirmButton: true,
+      });
+    }
+    return response;
+  } catch (error) {
+    dispatch({
+      type: CUSTOM_ORDER_PUSH_UAE_FAIL,
+      error: error.message,
+    });
+  }
+};
+
+
+export const CustomMissingOrderUpdate = (id,payload,navigate) => async (dispatch) => {
+  dispatch({ type: CUSTOM_MISSING_ORDER_UPDATE_REQUEST });
+
+  try {
+    const response = await axiosInstance.post(
+      `${API_URL}wp-json/custom-push-missingorder/v1/push-missing-order/${id}`
+    );
+
+    dispatch({
+      type: CUSTOM_MISSING_ORDER_UPDATE_SUCCESS,
+      payload: response.data,
+    });
+
+    console.log(response, "response from CustomItemSendToChina");
+
+    if (response.status === 200) {
+      const result = await Swal.fire({
+        title: response.data,
+        icon: "success",
+        showConfirmButton: true,
+      });
+      if (result.isConfirmed) {
+        navigate("/ordersystem");
+      }
+    } else {
+      Swal.fire({
+        title: response.data,
+        icon: "error",
+        showConfirmButton: true,
+      });
+    }
+    return response;
+  } catch (error) {
+    dispatch({
+      type: CUSTOM_MISSING_ORDER_UPDATE_FAIL,
       error: error.message,
     });
   }

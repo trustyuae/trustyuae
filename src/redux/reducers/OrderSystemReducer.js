@@ -51,6 +51,12 @@ import {
   GET_MISSING_ORDER_DETAILS_REQUEST,
   GET_MISSING_ORDER_DETAILS_SUCCESS,
   GET_MISSING_ORDER_DETAILS_FAIL,
+  CUSTOM_ORDER_PUSH_UAE_REQUEST,
+  CUSTOM_ORDER_PUSH_UAE_FAIL,
+  CUSTOM_ORDER_PUSH_UAE_SUCCESS,
+  CUSTOM_MISSING_ORDER_UPDATE_REQUEST,
+  CUSTOM_MISSING_ORDER_UPDATE_SUCCESS,
+  CUSTOM_MISSING_ORDER_UPDATE_FAIL,
 } from "../constants/Constants";
 
 const initialState = {
@@ -88,6 +94,10 @@ const initialState = {
   isMissingOrders: false,
   missingOrderDetails: [],
   isMissingOrderDetails: false,
+  customOrderPushToUAEData: [],
+  isCustomOrderPushToUAE: false,
+  customMissingOrderUpdate: [],
+  isCustomMissingOrderUpdate: false,
   error: null,
 };
 
@@ -285,6 +295,36 @@ const OrderSystemReducer = (state = initialState, action) => {
       return {
         ...state,
         isCustomOrderSendToChina: false,
+        error: action.payload,
+      };
+
+    case CUSTOM_ORDER_PUSH_UAE_REQUEST:
+      return { ...state, isCustomOrderPushToUAE: true };
+    case CUSTOM_ORDER_PUSH_UAE_SUCCESS:
+      return {
+        ...state,
+        isCustomOrderPushToUAE: false,
+        customOrderPushToUAEData: action.payload,
+      };
+    case CUSTOM_ORDER_PUSH_UAE_FAIL:
+      return {
+        ...state,
+        isCustomOrderPushToUAE: false,
+        error: action.payload,
+      };
+
+    case CUSTOM_MISSING_ORDER_UPDATE_REQUEST:
+      return { ...state, isCustomMissingOrderUpdate: true };
+    case CUSTOM_MISSING_ORDER_UPDATE_SUCCESS:
+      return {
+        ...state,
+        isCustomMissingOrderUpdate: false,
+        customMissingOrderUpdate: action.payload,
+      };
+    case CUSTOM_MISSING_ORDER_UPDATE_FAIL:
+      return {
+        ...state,
+        isCustomMissingOrderUpdate: false,
         error: action.payload,
       };
 

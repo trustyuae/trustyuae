@@ -680,14 +680,24 @@ const OrderDetailsInChina = () => {
     <>
       <Container fluid className="px-5">
         <MDBRow className="my-3">
-          <MDBCol className="d-flex justify-content-between">
+          <MDBCol className="d-flex">
             <Button
               variant="outline-secondary"
-              className="p-1 me-2 bg-transparent text-secondary"
+              className="bg-transparent text-secondary"
               onClick={() => navigate("/ordersystem_in_china")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
+          </MDBCol>
+          {orderDetails?.operation_user_id != userData?.user_id &&
+            orderDetails?.order_process == "started" && (
+              <MDBCol md="7" className="d-flex justify-content-center">
+                <Alert variant={"danger"}>
+                  {t("P1ChinaSystem.ThisOrderTakenBy")}:
+                </Alert>
+              </MDBCol>
+            )}
+            <MDBCol className="d-flex justify-content-end">
             <ButtonGroup>
               {radios.map((radio, idx) => (
                 <ToggleButton
@@ -704,15 +714,7 @@ const OrderDetailsInChina = () => {
                 </ToggleButton>
               ))}
             </ButtonGroup>
-          </MDBCol>
-          {orderDetails?.operation_user_id != userData?.user_id &&
-            orderDetails?.order_process == "started" && (
-              <MDBCol md="7" className="d-flex justify-content-end">
-                <Alert variant={"danger"}>
-                  {t("P1ChinaSystem.ThisOrderTakenBy")}:
-                </Alert>
-              </MDBCol>
-            )}
+            </MDBCol>
         </MDBRow>
         <Card className="p-3 mb-3">
           <Box className="d-flex align-items-center justify-content-between">

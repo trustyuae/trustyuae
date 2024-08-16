@@ -13,12 +13,10 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { Badge } from "react-bootstrap";
-import { FaEye } from "react-icons/fa";
+import { FaEye,FaEdit} from "react-icons/fa";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  MissingOrderSystemGet
-} from "../../redux/actions/OrderSystemActions";
+import { MissingOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
@@ -47,7 +45,7 @@ function MissingOrderSystem() {
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}/wp-json/custom-missing-orders/v1/missing-orders/?`;
+    let apiUrl = `${API_URL}wp-json/custom-missing-orders/v1/missing-orders/?`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     await dispatch(
@@ -89,7 +87,6 @@ function MissingOrderSystem() {
     setPage(1);
   };
 
-
   const columns = [
     { field: "date", headerName: "Date", className: "order-system", flex: 1 },
     {
@@ -127,32 +124,27 @@ function MissingOrderSystem() {
       type: "html",
       renderCell: (value, row) => {
         return (
-          <Link
-            to={`/missing_order_details/${value?.row?.order_id}`}
-            className=" d-flex "
-          >
-            <Button
-              type="button"
-              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+          <Box className="d-flex">
+            <Link
+              to={`/missing_order_details/${value?.row?.order_id}`}
+              className=" d-flex "
             >
-              <FaEye className="mb-1" />
-            </Button>
-            <Typography
-              variant="label"
-              className="fw-semibold text-secondary"
-              sx={{
-                fontSize: 14,
-                textTransform: "capitalize",
-              }}
-            >
-              {/* {"  "} */}
-              <Badge bg="success" className="m-2">
-                {value?.row?.order_process == "started"
-                  ? value?.row?.order_process
-                  : null}
-              </Badge>
-            </Typography>
-          </Link>
+              <Button
+                type="button"
+                className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+              >
+                <FaEye className="mb-1" />
+              </Button>
+            </Link>
+            <Box>
+              <Button
+                type="button"
+                className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+              >
+                <FaEdit className="mb-1" />
+              </Button>
+            </Box>
+          </Box>
         );
       },
     },
@@ -218,7 +210,7 @@ function MissingOrderSystem() {
     <Container fluid className="py-3">
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
-          Order Fulfillment System
+          Missing Order System
         </Typography>
       </Box>
       <Row className="mb-4 mt-4">
