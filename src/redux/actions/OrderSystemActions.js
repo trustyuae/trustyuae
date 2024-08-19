@@ -444,7 +444,6 @@ export const CustomItemSendToChina = (id, navigate) => async (dispatch) => {
   }
 };
 
-
 export const CustomOrderPushToUAE = (id, navigate) => async (dispatch) => {
   dispatch({ type: CUSTOM_ORDER_PUSH_UAE_REQUEST });
 
@@ -485,43 +484,40 @@ export const CustomOrderPushToUAE = (id, navigate) => async (dispatch) => {
   }
 };
 
+export const CustomMissingOrderUpdate =
+  (payload, navigate) => async (dispatch) => {
+    dispatch({ type: CUSTOM_MISSING_ORDER_UPDATE_REQUEST });
+    try {
+      const response = await axiosInstance.post(
+        `${API_URL}wp-json/custom-update-missingorder/v1/update-missing-order/`,
+        payload
+      );
 
-export const CustomMissingOrderUpdate = (id,payload,navigate) => async (dispatch) => {
-  dispatch({ type: CUSTOM_MISSING_ORDER_UPDATE_REQUEST });
-
-  try {
-    const response = await axiosInstance.post(
-      `${API_URL}wp-json/custom-push-missingorder/v1/push-missing-order/${id}`
-    );
-
-    dispatch({
-      type: CUSTOM_MISSING_ORDER_UPDATE_SUCCESS,
-      payload: response.data,
-    });
-
-    console.log(response, "response from CustomItemSendToChina");
-
-    if (response.status === 200) {
-      const result = await Swal.fire({
-        title: response.data,
-        icon: "success",
-        showConfirmButton: true,
+      dispatch({
+        type: CUSTOM_MISSING_ORDER_UPDATE_SUCCESS,
+        payload: response.data,
       });
-      if (result.isConfirmed) {
-        navigate("/ordersystem");
+
+      if (response.status === 200) {
+        await Swal.fire({
+          title: response.data.message,
+          icon: "success",
+          showConfirmButton: true,
+          timer: 2000, 
+        });
+      } else {
+        Swal.fire({
+          title: response.data,
+          icon: "error",
+          showConfirmButton: true,
+          timer: 2000, 
+        });
       }
-    } else {
-      Swal.fire({
-        title: response.data,
-        icon: "error",
-        showConfirmButton: true,
+      return response;
+    } catch (error) {
+      dispatch({
+        type: CUSTOM_MISSING_ORDER_UPDATE_FAIL,
+        error: error.message,
       });
     }
-    return response;
-  } catch (error) {
-    dispatch({
-      type: CUSTOM_MISSING_ORDER_UPDATE_FAIL,
-      error: error.message,
-    });
-  }
-};
+  };

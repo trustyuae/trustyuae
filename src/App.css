@@ -150,3 +150,7 @@
   display: flex;
   gap: 10px; /* Space between buttons */
 }
+
+.no-background {
+  background-color: transparent !important;
+}

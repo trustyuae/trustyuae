@@ -16,33 +16,23 @@ import {
   Accordion,
   AccordionSummary,
 } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CancelIcon from "@mui/icons-material/Cancel";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
-import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AddMessage,
-  AttachmentFileUpload,
-  CustomOrderOH,
+  CustomMissingOrderUpdate,
   CustomOrderPushToUAE,
   MissingOrderDetailsGet,
 } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
-import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import ShowAlert from "../../utils/ShowAlert";
-import Swal from "sweetalert2";
-import axiosInstance from "../../utils/AxiosInstance";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getUserData } from "../../utils/StorageUtils";
-import { OverAllAttachmentFileUpload } from "../../redux/actions/OrderSystemchinaActions";
-import { FaEdit } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 function MissingOrderDetails() {
   const { id } = useParams();
@@ -61,7 +51,6 @@ function MissingOrderDetails() {
   const [selectedFileUrl, setSelectedFileUrl] = useState(null);
   const webcamRef = useRef(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
-  const [showMessageOHModal, setshowMessageOHModal] = useState(false);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [message, setMessage] = useState("");
@@ -69,7 +58,6 @@ function MissingOrderDetails() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
-  const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
   const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -80,10 +68,6 @@ function MissingOrderDetails() {
 
   const orderDetailsDataOrderId = useSelector(
     (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
-  );
-
-  const AddInOnHold = useSelector(
-    (state) => state?.orderSystemData?.isCustomOrderOnHold
   );
 
   async function fetchUserData() {
@@ -99,28 +83,6 @@ function MissingOrderDetails() {
     fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const capture = useCallback(() => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    setSelectedFileUrl(imageSrc);
-    setShowAttachModal(false);
-    fetch(imageSrc)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const file = new File([blob], "screenshot.jpg", {
-          type: "image/jpeg",
-        });
-        setSelectedFile(file);
-      })
-      .catch((error) => {
-        console.error("Error converting data URL to file:", error);
-      });
-    setShowAttachmentModal(true);
-  }, [webcamRef]);
-
-  const retake = () => {
-    setSelectedFileUrl(null);
-  };
 
   async function fetchOrder() {
     try {
@@ -182,28 +144,6 @@ function MissingOrderDetails() {
     }
   };
 
-  const submitOH = async () => {
-    try {
-      const result = {
-        order_id: parseInt(orderDetails.order_id, 10),
-        item_id: [],
-        product_name: [],
-        variation_id: [],
-        user_id: parseInt(orderDetails.user_id, 10),
-        operation_user_id: parseInt(orderDetails.operation_user_id, 10),
-        onhold_note: messageOH,
-      };
-      orderDetails.items.forEach((item) => {
-        result.item_id.push(parseInt(item.item_id, 10));
-        result.product_name.push(item.product_name);
-        result.variation_id.push(parseInt(item.variation_id, 10));
-      });
-      dispatch(CustomOrderOH(result, navigate));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -255,12 +195,63 @@ function MissingOrderDetails() {
     const updatedData = tableData.map((item) => {
       if (item.product_id === event.product_id) {
         if (item.variation_id == event.variation_id) {
-          return { ...item, availability_status: value };
+          return { ...item, stock_status: value };
         }
       }
       return item;
     });
     setTableData(updatedData);
+  };
+
+  const handleOrderStatusChange = (value, event) => {
+    const updatedData = tableData.map((item) => {
+      if (item.product_id === event.product_id) {
+        if (item.variation_id == event.variation_id) {
+          return { ...item, order_status: value };
+        }
+      }
+      return item;
+    });
+    setTableData(updatedData);
+  };
+
+  const handleDispatchTypeChange = (value, event) => {
+    const updatedData = tableData.map((item) => {
+      if (item.product_id === event.product_id) {
+        if (item.variation_id == event.variation_id) {
+          return { ...item, dispatch_type: value };
+        }
+      }
+      return item;
+    });
+    setTableData(updatedData);
+  };
+
+  const handleUpdateData = async (rowdata) => {
+    if (rowdata.dispatch_type !== rowdata.order_status) {
+      await Swal.fire({
+        title: "Dispatch type and Order Status need to be Same",
+        icon: "error",
+        showConfirmButton: true,
+        timer: 2000,
+      });
+      return;
+    }
+
+    const payload = {
+      order_id: Number(id),
+      product_id: Number(rowdata.item_id),
+      variation_id: Number(rowdata.variation_id || 0),
+      stock_status: rowdata.stock_status,
+      order_status: rowdata.order_status,
+      dispatch_type: rowdata.dispatch_type,
+    };
+
+    try {
+      dispatch(CustomMissingOrderUpdate(payload, navigate));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const columns = [
@@ -278,9 +269,9 @@ function MissingOrderDetails() {
     },
     {
       field: "variant_details",
-      headerName: "Variant Details",
+      headerName: "Variations",
       className: "order-details",
-      flex: 1,
+      flex: 0.8,
       renderCell: (params) => {
         if (
           params.row.variations &&
@@ -335,23 +326,72 @@ function MissingOrderDetails() {
       className: "order-details",
     },
     {
-      field: "avl_quantity",
-      headerName: "Avl QTY",
-      flex: 0.5,
-    },
-    {
       field: "dispatch_type",
       headerName: "Dispatch Type",
-      flex: 0.5,
+      flex: 0.8,
       className: "order-details",
       type: "string",
+      renderCell: (params) => {
+        console.log(params.row, "params.row from order status");
+        const rowId = params.row.id;
+        const dispatchType = params.row.dispatch_type;
+
+        return (
+          <select
+            id={`dispatch-type-${rowId}`}
+            value={dispatchType}
+            onChange={(event) =>
+              handleDispatchTypeChange(event.target.value, params.row)
+            }
+            style={{
+              height: "30px",
+              fontSize: "0.875rem",
+              width: "100%",
+            }}
+          >
+            <option value="" disabled>
+              Select...
+            </option>
+            <option value="Dispatch">Dispatch</option>
+            <option value="Reserve">Reserve</option>
+            <option value="P2">P2</option>
+          </select>
+        );
+      },
     },
     {
       field: "order_status",
       headerName: "Order Status",
-      flex: 0.5,
+      flex: 0.8,
       className: "order-details",
       type: "string",
+      renderCell: (params) => {
+        console.log(params.row, "params.row from order status");
+        const rowId = params.row.id;
+        const orderStatus = params.row.order_status;
+
+        return (
+          <select
+            id={`order-status-${rowId}`}
+            value={orderStatus}
+            onChange={(event) =>
+              handleOrderStatusChange(event.target.value, params.row)
+            }
+            style={{
+              height: "30px",
+              fontSize: "0.875rem",
+              width: "100%",
+            }}
+          >
+            <option value="" disabled>
+              Select...
+            </option>
+            <option value="Dispatch">Dispatch</option>
+            <option value="Reserve">Reserve</option>
+            <option value="P2">P2</option>
+          </select>
+        );
+      },
     },
     {
       field: "stock_status",
@@ -361,15 +401,11 @@ function MissingOrderDetails() {
       type: "string",
       renderCell: (params) => {
         const rowId = params.row.id;
-        const currentStatus =
-          params.row.availability_status !== "" &&
-          params.row.availability_status !== "0"
-            ? params.row.availability_status
-            : params.row.estimated_production_time;
+        const currentStatus = params.row.stock_status;
 
         return (
           <select
-            id={`customer-status-${rowId}`}
+            id={`stock-status-${rowId}`}
             value={currentStatus}
             onChange={(event) =>
               handleStatusChange(event.target.value, params.row)
@@ -383,8 +419,8 @@ function MissingOrderDetails() {
             <option value="" disabled>
               Select...
             </option>
-            <option value="In Stock">In Stock</option>
-            <option value="Out Of Stock">Out of Stock</option>
+            <option value="instock">In Stock</option>
+            <option value="onbackorder">On BackOrder</option>
           </select>
         );
       },
@@ -392,21 +428,21 @@ function MissingOrderDetails() {
     {
       field: "update item",
       headerName: "Update Item",
-      flex: 0.5,
+      flex: 0.8,
       className: "order-system",
       type: "html",
-      renderCell: (value, row) => {
+      renderCell: (params) => {
         return (
-          <Box>
-            <Button
-              type="button"
-              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-            >
-              <FaEdit className="mb-1" />
-            </Button>
-          </Box>
+          <Button
+            type="button"
+            className="w-auto border-0 text-white"
+            onClick={() => handleUpdateData(params.row)}
+          >
+            Update
+          </Button>
         );
       },
+      cellClassName: "no-background",
     },
   ];
 
