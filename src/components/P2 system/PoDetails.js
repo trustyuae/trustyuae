@@ -156,7 +156,6 @@ const PoDetails = () => {
     // getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, page]);
-  }, [pageSize, page]);
 
   useEffect(() => {
     // fetchPO();
