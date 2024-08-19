@@ -19,9 +19,13 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import { AddMessage, CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
+// import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
+import {
+  AddMessage,
+  CompletedOrderDetailsGet,
+} from "../../Redux2/slices/OrderSystemSlice";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShowAlert from "../../utils/ShowAlert";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
@@ -40,31 +44,47 @@ function CompletedOrderDetails() {
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
-
-  const loader = useSelector(
-    (state) => state?.orderSystemData?.isCompletedOrderDetails
-  );
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.completedOrderDetails?.orders?.[0]
   );
+
+  const completedOrderDetailsData = useSelector(
+    (state) => state?.orderSystem?.completedOrderDetails
+  );
+
+  useEffect(() => {
+    if (completedOrderDetailsData) {
+      const completedOrderData = completedOrderDetailsData?.orders?.map(
+        (v, i) => ({
+          ...v,
+          id: i,
+        })
+      );
+      setOrderData(completedOrderData);
+    }
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsDataOrderId, completedOrderDetailsData]);
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(CompletedOrderDetailsGet(params.id));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
-      }
+      dispatch(CompletedOrderDetailsGet(params?.id));
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   }
 
@@ -93,7 +113,6 @@ function CompletedOrderDetails() {
       return "Variant data not available";
     }
   };
-
   const handleAddMessage = async (e) => {
     const orderId = parseInt(params.id, 10);
     let userID = JSON.parse(localStorage.getItem("user_data"));
@@ -102,24 +121,15 @@ function CompletedOrderDetails() {
       order_id: orderId,
       name: userID.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
+    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
+      console.log(payload, "payload from addmessage");
+      if (payload) {
         setMessage("");
         setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
+        ShowAlert("", payload, "success", null, null, null, null, 3000);
       }
     });
   };
-
   const columns = [
     {
       field: "item_id",
@@ -266,7 +276,9 @@ function CompletedOrderDetails() {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold"># {orderDetails?.user_name}</Typography>
+                    <Typography className="fw-bold">
+                      # {orderDetails?.user_name}
+                    </Typography>
                     <Typography
                       className=""
                       sx={{
@@ -563,7 +575,7 @@ function CompletedOrderDetails() {
           showModal={showModal}
           orderData={orderData}
         />
-          <Modal
+        <Modal
           show={showMessageModal}
           onHide={() => setshowMessageModal(false)}
           centered

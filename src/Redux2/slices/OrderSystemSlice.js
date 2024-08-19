@@ -67,7 +67,7 @@ export const CompletedOrderSystemGet = createAsyncThunk(
 
 export const CompletedOrderDetailsGet = createAsyncThunk(
   "orderSystem/CompletedOrderDetailsGet",
-  async ({ id }, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
         `wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`
@@ -193,7 +193,7 @@ export const AddMessage = createAsyncThunk(
         `wp-json/custom-message-note/v1/order-note/`,
         requestData
       );
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);
