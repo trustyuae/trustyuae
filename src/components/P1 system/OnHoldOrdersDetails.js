@@ -227,7 +227,7 @@ function OnHoldOrdersDetails() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axiosInstance.post(
-          `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
+          `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}`,
           {
             variation_id: Number(e.variation_id),
             image_url: e.dispatch_image,
@@ -680,7 +680,7 @@ function OnHoldOrdersDetails() {
     }
 
     const response = await axiosInstance.post(
-      `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
+      `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
       result
     );
     if (response) {

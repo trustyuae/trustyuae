@@ -38,19 +38,19 @@ export const OrderSystemGet = createAsyncThunk(
 );
 
 export const OrderDetailsGet = createAsyncThunk(
-    "orderSystem/OrderDetailsGet",
-    async ({ id }, { rejectWithValue }) => {
-      try {
-        const response = await axiosInstance.get(
-          `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
-        );
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching factories:", error.message);
-        return rejectWithValue(error.message);
-      }
+  "orderSystem/OrderDetailsGet",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
     }
-  );
+  }
+);
 
 export const CompletedOrderSystemGet = createAsyncThunk(
   "orderSystem/CompletedOrderSystemGet",
@@ -123,7 +123,7 @@ export const ReserveOrderSystemGet = createAsyncThunk(
 
 export const ReserveOrderDetailsGet = createAsyncThunk(
   "orderSystem/ReserveOrderDetailsGet",
-  async ({ id }, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
         `wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`
@@ -309,7 +309,7 @@ const orderSystemSlice = createSlice({
       state.customOrderOnHoldData = [];
       state.customOrderOnHoldFinishData = [];
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -488,10 +488,10 @@ const orderSystemSlice = createSlice({
       .addCase(CustomOrderFinishOH.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      })
+      });
   },
 });
 
 export const { clearstoredata, startSyncLoading, stopSyncLoading } =
-orderSystemSlice.actions;
+  orderSystemSlice.actions;
 export default orderSystemSlice.reducer;

@@ -295,7 +295,7 @@ const OrderDetailsInChina = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         await axiosInstance.post(
-          `${API_URL}wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}/?warehouse=China`,
+          `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}/?warehouse=China`,
           {
             variation_id: e.variation_id,
             image_url: e.dispatch_image,

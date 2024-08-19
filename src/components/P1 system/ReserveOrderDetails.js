@@ -19,19 +19,14 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  CompletedOrderDetailsGet,
-  ReserveOrderDetailsGet,
-} from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
+import { AddMessage, ReserveOrderDetailsGet } from "../../Redux2/slices/OrderSystemSlice";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import Form from "react-bootstrap/Form";
 import ShowAlert from "../../utils/ShowAlert";
 import { getUserData } from "../../utils/StorageUtils";
-
 function ReserveOrderDetails() {
   const params = useParams();
   const [orderData, setOrderData] = useState([]);
@@ -46,32 +41,49 @@ function ReserveOrderDetails() {
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
 
-  const loader = useSelector(
-    (state) => state?.orderSystemData?.isCompletedOrderDetails
-  );
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.reserveOrderDetails?.orders?.[0]
   );
 
-  async function fetchOrder() {
-    try {
-      const response = await dispatch(ReserveOrderDetailsGet(params.id));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
+  const reserveOrderDetailsData = useSelector(
+    (state) => state?.orderSystem?.reserveOrderDetails
+  );
+
+  useEffect(() => {
+    if (reserveOrderDetailsData) {
+      const reserveOrderData = reserveOrderDetailsData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrderData(reserveOrderData);
+    }
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
             ...product,
             id: index1,
-          }));
-          setTableData(newData);
-        });
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
       }
-    } catch (error) {
-      console.error(error);
     }
+  }, [orderDetailsDataOrderId, reserveOrderDetailsData]);
+
+  async function fetchOrder() {
+    dispatch(ReserveOrderDetailsGet(params.id));
   }
+
+  useEffect(() => {
+    fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setMessage, setTableData, setOrderData]);
 
   const handleAddMessage = async (e) => {
     const orderId = parseInt(params.id, 10);
@@ -81,20 +93,11 @@ function ReserveOrderDetails() {
       order_id: orderId,
       name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
+    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
+      if (payload) {
         setMessage("");
         setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
+        ShowAlert("", payload, "success", null, null, null, null, 2000);
       }
     });
   };
@@ -224,11 +227,6 @@ function ReserveOrderDetails() {
     },
   ];
 
-  useEffect(() => {
-    fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setMessage, setTableData, setOrderData]);
-
   return (
     <>
       <Container fluid className="px-5">
@@ -272,9 +270,7 @@ function ReserveOrderDetails() {
                     </Typography>
                   </Box>
                   <Box sx={{ marginLeft: "20px" }}>
-                    <Typography className="fw-bold">
-                      # {orderDetails?.user_name}
-                    </Typography>
+                    <Typography className="fw-bold"> # {orderDetails?.user_name}</Typography>
                     <Typography
                       className=""
                       sx={{
@@ -288,7 +284,7 @@ function ReserveOrderDetails() {
               )}
             </Box>
             <Box>
-              <Button
+            <Button
                 variant="outline-secondary"
                 className="p-1 me-3 bg-transparent text-secondary"
                 onClick={() => setshowMessageModal(true)}

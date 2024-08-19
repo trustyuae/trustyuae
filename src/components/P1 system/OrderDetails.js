@@ -31,8 +31,6 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axiosInstance from "../../utils/AxiosInstance";
 import { getUserData } from "../../utils/StorageUtils";
@@ -95,8 +93,6 @@ function OrderDetails() {
   const orderDetailsData = useSelector(
     (state) => state?.orderSystem?.orderDetails
   );
-
-  const messageData = useSelector((state) => state?.orderSystem?.message);
 
   const customOrderDataa = useSelector(
     (state) => state?.orderSystem?.customOrderData
@@ -184,12 +180,14 @@ function OrderDetails() {
       order_id: orderId,
       name: userID.first_name,
     };
-    dispatch(AddMessage(requestedMessage));
-    if (messageData) {
-      setMessage("");
-      setshowMessageModal(false);
-      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
-    }
+    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
+      console.log(payload, "payload from addmessage");
+      if (payload) {
+        setMessage("");
+        setshowMessageModal(false);
+        ShowAlert("", payload, "success", null, null, null, null, 3000);
+      }
+    });
   };
 
   const submitOH = async () => {
@@ -232,7 +230,7 @@ function OrderDetails() {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setTableData, setOrderData, messageData]);
+  }, [setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);

@@ -13,13 +13,14 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import {
+  ReserveOrderSystemGet,
+} from "../../Redux2/slices/OrderSystemSlice";
 
 function ReserveOrderSystem() {
   const inputRef = useRef(null);
@@ -40,35 +41,41 @@ function ReserveOrderSystem() {
     null,
     null,
   ]);
-  const loader = useSelector((state) => state?.orderSystemData?.isCompletedOrders);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+
+  const reserveOrdersData = useSelector(
+    (state) => state?.orderSystem?.reserveOrders
+  );
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (reserveOrdersData) {
+      const reserveData = reserveOrdersData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(reserveData);
+      setTotalPages(reserveOrdersData.total_pages);
+    }
+  }, [reserveOrdersData]);
+
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?&page=${page}&per_page=${pageSize}`;
-    if (searchOrderID)
-      apiUrl += `&orderid=${searchOrderID}`;
-    if (endDate)
-      apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+    let apiUrl = `wp-json/custom-reserved-orders/v1/reserved-orders/?&page=${page}&per_page=${pageSize}`;
+    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
+    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
       apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
     await dispatch(
-      CompletedOrderSystemGet({
+      ReserveOrderSystemGet({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    ).catch((error) => {
+      console.error(error);
+    });
   }
 
   const handleReset = () => {
-    // const inputRef = useRef(null);
     inputRef.current.value = "";
 
     setSearchOrderID("");
@@ -76,8 +83,8 @@ function ReserveOrderSystem() {
     setEndDate("");
     setSelectedDateRange([null, null]);
     setTotalPages(1);
-    clearDateRange()
-    clearEndDateRange()
+    clearDateRange();
+    clearEndDateRange();
     if (isReset) {
       setIsReset(false);
     } else {
@@ -119,7 +126,6 @@ function ReserveOrderSystem() {
       className: "order-system",
       type: "string",
     },
-    // { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName: "View Item",
@@ -188,7 +194,7 @@ function ReserveOrderSystem() {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
     }
-  }
+  };
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
     setStartDate("");
@@ -197,7 +203,7 @@ function ReserveOrderSystem() {
   const clearEndDateRange = () => {
     setSelectedCompletedDateRange([null, null]);
     setCompletedStartDate("");
-    setCompletedEndDate("")
+    setCompletedEndDate("");
   };
   useEffect(() => {
     fetchOrders();
@@ -253,41 +259,13 @@ function ReserveOrderSystem() {
                   </DemoContainer>
                 </LocalizationProvider>
                 {selectedDateRange[0] && selectedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                  <CancelIcon
+                    style={{ position: "absolute", right: "0", top: "39px" }}
+                    onClick={clearDateRange}
+                  />
                 )}
               </Form.Group>
             </Col>
-
-            {/* <Col xs="auto" lg="4">
-              <Form.Group style={{ position: "relative" }}>
-                <Form.Label className="fw-semibold">
-                  Completed Date Filter:
-                </Form.Label>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={["SingleInputDateRangeField"]}>
-                    <DateRangePicker
-                      sx={{
-                        "& .MuiInputBase-root": {
-                          paddingRight: 0,
-                        },
-                        "& .MuiInputBase-input": {
-                          padding: ".5rem .75rem .5rem .75rem",
-                          "&:hover": {
-                            borderColor: "#dee2e6",
-                          },
-                        },
-                      }}
-                      value={selectedCompletedDateRange}
-                      onChange={handleCompltedDateChange}
-                      slots={{ field: SingleInputDateRangeField }}
-                    />
-                  </DemoContainer>
-                </LocalizationProvider>
-                {selectedCompletedDateRange[0] && selectedCompletedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "47px" }} onClick={clearEndDateRange} />
-                )}
-              </Form.Group>
-            </Col> */}
           </Row>
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
