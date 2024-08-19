@@ -158,7 +158,6 @@ function OnHoldOrdersDetails() {
   }, [toggleStatus]);
 
   const handleAddMessage = async (e) => {
-    console.log(userData,'userData from handle Add message')
     const orderId = parseInt(id, 10);
     const requestedMessage = {
       message: message,
@@ -680,13 +679,10 @@ function OnHoldOrdersDetails() {
       setToggleStatus(0);
     }
 
-    console.log(result, "result");
-
     const response = await axiosInstance.post(
       `${API_URL}wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
       result
     );
-    console.log(response, "response");
     if (response) {
       fetchOrder();
     }

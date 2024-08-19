@@ -204,12 +204,8 @@ const ReserveOrderSystemInChina = () => {
     fetchOrders();
   };
   const orderId = (e) => {
-    // console.log(e,'e');
     if (e.key === "Enter") {
-      console.log("hiiii");
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
   const clearDateRange = () => {
@@ -225,7 +221,6 @@ const ReserveOrderSystemInChina = () => {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
   }, [pageSize, page, searchOrderID, isReset]);
 
   return (

@@ -210,7 +210,6 @@ const PoDetails = () => {
       return item;
     });
     setPO_OrderList(updatedData);
-    console.log(PO_OrderList, "PO_OrderList");
   };
 
   const validateAvailabilityStatuses = (statuses) => {
@@ -225,8 +224,6 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-    console.log(updatelist, "fetching update list");
-
     // Extracting necessary data for update
     const updatedData = {
       po_number: id,
@@ -246,7 +243,6 @@ const PoDetails = () => {
       ),
       received_quantity: updatelist.map((item) => item.received_quantity),
     };
-    console.log(updatedData, "updatedData below obj");
 
     // Check if availability_status is not empty
     const availabilityStatuses = updatelist.map((item) =>
@@ -275,8 +271,6 @@ const PoDetails = () => {
       updatedData.availability_status = availabilityStatuses;
     }
 
-    console.log(updatedData, "updatedData");
-
     // Proceed with dispatch update action
     let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
     await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
@@ -291,7 +285,6 @@ const PoDetails = () => {
   };
 
   const handleRecievedQtyChange = (index, event) => {
-    console.log(event, "event");
     if (index.target.value >= 0) {
       const updatedRecivedQtyData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
@@ -443,7 +436,6 @@ const PoDetails = () => {
       flex: 2.5,
       renderCell: (params) => {
         const handleClick = () => {
-          console.log(params.row, "params.row");
           handlePoModal(params.row.product_id, params.row.variation_id);
         };
 
@@ -463,8 +455,6 @@ const PoDetails = () => {
       headerName: t("POManagement.RMBPrice"),
       flex: 3,
       valueGetter: (value, row) => {
-        console.log(value, "rmb price");
-        console.log(row, "row rmb price");
         if (row.id === "TAX") {
           return row.taxTotal;
         }
@@ -656,6 +646,7 @@ const PoDetails = () => {
       return "Scheduled PO";
     }
   };
+  
   const handleAddMessage = async () => {
     setAddMessageD(true);
     try {
@@ -671,8 +662,6 @@ const PoDetails = () => {
         `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
         requestedMessage,
       );
-      console.log(response.data);
-
       setshowMessageModal(false);
       setMessage("");
       setAddMessageD(false);

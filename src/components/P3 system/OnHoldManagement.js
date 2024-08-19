@@ -120,8 +120,6 @@ function OnHoldManagement() {
     const orderId = selectedOrders.map((order) => order.order_id);
     const quantity = selectedOrders.map((order) => order.qty_fullfilled);
 
-    console.log(quantity, "quantity from handleOrderPerp");
-
     if (selectedOrders.length === 0) {
       await ShowAlert(
         "Please select products for fulfilling orders",
@@ -180,9 +178,7 @@ function OnHoldManagement() {
     };
 
     try {
-      console.log("Dispatching API call with data:", requestedDataP);
       const response = await dispatch(AddProductOrderForPre(requestedDataP));
-      console.log("Response from API:", response);
 
       if (response.status === 200) {
         await ShowAlert(

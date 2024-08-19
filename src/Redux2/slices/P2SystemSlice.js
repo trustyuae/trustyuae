@@ -26,7 +26,6 @@ export const PoDetailsData = createAsyncThunk(
   async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response, "response of PoDetailsData from slice");
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -166,7 +165,6 @@ export const PomSystemProductsDetails = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response from PomSystemProductsDetails slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);

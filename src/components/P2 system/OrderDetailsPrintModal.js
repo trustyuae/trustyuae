@@ -15,7 +15,6 @@ const OrderDetailsPrintModal = ({
   factoryName,
   poId,
 }) => {
-  console.log(PO_OrderList, "PO_OrderList akash");
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
   const handleExport = async () => {
@@ -235,7 +234,6 @@ const OrderDetailsPrintModal = ({
   const handleExportExcel = (e) => {
     const wb = XLSX.utils.book_new();
     const data = PO_OrderList.map((item) => {
-      console.log(item, "PO_OrderList for showing in excelsheet");
       if (item?.id !== "TAX") {
         return {
           "Product ID": item?.product_id || "N/A",
@@ -249,7 +247,6 @@ const OrderDetailsPrintModal = ({
       }
     }).filter((item) => item !== undefined);
 
-    console.log(data, "data of po_orderlist");
     const totalItem = PO_OrderList.find((item) => item?.id === "TAX");
     if (totalItem) {
       data.push({
@@ -281,7 +278,6 @@ const OrderDetailsPrintModal = ({
         return undefined;
       },
       renderCell: (params) => {
-        console.log(params, "params of modal of pdf");
         if (params.row.content) {
           return <strong>{params.row.content}</strong>;
         }
@@ -314,7 +310,7 @@ const OrderDetailsPrintModal = ({
       },
     },
   ];
-  console.log(PO_OrderList, "PO_OrderList");
+
   const rows = PO_OrderList.map((item) => {
     if (item.id === "TAX") {
       return {
@@ -338,7 +334,6 @@ const OrderDetailsPrintModal = ({
       };
     }
   });
-  console.log(rows, "rows");
 
   useEffect(() => {
     // Effect to handle changes in PO_OrderList, if needed

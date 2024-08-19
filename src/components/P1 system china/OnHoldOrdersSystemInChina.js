@@ -214,7 +214,6 @@ const OnHoldOrdersSystemInChina = () => {
   };
   const orderId = (e) => {
     if (e.key === "Enter") {
-      console.log("hiiii");
       setSearchOrderID(e.target.value);
     }
   };

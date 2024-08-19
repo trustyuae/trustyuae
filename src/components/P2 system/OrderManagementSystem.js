@@ -201,7 +201,6 @@ function OrderManagementSystem() {
   };
 
   const ImageModule = (rowData) => {
-    console.log(rowData,'rowData from Image Module')
     setImageURL(rowData.product_image);
     setImageId(rowData.item_id)
     setShowEditModal(true);

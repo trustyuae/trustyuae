@@ -13,7 +13,6 @@ export const GetErManagementData = createAsyncThunk(
   async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response from redux toolkit in slice')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);

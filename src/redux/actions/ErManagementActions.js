@@ -11,7 +11,6 @@ export const GetErManagementData = ({apiUrl}) => async (dispatch) => {
   try {
     dispatch({ type: GET_ER_MANAGEMENT_DATA_REQUEST });
     const response = await axiosInstance.get(apiUrl);
-    console.log(response, "response of OrderDetailsGet Api");
     dispatch({ type: GET_ER_MANAGEMENT_DATA_SUCCESS, payload: response?.data });
     return response;
   } catch (error) {

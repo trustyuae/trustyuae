@@ -29,7 +29,6 @@ const GRNView = () => {
     let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}/?&per_page=${pageSize}&page=${page}`;
     await dispatch(GetGRNView({ apiUrl }))
       .then((response) => {
-        console.log(response,'response from fetchorders in grn view')
         if (response?.data) {
           let data = response.data.data.map((v, i) => ({ ...v, id: i }));
           setPO_OrderList(data);

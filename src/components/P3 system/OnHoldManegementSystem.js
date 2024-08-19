@@ -699,7 +699,6 @@ function OnHoldManegementSystem() {
   };
 
   const handleRecievedQtyChange = (index, event) => {
-    console.log(event, "event");
     if (index.target.value >= 0) {
       const updatedRecivedQtyData = poTableData.map((item) => {
         if (item.product_id === event.product_id) {
@@ -741,7 +740,6 @@ function OnHoldManegementSystem() {
 
   const handleCreateGrn = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
-    console.log(poTableData, "poTableData in console");
     const payload = {
       po_id: poId || "",
       product_id: poTableData.map((item) => item.product_id),

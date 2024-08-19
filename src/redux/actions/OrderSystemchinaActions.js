@@ -355,8 +355,6 @@ export const CustomItemSendToUAE = (id, navigate) => async (dispatch) => {
       payload: response.data,
     });
 
-    console.log(response, "response from CustomItemSendToUAE");
-
     if (response.status === 200) {
       const result = await Swal.fire({
         title: response.data,

@@ -214,29 +214,28 @@ const CompletedOrderSystemInChina = () => {
     setPage(1);
     fetchOrders();
   };
+
   const orderId = (e) => {
-    // console.log(e,'e');
     if (e.key === "Enter") {
-      console.log("hiiii");
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
+
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
     setStartDate("");
     setEndDate("");
   };
+
   const clearEndDateRange = () => {
     setSelectedCompletedDateRange([null, null]);
     setCompletedStartDate("");
     setCompletedEndDate("");
   };
+
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
   }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
 
   return (

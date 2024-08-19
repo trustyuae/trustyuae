@@ -417,8 +417,6 @@ export const CustomItemSendToChina = (id, navigate) => async (dispatch) => {
       payload: response.data,
     });
 
-    console.log(response, "response from CustomItemSendToChina");
-
     if (response.status === 200) {
       const result = await Swal.fire({
         title: response.data,
@@ -456,8 +454,6 @@ export const CustomOrderPushToUAE = (id, navigate) => async (dispatch) => {
       type: CUSTOM_ORDER_PUSH_UAE_SUCCESS,
       payload: response.data,
     });
-
-    console.log(response, "response from CustomItemSendToChina");
 
     if (response.status === 200) {
       const result = await Swal.fire({

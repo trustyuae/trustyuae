@@ -9,7 +9,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
   async config => {
     const token = await getToken();
-    console.log(token,'token from instance')
     if (token) {
       config.headers.Authorization = `Live ${token}`;
     }

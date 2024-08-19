@@ -253,12 +253,8 @@ const OrderSystemInChina = () => {
   };
 
   const orderId = (e) => {
-    // console.log('hiiii');
-    // console.log(e,'e');
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
 

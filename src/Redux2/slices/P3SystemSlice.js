@@ -21,7 +21,6 @@ export const GetProductManual = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response from GetProductManual from slices')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -69,7 +68,6 @@ export const GetGRNView = createAsyncThunk(
   async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response.data, "response from getGrnView in slice");
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -96,7 +94,6 @@ export const GetProductOrderDetails = createAsyncThunk(
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response from GetProductOrderDetails')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);

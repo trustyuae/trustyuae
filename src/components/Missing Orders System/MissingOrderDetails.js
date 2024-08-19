@@ -332,7 +332,6 @@ function MissingOrderDetails() {
       className: "order-details",
       type: "string",
       renderCell: (params) => {
-        console.log(params.row, "params.row from order status");
         const rowId = params.row.id;
         const dispatchType = params.row.dispatch_type;
 
@@ -366,7 +365,6 @@ function MissingOrderDetails() {
       className: "order-details",
       type: "string",
       renderCell: (params) => {
-        console.log(params.row, "params.row from order status");
         const rowId = params.row.id;
         const orderStatus = params.row.order_status;
 
