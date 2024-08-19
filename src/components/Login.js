@@ -63,7 +63,7 @@ const Login = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loading = useSelector((state) => state.loginUser.loading);
+  const loading = useSelector((state) => state?.loginUser?.loading);
 
   return (
     <MDBContainer style={{ height: "100vh" }} className="p-3">

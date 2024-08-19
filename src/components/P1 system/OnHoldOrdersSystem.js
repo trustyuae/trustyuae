@@ -13,13 +13,12 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { OnHoldOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
 
 function OnHoldOrdersSystem() {
   const inputRef = useRef(null);
@@ -41,31 +40,34 @@ function OnHoldOrdersSystem() {
     null,
     null,
   ]);
-  const loader = useSelector((state) => state?.orderSystemData?.isCompletedOrders);
-
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+  const OnholdOrdersData = useSelector(
+    (state) => state?.orderSystem?.onHoldOrders
+  );
+  
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (OnholdOrdersData) {
+      const onHoldData = OnholdOrdersData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(onHoldData);
+      setTotalPages(OnholdOrdersData.total_pages);
+    }
+  }, [OnholdOrdersData]);
+
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
-    if (searchOrderID)
-      apiUrl += `&orderid=${searchOrderID}`;
-    if (endDate)
-      apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
-    if (dispatchType)
-      apiUrl += `&status=${dispatchType}`;
-    await dispatch(
-      CompletedOrderSystemGet({
+    let apiUrl = `wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
+    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
+    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+    if (dispatchType) apiUrl += `&status=${dispatchType}`;
+    dispatch(
+      OnHoldOrderSystemGet({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleReset = () => {
@@ -88,7 +90,12 @@ function OnHoldOrdersSystem() {
   };
 
   const columns = [
-    { field: "date", headerName: "Started Date", className: "order-system", flex: 1 },
+    {
+      field: "date",
+      headerName: "Started Date",
+      className: "order-system",
+      flex: 1,
+    },
     {
       field: "order_id",
       headerName: "Order ID",
@@ -116,7 +123,6 @@ function OnHoldOrdersSystem() {
       className: "order-system",
       type: "string",
     },
-    // { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName: "View Item",
@@ -188,21 +194,23 @@ function OnHoldOrdersSystem() {
     setDispatchType(e);
     setPage(1);
   };
-  const orderId=(e)=>{
+  const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
+      // setProductName("");
+      // fetchOrders();
     }
-  }
+  };
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
-    setStartDate("")
-    setEndDate("")
+    setStartDate("");
+    setEndDate("");
   };
 
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize,searchOrderID, page,dispatchType, isReset,setSearchOrderID]);
+  }, [pageSize, searchOrderID, page, dispatchType, isReset, setSearchOrderID]);
 
   return (
     <Container fluid className="py-3">
@@ -253,7 +261,10 @@ function OnHoldOrdersSystem() {
                   </DemoContainer>
                 </LocalizationProvider>
                 {selectedDateRange[0] && selectedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                  <CancelIcon
+                    style={{ position: "absolute", right: "0", top: "39px" }}
+                    onClick={clearDateRange}
+                  />
                 )}
               </Form.Group>
             </Col>
@@ -292,7 +303,7 @@ function OnHoldOrdersSystem() {
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
-              onClick={(e)=>handleSearchFilter(e)}
+              onClick={(e) => handleSearchFilter(e)}
             >
               Search
             </Button>
