@@ -27,18 +27,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  AttachmentFileUpload,
-  CustomItemSendToP2,
-  CustomOrderFinish,
-  CustomOrderFinishOH,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
-  OnHoldOrderDetailsGet,
-  OrderDetailsGet,
-  OverAllAttachmentFileUpload,
-} from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -49,6 +37,16 @@ import Swal from "sweetalert2";
 import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  AddMessage,
+  AttachmentFileUpload,
+  CustomOrderFinishOH,
+  InsertOrderPickup,
+  InsertOrderPickupCancel,
+  OnHoldOrderDetailsGet,
+  OverAllAttachmentFileUpload,
+} from "../../Redux2/slices/OrderSystemSlice";
+import {CustomItemSendToP2} from '../../redux/actions/OrderSystemActions'
 import { getUserData } from "../../utils/StorageUtils";
 
 function OnHoldOrdersDetails() {
@@ -58,7 +56,6 @@ function OnHoldOrdersDetails() {
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
-  const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
@@ -77,11 +74,11 @@ function OnHoldOrdersDetails() {
   const [selectedItemIdss, setSelectedItemIdss] = useState([]);
 
   const [message, setMessage] = useState("");
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
-  // const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
-  const [loader, setLoader] = useState(true);
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -89,8 +86,47 @@ function OnHoldOrdersDetails() {
   fileInputRef.current[selectedItemId] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.onHoldOrderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.onHoldOrderDetails?.orders?.[0]
   );
+
+  const OnHoldOrderDetailsData = useSelector(
+    (state) => state?.orderSystem?.onHoldOrderDetails
+  );
+
+  const messageData = useSelector((state) => state?.orderSystem?.message);
+
+  const OnHoldCustomOrderDataa = useSelector(
+    (state) => state?.orderSystem?.customOrderData
+  );
+
+  const OnHoldOrderFinishData = useSelector(
+    (state) => state?.orderSystem?.customOrderOnHoldFinishData
+  );
+
+  useEffect(() => {
+    const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
+      ...v,
+      id: i,
+    }));
+    setOrderData(onHoldOrderData);
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      setToggleStatus(Number(orderDetailsDataOrderId.toggle_status));
+
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsDataOrderId, OnHoldOrderDetailsData]);
 
   async function fetchUserData() {
     try {
@@ -100,7 +136,6 @@ function OnHoldOrdersDetails() {
       console.error("Error fetching user data:", error);
     }
   }
-
   useEffect(() => {
     fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -128,58 +163,38 @@ function OnHoldOrdersDetails() {
     setSelectedFileUrl(null);
   };
 
-  const fetchOrder = useCallback(async () => {
+  async function fetchOrder() {
     try {
-      const response = await dispatch(OnHoldOrderDetailsGet(id));
-      const data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      setToggleStatus(Number(response.data.orders[0].toggle_status));
-      const order = response.data.orders[0];
-      if (order) setOrderProcess(order.order_process);
-      if (data) {
-        const newData = data.flatMap((order) =>
-          order.items.map((product, index1) => ({ ...product, id: index1 }))
-        );
-        setTableData(newData);
-      }
-      setLoader(false);
+      dispatch(OnHoldOrderDetailsGet({ id }));
     } catch (error) {
       console.error(error);
     }
-  }, [dispatch, id]);
-
-  useEffect(() => {
-    if (id) fetchOrder();
-  }, [fetchOrder, id]);
+  }
 
   useEffect(() => {
     console.log(toggleStatus, "toggleStatus");
   }, [toggleStatus]);
 
-  const handleAddMessage = async (e) => {
-    const orderId = parseInt(id, 10);
+  const handleAddMessage = (e) => {
+    e.preventDefault(); // Prevent default form submission if this is used in a form
     const requestedMessage = {
       message: message,
-      order_id: orderId,
+      order_id: parseInt(id, 10),
       name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        setMessage("");
-        setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
-      }
-    });
+  
+    dispatch(AddMessage(requestedMessage))
+      .then(({ payload }) => {
+        if (payload) {
+          setMessage("");
+          setshowMessageModal(false);
+          ShowAlert("",  payload, "success", null, null, null, null, 2000);
+        }
+      })
+      .catch((error) => {
+        // Handle error if needed
+        console.error("Error adding message:", error);
+      });
   };
 
   useEffect(() => {
@@ -239,23 +254,21 @@ function OnHoldOrdersDetails() {
   };
 
   const handleSubmitAttachment = async () => {
-    setLoader(true);
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
-        await dispatch(
+        dispatch(
           AttachmentFileUpload({
             user_id: user_id,
-            order_id: id,
+            order_id:id,
             item_id: selectedItemId,
             variation_id: selectedVariationId,
             selectedFile: selectedFile,
           })
         );
       } else {
-        await dispatch(
+        dispatch(
           OverAllAttachmentFileUpload({
-            // order_id: orderDetailsDataOrderId?.order_id,
             order_id: id,
             order_dispatch_image: selectedFile,
           })
@@ -275,7 +288,6 @@ function OnHoldOrdersDetails() {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
-      setLoader(false);
     } catch (error) {
       console.error(error);
     }
@@ -347,7 +359,21 @@ function OnHoldOrdersDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      dispatch(CustomOrderFinishOH(user_id, id, navigate));
+      dispatch(CustomOrderFinishOH({ user_id, id }));
+      if (OnHoldOrderFinishData.status_code === 200) {
+        await Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "success",
+          showConfirmButton: true,
+        });
+        navigate("/on_hold_orders_system");
+      } else {
+        Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
     } catch (error) {
       console.error("Error while finishing order:", error);
     }
@@ -536,7 +562,7 @@ function OnHoldOrdersDetails() {
                     }}
                   />
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" &&
+                    orderDetails?.order_process == "started" &&
                     toggleStatus != 0 && (
                       <CancelIcon
                         sx={{
@@ -571,7 +597,7 @@ function OnHoldOrdersDetails() {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" &&
+                  orderDetails?.order_process == "started" &&
                   qty == avl_qty &&
                   toggleStatus != 0 ? (
                     <Button
@@ -611,7 +637,7 @@ function OnHoldOrdersDetails() {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" &&
+                  orderDetails?.order_process == "started" &&
                   qty == avl_qty &&
                   toggleStatus != 0 ? (
                     <Button
@@ -648,12 +674,9 @@ function OnHoldOrdersDetails() {
   ];
 
   const handalswitch = async (e) => {
-    setLoader(true);
     if (e) {
-      // setToggleStatus(1)
       handelSend(e);
     } else {
-      // setToggleStatus(0)
       handelSend(e);
     }
   };
@@ -688,9 +711,6 @@ function OnHoldOrdersDetails() {
     }
   };
 
-  // useEffect(()=>{
-  //   handelSend()
-  // },[toggleStatus])
   return (
     <>
       <Container fluid className="px-5">
@@ -773,7 +793,7 @@ function OnHoldOrdersDetails() {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+              orderDetails?.order_process == "started" ? (
                 // <Button
                 //   variant="outline-danger"
                 //   className="p-1 me-2 bg-transparent text-danger"
@@ -795,7 +815,7 @@ function OnHoldOrdersDetails() {
                   onChange={(e) => handalswitch(e.target.checked)}
                   // label="Send"
                 />
-              ) : orderProcess == "started" &&
+              ) : orderDetails?.order_process == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
                 // <Button variant="success" disabled>
                 //   Send
@@ -1000,7 +1020,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderDetails?.order_process == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -1036,7 +1056,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderDetails?.order_process == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -1163,10 +1183,10 @@ function OnHoldOrdersDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" &&
+            orderDetails?.order_process == "started" &&
             tableData?.some((data) => data.dispatch_image != "") ? (
               <>
-                <Button
+               <Button
                   variant="danger"
                   disabled={orderDetails.toggle_status == 1 ? false : true}
                   onClick={handleSendToP2ButtonClick}
@@ -1187,7 +1207,7 @@ function OnHoldOrdersDetails() {
                 <Button
                   variant="danger"
                   disabled={
-                    orderProcess != "started" ||
+                    orderDetails?.order_process != "started" ||
                     userData?.user_id != orderDetails?.operation_user_id ||
                     tableData?.some((data) => data.dispatch_image == "")
                   }
@@ -1199,7 +1219,7 @@ function OnHoldOrdersDetails() {
                 <Button
                   variant="danger"
                   disabled={
-                    orderProcess != "started" ||
+                    orderDetails?.order_process != "started" ||
                     userData?.user_id != orderDetails?.operation_user_id ||
                     tableData?.some((data) => data.dispatch_image == "")
                   }
