@@ -273,15 +273,8 @@ const OnHoldOrdersdetailsInChina = () => {
       if (selectedItemId) {
         await dispatch(
           AttachmentFileUpload({
-            // user_id: user_id,
-            // // order_id: orderDetailsDataOrderId?.order_id,
-            // order_id: id,
-            // item_id: selectedItemId,
-            // selectedFile: selectedFile,
-            // variation_id: selectedVariationId,
-
             user_id: user_id,
-            order_id: orderDetailsDataOrderId?.order_id,
+            order_id: id,
             item_id: selectedItemId,
             variation_id: selectedVariationId,
             selectedFile: selectedFile,
