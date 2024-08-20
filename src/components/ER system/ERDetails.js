@@ -14,17 +14,16 @@ import DataTable from "../DataTable";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import { Alert, Avatar, Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { API_URL } from "../../redux/constants/Constants";
-import { PerticularPoDetails } from "../../redux/actions/P2SystemActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import axiosInstance from "../../utils/AxiosInstance";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "../../utils/AxiosInstance";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { PerticularPoDetails } from "../../Redux2/slices/P2SystemSlice";
 
 const ERDetails = () => {
   const params = useParams();
@@ -41,19 +40,59 @@ const ERDetails = () => {
   const [addNote, setNote] = useState("");
   const [lang, setLang] = useState("En");
 
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
+  const perticularPoDetailsDataa = useSelector(
+    (state) => state?.p2System?.perticularPoDetailsData
   );
+
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
+
+  useEffect(() => {
+    if (perticularPoDetailsDataa) {
+      setStatus(perticularPoDetailsDataa.er_status);
+      setFactoryName(perticularPoDetailsDataa.factory_id);
+      setNote(perticularPoDetailsDataa.er_note);
+      let data = perticularPoDetailsDataa.line_items.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      data = data.map((d) => {
+        if (d.returned_qty == d.received_qty) {
+          return {
+            ...d,
+            received_qty: d.received_qty,
+            received_status: "Received",
+          };
+        }
+        if (0 >= d.received_qty) {
+          return {
+            ...d,
+            received_qty: d.received_qty,
+            received_status: "Not Received",
+          };
+        }
+        if (d.returned_qty >= d.received_qty) {
+          return {
+            ...d,
+            received_qty: d.received_qty,
+            received_status: "Partially received",
+          };
+        }
+        return d;
+      });
+      setERviewList(data);
+    }
+  }, [perticularPoDetailsDataa]);
 
   const radios = [
     { name: "English", value: "En" },
@@ -61,44 +100,14 @@ const ERDetails = () => {
   ];
 
   const handleLanguageChange = async (language) => {
-    setLang(language); 
-    i18n.changeLanguage(language); 
+    setLang(language);
+    i18n.changeLanguage(language);
   };
 
   const fetchER = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/`;
-      await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
-        setStatus(response.data.er_status);
-        setFactoryName(response.data.factory_id);
-        let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
-        setNote(response.data.er_note);
-        data = data.map((d) => {
-          if (d.returned_qty == d.received_qty) {
-            return {
-              ...d,
-              received_qty: d.received_qty,
-              received_status: "Received",
-            };
-          }
-          if (0 >= d.received_qty) {
-            return {
-              ...d,
-              received_qty: d.received_qty,
-              received_status: "Not Received",
-            };
-          }
-          if (d.returned_qty >= d.received_qty) {
-            return {
-              ...d,
-              received_qty: d.received_qty,
-              received_status: "Partially received",
-            };
-          }
-          return d;
-        });
-        setERviewList(data);
-      });
+      let apiUrl = `wp-json/custom-er-record/v1/fetch-er-record/${params.er_no}/`;
+      dispatch(PerticularPoDetails({ apiUrl }));
     } catch {
       console.error("Error fetching PO:");
     }
@@ -318,8 +327,8 @@ const ERDetails = () => {
     };
     try {
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-er-update/v1/update-er-item/`,
-        payload,
+        `wp-json/custom-er-update/v1/update-er-item/`,
+        payload
       );
       if (response.data.message) {
         const result = await ShowAlert(
@@ -349,7 +358,6 @@ const ERDetails = () => {
     i18n.changeLanguage(lang);
   }, []);
 
-
   return (
     <Container fluid className="px-5">
       <MDBRow className="my-3">
@@ -362,28 +370,28 @@ const ERDetails = () => {
             <ArrowBackIcon className="me-1" />
           </Button>
           <ButtonGroup>
-              {radios.map((radio, idx) => (
-                <ToggleButton
-                  key={idx}
-                  id={`radio-${idx}`}
-                  type="radio"
-                  variant={idx % 2 ? "outline-success" : "outline-danger"}
-                  name="radio"
-                  value={radio.value}
-                  checked={lang === radio.value}
-                  onClick={() => handleLanguageChange(radio.value)}
-                >
-                  {radio.name}
-                </ToggleButton>
-              ))}
-            </ButtonGroup>
+            {radios.map((radio, idx) => (
+              <ToggleButton
+                key={idx}
+                id={`radio-${idx}`}
+                type="radio"
+                variant={idx % 2 ? "outline-success" : "outline-danger"}
+                name="radio"
+                value={radio.value}
+                checked={lang === radio.value}
+                onClick={() => handleLanguageChange(radio.value)}
+              >
+                {radio.name}
+              </ToggleButton>
+            ))}
+          </ButtonGroup>
         </MDBCol>
       </MDBRow>
       <Card className="p-3 mb-3">
         <Box className="d-flex align-items-center justify-content-between">
           <Box>
             <Typography variant="h6" className="fw-bold mb-3">
-              {t('POManagement.ERview')}
+              {t("POManagement.ERview")}
             </Typography>
             <Box>
               <Typography className="fw-bold"># {params.er_no}</Typography>
@@ -409,13 +417,15 @@ const ERDetails = () => {
         <Row className="mb-3">
           <Col xs="auto" lg="4">
             <Form.Group className="fw-semibold mb-0">
-              <Form.Label>{t('POManagement.StatusFilter')}</Form.Label>
+              <Form.Label>{t("POManagement.StatusFilter")}</Form.Label>
               <Form.Select
                 className="mr-sm-2"
                 value={status}
                 onChange={(e) => handleStatusFilter(e)}
               >
-                <option value="In Progress">{t("POManagement.InProgress")}</option>
+                <option value="In Progress">
+                  {t("POManagement.InProgress")}
+                </option>
                 <option value="Closed">{t("POManagement.Closed")}</option>
               </Form.Select>
             </Form.Group>
@@ -442,7 +452,7 @@ const ERDetails = () => {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-             {t('POManagement.NoExachangeandReturnManagementDataAvailable')}
+              {t("POManagement.NoExachangeandReturnManagementDataAvailable")}
             </Alert>
           )}
           <Row>
@@ -450,7 +460,7 @@ const ERDetails = () => {
               className="mb-3"
               controlId="exampleForm.ControlTextarea1"
             >
-              <Form.Label>{t('POManagement.AddNote')}</Form.Label>
+              <Form.Label>{t("POManagement.AddNote")}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={2}
@@ -461,7 +471,7 @@ const ERDetails = () => {
           </Row>
           <Row>
             <Button type="button" className="w-auto" onClick={handleUpdate}>
-             {t('POManagement.Update')}
+              {t("POManagement.Update")}
             </Button>
           </Row>
         </MDBRow>

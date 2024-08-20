@@ -23,12 +23,14 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import { MDBRow } from "mdb-react-ui-kit";
-import axiosInstance from "../../utils/AxiosInstance";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
+import axiosInstance from "../../utils/AxiosInstance";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 function ExchangeAndReturn() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [pageSize, setPageSize] = useState(10);
@@ -45,8 +47,20 @@ function ExchangeAndReturn() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [lang, setLang] = useState("En");
 
-  const loader = useSelector((state) => state?.orderSystemData?.isOrders);
-  const dispatch = useDispatch();
+  const loader = useSelector((state) => state?.orderSystem?.isLoading);
+
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
+  useEffect(() => {
+    dispatch(fetchAllFactories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+    }
+  }, [factoryData]);
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
@@ -238,25 +252,11 @@ function ExchangeAndReturn() {
   const handleFactoryChange = (e) => {
     setSelectedFactory(e.target.value);
   };
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
-  );
-
-  useEffect(() => {
-    dispatch(AllFactoryActions());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data);
-    }
-  }, [allFactoryDatas]);
 
   const selectPOType = async () => {
     try {
       const response = await axiosInstance.get(
-        `${API_URL}wp-json/custom-er-api/v1/fetch-products-po/`,
+        `wp-json/custom-er-api/v1/fetch-products-po/`,
         {
           params: {
             factory_id: selectedFactory,
@@ -278,7 +278,7 @@ function ExchangeAndReturn() {
     try {
       setSelectPOId(id);
       const response = await axiosInstance.get(
-        `${API_URL}wp-json/custom-er-po/v1/fetch-orders-po/${id}`
+        `wp-json/custom-er-po/v1/fetch-orders-po/${id}`
       );
       let data2 = [
         ...response.data.items_with_variations,
@@ -292,7 +292,6 @@ function ExchangeAndReturn() {
   };
 
   const submit = async () => {
-;
     const selectedOrders = orders.filter((order) =>
       selectedOrderIds.includes(order.id)
     );
@@ -308,7 +307,7 @@ function ExchangeAndReturn() {
 
     try {
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-er-generate/v1/create-er/`,
+        `wp-json/custom-er-generate/v1/create-er/`,
         payload
       );
 
@@ -326,7 +325,6 @@ function ExchangeAndReturn() {
     } catch (error) {
       console.error(error);
     }
-
   };
 
   const ImageModule = (url) => {
