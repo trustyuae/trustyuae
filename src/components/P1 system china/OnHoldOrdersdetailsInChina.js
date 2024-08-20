@@ -55,7 +55,7 @@ import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  AddMessage,
+  // AddMessage,
   AttachmentFileUpload,
   CustomOrderFinishOH,
   InsertOrderPickup,
@@ -65,6 +65,7 @@ import {
 } from "../../redux/actions/OrderSystemchinaActions";
 import { getUserData } from "../../utils/StorageUtils";
 import { useTranslation } from "react-i18next";
+import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 
 const OnHoldOrdersdetailsInChina = () => {
   const { id } = useParams();
@@ -171,10 +172,9 @@ const OnHoldOrdersdetailsInChina = () => {
   }, [toggleStatus]);
 
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(id, 10);
     const requestedMessage = {
       message: message,
-      order_id: orderId,
+      order_id: parseInt(id, 10),
       name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {

@@ -220,9 +220,10 @@ export const OverAllAttachmentFileUpload =
 
 export const AddMessage = (requestData) => async (dispatch) => {
   try {
+    console.log(requestData,'requestData from old redux')
     dispatch({ type: ADD_MESSAGE_CHINA_REQUEST });
     const response = await axiosInstance.post(
-      `${API_URL}wp-json/custom-message-note/v1/order-note/?warehouse=China`,
+      `wp-json/custom-message-note/v1/order-note/?warehouse=China`,
       requestData
     );
     dispatch({ type: ADD_MESSAGE_CHINA_SUCCESS, payload: response?.data });

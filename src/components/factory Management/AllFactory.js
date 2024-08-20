@@ -2,16 +2,21 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
-import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
+// import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
 import { Alert, Box, Typography } from "@mui/material";
 import { API_URL } from "../../redux/constants/Constants";
-import axiosInstance from "../../utils/AxiosInstance";
+import axios from "axios";
 import Loader from "../../utils/Loader";
+import axiosInstance from "../../utils/AxiosInstance";
+import {
+  factoryEdit,
+  fetchFactoriesByFilterParam,
+} from "../../Redux2/slices/FactoriesSlice";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -27,13 +32,25 @@ function AllFactory() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+
+  const loading = useSelector((state) => state?.factory?.isLoading);
+
+  const factoryData = useSelector(
+    (state) => state?.factory?.factoriesWithParams
+  );
+
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+      setTotalPages(factoryData.total_pages);
+    }
+  }, [factoryData]);
 
   async function fetchFactories() {
-    setLoading(true);
     try {
-      const token = await JSON.parse(localStorage.getItem("token"));
-      let apiUrl = `${API_URL}wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
+      let apiUrl = `wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
       const params = {
         factory_name: factoryName,
         address: address,
@@ -41,15 +58,10 @@ function AllFactory() {
         contact_number: contactNumber,
         contact_email: email,
       };
-
-      const response = await axiosInstance.get(apiUrl, { params});
-      const factoryData = response.data.factories.map((item) => ({ ...item }));
-      setFactories(factoryData);
-      setTotalPages(response.data.total_pages);
-      setLoading(false); // Stop loading
-      return response.data;
+      const response = dispatch(
+        fetchFactoriesByFilterParam({ apiUrl, params })
+      );
     } catch (error) {
-      setLoading(false); // Stop loading
       throw error;
     }
   }
@@ -90,7 +102,7 @@ function AllFactory() {
       bank_account_details: selectedFactory.bank_account_details,
     };
     try {
-      await dispatch(FactoryEdit(selectedFactory, data));
+      await dispatch(factoryEdit(selectedFactory, data));
       setFactories((prevFactories) => {
         return prevFactories.map((factory) => {
           if (factory.id === selectedFactory.id) {
@@ -151,6 +163,7 @@ function AllFactory() {
             placeholder="Search Factory Name"
             value={factoryName}
             onChange={(e) => setFactoryName(e.target.value)}
+            className="custom-placeholder"
           />
         </MDBCol>
         <MDBCol md="3">
@@ -160,6 +173,7 @@ function AllFactory() {
             placeholder="Search Address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            className="custom-placeholder"
           />
         </MDBCol>
         <MDBCol md="2">
@@ -169,6 +183,7 @@ function AllFactory() {
             placeholder="Search Contact Person"
             value={contactPerson}
             onChange={(e) => setContactPerson(e.target.value)}
+            className="custom-placeholder"
           />
         </MDBCol>
         <MDBCol md="2">
@@ -178,6 +193,7 @@ function AllFactory() {
             placeholder="Search Contact Number"
             value={contactNumber}
             onChange={(e) => setContactNumber(e.target.value)}
+            className="custom-placeholder"
           />
         </MDBCol>
         <MDBCol md="3">
@@ -187,6 +203,7 @@ function AllFactory() {
             placeholder="Search Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="custom-placeholder"
           />
         </MDBCol>
       </MDBRow>

@@ -64,7 +64,8 @@ export const factoryEdit = createAsyncThunk(
 
 export const FactoryAdd = createAsyncThunk(
   "factory/FactoryAdd",
-  async (factData, navigate, { rejectWithValue }) => {
+  async (factData,{ rejectWithValue }) => {
+    console.log(factData,'factData from Factory Add')
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-factory/v1/add-factory`,
@@ -74,17 +75,6 @@ export const FactoryAdd = createAsyncThunk(
             "Content-Type": "application/json",
           },
         }
-      );
-
-      await ShowAlert(
-        "Success",
-        response?.data?.message,
-        "success",
-        false,
-        false,
-        "OK",
-        "",
-        1000
       );
       return response.data;
     } catch (error) {

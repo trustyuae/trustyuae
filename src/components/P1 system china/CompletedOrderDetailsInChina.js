@@ -24,18 +24,18 @@ import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  AddMessage,
+  // AddMessage,
   CompletedOrderDetailsGet,
 } from "../../redux/actions/OrderSystemchinaActions";
 import Form from "react-bootstrap/Form";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
-// import { AddMessage } from "../../redux/actions/OrderSystemActions";
 import ShowAlert from "../../utils/ShowAlert";
 import { getUserData } from "../../utils/StorageUtils";
 import { useTranslation } from "react-i18next";
+import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 
 const CompletedOrderDetailsInChina = () => {
-  const params = useParams();
+  const {id} = useParams();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
   const [orderData, setOrderData] = useState([]);
@@ -59,7 +59,7 @@ const CompletedOrderDetailsInChina = () => {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(CompletedOrderDetailsGet(params.id));
+      const response = await dispatch(CompletedOrderDetailsGet(id));
       let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
       setOrderData(data);
       setOrderDetails(response.data.orders[0]);
@@ -119,11 +119,10 @@ const CompletedOrderDetailsInChina = () => {
   };
 
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(params.id, 10);
-    let userData = await getUserData();
+    const userData = getUserData()
     const requestedMessage = {
       message: message,
-      order_id: orderId,
+      order_id: parseInt(id, 10),
       name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
@@ -292,7 +291,7 @@ const CompletedOrderDetailsInChina = () => {
                 <Box className="d-flex justify-content-between">
                   <Box>
                     <Typography className="fw-bold">
-                    {t("P1ChinaSystem.Order")}# {params.id}
+                    {t("P1ChinaSystem.Order")}# {id}
                     </Typography>
                     <Typography
                       className=""

@@ -54,7 +54,7 @@ import axiosInstance from "../../utils/AxiosInstance";
 import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  AddMessage,
+  // AddMessage,
   AttachmentFileUpload,
   CustomItemSendToUAE,
   CustomOrderFinish,
@@ -66,6 +66,7 @@ import {
 } from "../../redux/actions/OrderSystemchinaActions";
 import { getUserData } from "../../utils/StorageUtils";
 import { useTranslation } from "react-i18next";
+import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 
 const OrderDetailsInChina = () => {
   const { id } = useParams();
@@ -195,12 +196,10 @@ const OrderDetailsInChina = () => {
   }, []);
 
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
-      order_id: orderId,
-      name: userID.first_name,
+      order_id: parseInt(id, 10),
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {
@@ -314,7 +313,7 @@ const OrderDetailsInChina = () => {
         await dispatch(
           AttachmentFileUpload({
             user_id: user_id,
-            order_id: orderDetailsDataOrderId?.order_id,
+            order_id: id,
             item_id: selectedItemId,
             variation_id: selectedVariationId,
             selectedFile: selectedFile,
@@ -720,7 +719,7 @@ const OrderDetailsInChina = () => {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-                {t("P1ChinaSystem.OrderDetails")}:
+                {t("P1ChinaSystem.OrderDetails")}
               </Typography>
               {loader ? (
                 <Loader />

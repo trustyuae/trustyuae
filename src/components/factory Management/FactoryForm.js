@@ -5,10 +5,12 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Card, Container } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { FactoryAdd } from "../../redux/actions/AllFactoryActions";
+// import { FactoryAdd } from "../../redux/actions/AllFactoryActions";
 import { useNavigate } from "react-router-dom";
 import { isValidEmail } from "../../utils/validation";
 import { Box, Typography } from "@mui/material";
+import { FactoryAdd } from "../../Redux2/slices/FactoriesSlice";
+import ShowAlert from "../../utils/ShowAlert";
 
 function FactoryForm() {
   const dispatch = useDispatch();
@@ -32,7 +34,7 @@ function FactoryForm() {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
     const form = event?.currentTarget;
     if (form?.checkValidity() === false) {
       event.preventDefault();
@@ -40,7 +42,7 @@ function FactoryForm() {
     }
 
     if (factory.contact_email && !isValidEmail(factory.contact_email)) {
-      return
+      return;
     }
 
     setValidated(true);
@@ -54,14 +56,28 @@ function FactoryForm() {
     };
     try {
       if (form?.checkValidity()) {
-        dispatch(FactoryAdd(factData, navigate));
-        setFactory({
-          factory_name: "",
-          address: "",
-          contact_person: "",
-          contact_number: "",
-          contact_email: "",
-          bank_account_details: "",
+        dispatch(FactoryAdd(factData, navigate)).then(({ payload }) => {
+          if (payload) {
+            ShowAlert(
+              "Success",
+              payload?.message,
+              "success",
+              false,
+              false,
+              "OK",
+              "",
+              1000
+            );
+            navigate("/all_factory");
+          }
+          setFactory({
+            factory_name: "",
+            address: "",
+            contact_person: "",
+            contact_number: "",
+            contact_email: "",
+            bank_account_details: "",
+          });
         });
       }
     } catch (error) {
@@ -71,7 +87,11 @@ function FactoryForm() {
 
   return (
     <>
-      <Container fluid className="py-3" style={{ maxHeight: "100%",height:'85vh' }}>
+      <Container
+        fluid
+        className="py-3"
+        style={{ maxHeight: "100%", height: "85vh" }}
+      >
         <Box className="mb-4">
           <Typography variant="h4" className="fw-semibold">
             Add New Factory
@@ -89,10 +109,12 @@ function FactoryForm() {
                     name="factory_name"
                     value={factory.factory_name}
                     onChange={handleChange}
-                    className="form-control"
+                    className="custom-placeholder"
                     required
                   />
-                  <Form.Control.Feedback type="invalid">Please enter factory name.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please enter factory name.
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col xs="auto" lg="4">
@@ -104,9 +126,11 @@ function FactoryForm() {
                     name="address"
                     value={factory.address}
                     onChange={handleChange}
-                    className="form-control"
+                    className="custom-placeholder"
                   />
-                  <Form.Control.Feedback type="invalid">Please enter factory address.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please enter factory address.
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col xs="auto" lg="4">
@@ -114,16 +138,20 @@ function FactoryForm() {
                   className="mb-3"
                   controlId="formFactoryContactPerson"
                 >
-                  <Form.Label className="fw-semibold">Contact Person</Form.Label>
+                  <Form.Label className="fw-semibold">
+                    Contact Person
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter contact person"
                     name="contact_person"
                     value={factory.contact_person}
                     onChange={handleChange}
-                    className="form-control"
+                    className="custom-placeholder"
                   />
-                  <Form.Control.Feedback type="invalid">Please enter cntact person.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please enter cntact person.
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>
@@ -133,16 +161,20 @@ function FactoryForm() {
                   className="mb-3"
                   controlId="formFactoryContactNumber"
                 >
-                  <Form.Label className="fw-semibold">Contact Number</Form.Label>
+                  <Form.Label className="fw-semibold">
+                    Contact Number
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter contact number"
                     name="contact_number"
                     value={factory.contact_number}
                     onChange={handleChange}
-                    className="form-control"
+                    className="custom-placeholder"
                   />
-                  <Form.Control.Feedback type="invalid">Please enter cpntact number.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please enter cpntact number.
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col xs="auto" lg="4">
@@ -157,9 +189,11 @@ function FactoryForm() {
                     name="contact_email"
                     value={factory.contact_email}
                     onChange={handleChange}
-                    className="form-control"
+                    className="custom-placeholder"
                   />
-                  <Form.Control.Feedback type="invalid">Please entercontact email.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please entercontact email.
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col xs="auto" lg="4">
@@ -167,16 +201,20 @@ function FactoryForm() {
                   className="mb-3"
                   controlId="formFactoryBankAccountDetails"
                 >
-                  <Form.Label className="fw-semibold">Bank Account Details</Form.Label>
+                  <Form.Label className="fw-semibold">
+                    Bank Account Details
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter bank account details"
                     name="bank_account_details"
                     value={factory.bank_account_details}
                     onChange={handleChange}
-                    className="form-control"
+                    className="custom-placeholder"
                   />
-                  <Form.Control.Feedback type="invalid">Please enter bank account details.</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    Please enter bank account details.
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
             </Row>
@@ -195,7 +233,6 @@ function FactoryForm() {
         </Card>
       </Container>
     </>
-    
   );
 }
 export default FactoryForm;

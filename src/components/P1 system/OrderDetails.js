@@ -173,15 +173,12 @@ function OrderDetails() {
   };
 
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(id, 10);
-    let userID = getUserData();
     const requestedMessage = {
       message: message,
-      order_id: orderId,
-      name: userID.first_name,
+      order_id: parseInt(id, 10),
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
-      console.log(payload, "payload from addmessage");
       if (payload) {
         setMessage("");
         setshowMessageModal(false);
@@ -291,7 +288,7 @@ function OrderDetails() {
         dispatch(
           AttachmentFileUpload({
             user_id: user_id,
-            order_id: orderDetailsDataOrderId?.order_id,
+            order_id: id,
             item_id: selectedItemId,
             variation_id: selectedVariationId,
             selectedFile: selectedFile,

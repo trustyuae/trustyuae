@@ -29,6 +29,7 @@ import {
   ReserveOrderDetailsGet,
 } from "../../redux/actions/OrderSystemchinaActions";
 import { useTranslation } from "react-i18next";
+import { getUserData } from "../../utils/StorageUtils";
 
 const ReserveOrderdetailsInChina = () => {
   const params = useParams();
@@ -223,11 +224,11 @@ const ReserveOrderdetailsInChina = () => {
 
   const handleAddMessage = async (e) => {
     const orderId = parseInt(params.id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
+    let userData = getUserData()
     const requestedMessage = {
       message: message,
       order_id: orderId,
-      name: userID.first_name,
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async (response) => {
       if (response.data) {

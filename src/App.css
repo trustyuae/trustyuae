@@ -154,3 +154,8 @@
 .no-background {
   background-color: transparent !important;
 }
+
+.custom-placeholder::placeholder {
+  font-size: 14px; /* Adjust the size as needed */
+  color: #6c757d; /* Optional: You can also change the color */
+}
