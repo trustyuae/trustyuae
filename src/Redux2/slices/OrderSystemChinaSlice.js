@@ -42,7 +42,7 @@ export const OrderDetailsChinaGet = createAsyncThunk(
     async ({ id }, { rejectWithValue }) => {
       try {
         const response = await axiosInstance.get(
-          `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
+          `wp-json/custom-orders-new/v1/orders/?warehouse=China&orderid=${id}`
         );
         return response.data;
       } catch (error) {
@@ -70,7 +70,7 @@ export const CompletedOrderDetailsChinaGet = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`
+        `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -98,7 +98,7 @@ export const OnHoldOrderDetailsChinaGet = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`
+        `wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -126,7 +126,7 @@ export const ReserveOrderDetailsChinaGet = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`
+        `wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -146,7 +146,7 @@ export const AttachmentFileUploadChina = createAsyncThunk(
       const requestData = new FormData();
       requestData.append("dispatch_image", selectedFile);
       const response = await axiosInstance.post(
-        `wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}`,
+        `wp-json/custom-order-attachment/v1/insert-attachment/${user_id}/${order_id}/${item_id}/${variation_id}/?warehouse=China`,
         requestData,
         {
           headers: {
@@ -169,7 +169,7 @@ export const OverAllAttachmentFileUploadChina = createAsyncThunk(
       const requestData = new FormData();
       requestData.append("order_dispatch_image", order_dispatch_image);
       const response = await axiosInstance.post(
-        `wp-json/order-complete-attachment/v1/order-attachment/${order_id}`,
+        `wp-json/order-complete-attachment/v1/order-attachment/${order_id}/?warehouse=China`,
         requestData,
         {
           headers: {
@@ -190,7 +190,7 @@ export const AddMessageChina = createAsyncThunk(
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-message-note/v1/order-note/`,
+        `wp-json/custom-message-note/v1/order-note/?warehouse=China`,
         requestData
       );
       return response;
@@ -206,7 +206,7 @@ export const InsertOrderPickupChina = createAsyncThunk(
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-order-pick/v1/insert-order-pickup/`,
+        `wp-json/custom-order-pick/v1/insert-order-pickup/?warehouse=China`,
         requestData
       );
       return response.data;
@@ -222,7 +222,7 @@ export const InsertOrderPickupCancelChina = createAsyncThunk(
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-order-cancel/v1/insert-order-cancel/`,
+        `wp-json/custom-order-cancel/v1/insert-order-cancel/?warehouse=China`,
         requestData
       );
       return response.data;

@@ -14,26 +14,17 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { Badge, ButtonGroup, ToggleButton } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   OrderDetailsGet,
-//   OrderSystemGet,
-// } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
-import OrderDetails from "./OrderDetailsInChina";
 import PrintModal from "./PrintModalInChina";
-import {
-  OrderDetailsGet,
-  OrderSystemGet,
-} from "../../redux/actions/OrderSystemchinaActions";
+import { OrderDetailsChinaGet, OrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
-
-const OrderSystemInChina = () => {
+function OrderSystemInChina() {
+  const dispatch = useDispatch();
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
@@ -55,32 +46,43 @@ const OrderSystemInChina = () => {
   });
   const [orderData, setOrderData] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const loader = useSelector((state) => state?.orderSystemDataChina?.isOrders);
 
-  const dispatch = useDispatch();
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
+  const ordersData = useSelector((state) => state?.orderSystemChina?.orders?.orders);
+  const otherData = useSelector((state) => state?.orderSystemChina?.orders);
+  const orderDetails = useSelector((state) => state?.orderSystemChina?.orderDetails);
+
+  useEffect(() => {
+    if (ordersData) {
+      const oData = ordersData.map((v, i) => ({ ...v, id: i }));
+      setOrders(oData);
+    }
+    if (otherData) {
+      setOverAllData({
+        total_count: otherData?.total_count,
+        total_dispatch_orders: otherData?.total_dispatch_orders,
+        total_reserve_orders: otherData?.total_reserve_orders,
+      });
+      setTotalPages(otherData?.total_pages);
+    }
+  }, [ordersData, otherData]);
+
+  useEffect(() => {
+    if (orderDetails) {
+      const oDetails = orderDetails?.orders?.map((v, i) => ({ ...v, id: i }));
+      setOrderData(oDetails);
+    }
+  }, [orderDetails]);
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-orders-new/v1/orders/?warehouse=China`;
+    let apiUrl = `wp-json/custom-orders-new/v1/orders/?warehouse=China`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     await dispatch(
-      OrderSystemGet({
+      OrderSystemChinaGet({
         apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setOverAllData({
-          total_count: response.data.total_count,
-          total_dispatch_orders: response.data.total_dispatch_orders,
-          total_reserve_orders: response.data.total_reserve_orders,
-        });
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleReset = () => {
@@ -104,9 +106,7 @@ const OrderSystemInChina = () => {
 
   const handlePrint = async (orderId) => {
     try {
-      const response = await dispatch(OrderDetailsGet({ id: orderId }));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
+      const response = await dispatch(OrderDetailsChinaGet({ id: orderId }));
       setShowModal(true);
     } catch (error) {
       console.error(error);
@@ -255,6 +255,8 @@ const OrderSystemInChina = () => {
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
+      // setProductName("");
+      // fetchOrders();
     }
   };
 
@@ -297,8 +299,8 @@ const OrderSystemInChina = () => {
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
-                <Form.Control
+              <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
+              <Form.Control
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
@@ -343,8 +345,8 @@ const OrderSystemInChina = () => {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">{t("P1ChinaSystem.Dispatchtype")}:</Form.Label>
-                <Form.Select
+              <Form.Label className="fw-semibold">{t("P1ChinaSystem.Dispatchtype")}:</Form.Label>
+              <Form.Select
                   className="mr-sm-2 py-2"
                   onChange={(e) => searchDispatchTypeFilter(e.target.value)}
                 >
@@ -421,14 +423,14 @@ const OrderSystemInChina = () => {
                 onClick={handleSearchFilter}
               >
                 {t("P1ChinaSystem.Search")}:
-              </Button>
+                </Button>
               <Button
                 type="button"
                 className="mr-2 mx-1 w-auto"
                 onClick={handleReset}
               >
                 {t("P1ChinaSystem.ResetFilter")}:
-              </Button>
+                </Button>
             </Box>
           </Box>
         </Form>
@@ -454,7 +456,7 @@ const OrderSystemInChina = () => {
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
              {t("P1ChinaSystem.RecordsIsNotAlert")}:
-            </Alert>
+             </Alert>
           )}
         </>
       )}
