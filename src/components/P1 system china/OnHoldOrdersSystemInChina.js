@@ -13,18 +13,15 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-// import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemchinaActions";
+import { OnHoldOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
-
-const OnHoldOrdersSystemInChina = () => {
+function OnHoldOrdersSystemInChina() {
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
@@ -46,30 +43,34 @@ const OnHoldOrdersSystemInChina = () => {
     null,
     null,
   ]);
-  const loader = useSelector(
-    (state) => state?.orderSystemDataChina?.isCompletedOrders
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
+  const OnholdOrdersData = useSelector(
+    (state) => state?.orderSystemChina?.onHoldOrders
   );
-
+  
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (OnholdOrdersData) {
+      const onHoldData = OnholdOrdersData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(onHoldData);
+      setTotalPages(OnholdOrdersData.total_pages);
+    }
+  }, [OnholdOrdersData]);
+
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
+    let apiUrl = `wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (dispatchType) apiUrl += `&status=${dispatchType}`;
-    await dispatch(
-      CompletedOrderSystemGet({
+    dispatch(
+      OnHoldOrderSystemChinaGet({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleReset = () => {
@@ -125,7 +126,6 @@ const OnHoldOrdersSystemInChina = () => {
       className: "order-system",
       type: "string",
     },
-    // { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName: t("POManagement.ViewItem"),
@@ -215,6 +215,8 @@ const OnHoldOrdersSystemInChina = () => {
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
+      // setProductName("");
+      // fetchOrders();
     }
   };
   const clearDateRange = () => {
@@ -230,7 +232,7 @@ const OnHoldOrdersSystemInChina = () => {
 
   return (
     <Container fluid className="py-3">
-      <Box className="d-flex mb-4 justify-content-between">
+       <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
         {t("P1ChinaSystem.OnHoldOrdersSystemInChina")}
         </Typography>
@@ -256,8 +258,8 @@ const OnHoldOrdersSystemInChina = () => {
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">{t("P1ChinaSystem.OrderId")}:</Form.Label>
-                <Form.Control
+              <Form.Label className="fw-semibold">{t("P1ChinaSystem.OrderId")}:</Form.Label>
+              <Form.Control
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   // value={searchOrderID}
@@ -302,12 +304,12 @@ const OnHoldOrdersSystemInChina = () => {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">{t("P1ChinaSystem.Dispatchtype")}:</Form.Label>
-                <Form.Select
+              <Form.Label className="fw-semibold">{t("P1ChinaSystem.Dispatchtype")}:</Form.Label>
+              <Form.Select
                   className="mr-sm-2 py-2"
                   onChange={(e) => searchDispatchTypeFilter(e.target.value)}
                 >
-                  <option value="all">{t("POManagement.All")}</option>
+                    <option value="all">{t("POManagement.All")}</option>
                   <option value="dispatch">{t("P1ChinaSystem.dispatch")}</option>
                   <option value="reserve">{t("P1ChinaSystem.reserve")}</option>
                 </Form.Select>
@@ -317,8 +319,8 @@ const OnHoldOrdersSystemInChina = () => {
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
               <Form.Label className="fw-semibold mb-0 me-2">
-                
-              </Form.Label>{t("P1ChinaSystem.PageSize")}:
+              {t("P1ChinaSystem.PageSize")}:
+              </Form.Label>
               <Form.Control
                 as="select"
                 className="w-auto"
@@ -337,7 +339,7 @@ const OnHoldOrdersSystemInChina = () => {
               className="mr-2 mx-1 w-auto"
               onClick={(e) => handleSearchFilter(e)}
             >
-            {t("P1ChinaSystem.Search")}
+               {t("P1ChinaSystem.Search")}
             </Button>
             <Button
               type="button"
@@ -345,7 +347,7 @@ const OnHoldOrdersSystemInChina = () => {
               onClick={handleReset}
             >
               {t("P1ChinaSystem.ResetFilter")}
-            </Button>
+              </Button>
           </Box>
         </Form>
       </Row>
@@ -370,7 +372,7 @@ const OnHoldOrdersSystemInChina = () => {
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
                {t("P1ChinaSystem.RecordsIsNotAlert")}:
-            </Alert>
+               </Alert>
           )}
         </>
       )}

@@ -33,17 +33,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   AddMessage,
-//   AttachmentFileUpload,
-//   CustomOrderFinish,
-//   CustomOrderFinishOH,
-//   InsertOrderPickup,
-//   InsertOrderPickupCancel,
-//   OnHoldOrderDetailsGet,
-//   OrderDetailsGet,
-//   OverAllAttachmentFileUpload,
-// } from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
@@ -51,23 +40,13 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
-import axiosInstance from "../../utils/AxiosInstance";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  // AddMessage,
-  AttachmentFileUpload,
-  CustomOrderFinishOH,
-  InsertOrderPickup,
-  InsertOrderPickupCancel,
-  OnHoldOrderDetailsGet,
-  OverAllAttachmentFileUpload,
-} from "../../redux/actions/OrderSystemchinaActions";
 import { getUserData } from "../../utils/StorageUtils";
 import { useTranslation } from "react-i18next";
-import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
+import axiosInstance from "../../utils/AxiosInstance";
+import { AddMessageChina, AttachmentFileUploadChina, CustomOrderFinishOHChina, InsertOrderPickupChina, OnHoldOrderDetailsChinaGet, OverAllAttachmentFileUploadChina } from "../../Redux2/slices/OrderSystemChinaSlice";
 
-const OnHoldOrdersdetailsInChina = () => {
+function OnHoldOrdersdetailsInChina() {
   const { id } = useParams();
   const fileInputRef = useRef({});
   const { t, i18n } = useTranslation();
@@ -75,7 +54,6 @@ const OnHoldOrdersdetailsInChina = () => {
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
-  const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
@@ -94,8 +72,7 @@ const OnHoldOrdersdetailsInChina = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
-  // const loader = useSelector((state) => state?.orderSystemData?.isOrderDetails);
-  const [loader, setLoader] = useState(true);
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
 
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -103,8 +80,47 @@ const OnHoldOrdersdetailsInChina = () => {
   fileInputRef.current[selectedItemId] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemDataChina?.onHoldOrderDetails?.orders?.[0]
+    (state) => state?.orderSystemChina?.onHoldOrderDetails?.orders?.[0]
   );
+
+  const OnHoldOrderDetailsData = useSelector(
+    (state) => state?.orderSystemChina?.onHoldOrderDetails
+  );
+
+  const messageData = useSelector((state) => state?.orderSystemChina?.message);
+
+  const OnHoldCustomOrderDataa = useSelector(
+    (state) => state?.orderSystemChina?.customOrderData
+  );
+
+  const OnHoldOrderFinishData = useSelector(
+    (state) => state?.orderSystemChina?.customOrderOnHoldFinishData
+  );
+
+  useEffect(() => {
+    const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
+      ...v,
+      id: i,
+    }));
+    setOrderData(onHoldOrderData);
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      setToggleStatus(Number(orderDetailsDataOrderId.toggle_status));
+
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsDataOrderId, OnHoldOrderDetailsData]);
 
   async function fetchUserData() {
     try {
@@ -114,10 +130,9 @@ const OnHoldOrdersdetailsInChina = () => {
       console.error("Error fetching user data:", error);
     }
   }
-
   useEffect(() => {
     fetchUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const capture = useCallback(() => {
@@ -144,32 +159,11 @@ const OnHoldOrdersdetailsInChina = () => {
 
   async function fetchOrder() {
     try {
-      const response = await dispatch(OnHoldOrderDetailsGet(id));
-
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      setToggleStatus(Number(response.data.orders[0].toggle_status));
-      const order = response.data.orders[0];
-      if (order) setOrderProcess(order.order_process);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
-      }
-      setLoader(false);
+      dispatch(OnHoldOrderDetailsChinaGet({ id }));
     } catch (error) {
       console.error(error);
     }
   }
-
-  useEffect(() => {
-    console.log(toggleStatus, "toggleStatus");
-  }, [toggleStatus]);
 
   const handleAddMessage = async (e) => {
     const requestedMessage = {
@@ -177,28 +171,18 @@ const OnHoldOrdersdetailsInChina = () => {
       order_id: parseInt(id, 10),
       name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
-        setMessage("");
-        setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
-      }
-    });
+    dispatch(AddMessageChina(requestedMessage));
+    if (messageData) {
+      setMessage("");
+      setshowMessageModal(false);
+      ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
+    }
   };
 
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message, setTableData, setOrderData]);
+  }, [setMessage, setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -267,12 +251,11 @@ const OnHoldOrdersdetailsInChina = () => {
   };
 
   const handleSubmitAttachment = async () => {
-    setLoader(true);
     try {
       const { user_id } = userData ?? {};
       if (selectedItemId) {
-        await dispatch(
-          AttachmentFileUpload({
+        dispatch(
+          AttachmentFileUploadChina({
             user_id: user_id,
             order_id: id,
             item_id: selectedItemId,
@@ -281,9 +264,8 @@ const OnHoldOrdersdetailsInChina = () => {
           })
         );
       } else {
-        await dispatch(
-          OverAllAttachmentFileUpload({
-            // order_id: orderDetailsDataOrderId?.order_id,
+        dispatch(
+          OverAllAttachmentFileUploadChina({
             order_id: id,
             order_dispatch_image: selectedFile,
           })
@@ -303,7 +285,7 @@ const OnHoldOrdersdetailsInChina = () => {
       );
       if (result.isConfirmed) handleCancel();
       fetchOrder();
-      setLoader(false);
+      // setLoader(false);
     } catch (error) {
       console.error(error);
     }
@@ -317,22 +299,7 @@ const OnHoldOrdersdetailsInChina = () => {
       end_time: "",
       order_status: "started",
     };
-    await dispatch(InsertOrderPickup(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleCancelOrderProcess = async () => {
-    const requestData = {
-      order_id: parseInt(id, 10),
-      operation_id: orderDetails?.operation_user_id,
-      order_status: "Cancelled",
-    };
-    await dispatch(InsertOrderPickupCancel(requestData))
+    await dispatch(InsertOrderPickupChina(requestData))
       .then((response) => {
         fetchOrder();
       })
@@ -344,7 +311,21 @@ const OnHoldOrdersdetailsInChina = () => {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      dispatch(CustomOrderFinishOH(user_id, id, navigate));
+      dispatch(CustomOrderFinishOHChina({ user_id, id }));
+      if (OnHoldOrderFinishData.status_code === 200) {
+        await Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "success",
+          showConfirmButton: true,
+        });
+        navigate("/on_hold_orders_system");
+      } else {
+        Swal.fire({
+          title: OnHoldOrderFinishData.message,
+          icon: "error",
+          showConfirmButton: true,
+        });
+      }
     } catch (error) {
       console.error("Error while finishing order:", error);
     }
@@ -487,7 +468,7 @@ const OnHoldOrdersdetailsInChina = () => {
           fileInputRef.current = {};
         }
         if (value && value.row.dispatch_image) {
-          const isDisabled = orderDetails.order_process !== "started";
+          const isDisabled = orderDetails?.order_process !== "started";
           return (
             <Row className={`${"justify-content-center"} h-100`}>
               <Col
@@ -515,7 +496,7 @@ const OnHoldOrdersdetailsInChina = () => {
                     }}
                   />
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderProcess == "started" &&
+                    orderDetails?.order_process == "started" &&
                     toggleStatus != 0 && (
                       <CancelIcon
                         sx={{
@@ -550,7 +531,7 @@ const OnHoldOrdersdetailsInChina = () => {
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" &&
+                  orderDetails?.order_process == "started" &&
                   qty == avl_qty &&
                   toggleStatus != 0 ? (
                     <Button
@@ -590,7 +571,7 @@ const OnHoldOrdersdetailsInChina = () => {
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" &&
+                  orderDetails?.order_process == "started" &&
                   qty == avl_qty &&
                   toggleStatus != 0 ? (
                     <Button
@@ -627,7 +608,7 @@ const OnHoldOrdersdetailsInChina = () => {
   ];
 
   const handalswitch = async (e) => {
-    setLoader(true);
+    // setLoader(true);
     if (e) {
       // setToggleStatus(1)
       handelSend(e);
@@ -657,6 +638,7 @@ const OnHoldOrdersdetailsInChina = () => {
       result.toggle_status = 0;
       setToggleStatus(0);
     }
+
     const response = await axiosInstance.post(
       `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/?warehouse=China`,
       result
@@ -666,13 +648,10 @@ const OnHoldOrdersdetailsInChina = () => {
     }
   };
 
-  // useEffect(()=>{
-  //   handelSend()
-  // },[toggleStatus])
   return (
     <>
       <Container fluid className="px-5">
-        <MDBRow className="my-3">
+      <MDBRow className="my-3">
           <MDBCol className="d-flex justify-content-start">
             <Button
               variant="outline-secondary"
@@ -748,7 +727,7 @@ const OnHoldOrdersdetailsInChina = () => {
                 <LocalPrintshopOutlinedIcon />
               </Button>
               {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
+              orderDetails?.order_process == "started" ? (
                 // <Button
                 //   variant="outline-danger"
                 //   className="p-1 me-2 bg-transparent text-danger"
@@ -770,7 +749,7 @@ const OnHoldOrdersdetailsInChina = () => {
                   onChange={(e) => handalswitch(e.target.checked)}
                   // label="Send"
                 />
-              ) : orderProcess == "started" &&
+              ) : orderDetails?.order_process == "started" &&
                 userData?.user_id != orderDetails?.operation_user_id ? (
                 // <Button variant="success" disabled>
                 //   Send
@@ -816,7 +795,7 @@ const OnHoldOrdersdetailsInChina = () => {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-                {t("P1ChinaSystem.CustomerOrder")}
+              {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -832,7 +811,7 @@ const OnHoldOrdersdetailsInChina = () => {
                         }}
                       >
                         {t("P1ChinaSystem.Name")}
-                      </Typography>
+                        </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -857,7 +836,7 @@ const OnHoldOrdersdetailsInChina = () => {
                         }}
                       >
                         {t("P1ChinaSystem.Phone")}
-                      </Typography>
+                        </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -882,7 +861,7 @@ const OnHoldOrdersdetailsInChina = () => {
                         }}
                       >
                         {t("P1ChinaSystem.CustomerShippingAddress")}
-                      </Typography>
+                        </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -907,7 +886,7 @@ const OnHoldOrdersdetailsInChina = () => {
                         }}
                       >
                         {t("P1ChinaSystem.OrderProcess")}
-                      </Typography>
+                        </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -975,7 +954,7 @@ const OnHoldOrdersdetailsInChina = () => {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderDetails?.order_process == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -1011,7 +990,7 @@ const OnHoldOrdersdetailsInChina = () => {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderDetails?.order_process == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -1046,7 +1025,7 @@ const OnHoldOrdersdetailsInChina = () => {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-            {t("P1ChinaSystem.OrderDetails")}
+          {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -1085,13 +1064,13 @@ const OnHoldOrdersdetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                            {t("P1ChinaSystem.Messages")}
+                          {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
                           style={{ maxHeight: "200px", overflowY: "auto" }}
                         >
-                          <List>
+                           <List>
                             {orderDetailsDataOrderId?.operation_user_note.map(
                               (message, i) => (
                                 <ListItem
@@ -1127,7 +1106,7 @@ const OnHoldOrdersdetailsInChina = () => {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" &&
+            orderDetails?.order_process == "started" &&
             tableData?.some((data) => data.dispatch_image != "") ? (
               <>
                 <Button
@@ -1136,14 +1115,14 @@ const OnHoldOrdersdetailsInChina = () => {
                   onClick={handleFinishButtonClick}
                 >
                   {t("P1ChinaSystem.Finish")}
-                </Button>
+                  </Button>
               </>
             ) : (
               <>
                 <Button
                   variant="danger"
                   disabled={
-                    orderProcess != "started" ||
+                    orderDetails?.order_process != "started" ||
                     userData?.user_id != orderDetails?.operation_user_id ||
                     // orderDetails.toggle_status==1?true:false||
                     tableData?.some((data) => data.dispatch_image == "")
@@ -1151,7 +1130,7 @@ const OnHoldOrdersdetailsInChina = () => {
                   onClick={handleFinishButtonClick}
                 >
                   {t("P1ChinaSystem.Finish")}
-                </Button>
+                  </Button>
               </>
             )}
           </MDBCol>
