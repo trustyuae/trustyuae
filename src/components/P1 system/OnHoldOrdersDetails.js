@@ -46,7 +46,7 @@ import {
   OnHoldOrderDetailsGet,
   OverAllAttachmentFileUpload,
 } from "../../Redux2/slices/OrderSystemSlice";
-import {CustomItemSendToP2} from '../../redux/actions/OrderSystemActions'
+import { CustomItemSendToP2 } from "../../redux/actions/OrderSystemActions";
 import { getUserData } from "../../utils/StorageUtils";
 
 function OnHoldOrdersDetails() {
@@ -71,7 +71,6 @@ function OnHoldOrdersDetails() {
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
-  const [selectedItemIdss, setSelectedItemIdss] = useState([]);
 
   const [message, setMessage] = useState("");
 
@@ -91,12 +90,6 @@ function OnHoldOrdersDetails() {
 
   const OnHoldOrderDetailsData = useSelector(
     (state) => state?.orderSystem?.onHoldOrderDetails
-  );
-
-  const messageData = useSelector((state) => state?.orderSystem?.message);
-
-  const OnHoldCustomOrderDataa = useSelector(
-    (state) => state?.orderSystem?.customOrderData
   );
 
   const OnHoldOrderFinishData = useSelector(
@@ -128,15 +121,15 @@ function OnHoldOrdersDetails() {
     }
   }, [orderDetailsDataOrderId, OnHoldOrderDetailsData]);
 
-  async function fetchUserData() {
-    try {
-      const userdata = await getUserData();
-      setUserData(userdata || {});
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  }
   useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const userdata = await getUserData();
+        setUserData(userdata || {});
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
     fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -171,9 +164,6 @@ function OnHoldOrdersDetails() {
     }
   }
 
-  useEffect(() => {
-    console.log(toggleStatus, "toggleStatus");
-  }, [toggleStatus]);
 
   const handleAddMessage = (e) => {
     e.preventDefault(); // Prevent default form submission if this is used in a form
@@ -182,13 +172,13 @@ function OnHoldOrdersDetails() {
       order_id: parseInt(id, 10),
       name: userData.first_name,
     };
-  
+
     dispatch(AddMessage(requestedMessage))
       .then(({ payload }) => {
         if (payload) {
           setMessage("");
           setshowMessageModal(false);
-          ShowAlert("",  payload, "success", null, null, null, null, 2000);
+          ShowAlert("", payload, "success", null, null, null, null, 2000);
         }
       })
       .catch((error) => {
@@ -200,7 +190,7 @@ function OnHoldOrdersDetails() {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setMessage, setTableData, setOrderData]);
+  }, [setTableData, setOrderData]);
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -260,7 +250,7 @@ function OnHoldOrdersDetails() {
         dispatch(
           AttachmentFileUpload({
             user_id: user_id,
-            order_id:id,
+            order_id: id,
             item_id: selectedItemId,
             variation_id: selectedVariationId,
             selectedFile: selectedFile,
@@ -1020,7 +1010,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                                orderDetails?.order_process == "started" ? (
+                              orderDetails?.order_process == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -1056,7 +1046,7 @@ function OnHoldOrdersDetails() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                                orderDetails?.order_process == "started" ? (
+                              orderDetails?.order_process == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -1186,7 +1176,7 @@ function OnHoldOrdersDetails() {
             orderDetails?.order_process == "started" &&
             tableData?.some((data) => data.dispatch_image != "") ? (
               <>
-               <Button
+                <Button
                   variant="danger"
                   disabled={orderDetails.toggle_status == 1 ? false : true}
                   onClick={handleSendToP2ButtonClick}
@@ -1306,7 +1296,7 @@ function OnHoldOrdersDetails() {
               <Button
                 variant="secondary"
                 className="mt-2 fw-semibold"
-                onClick={handleAddMessage}
+                onClick={(e)=>handleAddMessage(e)}
               >
                 Add Message
               </Button>
