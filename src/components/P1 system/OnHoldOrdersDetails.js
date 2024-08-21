@@ -40,13 +40,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   AddMessage,
   AttachmentFileUpload,
+  CustomItemSendToP2,
   CustomOrderFinishOH,
   InsertOrderPickup,
   InsertOrderPickupCancel,
   OnHoldOrderDetailsGet,
   OverAllAttachmentFileUpload,
 } from "../../Redux2/slices/OrderSystemSlice";
-import { CustomItemSendToP2 } from "../../redux/actions/OrderSystemActions";
 import { getUserData } from "../../utils/StorageUtils";
 
 function OnHoldOrdersDetails() {
@@ -163,7 +163,6 @@ function OnHoldOrdersDetails() {
       console.error(error);
     }
   }
-
 
   const handleAddMessage = (e) => {
     e.preventDefault(); // Prevent default form submission if this is used in a form
@@ -308,7 +307,19 @@ function OnHoldOrdersDetails() {
     };
 
     try {
-      dispatch(CustomItemSendToP2(id, payload, navigate));
+      dispatch(CustomItemSendToP2({ id, payload })).then(({ payload }) => {
+        if (payload) {
+          Swal.fire({
+            title: payload.message,
+            icon: payload.status === 200 ? "success" : "error",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/on_hold_orders_system");
+            }
+          });
+        }
+      });
     } catch (error) {
       console.error("Error sending items to p2 system:", error);
     }
@@ -1296,7 +1307,7 @@ function OnHoldOrdersDetails() {
               <Button
                 variant="secondary"
                 className="mt-2 fw-semibold"
-                onClick={(e)=>handleAddMessage(e)}
+                onClick={(e) => handleAddMessage(e)}
               >
                 Add Message
               </Button>

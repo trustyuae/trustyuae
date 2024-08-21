@@ -43,15 +43,24 @@ import Swal from "sweetalert2";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import axiosInstance from "../../utils/AxiosInstance";
 import { getUserData } from "../../utils/StorageUtils";
-import { AddMessageChina, AttachmentFileUploadChina, CustomOrderFinishChina, CustomOrderOHChina, InsertOrderPickupCancelChina, InsertOrderPickupChina, OrderDetailsChinaGet, OverAllAttachmentFileUploadChina } from "../../Redux2/slices/OrderSystemChinaSlice";
-import {CustomItemSendToUAE} from '../../redux/actions/OrderSystemchinaActions';
+import {
+  AddMessageChina,
+  AttachmentFileUploadChina,
+  CustomItemSendToUAE,
+  CustomOrderFinishChina,
+  CustomOrderOHChina,
+  InsertOrderPickupCancelChina,
+  InsertOrderPickupChina,
+  OrderDetailsChinaGet,
+  OverAllAttachmentFileUploadChina,
+} from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 function OrderDetailsInChina() {
   const { id } = useParams();
   const fileInputRef = useRef({});
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
-  const [userData, setUserData] = useState(null); 
+  const [userData, setUserData] = useState(null);
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [selectedVariationId, setSelectedVariationId] = useState("");
@@ -82,7 +91,9 @@ function OrderDetailsInChina() {
     selectedVariationId ? selectedVariationId : selectedItemId
   ] = useRef(null);
 
-  const AddInOnHold = useSelector((state) => state?.orderSystemChina?.isLoading);
+  const AddInOnHold = useSelector(
+    (state) => state?.orderSystemChina?.isLoading
+  );
 
   const Finished = useSelector((state) => state?.orderSystemChina?.isLoading);
 
@@ -205,7 +216,16 @@ function OrderDetailsInChina() {
 
   const handleSendToUAESystem = async () => {
     try {
-      await dispatch(CustomItemSendToUAE(id, navigate));
+      dispatch(CustomItemSendToUAE(id)).then(({payload})=>{
+        const result = Swal.fire({
+          title: payload,
+          icon: payload ? "success" : "error",
+          showConfirmButton: true,
+        });
+        if (result.isConfirmed) {
+          navigate("/ordersystem");
+        }
+      })
     } catch (error) {
       console.log(error);
     }
@@ -241,7 +261,7 @@ function OrderDetailsInChina() {
           null,
           2000
         );
-        navigate("/on_hold_orders_system");
+        navigate("/on_hold_orders_system_in_china");
       }
     } catch (error) {
       console.log(error);
@@ -356,12 +376,12 @@ function OrderDetailsInChina() {
       order_status: "started",
     };
     dispatch(InsertOrderPickupChina(requestData))
-    .then((response) => {
-      fetchOrder();
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+      .then((response) => {
+        fetchOrder();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleCancelOrderProcess = async () => {
@@ -371,12 +391,12 @@ function OrderDetailsInChina() {
       order_status: "Cancelled",
     };
     dispatch(InsertOrderPickupCancelChina(requestData))
-    .then((response) => {
-      fetchOrder();
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+      .then((response) => {
+        fetchOrder();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleFinishButtonClick = async () => {
@@ -678,11 +698,11 @@ function OrderDetailsInChina() {
     <>
       <Container fluid className="px-5">
         <MDBRow className="my-3">
-        <MDBCol className="d-flex">
+          <MDBCol className="d-flex">
             <Button
-               variant="outline-secondary"
-               className="bg-transparent text-secondary"
-               onClick={() => navigate("/ordersystem_in_china")}
+              variant="outline-secondary"
+              className="bg-transparent text-secondary"
+              onClick={() => navigate("/ordersystem_in_china")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
@@ -695,7 +715,7 @@ function OrderDetailsInChina() {
                 </Alert>
               </MDBCol>
             )}
-            <MDBCol className="d-flex justify-content-end">
+          <MDBCol className="d-flex justify-content-end">
             <ButtonGroup>
               {radios.map((radio, idx) => (
                 <ToggleButton
@@ -712,20 +732,20 @@ function OrderDetailsInChina() {
                 </ToggleButton>
               ))}
             </ButtonGroup>
-            </MDBCol>
+          </MDBCol>
         </MDBRow>
         <Card className="p-3 mb-3">
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-              {t("P1ChinaSystem.OrderDetails")}
+                {t("P1ChinaSystem.OrderDetails")}
               </Typography>
               {loader ? (
                 <Loader />
               ) : (
                 <Box className="d-flex">
                   <Box>
-                  <Typography className="fw-bold">
+                    <Typography className="fw-bold">
                       #{t("P1ChinaSystem.Order")} {id}
                     </Typography>
                     <Typography
@@ -739,20 +759,20 @@ function OrderDetailsInChina() {
                   </Box>
                   {orderDetails?.operation_user_id != userData?.user_id &&
                     orderDetails?.order_process == "started" && (
-                    <Box className="ms-5">
-                      <Typography className="fw-bold">
-                        {orderDetails?.user_name}
-                      </Typography>
-                      <Typography
-                        className=""
-                        sx={{
-                          fontSize: 14,
-                        }}
-                      >
-                        <Badge bg="success">Order Started By</Badge>
-                      </Typography>
-                    </Box>
-                  )}
+                      <Box className="ms-5">
+                        <Typography className="fw-bold">
+                          {orderDetails?.user_name}
+                        </Typography>
+                        <Typography
+                          className=""
+                          sx={{
+                            fontSize: 14,
+                          }}
+                        >
+                          <Badge bg="success">Order Started By</Badge>
+                        </Typography>
+                      </Box>
+                    )}
                 </Box>
               )}
             </Box>
@@ -790,29 +810,29 @@ function OrderDetailsInChina() {
                   </Button>
                 </Box>
               ) : orderDetails?.order_process == "started" &&
-              userData?.user_id != orderDetails?.operation_user_id ? (
-              <Box>
-                <Button variant="success" disabled className="me-3">
-                  {t("P1ChinaSystem.Start")}
-                </Button>
-                <Button variant="primary" disabled>
-                  {t("P1ChinaSystem.SendToUAE")}
-                </Button>
-              </Box>
+                userData?.user_id != orderDetails?.operation_user_id ? (
+                <Box>
+                  <Button variant="success" disabled className="me-3">
+                    {t("P1ChinaSystem.Start")}
+                  </Button>
+                  <Button variant="primary" disabled>
+                    {t("P1ChinaSystem.SendToUAE")}
+                  </Button>
+                </Box>
               ) : (
                 <Box>
-                <Button
-                  variant="success"
-                  // disabled
-                  onClick={handleStartOrderProcess}
-                  className="me-3"
-                >
-                  {t("P1ChinaSystem.Start")}
-                </Button>
-                <Button variant="primary" disabled>
-                  {t("P1ChinaSystem.SendToUAE")}
-                </Button>
-              </Box>
+                  <Button
+                    variant="success"
+                    // disabled
+                    onClick={handleStartOrderProcess}
+                    className="me-3"
+                  >
+                    {t("P1ChinaSystem.Start")}
+                  </Button>
+                  <Button variant="primary" disabled>
+                    {t("P1ChinaSystem.SendToUAE")}
+                  </Button>
+                </Box>
               )}
             </Box>
           </Box>
@@ -824,7 +844,7 @@ function OrderDetailsInChina() {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-              {t("P1ChinaSystem.CustomerOrder")}
+                {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -840,7 +860,7 @@ function OrderDetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.Name")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -865,7 +885,7 @@ function OrderDetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.Phone")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -890,7 +910,7 @@ function OrderDetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.CustomerShippingAddress")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -915,7 +935,7 @@ function OrderDetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.OrderProcess")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -986,7 +1006,7 @@ function OrderDetailsInChina() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                                orderDetails.order_process == "started" ? (
+                              orderDetails.order_process == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -1022,7 +1042,7 @@ function OrderDetailsInChina() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                                orderDetails.order_process == "started" ? (
+                              orderDetails.order_process == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -1056,7 +1076,7 @@ function OrderDetailsInChina() {
         </Row>
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-          {t("P1ChinaSystem.OrderDetails")}
+            {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -1092,7 +1112,7 @@ function OrderDetailsInChina() {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                          {t("P1ChinaSystem.Messages")}
+                            {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
@@ -1142,7 +1162,7 @@ function OrderDetailsInChina() {
                   onClick={() => setshowMessageOHModal(true)}
                 >
                   {t("P1ChinaSystem.OnHold")}
-                  </Button>
+                </Button>
                 {Finished ? (
                   <Button
                     variant="danger"
@@ -1150,11 +1170,11 @@ function OrderDetailsInChina() {
                     onClick={handleFinishButtonClick}
                   >
                     {t("P1ChinaSystem.Finish")}
-                    </Button>
+                  </Button>
                 ) : (
                   <Button variant="danger" onClick={handleFinishButtonClick}>
                     {t("P1ChinaSystem.Finish")}
-                    </Button>
+                  </Button>
                 )}
               </>
             ) : (
@@ -1170,14 +1190,14 @@ function OrderDetailsInChina() {
                   onClick={() => setshowMessageOHModal(true)}
                 >
                   {t("P1ChinaSystem.OnHold")}
-                  </Button>
+                </Button>
                 {Finished ? (
                   <Button
                     variant="danger"
                     disabled
                     onClick={handleFinishButtonClick}
                   >
-                       {t("P1ChinaSystem.Finish")}
+                    {t("P1ChinaSystem.Finish")}
                   </Button>
                 ) : (
                   <Button
@@ -1189,7 +1209,7 @@ function OrderDetailsInChina() {
                     }
                     onClick={handleFinishButtonClick}
                   >
-                 {t("P1ChinaSystem.Finish")}
+                    {t("P1ChinaSystem.Finish")}
                   </Button>
                 )}
               </>
@@ -1378,5 +1398,5 @@ function OrderDetailsInChina() {
       </Container>
     </>
   );
-};
+}
 export default OrderDetailsInChina;

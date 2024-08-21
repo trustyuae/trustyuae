@@ -25,6 +25,8 @@ const initialState = {
   missingOrderDetails: [],
   customOrderPushToUAEData: [],
   customMissingOrderUpdate: [],
+  customItemSendToChinaData: [],
+  customItemSendToP2: [],
   error: null,
 };
 
@@ -43,7 +45,7 @@ export const OrderSystemGet = createAsyncThunk(
 
 export const OrderDetailsGet = createAsyncThunk(
   "orderSystem/OrderDetailsGet",
-  async ({ id }, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
         `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
@@ -345,6 +347,38 @@ export const CustomOrderPushToUAE = createAsyncThunk(
   }
 );
 
+export const CustomItemSendToChina = createAsyncThunk(
+  "orderSystem/CustomItemSendToChina",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-push-order/v1/push-order-china/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const CustomItemSendToP2 = createAsyncThunk(
+  "orderSystem/CustomItemSendToP2",
+  async ({ id, payload }, { rejectWithValue }) => {
+    console.log(payload, "payload from CustomItemSendToP2");
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const orderSystemSlice = createSlice({
   name: "orderSystem",
   initialState,
@@ -378,6 +412,8 @@ const orderSystemSlice = createSlice({
       state.customOrderOnHoldFinishData = [];
       state.customOrderPushToUAEData = [];
       state.customMissingOrderUpdate = [];
+      state.customItemSendToChinaData = [];
+      state.customItemSendToP2 = [];
       state.error = null;
     },
   },
@@ -600,6 +636,28 @@ const orderSystemSlice = createSlice({
         state.customOrderPushToUAEData = action.payload;
       })
       .addCase(CustomOrderPushToUAE.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(CustomItemSendToChina.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CustomItemSendToChina.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.customItemSendToChinaData = action.payload;
+      })
+      .addCase(CustomItemSendToChina.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(CustomItemSendToP2.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CustomItemSendToP2.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.customItemSendToP2 = action.payload;
+      })
+      .addCase(CustomItemSendToP2.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

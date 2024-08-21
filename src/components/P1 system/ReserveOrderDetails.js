@@ -28,7 +28,7 @@ import Form from "react-bootstrap/Form";
 import ShowAlert from "../../utils/ShowAlert";
 import { getUserData } from "../../utils/StorageUtils";
 function ReserveOrderDetails() {
-  const params = useParams();
+  const {id} = useParams();
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -38,6 +38,7 @@ function ReserveOrderDetails() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
+  const [userData, setUserData] = useState(null);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
 
@@ -50,6 +51,19 @@ function ReserveOrderDetails() {
   const reserveOrderDetailsData = useSelector(
     (state) => state?.orderSystem?.reserveOrderDetails
   );
+
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const userdata = await getUserData();
+        setUserData(userdata || {});
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (reserveOrderDetailsData) {
@@ -77,7 +91,7 @@ function ReserveOrderDetails() {
   }, [orderDetailsDataOrderId, reserveOrderDetailsData]);
 
   async function fetchOrder() {
-    dispatch(ReserveOrderDetailsGet(params.id));
+    dispatch(ReserveOrderDetailsGet(id));
   }
 
   useEffect(() => {
@@ -86,11 +100,9 @@ function ReserveOrderDetails() {
   }, [setMessage, setTableData, setOrderData]);
 
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(params.id, 10);
-    let userData = await getUserData();
     const requestedMessage = {
       message: message,
-      order_id: orderId,
+      order_id: parseInt(id, 10),
       name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
@@ -258,7 +270,7 @@ function ReserveOrderDetails() {
                 <Box className="d-flex justify-content-between">
                   <Box>
                     <Typography className="fw-bold">
-                      Order# {params.id}
+                      Order# {id}
                     </Typography>
                     <Typography
                       className=""

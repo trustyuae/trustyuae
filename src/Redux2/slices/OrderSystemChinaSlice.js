@@ -21,6 +21,7 @@ const initialState = {
   customOrderData: [],
   customOrderOnHoldData: [],
   customOrderOnHoldFinishData: [],
+  customItemSendToUAEData: [],
   error: null,
 };
 
@@ -279,6 +280,22 @@ export const CustomOrderFinishOHChina = createAsyncThunk(
   }
 );
 
+export const CustomItemSendToUAE = createAsyncThunk(
+  "orderSystem/CustomItemSendToUAE",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-push-order/v1/push-order-china/${id}/?warehouse=China`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
 const orderSystemChinaSlice = createSlice({
   name: "orderSystem",
   initialState,
@@ -308,6 +325,7 @@ const orderSystemChinaSlice = createSlice({
       state.customOrderData = [];
       state.customOrderOnHoldData = [];
       state.customOrderOnHoldFinishData = [];
+      state.customItemSendToUAEData = [];
       state.error = null;
     }
   },
@@ -486,6 +504,17 @@ const orderSystemChinaSlice = createSlice({
         state.customOrderOnHoldFinishData = action.payload;
       })
       .addCase(CustomOrderFinishOHChina.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(CustomItemSendToUAE.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CustomItemSendToUAE.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.customItemSendToUAEData = action.payload;
+      })
+      .addCase(CustomItemSendToUAE.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

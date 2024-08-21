@@ -37,6 +37,7 @@ import { getUserData } from "../../utils/StorageUtils";
 import {
   AddMessage,
   AttachmentFileUpload,
+  CustomItemSendToChina,
   CustomOrderFinish,
   CustomOrderOH,
   InsertOrderPickup,
@@ -44,7 +45,6 @@ import {
   OrderDetailsGet,
   OverAllAttachmentFileUpload,
 } from "../../Redux2/slices/OrderSystemSlice";
-import { CustomItemSendToChina } from "../../redux/actions/OrderSystemActions";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -162,7 +162,7 @@ function OrderDetails() {
 
   async function fetchOrder() {
     try {
-      dispatch(OrderDetailsGet({ id: id }));
+      dispatch(OrderDetailsGet(id));
     } catch (error) {
       console.error(error);
     }
@@ -349,7 +349,16 @@ function OrderDetails() {
 
   const handleSendToChinaSystem = async () => {
     try {
-      await dispatch(CustomItemSendToChina(id, navigate));
+     dispatch(CustomItemSendToChina(id)).then(({payload})=>{
+      const result = Swal.fire({
+        title: payload,
+        icon: payload ? "success" : "error",
+        showConfirmButton: true,
+      });
+      if (result.isConfirmed) {
+        navigate("/ordersystem_in_china");
+      }
+     })
     } catch (error) {
       console.log(error);
     }
