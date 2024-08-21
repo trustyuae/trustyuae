@@ -10,35 +10,43 @@ import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { GetGRNView } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
+import { GetGRNView } from "../../Redux2/slices/P3SystemSlice";
 
 const GRNView = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
-  const loader = useSelector((state) => state?.managementSystem?.isGrnView);
+  const loader = useSelector((state) => state?.p3System?.isLoading);
   const [pageSize, setPageSize] = useState(5);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [verifiedName, setVerifiedName] =useState("");
-
-  const fetchOrder = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-view-grn-api/v1/view-grn-details/${id}/?&per_page=${pageSize}&page=${page}`;
-    await dispatch(GetGRNView({ apiUrl }))
-      .then((response) => {
-        if (response?.data) {
-          let data = response.data.data.map((v, i) => ({ ...v, id: i }));
-          setPO_OrderList(data);
-          setVerifiedName(response.data.verified_by)
+  const fetchOrder = () => {
+    const apiUrl = `wp-json/custom-view-grn-api/v1/view-grn-details/${id}`;
+    
+    dispatch(GetGRNView(apiUrl))
+      .then((actionResult) => {
+        if (GetGRNView.fulfilled.match(actionResult)) {
+          const payload = actionResult.payload;
+          if (Array.isArray(payload.data)) {
+            console.log(payload, 'payload from GRN view');
+            const data = payload.data.map((v, i) => ({ ...v, id: i }));
+            setPO_OrderList(data);
+            setVerifiedName(payload.verified_by);
+          } else {
+            console.error("Response data is not an array:", payload);
+            setPO_OrderList([]);
+          }
         } else {
+          console.error("Failed to fetch GRN view:", actionResult.payload);
           setPO_OrderList([]);
         }
       })
       .catch((error) => {
-        console.error("Error fetching order:", error);
+        console.error("Failed to fetch GRN view:", error);
         setPO_OrderList([]);
       });
   };

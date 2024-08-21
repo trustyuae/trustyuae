@@ -14,10 +14,11 @@ import DataTable from "../DataTable";
 import { API_URL } from "../../redux/constants/Constants";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { GetGRNList } from "../../redux/actions/P3SystemActions";
+// import { GetGRNList } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { GetGRNList } from "../../Redux2/slices/P3SystemSlice";
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -30,7 +31,17 @@ function GRNManagement() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [grnList, setGrnList] = useState([]);
-  const loader = useSelector((state) => state?.managementSystem?.isGrnList);
+  const loader = useSelector((state) => state?.p3System?.isLoading);
+
+  const grnListData = useSelector((state) => state?.p3System?.grnList);
+
+  useEffect(() => {
+    if (grnListData) {
+      const grnData = grnListData?.data?.map((v, i) => ({ ...v, id: i }));
+      setGrnList(grnData);
+      setTotalPages(grnData?.total_pages);
+    }
+  }, [grnListData]);
 
   const handleStatusChange = (e) => {
     setStatusFilter(e.target.value);
@@ -116,11 +127,7 @@ function GRNManagement() {
       apiUrl = `${API_URL}wp-json/custom-get-grns-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
-      await dispatch(GetGRNList({ apiUrl })).then((response) => {
-        let data = response?.data?.data?.map((v, i) => ({ ...v, id: i }));
-        setGrnList(data);
-        setTotalPages(response?.data?.total_pages);
-      });
+      dispatch(GetGRNList({ apiUrl }));
     } catch (error) {
       console.error(error);
       setGrnList([]);

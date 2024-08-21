@@ -15,19 +15,25 @@ import { Badge, Card, Col, Form, Modal, Row } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import { API_URL } from "../../redux/constants/Constants";
+// import {
+//   AddProductOrderForPre,
+//   AddProductOrderForStock,
+//   GetProductDetails,
+//   GetProductOrderDetails,
+// } from "../../redux/actions/P3SystemActions";
+import Loader from "../../utils/Loader";
+import ShowAlert from "../../utils/ShowAlert";
+import ShowAlert2 from "../../utils/ShowAlert2";
 import {
   AddProductOrderForPre,
   AddProductOrderForStock,
   GetProductDetails,
   GetProductOrderDetails,
-} from "../../redux/actions/P3SystemActions";
-import Loader from "../../utils/Loader";
-import ShowAlert from "../../utils/ShowAlert";
-import ShowAlert2 from "../../utils/ShowAlert2";
+} from "../../Redux2/slices/P3SystemSlice";
 
 function OnHoldManagement() {
-  const dispatch = useDispatch();
   const params = useParams();
+  const dispatch = useDispatch();
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -36,23 +42,19 @@ function OnHoldManagement() {
   const [productData, setProductData] = useState([]);
   const [productDetailsData, setProductDetailsData] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
-  const loader = useSelector(
-    (state) => state?.managementSystem?.isProductOrderDetails
-  );
+  const loader = useSelector((state) => state?.p3System?.isLoading);
 
-  const loader2 = useSelector(
-    (state) => state?.managementSystem?.isProductDetails
-  );
+  const loader2 = useSelector((state) => state?.p3System?.isLoading);
 
   async function fetchProductDetails() {
-    let apiUrl = `${API_URL}wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
+    let apiUrl = `wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
     await dispatch(
       GetProductDetails({
         apiUrl: `${apiUrl}`,
       })
     )
-      .then((response) => {
-        let data = response.data;
+      .then(({ payload }) => {
+        let data = payload;
         setProductDetailsData(data);
       })
       .catch((error) => {
@@ -61,14 +63,14 @@ function OnHoldManagement() {
   }
 
   async function fetchProductOrderDetails() {
-    let apiUrl = `${API_URL}wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}/?&per_page=${pageSize}&page=${page}`;
+    let apiUrl = `wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
     await dispatch(
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
       })
     )
-      .then((response) => {
-        let data = response.data.records.map((v, i) => ({
+      .then(({ payload }) => {
+        let data = payload.records.map((v, i) => ({
           ...v,
           id: i,
           isSelected: false,
@@ -178,43 +180,31 @@ function OnHoldManagement() {
     };
 
     try {
-      const response = await dispatch(AddProductOrderForPre(requestedDataP));
-
-      if (response.status === 200) {
-        await ShowAlert(
-          response?.data,
-          "",
-          "success",
-          false,
-          false,
-          "",
-          "",
-          "",
-          1000
-        );
-
-        await fetchProductOrderDetails();
-
-        setProductData((prevProductData) =>
-          prevProductData.map((row) => ({ ...row, isSelected: false }))
-        );
-        setSelectedOrders([]);
-
-        if (selectedOrders.length === productData.length) {
-          setProductData([]);
+      const response = await dispatch(
+        AddProductOrderForPre(requestedDataP)
+      ).then(({ payload }) => {
+        console.log(payload, "payload from  AddProductOrderForPre");
+        if (response?.data?.status_code === 200) {
+          ShowAlert(
+            response?.data?.Message,
+            "",
+            "success", // Assuming success icon
+            false,
+            false,
+            "",
+            "",
+            "",
+            3500
+          );
         }
-      } else {
-        await ShowAlert(
-          response?.data?.Message || "Failed to send data",
-          "",
-          "error",
-          false,
-          false,
-          "",
-          "",
-          "",
-          3500
-        );
+      });
+      await fetchProductOrderDetails();
+      setProductData((prevProductData) =>
+        prevProductData.map((row) => ({ ...row, isSelected: false }))
+      );
+      setSelectedOrders([]);
+      if (selectedOrders.length === productData.length) {
+        setProductData([]);
       }
     } catch (error) {
       console.error("Error occurred:", error);
@@ -229,8 +219,8 @@ function OnHoldManagement() {
       grn_no: grn_no,
     };
     await dispatch(AddProductOrderForStock(requestedData))
-      .then(async (response) => {
-        if (response) {
+      .then(async ({ payload }) => {
+        if (payload) {
           await ShowAlert(
             "product added in InStock Successfully!",
             "",
@@ -381,7 +371,7 @@ function OnHoldManagement() {
             <Typography variant="h6" className="fw-bold mb-3">
               Order Details
             </Typography>
-            <Box className='me-3'>
+            <Box className="me-3">
               <Form.Group className="d-flex align-items-center justify-content-center justify-content-between">
                 <Form.Label className="me-3 mt-2 fw-bold">PageSize </Form.Label>
                 <Form.Control
