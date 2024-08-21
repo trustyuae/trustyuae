@@ -4,20 +4,19 @@ import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { API_URL } from "../../redux/constants/Constants";
 import DataTable from "../DataTable";
 import { Card, Col, Row } from "react-bootstrap";
 import { Alert, Avatar, Box, Typography } from "@mui/material";
 import { CompressImage } from "../../utils/CompressImage";
 import EditIcon from "@mui/icons-material/Edit";
 import { useDispatch, useSelector } from "react-redux";
+import Loader from "../../utils/Loader";
+import defaultImage from "../../assets/default.png";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import {
   EditProductsList,
   GetAllProductsList,
-} from "../../redux/actions/ProductManagementActions";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import Loader from "../../utils/Loader";
-import defaultImage from "../../assets/default.png";
+} from "../../Redux2/slices/ProductManagementSlice";
 
 function AllProductList() {
   const inputRef = useRef(null);
@@ -34,34 +33,38 @@ function AllProductList() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [imageURL, setImageURL] = useState("");
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
+  const loader = useSelector((state) => state?.productManagement?.isLoading);
+
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
+  const allProductsData = useSelector(
+    (state) => state?.productManagement?.allProducts
   );
-  const loader = useSelector((state) => state?.allProducts?.isAllProducts);
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas?.factories?.map((item) => ({ ...item }));
-      setFactories(data);
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
+
+  useEffect(() => {
+    if (allProductsData) {
+      setProducts(allProductsData.products);
+      setTotalPages(allProductsData.total_pages);
+    }
+  }, []);
 
   const fetchProducts = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
+    let apiUrl = `wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
     if (searchId) apiUrl += `&product_id=${searchId}`;
     if (searchName) apiUrl += `&product_name=${searchName}`;
     try {
-      const response = await dispatch(GetAllProductsList({ apiUrl }));
-      if (response && response.data && response.data.products) {
-        setProducts(response.data.products);
-        setTotalPages(response.data.total_pages);
-      } else {
-        console.error("No products found in the response");
-      }
+      dispatch(GetAllProductsList({ apiUrl }));
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -263,26 +266,6 @@ function AllProductList() {
       </MDBRow>
 
       <Row>
-        {/* {loader ? (
-          <Loader />
-        ) : (
-          <div className="mt-2">
-            <DataTable
-              columns={columns}
-              rows={products}
-              // rows={factories}
-              // page={page}
-              // pageSize={pageSize}
-              // totalPages={totalPages}
-              // handleChange={handleChange}
-              page={currentPage}
-              pageSize={itemsPerPage}
-              totalPages={totalPages}
-              handleChange={handleChange}
-            />
-          </div>
-        )} */}
-
         {loader ? (
           <Loader />
         ) : (
@@ -414,3 +397,4 @@ function AllProductList() {
 }
 
 export default AllProductList;
+	
