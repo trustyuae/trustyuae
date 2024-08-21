@@ -2,7 +2,16 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Button, ButtonGroup, Card, Col, Modal, Row, ToggleButton } from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  ButtonGroup,
+  Card,
+  Col,
+  Modal,
+  Row,
+  ToggleButton,
+} from "react-bootstrap";
 import PrintModal from "./PrintModalInChina";
 import {
   Alert,
@@ -24,9 +33,9 @@ import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
-  // AddMessage,
-  CompletedOrderDetailsGet,
-} from "../../redux/actions/OrderSystemchinaActions";
+  AddMessageChina,
+  CompletedOrderDetailsChinaGet,
+} from "../../Redux2/slices/OrderSystemChinaSlice";
 import Form from "react-bootstrap/Form";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import ShowAlert from "../../utils/ShowAlert";
@@ -34,8 +43,8 @@ import { getUserData } from "../../utils/StorageUtils";
 import { useTranslation } from "react-i18next";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 
-const CompletedOrderDetailsInChina = () => {
-  const {id} = useParams();
+function CompletedOrderDetailsInChina() {
+  const { id } = useParams();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
   const [orderData, setOrderData] = useState([]);
@@ -48,33 +57,62 @@ const CompletedOrderDetailsInChina = () => {
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [message, setMessage] = useState("");
+  const [userData, setUserData] = useState(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
 
-  const loader = useSelector(
-    (state) => state?.orderSystemDataChina?.isCompletedOrderDetails
-  );
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemDataChina?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystemChina?.completedOrderDetails?.orders?.[0]
   );
 
-  async function fetchOrder() {
-    try {
-      const response = await dispatch(CompletedOrderDetailsGet(id));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
+  const completedOrderDetailsData = useSelector(
+    (state) => state?.orderSystemChina?.completedOrderDetails
+  );
+
+  const messageData = useSelector((state) => state?.orderSystemChina?.message);
+
+  useEffect(() => {
+    if (completedOrderDetailsData) {
+      const completedOrderData = completedOrderDetailsData?.orders?.map(
+        (v, i) => ({
+          ...v,
+          id: i,
+        })
+      );
+      setOrderData(completedOrderData);
+    }
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
             ...product,
             id: index1,
-          }));
-          setTableData(newData);
-        });
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
       }
-    } catch (error) {
-      console.error(error);
     }
+  }, [orderDetailsDataOrderId, completedOrderDetailsData]);
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function fetchOrder() {
+    dispatch(CompletedOrderDetailsChinaGet(id));
   }
 
   useEffect(() => {
@@ -119,19 +157,18 @@ const CompletedOrderDetailsInChina = () => {
   };
 
   const handleAddMessage = async (e) => {
-    const userData = getUserData()
     const requestedMessage = {
       message: message,
       order_id: parseInt(id, 10),
       name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
+    await dispatch(AddMessageChina(requestedMessage)).then(async () => {
+      if (messageData) {
         setMessage("");
         setshowMessageModal(false);
-        const result = await ShowAlert(
+        ShowAlert(
           "",
-          response.data,
+          messageData.data,
           "success",
           null,
           null,
@@ -158,7 +195,7 @@ const CompletedOrderDetailsInChina = () => {
     },
     {
       field: "variant_details",
-      headerName:t("P1ChinaSystem.VariantDetails"),
+      headerName: t("P1ChinaSystem.VariantDetails"),
       className: "order-details",
       flex: 1.5,
       renderCell: (params) => {
@@ -250,9 +287,7 @@ const CompletedOrderDetailsInChina = () => {
     <>
       <Container fluid className="px-5">
         <MDBRow className="my-3">
-          <MDBCol
-            className="d-flex justify-content-between"
-          >
+          <MDBCol className="d-flex justify-content-between">
             <Button
               variant="outline-secondary"
               className="p-1 me-2 bg-transparent text-secondary"
@@ -283,7 +318,7 @@ const CompletedOrderDetailsInChina = () => {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-              {t("P1ChinaSystem.OrderDetails")}
+                {t("P1ChinaSystem.OrderDetails")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -291,7 +326,7 @@ const CompletedOrderDetailsInChina = () => {
                 <Box className="d-flex justify-content-between">
                   <Box>
                     <Typography className="fw-bold">
-                    {t("P1ChinaSystem.Order")}# {id}
+                      {t("P1ChinaSystem.Order")}# {id}
                     </Typography>
                     <Typography
                       className=""
@@ -343,7 +378,7 @@ const CompletedOrderDetailsInChina = () => {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-              {t("P1ChinaSystem.CustomerOrder")}
+                {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -383,7 +418,7 @@ const CompletedOrderDetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                       {t("P1ChinaSystem.Phone")}
+                        {t("P1ChinaSystem.Phone")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -495,7 +530,7 @@ const CompletedOrderDetailsInChina = () => {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-          {t("P1ChinaSystem.OrderDetails")}
+            {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -534,7 +569,7 @@ const CompletedOrderDetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                          {t("P1ChinaSystem.Messages")}
+                            {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
@@ -621,6 +656,6 @@ const CompletedOrderDetailsInChina = () => {
       </Container>
     </>
   );
-};
+}
 
 export default CompletedOrderDetailsInChina;

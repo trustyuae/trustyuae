@@ -20,11 +20,11 @@ import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemchinaActions";
+import { CompletedOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 
-const CompletedOrderSystemInChina = () => {
+function CompletedOrderSystemInChina() {
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
@@ -44,31 +44,36 @@ const CompletedOrderSystemInChina = () => {
     null,
     null,
   ]);
-  const loader = useSelector(
-    (state) => state?.orderSystemDataChina?.isCompletedOrders
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
+
+  const completedOrdersData = useSelector(
+    (state) => state?.orderSystemChina?.completedOrders
   );
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (completedOrdersData) {
+      const completedData = completedOrdersData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(completedData);
+      setTotalPages(completedOrdersData.total_pages);
+    }
+  }, [completedOrdersData]);
+
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
+    let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
       apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
-    await dispatch(
-      CompletedOrderSystemGet({
+    dispatch(
+      CompletedOrderSystemChinaGet({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleReset = () => {
@@ -266,8 +271,8 @@ const CompletedOrderSystemInChina = () => {
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
-                <Form.Control
+              <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
+              <Form.Control
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
@@ -370,14 +375,14 @@ const CompletedOrderSystemInChina = () => {
               onClick={(e) => handleSearchFilter(e)}
             >
               {t("POManagement.Search")}
-            </Button>
+              </Button>
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
               onClick={handleReset}
             >
               {t("POManagement.ResetFilter")}
-            </Button>
+              </Button>
           </Box>
         </Form>
       </Row>
@@ -402,7 +407,7 @@ const CompletedOrderSystemInChina = () => {
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
              {t("P1ChinaSystem.RecordsIsNotAlert")}
-            </Alert>
+             </Alert>
           )}
         </>
       )}

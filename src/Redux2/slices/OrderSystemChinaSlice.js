@@ -67,7 +67,7 @@ export const CompletedOrderSystemChinaGet = createAsyncThunk(
 
 export const CompletedOrderDetailsChinaGet = createAsyncThunk(
   "orderSystem/CompletedOrderDetailsGet",
-  async ({ id }, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
         `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`
