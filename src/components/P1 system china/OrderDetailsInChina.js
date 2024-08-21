@@ -217,16 +217,17 @@ function OrderDetailsInChina() {
 
   const handleSendToUAESystem = async () => {
     try {
-      dispatch(CustomItemSendToUAE(id)).then(({payload})=>{
-        const result = Swal.fire({
+      dispatch(CustomItemSendToUAE(id)).then(({ payload }) => {
+        Swal.fire({
           title: payload,
           icon: payload ? "success" : "error",
           showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/ordersystem");
+          }
         });
-        if (result.isConfirmed) {
-          navigate("/ordersystem");
-        }
-      })
+      });
     } catch (error) {
       console.log(error);
     }

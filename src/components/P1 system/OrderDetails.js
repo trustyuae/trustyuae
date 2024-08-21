@@ -349,16 +349,17 @@ function OrderDetails() {
 
   const handleSendToChinaSystem = async () => {
     try {
-     dispatch(CustomItemSendToChina(id)).then(({payload})=>{
-      const result = Swal.fire({
-        title: payload,
-        icon: payload ? "success" : "error",
-        showConfirmButton: true,
+      dispatch(CustomItemSendToChina(id)).then(({ payload }) => {
+        Swal.fire({
+          title: payload,
+          icon: payload ? "success" : "error",
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/ordersystem_in_china");
+          }
+        });
       });
-      if (result.isConfirmed) {
-        navigate("/ordersystem_in_china");
-      }
-     })
     } catch (error) {
       console.log(error);
     }
