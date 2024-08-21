@@ -20,12 +20,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddMessage,
-  CustomMissingOrderUpdate,
-  CustomOrderPushToUAE,
-  MissingOrderDetailsGet,
-} from "../../redux/actions/OrderSystemActions";
 import Form from "react-bootstrap/Form";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
@@ -33,6 +27,12 @@ import ShowAlert from "../../utils/ShowAlert";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getUserData } from "../../utils/StorageUtils";
 import Swal from "sweetalert2";
+import {
+  AddMessage,
+  CustomMissingOrderUpdate,
+  CustomOrderPushToUAE,
+  MissingOrderDetailsGet,
+} from "../../Redux2/slices/OrderSystemSlice";
 
 function MissingOrderDetails() {
   const { id } = useParams();
@@ -42,19 +42,12 @@ function MissingOrderDetails() {
   const [tableData, setTableData] = useState([]);
   const [selectedVariationId, setSelectedVariationId] = useState("");
   const [orderDetails, setOrderDetails] = useState(null);
-  const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState("");
-  const [selectedFileUrl, setSelectedFileUrl] = useState(null);
-  const webcamRef = useRef(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
-  const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [message, setMessage] = useState("");
-  const [messageOH, setOHMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
@@ -67,40 +60,54 @@ function MissingOrderDetails() {
   ] = useRef(null);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemData?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.missingOrderDetails?.orders?.[0]
   );
 
-  async function fetchUserData() {
-    try {
-      const userdata = await getUserData();
-      setUserData(userdata || {});
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  }
+  const missingOrderDetailsData = useSelector(
+    (state) => state?.orderSystem?.missingOrderDetails
+  );
 
   useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const userdata = await getUserData();
+        setUserData(userdata || {});
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
     fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function fetchOrder() {
-    try {
-      const response = await dispatch(MissingOrderDetailsGet({ id: id }));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      const order = response.data.orders[0];
-      if (order) setOrderProcess(order.order_process);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
+  useEffect(() => {
+    if (missingOrderDetailsData) {
+      const missingOrderData = missingOrderDetailsData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrderData(missingOrderData);
+    }
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
             ...product,
             id: index1,
-          }));
-          setTableData(newData);
-        });
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
       }
+    }
+  }, [orderDetailsDataOrderId, missingOrderDetailsData]);
+
+  async function fetchOrder() {
+    try {
+      dispatch(MissingOrderDetailsGet(id));
     } catch (error) {
       console.error(error);
     }
@@ -111,34 +118,40 @@ function MissingOrderDetails() {
   };
 
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
-      order_id: orderId,
-      name: userID.first_name,
+      order_id: parseInt(id, 10),
+      name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
+    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
+      if (payload) {
         setMessage("");
         setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
+        await ShowAlert("", payload, "success", null, null, null, null, 2000);
       }
     });
   };
 
   const handlePushToOrders = async () => {
     try {
-      await dispatch(CustomOrderPushToUAE(id, navigate));
+      await dispatch(CustomOrderPushToUAE(id)).then(({ payload }) => {
+        if (payload) {
+          const result = Swal.fire({
+            title: payload,
+            icon: "success",
+            showConfirmButton: true,
+          });
+          if (result.isConfirmed) {
+            navigate("/ordersystem");
+          }
+        } else {
+          Swal.fire({
+            title: payload,
+            icon: "error",
+            showConfirmButton: true,
+          });
+        }
+      });
     } catch (error) {
       console.log(error);
     }
@@ -248,7 +261,25 @@ function MissingOrderDetails() {
     };
 
     try {
-      dispatch(CustomMissingOrderUpdate(payload, navigate));
+      dispatch(CustomMissingOrderUpdate(payload, navigate)).then(
+        ({ payload }) => {
+          if (payload) {
+            Swal.fire({
+              title: payload.message,
+              icon: "success",
+              showConfirmButton: true,
+              timer: 2000,
+            });
+          } else {
+            Swal.fire({
+              title: payload,
+              icon: "error",
+              showConfirmButton: true,
+              timer: 2000,
+            });
+          }
+        }
+      );
     } catch (error) {
       console.error(error);
     }
@@ -443,6 +474,8 @@ function MissingOrderDetails() {
       cellClassName: "no-background",
     },
   ];
+
+  console.log(tableData, "tabledata");
 
   return (
     <>

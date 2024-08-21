@@ -21,6 +21,10 @@ const initialState = {
   customOrderData: [],
   customOrderOnHoldData: [],
   customOrderOnHoldFinishData: [],
+  missingOrders: [],
+  missingOrderDetails: [],
+  customOrderPushToUAEData: [],
+  customMissingOrderUpdate: [],
   error: null,
 };
 
@@ -136,6 +140,36 @@ export const ReserveOrderDetailsGet = createAsyncThunk(
   }
 );
 
+export const MissingOrderSystemGet = createAsyncThunk(
+  "orderSystem/MissingOrderSystemGet",
+  async ({ apiUrl }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(apiUrl);
+
+      console.log(response, "response from missing order system slice");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const MissingOrderDetailsGet = createAsyncThunk(
+  "orderSystem/MissingOrderDetailsGet",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-missing-orders/v1/missing-orders/?orderid=${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const AttachmentFileUpload = createAsyncThunk(
   "orderSystem/AttachmentFileUpload",
   async (
@@ -188,7 +222,7 @@ export const OverAllAttachmentFileUpload = createAsyncThunk(
 export const AddMessage = createAsyncThunk(
   "orderSystem/AddMessage",
   async (requestData, { rejectWithValue }) => {
-    console.log(requestData,'requestData')
+    console.log(requestData, "requestData");
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-message-note/v1/order-note/`,
@@ -274,7 +308,38 @@ export const CustomOrderFinishOH = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      console.error("Error fetching factories:", error.message);
+      console.error("Error while Custom Order Finish OH:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const CustomMissingOrderUpdate = createAsyncThunk(
+  "orderSystem/CustomMissingOrderUpdate",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-update-missingorder/v1/update-missing-order/`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error while Custom Missing Order Update:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const CustomOrderPushToUAE = createAsyncThunk(
+  "orderSystem/CustomOrderPushToUAE",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-push-missingorder/v1/push-missing-order/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error while Custom Order Push To UAE:", error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -299,6 +364,8 @@ const orderSystemSlice = createSlice({
       state.completedOrderDetails = [];
       state.reserveOrders = [];
       state.reserveOrderDetails = [];
+      state.missingOrders = [];
+      state.missingOrderDetails = [];
       state.onHoldOrders = [];
       state.onHoldOrderDetails = [];
       state.uploadAttachFile = [];
@@ -309,6 +376,8 @@ const orderSystemSlice = createSlice({
       state.customOrderData = [];
       state.customOrderOnHoldData = [];
       state.customOrderOnHoldFinishData = [];
+      state.customOrderPushToUAEData = [];
+      state.customMissingOrderUpdate = [];
       state.error = null;
     },
   },
@@ -402,6 +471,28 @@ const orderSystemSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
+      .addCase(MissingOrderSystemGet.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(MissingOrderSystemGet.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.missingOrders = action.payload;
+      })
+      .addCase(MissingOrderSystemGet.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(MissingOrderDetailsGet.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(MissingOrderDetailsGet.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.missingOrderDetails = action.payload;
+      })
+      .addCase(MissingOrderDetailsGet.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
       .addCase(AttachmentFileUpload.pending, (state) => {
         state.isLoading = true;
       })
@@ -487,6 +578,28 @@ const orderSystemSlice = createSlice({
         state.customOrderOnHoldFinishData = action.payload;
       })
       .addCase(CustomOrderFinishOH.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(CustomMissingOrderUpdate.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CustomMissingOrderUpdate.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.customMissingOrderUpdate = action.payload;
+      })
+      .addCase(CustomMissingOrderUpdate.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(CustomOrderPushToUAE.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CustomOrderPushToUAE.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.customOrderPushToUAEData = action.payload;
+      })
+      .addCase(CustomOrderPushToUAE.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

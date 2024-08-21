@@ -30,9 +30,10 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ShowAlert from "../../utils/ShowAlert";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import Form from "react-bootstrap/Form";
+import { getUserData } from "../../utils/StorageUtils";
 
 function CompletedOrderDetails() {
-  const params = useParams();
+  const {id} = useParams();
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -42,6 +43,7 @@ function CompletedOrderDetails() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
+  const [userData, setUserData] = useState(null);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
@@ -52,6 +54,19 @@ function CompletedOrderDetails() {
   const completedOrderDetailsData = useSelector(
     (state) => state?.orderSystem?.completedOrderDetails
   );
+
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const userdata = await getUserData();
+        setUserData(userdata || {});
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (completedOrderDetailsData) {
@@ -82,7 +97,7 @@ function CompletedOrderDetails() {
 
   async function fetchOrder() {
     try {
-      dispatch(CompletedOrderDetailsGet(params?.id));
+      dispatch(CompletedOrderDetailsGet(id));
     } catch (error) {
       console.log(error);
     }
@@ -114,12 +129,10 @@ function CompletedOrderDetails() {
     }
   };
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(params.id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
-      order_id: orderId,
-      name: userID.first_name,
+      order_id: parseInt(id, 10),
+      name: userData.first_name,
     };
     await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
       console.log(payload, "payload from addmessage");
@@ -261,10 +274,10 @@ function CompletedOrderDetails() {
               {loader ? (
                 <Loader />
               ) : (
-                <Box className="d-flex justify-content-between">
+                <Box className="d-flex justify-content-between">  
                   <Box>
                     <Typography className="fw-bold">
-                      Order# {params.id}
+                      Order# {id}
                     </Typography>
                     <Typography
                       className=""

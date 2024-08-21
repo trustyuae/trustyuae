@@ -12,14 +12,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { FaEye} from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
+import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { MissingOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { MissingOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
 
 function MissingOrderSystem() {
   const inputRef = useRef(null);
@@ -44,7 +43,7 @@ function MissingOrderSystem() {
   const dispatch = useDispatch();
 
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-missing-orders/v1/missing-orders/?`;
+    let apiUrl = `wp-json/custom-missing-orders/v1/missing-orders/?`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     await dispatch(
@@ -52,15 +51,15 @@ function MissingOrderSystem() {
         apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
       })
     )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
+      .then(({ payload }) => {
+        let data = payload.orders.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
         setOverAllData({
-          total_count: response.data.total_count,
-          total_dispatch_orders: response.data.total_dispatch_orders,
-          total_reserve_orders: response.data.total_reserve_orders,
+          total_count: payload.total_count,
+          total_dispatch_orders: payload.total_dispatch_orders,
+          total_reserve_orders: payload.total_reserve_orders,
         });
-        setTotalPages(response.data.total_pages);
+        setTotalPages(payload.total_pages);
       })
       .catch((error) => {
         console.error(error);
@@ -123,17 +122,17 @@ function MissingOrderSystem() {
       type: "html",
       renderCell: (value, row) => {
         return (
-            <Link
-              to={`/missing_order_details/${value?.row?.order_id}`}
-              className=" d-flex "
+          <Link
+            to={`/missing_order_details/${value?.row?.order_id}`}
+            className=" d-flex "
+          >
+            <Button
+              type="button"
+              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
             >
-              <Button
-                type="button"
-                className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-              >
-                <FaEye className="mb-1" />
-              </Button>
-            </Link>
+              <FaEye className="mb-1" />
+            </Button>
+          </Link>
         );
       },
     },
