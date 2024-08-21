@@ -28,7 +28,6 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-// import { CompletedOrderDetailsGet } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -41,7 +40,6 @@ import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import ShowAlert from "../../utils/ShowAlert";
 import { getUserData } from "../../utils/StorageUtils";
 import { useTranslation } from "react-i18next";
-import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 
 function CompletedOrderDetailsInChina() {
   const { id } = useParams();
