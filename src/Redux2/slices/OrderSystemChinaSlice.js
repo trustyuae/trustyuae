@@ -123,7 +123,7 @@ export const ReserveOrderSystemChinaGet = createAsyncThunk(
 
 export const ReserveOrderDetailsChinaGet = createAsyncThunk(
   "orderSystem/ReserveOrderDetailsGet",
-  async ({ id }, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
         `wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&orderid=${id}`

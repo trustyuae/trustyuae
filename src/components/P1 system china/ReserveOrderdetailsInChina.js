@@ -2,7 +2,16 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { Badge, Button, ButtonGroup, Card, Col, Modal, Row, ToggleButton } from "react-bootstrap";
+import {
+  Badge,
+  Button,
+  ButtonGroup,
+  Card,
+  Col,
+  Modal,
+  Row,
+  ToggleButton,
+} from "react-bootstrap";
 import PrintModal from "./PrintModalInChina";
 import {
   Alert,
@@ -19,20 +28,26 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
+// import {
+//   CompletedOrderDetailsGet,
+//   ReserveOrderDetailsGet,
+// } from "../../redux/actions/OrderSystemActions";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
+import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  AddMessageChina,
+  ReserveOrderDetailsChinaGet,
+} from "../../Redux2/slices/OrderSystemChinaSlice";
 import ShowAlert from "../../utils/ShowAlert";
 import Form from "react-bootstrap/Form";
-import {
-  AddMessage,
-  ReserveOrderDetailsGet,
-} from "../../redux/actions/OrderSystemchinaActions";
 import { useTranslation } from "react-i18next";
 import { getUserData } from "../../utils/StorageUtils";
+import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 
-const ReserveOrderdetailsInChina = () => {
-  const params = useParams();
+function ReserveOrderdetailsInChina() {
+  const {id} = useParams();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
   const [orderData, setOrderData] = useState([]);
@@ -44,39 +59,67 @@ const ReserveOrderdetailsInChina = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
+  const [userData, setUserData] = useState(null);
   const [message, setMessage] = useState("");
   const [showMessageModal, setshowMessageModal] = useState(false);
 
-  const loader = useSelector(
-    (state) => state?.orderSystemDataChina?.isCompletedOrderDetails
-  );
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
+
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemDataChina?.completedOrderDetails?.orders?.[0]
+    (state) => state?.orderSystemChina?.reserveOrderDetails?.orders?.[0]
   );
+
+  const reserveOrderDetailsData = useSelector(
+    (state) => state?.orderSystemChina?.reserveOrderDetails
+  );
+
+  const messageData = useSelector((state) => state?.orderSystemChina?.message);
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (reserveOrderDetailsData) {
+      const reserveOrderData = reserveOrderDetailsData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrderData(reserveOrderData);
+    }
+
+    if (orderDetailsDataOrderId) {
+      setOrderDetails(orderDetailsDataOrderId);
+      if (Array.isArray(orderDetailsDataOrderId.items)) {
+        const newData = orderDetailsDataOrderId?.items?.map(
+          (product, index1) => ({
+            ...product,
+            id: index1,
+          })
+        );
+        setTableData(newData);
+      } else {
+        console.warn("orderDetailsDataOrderId.items is not an array");
+      }
+    }
+  }, [orderDetailsDataOrderId, reserveOrderDetailsData]);
+
+  async function fetchOrder() {
+    dispatch(ReserveOrderDetailsChinaGet(id));
+  }
 
   useEffect(() => {
     fetchOrder();
   }, [setMessage, setTableData, setOrderData]);
-
-  async function fetchOrder() {
-    try {
-      const response = await dispatch(ReserveOrderDetailsGet(params.id));
-      let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-      setOrderData(data);
-      setOrderDetails(response.data.orders[0]);
-      if (data) {
-        data.forEach((order, index) => {
-          const newData = order.items.map((product, index1) => ({
-            ...product,
-            id: index1,
-          }));
-          setTableData(newData);
-        });
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   const ImageModule = (url) => {
     setImageURL(url);
@@ -223,20 +266,18 @@ const ReserveOrderdetailsInChina = () => {
   }, []);
 
   const handleAddMessage = async (e) => {
-    const orderId = parseInt(params.id, 10);
-    let userData = getUserData()
     const requestedMessage = {
       message: message,
-      order_id: orderId,
+      order_id: parseInt(id, 10),
       name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
+    await dispatch(AddMessageChina(requestedMessage)).then(async () => {
+      if (messageData) {
         setMessage("");
         setshowMessageModal(false);
-        const result = await ShowAlert(
+        ShowAlert(
           "",
-          response.data,
+          messageData.data,
           "success",
           null,
           null,
@@ -283,7 +324,7 @@ const ReserveOrderdetailsInChina = () => {
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
-              {t("P1ChinaSystem.OrderDetails")}:
+                {t("P1ChinaSystem.OrderDetails")}:
               </Typography>
               {loader ? (
                 <Loader />
@@ -291,7 +332,7 @@ const ReserveOrderdetailsInChina = () => {
                 <Box className="d-flex justify-content-between">
                   <Box>
                     <Typography className="fw-bold">
-                    {t("P1ChinaSystem.Order")}# {params.id}
+                      {t("P1ChinaSystem.Order")}# {id}
                     </Typography>
                     <Typography
                       className=""
@@ -320,6 +361,13 @@ const ReserveOrderdetailsInChina = () => {
             </Box>
             <Box>
               <Button
+                variant="outline-secondary"
+                className="p-1 me-3 bg-transparent text-secondary"
+                onClick={() => setshowMessageModal(true)}
+              >
+                <AddCommentOutlinedIcon />
+              </Button>
+              <Button
                 variant="outline-primary"
                 className="p-1 me-3 bg-transparent text-primary"
                 onClick={handlePrint}
@@ -336,7 +384,7 @@ const ReserveOrderdetailsInChina = () => {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-              {t("P1ChinaSystem.CustomerOrder")}
+                {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -351,7 +399,7 @@ const ReserveOrderdetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                         {t("P1ChinaSystem.Name")}
+                        {t("P1ChinaSystem.Name")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -376,7 +424,7 @@ const ReserveOrderdetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                       {t("P1ChinaSystem.Phone")}
+                        {t("P1ChinaSystem.Phone")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -426,7 +474,7 @@ const ReserveOrderdetailsInChina = () => {
                           fontSize: 14,
                         }}
                       >
-                         {t("P1ChinaSystem.OrderProcess")}
+                        {t("P1ChinaSystem.OrderProcess")}
                       </Typography>
                     </Col>
                     <Col md={7}>
@@ -488,7 +536,7 @@ const ReserveOrderdetailsInChina = () => {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-          {t("P1ChinaSystem.OrderDetails")}
+            {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -527,7 +575,7 @@ const ReserveOrderdetailsInChina = () => {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                          {t("P1ChinaSystem.Messages")}
+                            {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
@@ -614,6 +662,6 @@ const ReserveOrderdetailsInChina = () => {
       </Container>
     </>
   );
-};
+}
 
 export default ReserveOrderdetailsInChina;

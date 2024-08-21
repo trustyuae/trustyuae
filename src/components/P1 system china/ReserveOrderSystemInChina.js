@@ -13,18 +13,15 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-// import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemActions";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { CompletedOrderSystemGet } from "../../redux/actions/OrderSystemchinaActions";
+import { ReserveOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
-
-const ReserveOrderSystemInChina = () => {
+function ReserveOrderSystemInChina() {
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
@@ -44,35 +41,41 @@ const ReserveOrderSystemInChina = () => {
     null,
     null,
   ]);
-  const loader = useSelector(
-    (state) => state?.orderSystemDataChina?.isCompletedOrders
+  const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
+
+  const reserveOrdersData = useSelector(
+    (state) => state?.orderSystemChina?.reserveOrders
   );
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (reserveOrdersData) {
+      const reserveData = reserveOrdersData?.orders?.map((v, i) => ({
+        ...v,
+        id: i,
+      }));
+      setOrders(reserveData);
+      setTotalPages(reserveOrdersData.total_pages);
+    }
+  }, [reserveOrdersData]);
+
   async function fetchOrders() {
-    let apiUrl = `${API_URL}wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
+    let apiUrl = `wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
       apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
     await dispatch(
-      CompletedOrderSystemGet({
+      ReserveOrderSystemChinaGet({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({ ...v, id: i }));
-        setOrders(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    ).catch((error) => {
+      console.error(error);
+    });
   }
 
   const handleReset = () => {
-    // const inputRef = useRef(null);
     inputRef.current.value = "";
 
     setSearchOrderID("");
@@ -123,7 +126,6 @@ const ReserveOrderSystemInChina = () => {
       className: "order-system",
       type: "string",
     },
-    // { field: "end_date", headerName: "Completed Date", className: "order-system", flex: 1 },
     {
       field: "view_item",
       headerName:  t("POManagement.ViewItem"),
@@ -225,7 +227,7 @@ const ReserveOrderSystemInChina = () => {
 
   return (
     <Container fluid className="py-3">
-      <Box className="d-flex mb-4 justify-content-between">
+       <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
         {t("P1ChinaSystem.ReserveOrderSystemInChina")}
         </Typography>
@@ -251,8 +253,8 @@ const ReserveOrderSystemInChina = () => {
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-                <Form.Label className="fw-semibold">  {t("P1ChinaSystem.OrderId")}::</Form.Label>
-                <Form.Control
+              <Form.Label className="fw-semibold">  {t("P1ChinaSystem.OrderId")}::</Form.Label>
+              <Form.Control
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
@@ -295,37 +297,6 @@ const ReserveOrderSystemInChina = () => {
                 )}
               </Form.Group>
             </Col>
-
-            {/* <Col xs="auto" lg="4">
-                <Form.Group style={{ position: "relative" }}>
-                  <Form.Label className="fw-semibold">
-                    Completed Date Filter:
-                  </Form.Label>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["SingleInputDateRangeField"]}>
-                      <DateRangePicker
-                        sx={{
-                          "& .MuiInputBase-root": {
-                            paddingRight: 0,
-                          },
-                          "& .MuiInputBase-input": {
-                            padding: ".5rem .75rem .5rem .75rem",
-                            "&:hover": {
-                              borderColor: "#dee2e6",
-                            },
-                          },
-                        }}
-                        value={selectedCompletedDateRange}
-                        onChange={handleCompltedDateChange}
-                        slots={{ field: SingleInputDateRangeField }}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-                  {selectedCompletedDateRange[0] && selectedCompletedDateRange[1] && (
-                    <CancelIcon style={{ position: "absolute", right: "0", top: "47px" }} onClick={clearEndDateRange} />
-                  )}
-                </Form.Group>
-              </Col> */}
           </Row>
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
@@ -351,14 +322,14 @@ const ReserveOrderSystemInChina = () => {
               onClick={handleSearchFilter}
             >
              {t("P1ChinaSystem.Search")}:
-            </Button>
+             </Button>
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
               onClick={handleReset}
             >
               {t("P1ChinaSystem.ResetFilter")}:
-            </Button>
+              </Button>
           </Box>
         </Form>
       </Row>
@@ -383,7 +354,7 @@ const ReserveOrderSystemInChina = () => {
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
                 {t("P1ChinaSystem.RecordsIsNotAlert")}:
-            </Alert>
+                </Alert>
           )}
         </>
       )}
