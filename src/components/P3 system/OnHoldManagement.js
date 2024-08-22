@@ -41,6 +41,7 @@ function OnHoldManagement() {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [productData, setProductData] = useState([]);
   const [productDetailsData, setProductDetailsData] = useState([]);
+  const [productOverallData, setProductOverallData] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
   const loader = useSelector((state) => state?.p3System?.isLoading);
 
@@ -70,6 +71,7 @@ function OnHoldManagement() {
       })
     )
       .then(({ payload }) => {
+        setProductOverallData(payload);
         let data = payload.records.map((v, i) => ({
           ...v,
           id: i,
@@ -169,9 +171,9 @@ function OnHoldManagement() {
     if (confirmation === "Cancel") {
       return;
     }
-
     const requestedDataP = {
       product_id: params.id,
+      po_id: productOverallData.po_id,
       order_id: orderId,
       quantity: quantity,
       grn_no: params.grn_no,
