@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
-import {
-  MDBContainer,
-  MDBCol,
-  MDBRow,
-  MDBInput,
-  MDBCheckbox,
-  MDBCardImage,
-} from "mdb-react-ui-kit";
+import { MDBContainer, MDBInput, MDBCheckbox } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, loginUserWithToken } from "../redux/actions/UserActions";
 import { useNavigate } from "react-router-dom";
 import { isValidEmail } from "../utils/validation";
 import styled from "styled-components";
 import { Box, CardContent } from "@mui/material";
 import { Card, Col, Row } from "react-bootstrap";
+import { loginUser, loginUserWithToken } from "../Redux2/slices/UserSlice";
+import { getUserData } from "../utils/StorageUtils";
+import ShowAlert from "../utils/ShowAlert";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -32,7 +27,7 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let isValid = true;
 
     if (!username) {
@@ -46,14 +41,49 @@ const Login = () => {
     }
 
     if (!password) {
-      setPasswordError("Please enter valid password");
+      setPasswordError("Please enter a valid password");
       isValid = false;
     } else {
       setPasswordError("");
     }
 
     if (isValid) {
-      dispatch(loginUser({ username, password }, navigate));
+      try {
+        const { payload } = dispatch(loginUser({ username, password }));
+        ShowAlert(
+          "Success",
+          "you have Logged In Successfully!",
+          "success",
+          true,
+          false,
+          "OK",
+        ).then(async (result) => {
+          if (result.isConfirmed) {
+            const userData = await getUserData();
+            switch (userData.user_role) {
+              case "administrator":
+              case "packing_assistant":
+                navigate("/ordersystem");
+                break;
+              case "factory_coordinator":
+                navigate("/PO_ManagementSystem");
+                break;
+              case "customer_support":
+                navigate("/order_not_available");
+                break;
+              case "operation_assistant":
+                navigate("/On_Hold_Manegement_System");
+                break;
+              default:
+                console.log("Unknown role");
+            }
+          }
+        });
+      } catch (error) {
+        console.log("Error while login:", error);
+      }
+    } else {
+      console.log("Error while login");
     }
   };
 

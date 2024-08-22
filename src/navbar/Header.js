@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../redux/actions/UserActions";
 import { Box } from "@mui/material";
 import { getUserData } from "../utils/StorageUtils";
+import { logoutUser } from "../Redux2/slices/UserSlice";
+import ShowAlert from "../utils/ShowAlert";
 
 const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
@@ -11,7 +12,31 @@ const Header = ({ onToggleSidebar }) => {
   const [userData, setUserData] = useState(null);
   const handleLogOut = async () => {
     try {
-      dispatch(logoutUser(navigate));
+      dispatch(logoutUser()).then((res) => {
+        ShowAlert(
+          "Do You Want Logged Out?",
+          "",
+          "question",
+          true,
+          true,
+          "Confirm",
+          "Cancel"
+        ).then((result) => {
+          if (result.isConfirmed) {
+            ShowAlert(
+              "Success",
+              "you have logged out successfully",
+              "success",
+              false,
+              false,
+              "OK",
+              "",
+              1000
+            );
+            navigate("/");
+          }
+        });
+      });
     } catch (error) {
       console.error("Logout error:", error);
     }
