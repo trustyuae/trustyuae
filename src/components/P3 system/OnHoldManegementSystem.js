@@ -14,17 +14,19 @@ import {
 import DataTable from "../DataTable";
 import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
-import { AddGrn, GetProductManual } from "../../redux/actions/P3SystemActions";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { CompressImage } from "../../utils/CompressImage";
 import axiosInstance from "../../utils/AxiosInstance";
 
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import { AddMessage } from "../../redux/actions/OrderSystemActions";
+import { getUserData } from "../../utils/StorageUtils";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { AddGrn, GetProductManual } from "../../Redux2/slices/P3SystemSlice";
 import ShowAlert from "../../utils/ShowAlert";
+import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
+import { MergeRounded } from "@mui/icons-material";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -44,7 +46,6 @@ function OnHoldManegementSystem() {
   const [tableData, setTableData] = useState([]);
   const [poTableData, setPoTableData] = useState([]);
   const [date, setDate] = useState(getTodayDate());
-  const [userName, setuserName] = useState("");
   const [isValid, setIsValid] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
@@ -65,19 +66,39 @@ function OnHoldManegementSystem() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [currentStartIndex, setCurrentStartIndex] = useState(1);
+
+  const factoryData = useSelector((state) => state?.factory?.factories);
+  const [userData, setUserData] = useState(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
-  );
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+    }
+  }, [factoryData]);
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getall = async () => {
-    let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
+    let url = `wp-json/custom-api-product/v1/get-product/?`;
     const response = await axiosInstance.get(url);
     setoptionsArray(
       response.data.products.map((user) => ({
@@ -442,6 +463,21 @@ function OnHoldManegementSystem() {
     validateForm(updatedData);
   }
 
+  // const handleQtyChange = (index, event) => {
+  //   const newQuantity = parseFloat(event?.target?.value);
+  //   if (!isNaN(newQuantity) && index.target.value >= 0) {
+  //     const updatedRecivedQtyData = poTableData.map((item) => {
+  //       if (item?.product_id === event?.product_id) {
+  //         if (item.variation_id == event.variation_id) {
+  //           return { ...item, received_quantity: index?.target?.value };
+  //         }
+  //       }
+  //       return item;
+  //     });
+  //     setPoTableData(updatedRecivedQtyData);
+  //   }
+  // };
+
   const handleFieldChange = (id, field, value) => {
     const updatedData = tableData.map((item) => {
       if (item.id === value.id) {
@@ -478,7 +514,7 @@ function OnHoldManegementSystem() {
   };
 
   const getAllProducts = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
+    let apiUrl = `wp-json/custom-api-product/v1/get-product/?`;
     if (productNameF && productIDF) {
       apiUrl += `product_name=${productNameF}&product_id=${productIDF}`;
     } else if (productNameF) {
@@ -489,32 +525,37 @@ function OnHoldManegementSystem() {
     try {
       if (productIDF) {
         setSelectedOption(null);
-        const response = await dispatch(GetProductManual({ apiUrl }));
-        const data = response.data.products.map((v, i) => ({ ...v, id: i }));
-        const modifiedData = data.map((item) => ({
-          ...item,
-          variationColor: item.variation_values.length === 0 ? "" : "",
-          variationSize: item.variation_values.length === 0 ? "" : "",
-        }));
-        setSingleProductD(modifiedData);
-        inputRef.current.value = "";
+        dispatch(GetProductManual(apiUrl)).then(({ payload }) => {
+          const data = payload.products.map((v, i) => ({
+            ...v,
+            id: i,
+          }));
+          const modifiedData = data.map((item) => ({
+            ...item,
+            variationColor: item.variation_values.length === 0 ? "" : "",
+            variationSize: item.variation_values.length === 0 ? "" : "",
+          }));
+          setSingleProductD(modifiedData);
+          inputRef.current.value = "";
+        });
       } else if (productNameF && productIDF) {
-        const response = await dispatch(GetProductManual({ apiUrl }));
-        if (response.data.products) {
-          setSelectedOption(null);
-        }
-        const data = response.data.products.map((v, i) => ({ ...v, id: i }));
-        const modifiedData = data.map((item) => ({
-          ...item,
-          variationColor: item.variation_values.length === 0 ? "" : "",
-          variationSize: item.variation_values.length === 0 ? "" : "",
-        }));
-        setSingleProductD(modifiedData);
-        inputRef.current.value = "";
+        dispatch(GetProductManual(apiUrl)).then(({ payload }) => {
+          if (payload.products) {
+            setSelectedOption(null);
+          }
+          const data = payload.products.map((v, i) => ({ ...v, id: i }));
+          const modifiedData = data.map((item) => ({
+            ...item,
+            variationColor: item.variation_values.length === 0 ? "" : "",
+            variationSize: item.variation_values.length === 0 ? "" : "",
+          }));
+          setSingleProductD(modifiedData);
+          inputRef.current.value = "";
+        });
       }
     } catch (error) {
-      console.error(error);
-      // setSingleProductD([]);
+      console.error("Error occurred:", error);
+      setSingleProductD([]);
     }
   };
 
@@ -532,11 +573,6 @@ function OnHoldManegementSystem() {
     getAllProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productNameF, productIDF, tableData]);
-
-  useEffect(() => {
-    let info = JSON.parse(localStorage.getItem("user_data"));
-    setuserName(info.first_name + " " + info.last_name);
-  }, []);
 
   const handalADDProduct = () => {
     let data = [...tableData, ...singleProductD];
@@ -611,35 +647,12 @@ function OnHoldManegementSystem() {
 
   const handleSubmit = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
-    // tableData.forEach((data) => {
-    //   if (data.variation_details && data.variation_values) {
-    //     const { variation_details, variation_values } = data;
-    //     const matchingKeys = Object.keys(variation_details).filter((key) => {
-    //       const detail = variation_details[key];
-    //       // Check if all properties in variation_values match with detail
-    //       return Object.keys(variation_values).every((prop) => {
-    //         return detail[prop] === variation_values[prop];
-    //       });
-    //     });
-    //     if (matchingKeys.length > 0) {
-    //       data.variation_id = Number(matchingKeys[0]);
-    //     }
-    //   }
-    // });
-    // const convertedData = tableData.map((item) => ({
-    //   product_id: parseInt(item.product_id),
-    //   product_name: item.product_name,
-    //   product_image: item.product_image,
-    //   variation_id: item.variation_id ? item.variation_id : 0,
-    //   variations: item.variation_values,
-    //   qty_remain: parseInt(item.Quantity),
-    //   updated_date: currentDate,
-    // }));
-
     const variationIds = tableData.flatMap((item) => {
-      return Array.isArray(item.variation_id)
-        ? item.variation_id.map((id) => id.toString())
-        : [""];
+      if (Array.isArray(item.variation_id) && item.variation_id.length > 0) {
+        return item.variation_id.map((id) => id.toString());
+      } else {
+        return ["0"];
+      }
     });
 
     const payload = {
@@ -647,11 +660,21 @@ function OnHoldManegementSystem() {
       variation_id: variationIds,
       received_qty: tableData.map((item) => item.Quantity),
       created_date: currentDate,
-      verified_by: userName,
+      verified_by: userData?.first_name + " " + userData?.last_name,
       status: "Pending for process",
     };
     try {
-      dispatch(AddGrn(payload, navigate));
+      dispatch(AddGrn(payload)).then(({ payload }) => {
+        Swal.fire({
+          title: payload.data,
+          icon: payload.status === 200 ? "success" : "error",
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/GRN_Management");
+          }
+        });
+      });
     } catch (error) {
       console.error(error);
     }
@@ -669,7 +692,7 @@ function OnHoldManegementSystem() {
   const selectPOId = async () => {
     try {
       const response = await axiosInstance.get(
-        `${API_URL}wp-json/get-po-ids/v1/show-po-id/${selectedFactory}`,
+        `wp-json/get-po-ids/v1/show-po-id/${selectedFactory}`
       );
       let data = response.data;
       setAllPoIds(data);
@@ -681,7 +704,7 @@ function OnHoldManegementSystem() {
   const fetchPoProductData = async () => {
     try {
       const response = await axiosInstance.get(
-        `${API_URL}wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`
+        `wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`
       );
 
       // Ensure each row has a unique 'id'
@@ -713,27 +736,16 @@ function OnHoldManegementSystem() {
   };
 
   const handleAddRemark = async (e) => {
-    // const orderId = parseInt(id, 10);
-    let userID = JSON.parse(localStorage.getItem("user_data"));
     const requestedMessage = {
       message: message,
-      // order_id: orderId,
-      // name: userID.first_name,
+      // order_id: parseInt(id, 10),
+      name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async (response) => {
-      if (response.data) {
+    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
+      if (payload) {
         setMessage("");
         setshowMessageModal(false);
-        const result = await ShowAlert(
-          "",
-          response.data,
-          "success",
-          null,
-          null,
-          null,
-          null,
-          2000
-        );
+        ShowAlert("", payload, "success", null, null, null, null, 2000);
       }
     });
   };
@@ -746,12 +758,22 @@ function OnHoldManegementSystem() {
       variation_id: poTableData.map((item) => item.variation_id),
       received_qty: poTableData.map((item) => item.received_quantity),
       created_date: currentDate,
-      verified_by: userName || "",
+      verified_by: userData?.first_name + " " + userData?.last_name || "",
       status: "Processing",
     };
 
     try {
-      await dispatch(AddGrn(payload, navigate));
+      await dispatch(AddGrn(payload)).then(({ payload }) => {
+        Swal.fire({
+          title: payload.data,
+          icon: payload.status === 200 ? "success" : "error",
+          showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/GRN_Management");
+          }
+        });
+      });
       const updatedPoTableData = poTableData.map((item) => ({
         ...item,
         received_quantity: 0,
@@ -769,13 +791,6 @@ function OnHoldManegementSystem() {
   };
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas?.factories) {
-      let data = allFactoryDatas?.factories?.map((item) => ({ ...item }));
-      setFactories(data);
-    }
-  }, [allFactoryDatas]);
-
-  useEffect(() => {
     selectPOId();
   }, [selectedFactory]);
 
@@ -784,7 +799,6 @@ function OnHoldManegementSystem() {
       fetchPoProductData();
     }
   }, [selectedPOId, selectedFactory, poId, pageSize, page]);
-
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -813,7 +827,7 @@ function OnHoldManegementSystem() {
               <Form.Control
                 type="text"
                 placeholder="Enter No of received boxes"
-                value={userName}
+                value={userData?.first_name + " " + userData?.last_name}
                 readOnly
                 disabled
                 className="mr-sm-2 py-2"

@@ -18,9 +18,10 @@ const initialState = {
 
 export const GetProductManual = createAsyncThunk(
   "factory/GetProductManual",
-  async ({ apiUrl }, { rejectWithValue }) => {
+  async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
+      console.log(response,'response from product manual')
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -31,8 +32,9 @@ export const GetProductManual = createAsyncThunk(
 
 export const AddGrn = createAsyncThunk(
   "factory/AddGrn",
-  async ({ payload }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
+      console.log(payload,'payload')
       const response = await axiosInstance.post(
         `wp-json/create-po-grn/v1/create-grn-by-po/`,
         payload,
