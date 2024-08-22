@@ -89,7 +89,7 @@ const Sidebar = () => {
                     <span>On Hold Orders System</span>
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     to="/reserve_orders_system"
                     className={
@@ -102,7 +102,7 @@ const Sidebar = () => {
                     <i className="bi bi-circle"></i>
                     <span>Reserve Orders System</span>
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </li>
           )}
@@ -408,7 +408,7 @@ const Sidebar = () => {
                   <span>On Hold Orders System</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/reserve_orders_system_in_china"
                   className={
@@ -421,7 +421,7 @@ const Sidebar = () => {
                   <i className="bi bi-circle"></i>
                   <span>Reserve Orders System</span>
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </li>
 

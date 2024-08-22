@@ -145,14 +145,6 @@ export const UpdatePODetails = createAsyncThunk(
   async ({ apiUrl, payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(apiUrl, payload);
-      await ShowAlert(
-        response.data.message,
-        "",
-        "success",
-        true,
-        false,
-        "OK"
-      );
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);

@@ -326,7 +326,7 @@ function OrderSystem() {
                 >
                   <option value="all">All</option>
                   <option value="dispatch">Dispatch</option>
-                  <option value="reserve">Reserve</option>
+                  {/* <option value="reserve">Reserve</option> */}
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -359,7 +359,7 @@ function OrderSystem() {
                   readOnly
                 />
               </Form.Group>
-              <Form.Group className="d-flex mx-1 align-items-center">
+              {/* <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
                   Reserve Orders:
                 </Form.Label>
@@ -371,7 +371,7 @@ function OrderSystem() {
                   value={overAllData.total_reserve_orders}
                   readOnly
                 />
-              </Form.Group>
+              </Form.Group> */}
             </Box>
             <Box className="d-flex">
               <Form.Group className="d-flex mx-1 align-items-center">

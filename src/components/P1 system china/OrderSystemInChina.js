@@ -21,7 +21,10 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import PrintModal from "./PrintModalInChina";
-import { OrderDetailsChinaGet, OrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
+import {
+  OrderDetailsChinaGet,
+  OrderSystemChinaGet,
+} from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 
 function OrderSystemInChina() {
@@ -49,9 +52,13 @@ function OrderSystemInChina() {
   const [showModal, setShowModal] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
-  const ordersData = useSelector((state) => state?.orderSystemChina?.orders?.orders);
+  const ordersData = useSelector(
+    (state) => state?.orderSystemChina?.orders?.orders
+  );
   const otherData = useSelector((state) => state?.orderSystemChina?.orders);
-  const orderDetails = useSelector((state) => state?.orderSystemChina?.orderDetails);
+  const orderDetails = useSelector(
+    (state) => state?.orderSystemChina?.orderDetails
+  );
 
   useEffect(() => {
     if (ordersData) {
@@ -115,7 +122,12 @@ function OrderSystemInChina() {
   };
 
   const columns = [
-    { field: "date", headerName: t("POManagement.Date"), className: "order-system", flex: 1 },
+    {
+      field: "date",
+      headerName: t("POManagement.Date"),
+      className: "order-system",
+      flex: 1,
+    },
     {
       field: "order_id",
       headerName: t("P1ChinaSystem.OrderId"),
@@ -130,7 +142,7 @@ function OrderSystemInChina() {
     },
     {
       field: "shipping_country",
-      headerName:t("P1ChinaSystem.ShippingCountry"),
+      headerName: t("P1ChinaSystem.ShippingCountry"),
       type: "string",
       className: "order-system",
       flex: 1,
@@ -300,8 +312,11 @@ function OrderSystemInChina() {
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-              <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
-              <Form.Control
+                <Form.Label className="fw-semibold">
+                  {" "}
+                  {t("P1ChinaSystem.OrderId")}:
+                </Form.Label>
+                <Form.Control
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
@@ -314,7 +329,7 @@ function OrderSystemInChina() {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
-                {t("P1ChinaSystem.Datefilter")}:
+                  {t("P1ChinaSystem.Datefilter")}:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -346,14 +361,18 @@ function OrderSystemInChina() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-              <Form.Label className="fw-semibold">{t("P1ChinaSystem.Dispatchtype")}:</Form.Label>
-              <Form.Select
+                <Form.Label className="fw-semibold">
+                  {t("P1ChinaSystem.Dispatchtype")}:
+                </Form.Label>
+                <Form.Select
                   className="mr-sm-2 py-2"
                   onChange={(e) => searchDispatchTypeFilter(e.target.value)}
                 >
                   <option value="all">{t("POManagement.All")}</option>
-                  <option value="dispatch">{t("P1ChinaSystem.dispatch")}</option>
-                  <option value="reserve">{t("P1ChinaSystem.reserve")}</option>
+                  <option value="dispatch">
+                    {t("P1ChinaSystem.dispatch")}
+                  </option>
+                  {/* <option value="reserve">{t("P1ChinaSystem.reserve")}</option> */}
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -362,7 +381,7 @@ function OrderSystemInChina() {
             <Box className="d-flex">
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
-                {t("P1ChinaSystem.TotalOrders")}:
+                  {t("P1ChinaSystem.TotalOrders")}:
                 </Form.Label>
                 <Form.Control
                   as="input"
@@ -375,7 +394,7 @@ function OrderSystemInChina() {
               </Form.Group>
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
-                {t("P1ChinaSystem.DispatchOrders")}:
+                  {t("P1ChinaSystem.DispatchOrders")}:
                 </Form.Label>
                 <Form.Control
                   as="input"
@@ -386,7 +405,7 @@ function OrderSystemInChina() {
                   readOnly
                 />
               </Form.Group>
-              <Form.Group className="d-flex mx-1 align-items-center">
+              {/* <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
                 {t("P1ChinaSystem.ReserveOrders")}:
                 </Form.Label>
@@ -398,12 +417,12 @@ function OrderSystemInChina() {
                   value={overAllData.total_reserve_orders}
                   readOnly
                 />
-              </Form.Group>
+              </Form.Group> */}
             </Box>
             <Box className="d-flex">
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
-                {t("P1ChinaSystem.PageSize")}:
+                  {t("P1ChinaSystem.PageSize")}:
                 </Form.Label>
                 <Form.Control
                   as="select"
@@ -424,14 +443,14 @@ function OrderSystemInChina() {
                 onClick={handleSearchFilter}
               >
                 {t("P1ChinaSystem.Search")}:
-                </Button>
+              </Button>
               <Button
                 type="button"
                 className="mr-2 mx-1 w-auto"
                 onClick={handleReset}
               >
                 {t("P1ChinaSystem.ResetFilter")}:
-                </Button>
+              </Button>
             </Box>
           </Box>
         </Form>
@@ -456,8 +475,8 @@ function OrderSystemInChina() {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-             {t("P1ChinaSystem.RecordsIsNotAlert")}:
-             </Alert>
+              {t("P1ChinaSystem.RecordsIsNotAlert")}:
+            </Alert>
           )}
         </>
       )}
@@ -469,6 +488,6 @@ function OrderSystemInChina() {
       />
     </Container>
   );
-};
+}
 
 export default OrderSystemInChina;

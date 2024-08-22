@@ -3,7 +3,7 @@ import { MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { Alert, Box, Typography } from "@mui/material";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Modal, Row } from "react-bootstrap";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -17,6 +17,10 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { GetGRNList } from "../../Redux2/slices/P3SystemSlice";
+import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
+import { getUserData } from "../../utils/StorageUtils";
+import ShowAlert from "../../utils/ShowAlert";
+import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -29,7 +33,11 @@ function GRNManagement() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [grnList, setGrnList] = useState([]);
+  const [userData, setUserData] = useState(null);
   const loader = useSelector((state) => state?.p3System?.isLoading);
+  const [message, setMessage] = useState("");
+  const [selectedGrnNo, setSelectedGrnNo] = useState(null);
+  const [showMessageModal, setshowMessageModal] = useState(false);
 
   const grnListData = useSelector((state) => state?.p3System?.grnList);
 
@@ -40,6 +48,20 @@ function GRNManagement() {
       setTotalPages(grnData?.total_pages);
     }
   }, [grnListData]);
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleStatusChange = (e) => {
     setStatusFilter(e.target.value);
@@ -94,7 +116,7 @@ function GRNManagement() {
       },
     },
     {
-      field: "message",
+      field: "grn_note",
       headerName: "Remark",
       flex: 1,
       type: "string",
@@ -105,15 +127,29 @@ function GRNManagement() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
+        const handleShowMessageModal = () => {
+          setSelectedGrnNo(value?.row?.grn_no); // Set the grn_no in state
+          setshowMessageModal(true); // Open the modal
+        };
+
         return (
-          <Link to={`/GRN_View/${value?.row?.grn_no}`}>
+          <Box>
+            <Link to={`/GRN_View/${value?.row?.grn_no}`}>
+              <Button
+                type="button"
+                className="w-auto bg-transparent border-0 text-secondary fs-5"
+              >
+                <FaEye className="mb-1" />
+              </Button>
+            </Link>
             <Button
-              type="button"
-              className="w-auto bg-transparent border-0 text-secondary fs-5"
+              variant="outline-secondary"
+              className="p-1 me-3 bg-transparent text-secondary"
+              onClick={handleShowMessageModal}
             >
-              <FaEye className="mb-1" />
+              <AddCommentOutlinedIcon />
             </Button>
-          </Link>
+          </Box>
         );
       },
     },
@@ -141,6 +177,21 @@ function GRNManagement() {
     // setPage(e.target.value);
   };
 
+  const handleAddRemark = async (e) => {
+    const requestedMessage = {
+      message: message,
+      Grn_no: selectedGrnNo,
+      name: userData.first_name,
+    };
+    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
+      if (payload) {
+        setMessage("");
+        setshowMessageModal(false);
+        ShowAlert("", payload, "success", null, null, null, null, 2000);
+      }
+    });
+  };
+
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
     setStartDate("");
@@ -150,7 +201,7 @@ function GRNManagement() {
   useEffect(() => {
     handlGetGRNList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endDate, selectedDateRange, statusFilter, page,pageSize]);
+  }, [endDate, selectedDateRange, statusFilter, page, pageSize]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -218,9 +269,7 @@ function GRNManagement() {
           </Col>
           <Col xs="auto" lg="1">
             <Form.Group>
-              <Form.Label>
-                PageSize{" "}
-              </Form.Label>
+              <Form.Label>PageSize </Form.Label>
               <Form.Control
                 as="select"
                 className="w-auto"
@@ -266,6 +315,33 @@ function GRNManagement() {
           )}
         </Card>
       </MDBRow>
+      <Modal
+        show={showMessageModal}
+        onHide={() => setshowMessageModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Add Remark</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Control
+            as="textarea"
+            placeholder="Enter your message here..."
+            rows={3}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <Box className="text-end my-3">
+            <Button
+              variant="secondary"
+              className="mt-2 fw-semibold"
+              onClick={handleAddRemark}
+            >
+              Add Message
+            </Button>
+          </Box>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 }

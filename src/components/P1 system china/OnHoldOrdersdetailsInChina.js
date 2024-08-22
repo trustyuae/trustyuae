@@ -24,6 +24,9 @@ import {
   List,
   Accordion,
   AccordionSummary,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -44,7 +47,15 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getUserData } from "../../utils/StorageUtils";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "../../utils/AxiosInstance";
-import { AddMessageChina, AttachmentFileUploadChina, CustomOrderFinishOHChina, InsertOrderPickupChina, OnHoldOrderDetailsChinaGet, OverAllAttachmentFileUploadChina } from "../../Redux2/slices/OrderSystemChinaSlice";
+import {
+  AddMessageChina,
+  AttachmentFileUploadChina,
+  CustomItemSendToP2,
+  CustomOrderFinishOHChina,
+  InsertOrderPickupChina,
+  OnHoldOrderDetailsChinaGet,
+  OverAllAttachmentFileUploadChina,
+} from "../../Redux2/slices/OrderSystemChinaSlice";
 
 function OnHoldOrdersdetailsInChina() {
   const { id } = useParams();
@@ -67,6 +78,9 @@ function OnHoldOrdersdetailsInChina() {
   const [selectedItemId, setSelectedItemId] = useState("");
   const [selectedVariationId, setSelecetedVariationId] = useState("");
   const [toggleStatus, setToggleStatus] = useState(0);
+
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
 
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -132,7 +146,7 @@ function OnHoldOrdersdetailsInChina() {
   }
   useEffect(() => {
     fetchUserData();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const capture = useCallback(() => {
@@ -308,6 +322,49 @@ function OnHoldOrdersdetailsInChina() {
       });
   };
 
+  const handleItemSelection = (rowData) => {
+    const selectedIndex = selectedItemIds.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIds.filter((id) => id !== rowData.id)
+        : [...selectedItemIds, rowData.id];
+
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, rowData]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+    }
+    setSelectedItemIds(newSelected);
+  };
+
+  const handleSendToP2ButtonClick = async () => {
+    const selectedProductIds = selectedItems.map((item) => item.item_id);
+    const selectedVariationIds = selectedItems.map((item) => item.variation_id);
+
+    const payload = {
+      product_id: selectedProductIds,
+      variation_id: selectedVariationIds,
+    };
+
+    try {
+      dispatch(CustomItemSendToP2({ id, payload })).then(({ payload }) => {
+        if (payload) {
+          Swal.fire({
+            title: payload.message,
+            icon: payload.status === 200 ? "success" : "error",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/on_hold_orders_system_in_china");
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Error sending items to p2 system:", error);
+    }
+  };
+
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
@@ -365,6 +422,24 @@ function OnHoldOrdersdetailsInChina() {
   };
 
   const columns = [
+    {
+      field: "select",
+      headerName: "Select",
+      flex: 0.5,
+      renderCell: (params) => {
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={<Checkbox />}
+              style={{ justifyContent: "center" }}
+              checked={selectedItemIds.includes(params.row.id)}
+              onChange={(event) => handleItemSelection(params.row)}
+            />
+          </FormGroup>
+        );
+      },
+    },
     {
       field: "item_id",
       headerName: t("P1ChinaSystem.ItemId"),
@@ -651,7 +726,7 @@ function OnHoldOrdersdetailsInChina() {
   return (
     <>
       <Container fluid className="px-5">
-      <MDBRow className="my-3">
+        <MDBRow className="my-3">
           <MDBCol className="d-flex justify-content-start">
             <Button
               variant="outline-secondary"
@@ -795,7 +870,7 @@ function OnHoldOrdersdetailsInChina() {
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
-              {t("P1ChinaSystem.CustomerOrder")}
+                {t("P1ChinaSystem.CustomerOrder")}
               </Typography>
               {loader ? (
                 <Loader />
@@ -811,7 +886,7 @@ function OnHoldOrdersdetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.Name")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -836,7 +911,7 @@ function OnHoldOrdersdetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.Phone")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -861,7 +936,7 @@ function OnHoldOrdersdetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.CustomerShippingAddress")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -886,7 +961,7 @@ function OnHoldOrdersdetailsInChina() {
                         }}
                       >
                         {t("P1ChinaSystem.OrderProcess")}
-                        </Typography>
+                      </Typography>
                     </Col>
                     <Col md={7}>
                       <Typography
@@ -954,7 +1029,7 @@ function OnHoldOrdersdetailsInChina() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                                orderDetails?.order_process == "started" ? (
+                              orderDetails?.order_process == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -990,7 +1065,7 @@ function OnHoldOrdersdetailsInChina() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetails?.operation_user_id &&
-                                orderDetails?.order_process == "started" ? (
+                              orderDetails?.order_process == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -1025,7 +1100,7 @@ function OnHoldOrdersdetailsInChina() {
 
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
-          {t("P1ChinaSystem.OrderDetails")}
+            {t("P1ChinaSystem.OrderDetails")}
           </Typography>
           {loader ? (
             <Loader />
@@ -1064,13 +1139,13 @@ function OnHoldOrdersdetailsInChina() {
                           id="panel1-header"
                         >
                           <Typography variant="h6" className="fw-bold">
-                          {t("P1ChinaSystem.Messages")}
+                            {t("P1ChinaSystem.Messages")}
                           </Typography>
                         </AccordionSummary>
                         <AccordionDetails
                           style={{ maxHeight: "200px", overflowY: "auto" }}
                         >
-                           <List>
+                          <List>
                             {orderDetailsDataOrderId?.operation_user_note.map(
                               (message, i) => (
                                 <ListItem
@@ -1112,13 +1187,33 @@ function OnHoldOrdersdetailsInChina() {
                 <Button
                   variant="danger"
                   disabled={orderDetails.toggle_status == 1 ? false : true}
+                  onClick={handleSendToP2ButtonClick}
+                  className="me-3"
+                >
+                  Send to P2 System
+                </Button>
+                <Button
+                  variant="danger"
+                  disabled={orderDetails.toggle_status == 1 ? false : true}
                   onClick={handleFinishButtonClick}
                 >
                   {t("P1ChinaSystem.Finish")}
-                  </Button>
+                </Button>
               </>
             ) : (
               <>
+                <Button
+                  variant="danger"
+                  disabled={
+                    orderDetails?.order_process != "started" ||
+                    userData?.user_id != orderDetails?.operation_user_id ||
+                    tableData?.some((data) => data.dispatch_image == "")
+                  }
+                  onClick={handleSendToP2ButtonClick}
+                  className="me-3"
+                >
+                  Send to P2 System
+                </Button>
                 <Button
                   variant="danger"
                   disabled={
@@ -1130,7 +1225,7 @@ function OnHoldOrdersdetailsInChina() {
                   onClick={handleFinishButtonClick}
                 >
                   {t("P1ChinaSystem.Finish")}
-                  </Button>
+                </Button>
               </>
             )}
           </MDBCol>
@@ -1279,6 +1374,6 @@ function OnHoldOrdersdetailsInChina() {
       </Container>
     </>
   );
-};
+}
 
 export default OnHoldOrdersdetailsInChina;

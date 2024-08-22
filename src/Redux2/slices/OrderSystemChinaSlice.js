@@ -22,6 +22,7 @@ const initialState = {
   customOrderOnHoldData: [],
   customOrderOnHoldFinishData: [],
   customItemSendToUAEData: [],
+  customItemSendToP2: [],
   error: null,
 };
 
@@ -39,19 +40,19 @@ export const OrderSystemChinaGet = createAsyncThunk(
 );
 
 export const OrderDetailsChinaGet = createAsyncThunk(
-    "orderSystem/OrderDetailsGet",
-    async ({ id }, { rejectWithValue }) => {
-      try {
-        const response = await axiosInstance.get(
-          `wp-json/custom-orders-new/v1/orders/?warehouse=China&orderid=${id}`
-        );
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching factories:", error.message);
-        return rejectWithValue(error.message);
-      }
+  "orderSystem/OrderDetailsGet",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-orders-new/v1/orders/?warehouse=China&orderid=${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
     }
-  );
+  }
+);
 
 export const CompletedOrderSystemChinaGet = createAsyncThunk(
   "orderSystem/CompletedOrderSystemGet",
@@ -295,6 +296,22 @@ export const CustomItemSendToUAE = createAsyncThunk(
   }
 );
 
+export const CustomItemSendToP2 = createAsyncThunk(
+  "orderSystem/CustomItemSendToP2",
+  async ({ id, payload }, { rejectWithValue }) => {
+    console.log(payload, "payload from CustomItemSendToP2");
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const orderSystemChinaSlice = createSlice({
   name: "orderSystem",
@@ -326,8 +343,9 @@ const orderSystemChinaSlice = createSlice({
       state.customOrderOnHoldData = [];
       state.customOrderOnHoldFinishData = [];
       state.customItemSendToUAEData = [];
+      state.customItemSendToP2 = [];
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -518,9 +536,20 @@ const orderSystemChinaSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
+      .addCase(CustomItemSendToP2.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(CustomItemSendToP2.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.customItemSendToP2 = action.payload;
+      })
+      .addCase(CustomItemSendToP2.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      });
   },
 });
 
 export const { clearstoredata, startSyncLoading, stopSyncLoading } =
-orderSystemChinaSlice.actions;
+  orderSystemChinaSlice.actions;
 export default orderSystemChinaSlice.reducer;

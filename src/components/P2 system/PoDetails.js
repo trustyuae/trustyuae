@@ -5,6 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
+
 import {
   Badge,
   ButtonGroup,
@@ -48,6 +49,7 @@ import {
   PerticularPoDetails,
   UpdatePODetails,
 } from "../../Redux2/slices/P2SystemSlice";
+import ShowAlert from "../../utils/ShowAlert";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -111,7 +113,6 @@ const PoDetails = () => {
     fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   useEffect(() => {
     // if(perticularPoDetailsDatas){
@@ -289,7 +290,17 @@ const PoDetails = () => {
 
     // Proceed with dispatch update action
     let apiUrl = `wp-json/custom-available-status/v1/estimated-status/${id}`;
-    await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
+    await dispatch(UpdatePODetails({apiUrl,payload: updatedData})).then(({payload})=>{
+      console.log(payload,'payload from UpdatePODetails')
+     ShowAlert(
+        payload.message,
+        "",
+        "",
+        true,
+        false,
+        "OK"
+      );
+    })
   };
 
   const handlepayMentStatus = (value) => {
@@ -426,23 +437,23 @@ const PoDetails = () => {
       renderCell: (value, row) => {
         return (
           <Box
-          onClick={() => {
-            ImageModule(value.row);
-          }}
-        >
-          <img
-            src={
-              value.row.factory_image
-                ? value.row.factory_image
-                : value.row.image
-                ? value.row.image
-                : defaulImage
-            }
-            alt={value.row.product_name}
-            className="img-fluid"
-            width={100}
-          />
-        </Box>
+            onClick={() => {
+              ImageModule(value.row);
+            }}
+          >
+            <img
+              src={
+                value.row.factory_image
+                  ? value.row.factory_image
+                  : value.row.image
+                  ? value.row.image
+                  : defaulImage
+              }
+              alt={value.row.product_name}
+              className="img-fluid"
+              width={100}
+            />
+          </Box>
         );
       },
     },
@@ -558,7 +569,7 @@ const PoDetails = () => {
         const dateValue =
           selectedDate && selectedDate !== "0000-00-00"
             ? dayjs(selectedDate)
-            : dayjs();
+            : null;
 
         return (
           <Box
@@ -604,7 +615,7 @@ const PoDetails = () => {
               <DatePicker
                 format="YYYY-MM-DD"
                 value={dateValue} // Use determined value for DatePicker
-                onChange={(date) => handleDateChange(rowId,date)}
+                onChange={(date) => handleDateChange(rowId, date)}
                 sx={{
                   width: "80%",
                   "& .MuiInputBase-input": {
@@ -1023,7 +1034,7 @@ const PoDetails = () => {
           poId={id}
         />
       )}
-     <Modal
+      <Modal
         show={showEditModal}
         // onHide={handleCloseEditModal}
         onHide={() => setShowEditModal(false)}
