@@ -99,6 +99,7 @@ export const AddPO = createAsyncThunk(
         `wp-json/custom-po-number/v1/po-id-generate/`,
         payload
       );
+      console.log(response,'response from Add PO')
       return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);

@@ -40,6 +40,7 @@ import {
   ManualOrScheduledPoDetailsData,
   PoDetailsData,
 } from "../../Redux2/slices/P2SystemSlice";
+import Swal from "sweetalert2";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -860,20 +861,17 @@ function OrderManagementSystem() {
             .join(",") || 0,
       };
       try {
-        dispatch(AddPO(payload));
-        if (addedPoDataa.status == 200) {
-          const result = await ShowAlert(
-            "Success",
-            addedPoDataa.data,
-            "success",
-            true,
-            false,
-            "OK"
-          );
-          if (result.isConfirmed) {
-            navigate("/PO_ManagementSystem");
-          }
-        }
+        dispatch(AddPO(payload)).then(({ payload }) => {
+          Swal.fire({
+            title: payload.data,
+            icon: payload.status === 200 ? "success" : "error",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/PO_ManagementSystem");
+            }
+          });
+        });
       } catch (error) {
         console.error("Error generating PO IDs:", error);
         setIsDisabled(true);
@@ -885,6 +883,7 @@ function OrderManagementSystem() {
       setIsDisabled(false);
     }
   };
+
   const handleGenerateManualPO = async () => {
     const filteredOrders = getFilteredData(selectedManualOrderDetails);
     const factoryIds = [
@@ -903,19 +902,17 @@ function OrderManagementSystem() {
         note: manualNote,
       };
       try {
-        dispatch(AddManualPO(payload));
-        if (addedManualPoDataa.status == 200) {
-          setIsDisabled(true);
-          const result = await ShowAlert(
-            "Success",
-            addedManualPoDataa.data,
-            "success",
-            true,
-            false,
-            "OK"
-          );
-          if (result.isConfirmed) navigate("/PO_ManagementSystem");
-        }
+        dispatch(AddManualPO(payload)).then(({ payload }) => {
+          Swal.fire({
+            title: payload.data,
+            icon: payload.status === 200 ? "success" : "error",
+            showConfirmButton: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              navigate("/PO_ManagementSystem");
+            }
+          });
+        });
       } catch (error) {
         console.error("Error generating PO IDs:", error);
         setIsDisabled(true);
@@ -958,19 +955,17 @@ function OrderManagementSystem() {
           reminder_date: remainderDate,
         };
         try {
-          dispatch(AddSchedulePO(payload));
-          if (addedSchedulePoDataa.status == 200) {
-            setIsDisabled(true);
-            const result = await ShowAlert(
-              "Success",
-              addedSchedulePoDataa.data,
-              "success",
-              true,
-              false,
-              "OK"
-            );
-            if (result.isConfirmed) navigate("/PO_ManagementSystem");
-          }
+          dispatch(AddSchedulePO(payload)).then(({ payload }) => {
+            Swal.fire({
+              title: payload.data,
+              icon: payload.status === 200 ? "success" : "error",
+              showConfirmButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                navigate("/PO_ManagementSystem");
+              }
+            });
+          });
         } catch (error) {
           console.error("Error generating PO IDs:", error);
           setIsDisabled(true);
