@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers-pro";
-// import { GetErManagementData } from "../../redux/actions/ErManagementActions";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";

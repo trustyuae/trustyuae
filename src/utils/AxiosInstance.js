@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getToken } from './StorageUtils';
-import { API_URL } from '../redux/constants/Constants';
+import { API_URL } from '../utils/constants';
 
 const instance = axios.create({
   baseURL: `${API_URL}`,

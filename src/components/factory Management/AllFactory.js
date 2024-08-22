@@ -4,15 +4,11 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { useDispatch, useSelector } from "react-redux";
 import EditFactoryModal from "./EditFactoryModal";
-// import { FactoryEdit } from "../../redux/actions/AllFactoryActions";
 import { Button, Row } from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
 import { Alert, Box, Typography } from "@mui/material";
-import { API_URL } from "../../redux/constants/Constants";
-import axios from "axios";
 import Loader from "../../utils/Loader";
-import axiosInstance from "../../utils/AxiosInstance";
 import {
   factoryEdit,
   fetchFactoriesByFilterParam,

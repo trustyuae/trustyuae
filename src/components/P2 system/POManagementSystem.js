@@ -12,7 +12,6 @@ import {
 } from "@mui/x-date-pickers-pro";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { API_URL } from "../../redux/constants/Constants";
 import { Link } from "react-router-dom";
 import { ButtonGroup, Card, Tab, Tabs, ToggleButton } from "react-bootstrap";
 import DataTable from "../DataTable";
@@ -77,9 +76,9 @@ function POManagementSystem() {
       if (poType === "po") {
         apiUrl = `wp-json/custom-po-management/v1/po-generated-order/?&per_page=${pageSize}&page=${page}`;
       } else if (poType === "mpo") {
-        apiUrl = `${API_URL}wp-json/custom-mo-management/v1/generated-mo-order/?&per_page=${pageSize}&page=${page}`;
+        apiUrl = `wp-json/custom-mo-management/v1/generated-mo-order/?&per_page=${pageSize}&page=${page}`;
       } else if (poType === "spo") {
-        apiUrl = `${API_URL}wp-json/custom-so-management/v1/generated-so-order/?&per_page=${pageSize}&page=${page}`;
+        apiUrl = `wp-json/custom-so-management/v1/generated-so-order/?&per_page=${pageSize}&page=${page}`;
       }
 
       // Build query parameters based on selected filters

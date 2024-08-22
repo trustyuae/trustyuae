@@ -13,7 +13,6 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";

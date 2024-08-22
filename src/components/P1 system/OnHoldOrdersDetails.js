@@ -35,7 +35,6 @@ import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import axiosInstance from "../../utils/AxiosInstance";
-import { API_URL } from "../../redux/constants/Constants";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   AddMessage,

@@ -5,7 +5,6 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_URL, API_URL_N } from "../../redux/constants/Constants";
 import {
   Badge,
   ButtonGroup,
@@ -24,8 +23,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -34,12 +31,7 @@ import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-// import {
-//   PerticularPoDetails,
-//   UpdatePODetails,
-// } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import PoDetailsModalInView from "./PoDetailsModalInView";
 import { useTranslation } from "react-i18next";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -139,7 +131,7 @@ const PoDetails = () => {
 
   const fetchPO = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
+      let apiUrl = `wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
       await dispatch(PerticularPoDetails({ apiUrl })).then(({ payload }) => {
         let data = payload.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
@@ -296,7 +288,7 @@ const PoDetails = () => {
     }
 
     // Proceed with dispatch update action
-    let apiUrl = `${API_URL}wp-json/custom-available-status/v1/estimated-status/${id}`;
+    let apiUrl = `wp-json/custom-available-status/v1/estimated-status/${id}`;
     await dispatch(UpdatePODetails({ apiUrl }, updatedData, navigate));
   };
 

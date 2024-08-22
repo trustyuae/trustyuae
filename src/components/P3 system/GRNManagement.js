@@ -11,10 +11,8 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
-import { API_URL } from "../../redux/constants/Constants";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-// import { GetGRNList } from "../../redux/actions/P3SystemActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -124,7 +122,7 @@ function GRNManagement() {
   const handlGetGRNList = async () => {
     try {
       let apiUrl;
-      apiUrl = `${API_URL}wp-json/custom-get-grns-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
+      apiUrl = `wp-json/custom-get-grns-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       dispatch(GetGRNList({ apiUrl }));

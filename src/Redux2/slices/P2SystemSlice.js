@@ -145,7 +145,7 @@ export const UpdatePODetails = createAsyncThunk(
   async ({ apiUrl, payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(apiUrl, payload);
-      const result = await ShowAlert(
+      await ShowAlert(
         response.data.message,
         "",
         "success",

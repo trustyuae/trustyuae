@@ -18,10 +18,8 @@ import {
 } from "@mui/material";
 import DataTable from "../DataTable";
 import { ButtonGroup, Card, Modal, ToggleButton } from "react-bootstrap";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import { MDBRow } from "mdb-react-ui-kit";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";

@@ -1,11 +1,10 @@
-import React, { isValidElement, useEffect, useState } from "react";
+import React, { useState } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Card, Container } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-// import { FactoryAdd } from "../../redux/actions/AllFactoryActions";
 import { useNavigate } from "react-router-dom";
 import { isValidEmail } from "../../utils/validation";
 import { Box, Typography } from "@mui/material";

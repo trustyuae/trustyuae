@@ -3,7 +3,6 @@ import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { API_URL } from "../../redux/constants/Constants";
 import { Badge, Card } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";

@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 import DataTable from "../DataTable";
-import { API_URL } from "../../redux/constants/Constants";
 import { useDispatch, useSelector } from "react-redux";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +20,6 @@ import axiosInstance from "../../utils/AxiosInstance";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import { getUserData } from "../../utils/StorageUtils";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import { AddGrn, GetProductManual } from "../../Redux2/slices/P3SystemSlice";
 import ShowAlert from "../../utils/ShowAlert";

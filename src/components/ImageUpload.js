@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { API_URL } from '../redux/constants/Constants';
+import { API_URL } from '../utils/constants';
 import { CompressImage } from '../utils/CompressImage';
 
 const ImageUpload = () => {

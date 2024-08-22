@@ -25,7 +25,6 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import PrintModal from "./PrintModal";
-import { API_URL } from "../../redux/constants/Constants";
 
 function OrderSystem() {
   const dispatch = useDispatch();
