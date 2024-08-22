@@ -368,21 +368,17 @@ function OrderDetails() {
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
-      dispatch(CustomOrderFinish({ user_id, id }));
-      if (customOrderDataa?.status_code === 200) {
+      dispatch(CustomOrderFinish({ user_id, id })).then(({ payload }) => {
         Swal.fire({
-          title: customOrderDataa.message,
-          icon: "success",
+          title: payload.message,
+          icon: payload.status_code === 200 ? "success" : "error",
           showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate("/ordersystem");
+          }
         });
-        navigate("/ordersystem");
-      } else {
-        Swal.fire({
-          title: customOrderDataa.message,
-          icon: "error",
-          showConfirmButton: true,
-        });
-      }
+      });
     } catch (error) {
       console.error("Error while finishing order:", error);
     }
