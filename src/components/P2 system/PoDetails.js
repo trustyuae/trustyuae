@@ -34,27 +34,34 @@ import Swal from "sweetalert2";
 import OrderDetailsPrintModal from "./OrderDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  PerticularPoDetails,
-  UpdatePODetails,
-} from "../../redux/actions/P2SystemActions";
+// import {
+//   PerticularPoDetails,
+//   UpdatePODetails,
+// } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import PoDetailsModalInView from "./PoDetailsModalInView";
 import { useTranslation } from "react-i18next";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
-import axiosInstance from "../../utils/AxiosInstance";
 import defaulImage from "../../../src/assets/default.png";
 import { DatePicker } from "@mui/x-date-pickers-pro";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import axiosInstance from "../../utils/AxiosInstance";
+import { getUserData } from "../../utils/StorageUtils";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import {
+  PerticularPoDetails,
+  UpdatePODetails,
+} from "../../Redux2/slices/P2SystemSlice";
 
 const PoDetails = () => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
+  const [userData, setUserData] = useState(null);
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState("");
   const [PoStatus, setPoStatus] = useState("");
@@ -79,28 +86,46 @@ const PoDetails = () => {
   const [showEditModal, setShowEditModal] = useState(false);
 
   const navigate = useNavigate();
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
-  );
 
-  const PoUpdate = useSelector(
-    (state) => state?.orderNotAvailable?.isUpdatedPoDetails
-  );
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
+  const PoUpdate = useSelector((state) => state?.p2System?.isLoading);
 
   const perticularOrderDetailsLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isPerticularPoDetailsData
+    (state) => state?.p2System?.isLoading
   );
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data);
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
+
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
+  useEffect(() => {
+    // if(perticularPoDetailsDatas){
+    //   const perticularData = perticularPoDetailsDatas
+    // }
+  }, []);
 
   const radios = [
     { name: "English", value: "En" },
@@ -115,25 +140,25 @@ const PoDetails = () => {
   const fetchPO = async () => {
     try {
       let apiUrl = `${API_URL}wp-json/custom-po-details/v1/po-order-details/${id}/?&page=${page}&per_page=${pageSize}`;
-      await dispatch(PerticularPoDetails({ apiUrl })).then((response) => {
-        let data = response.data.line_items.map((v, i) => ({ ...v, id: i }));
+      await dispatch(PerticularPoDetails({ apiUrl })).then(({ payload }) => {
+        let data = payload.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
         const row = [
           ...data,
           {
             id: "TAX",
             label: "Total:",
-            total_quantity: response?.data?.total_count || 0,
-            taxTotal: response?.data?.total_rmb_cost,
-            total_cost: response?.data?.total_cost || 0,
+            total_quantity: payload?.total_count || 0,
+            taxTotal: payload?.total_rmb_cost,
+            total_cost: payload?.total_cost || 0,
           },
         ];
         setPO_OrderList(row);
-        setERId(response.data.er_no);
-        setFactorieName(response.data.factory_id);
-        setPoStatus(response.data.po_status);
-        setPaymentStatus(response.data.payment_status);
-        setTotalPages(response?.data?.total_pages);
+        setERId(payload.er_no);
+        setFactorieName(payload.factory_id);
+        setPoStatus(payload.po_status);
+        setPaymentStatus(payload.payment_status);
+        setTotalPages(payload?.total_pages);
       });
     } catch {
       console.error("Error fetching PO:");
@@ -143,7 +168,7 @@ const PoDetails = () => {
   const getMessages = async () => {
     try {
       const response = await axiosInstance.get(
-        `${API_URL}wp-json/custom-po-note/v1/get-po-notes/${id}`,
+        `wp-json/custom-po-note/v1/get-po-notes/${id}`
       );
       setMessages(response.data);
     } catch (error) {
@@ -224,7 +249,7 @@ const PoDetails = () => {
 
   const handleUpdate = async () => {
     let updatelist = PO_OrderList.slice(0, -1);
-    // Extracting necessary data for update
+
     const updatedData = {
       po_number: id,
       request_quantity: updatelist.map((item) => item.available_quantity),
@@ -243,7 +268,6 @@ const PoDetails = () => {
       ),
       received_quantity: updatelist.map((item) => item.received_quantity),
     };
-
     // Check if availability_status is not empty
     const availabilityStatuses = updatelist.map((item) =>
       item.availability_status
@@ -334,7 +358,6 @@ const PoDetails = () => {
     setShowEditModal(true);
   };
 
-
   const variant2 = (params) => {
     const variationValue = params.row.variation_value;
 
@@ -342,9 +365,11 @@ const PoDetails = () => {
     try {
       if (variationValue) {
         const parsedValue = JSON.parse(variationValue);
-  
-        if (typeof parsedValue === 'object' && parsedValue !== null) {
-          variationArray = Object.entries(parsedValue).map(([key, value]) => ({ [key]: value }));
+
+        if (typeof parsedValue === "object" && parsedValue !== null) {
+          variationArray = Object.entries(parsedValue).map(([key, value]) => ({
+            [key]: value,
+          }));
         } else {
           console.error("Parsed value is not an object:", parsedValue);
         }
@@ -409,23 +434,23 @@ const PoDetails = () => {
       renderCell: (value, row) => {
         return (
           <Box
-            onClick={() => {
-              ImageModule(value.row);
-            }}
-          >
-            <img
-              src={
-                value.row.factory_image
-                  ? value.row.factory_image
-                  : value.row.image
-                  ? value.row.image
-                  : defaulImage
-              }
-              alt={value.row.product_name}
-              className="img-fluid"
-              width={100}
-            />
-          </Box>
+          onClick={() => {
+            ImageModule(value.row);
+          }}
+        >
+          <img
+            src={
+              value.row.factory_image
+                ? value.row.factory_image
+                : value.row.image
+                ? value.row.image
+                : defaulImage
+            }
+            alt={value.row.product_name}
+            className="img-fluid"
+            width={100}
+          />
+        </Box>
         );
       },
     },
@@ -646,22 +671,22 @@ const PoDetails = () => {
       return "Scheduled PO";
     }
   };
-  
   const handleAddMessage = async () => {
     setAddMessageD(true);
     try {
       // const orderId = parseInt(id, 10);
-      let userID = JSON.parse(localStorage.getItem("user_data"));
+
       const requestedMessage = {
         po_note: message,
-        po_id: id,
-        user_id: userID.user_id,
+        po_id: parseInt(id, 10),
+        user_id: userData.user_id,
       };
 
       const response = await axiosInstance.post(
-        `${API_URL}wp-json/custom-po-note/v1/add-po-note/`,
-        requestedMessage,
+        `wp-json/custom-po-note/v1/add-po-note/`,
+        requestedMessage
       );
+
       setshowMessageModal(false);
       setMessage("");
       setAddMessageD(false);
@@ -1006,7 +1031,7 @@ const PoDetails = () => {
           poId={id}
         />
       )}
-      <Modal
+     <Modal
         show={showEditModal}
         // onHide={handleCloseEditModal}
         onHide={() => setShowEditModal(false)}

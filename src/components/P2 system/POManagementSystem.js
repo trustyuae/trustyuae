@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import axiosInstance from "../../utils/AxiosInstance";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -20,13 +19,14 @@ import DataTable from "../DataTable";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useDispatch, useSelector } from "react-redux";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
-import { PomSystemProductsDetails } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import { useTranslation } from "react-i18next";
 import CancelIcon from "@mui/icons-material/Cancel";
+import axiosInstance from "../../utils/AxiosInstance";
+import { PomSystemProductsDetails } from "../../Redux2/slices/P2SystemSlice";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 
 function POManagementSystem() {
   const inputRef = useRef(null);
@@ -54,28 +54,28 @@ function POManagementSystem() {
   const [totalPages, setTotalPages] = useState(1);
   const [lang, setLang] = useState("En");
 
-  const allFactoryDatas = useSelector((state) => state?.allFactoryData?.factory);
+  const factoryData = useSelector((state) => state?.factory?.factories);
 
   const pomSystemProductDetailsLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isPomSystemProductDetails
+    (state) => state?.p2System?.isLoading
   );
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
 
   const POM_system_products = async () => {
     try {
       let apiUrl;
       if (poType === "po") {
-        apiUrl = `${API_URL}wp-json/custom-po-management/v1/po-generated-order/?&per_page=${pageSize}&page=${page}`;
+        apiUrl = `wp-json/custom-po-management/v1/po-generated-order/?&per_page=${pageSize}&page=${page}`;
       } else if (poType === "mpo") {
         apiUrl = `${API_URL}wp-json/custom-mo-management/v1/generated-mo-order/?&per_page=${pageSize}&page=${page}`;
       } else if (poType === "spo") {
@@ -93,13 +93,16 @@ function POManagementSystem() {
       if (PoStatus) params.status = PoStatus;
 
       // Construct the final API URL with query parameters
-      const response = await dispatch(PomSystemProductsDetails({
-        apiUrl: `${apiUrl}&${new URLSearchParams(params).toString()}`
-      }));
-
-      const data = response.data.pre_orders.map((v, i) => ({ ...v, id: i }));
-      setOrderList(data);
-      setTotalPages(response.data.total_pages);
+      dispatch(
+        PomSystemProductsDetails({
+          apiUrl: `${apiUrl}&${new URLSearchParams(params).toString()}`,
+        })
+      ).then(({ payload }) => {
+        console.log(payload,'payload data')
+        const data = payload.pre_orders.map((v, i) => ({ ...v, id: i }));
+        setOrderList(data);
+        setTotalPages(payload.total_pages);
+      });
     } catch (error) {
       console.error("Error Products:", error);
       setOrderList([]);
@@ -232,7 +235,7 @@ function POManagementSystem() {
     if (result.isConfirmed) {
       try {
         const response = await axiosInstance.get(
-          `${API_URL}wp-json/delete-record/v1/delete-po-record/${id}`
+          `wp-json/delete-record/v1/delete-po-record/${id}`
         );
         if (response) {
           POM_system_products();
@@ -252,7 +255,7 @@ function POManagementSystem() {
     setSelectedDateRange([null, null]);
     setSelectedFactory("");
     setPoStatus("");
-    setSearchPoID(""); 
+    setSearchPoID("");
   };
 
   const handleChange = (event, value) => {
@@ -271,8 +274,8 @@ function POManagementSystem() {
 
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
-    setStartDate("")
-    setEndDate("")
+    setStartDate("");
+    setEndDate("");
   };
   return (
     <Container fluid className="p-5">
@@ -326,7 +329,10 @@ function POManagementSystem() {
                   </DemoContainer>
                 </LocalizationProvider>
                 {selectedDateRange[0] && selectedDateRange[1] && (
-                  <CancelIcon style={{ position: "absolute", right: "0", top: "39px" }} onClick={clearDateRange} />
+                  <CancelIcon
+                    style={{ position: "absolute", right: "0", top: "39px" }}
+                    onClick={clearDateRange}
+                  />
                 )}
               </Form.Group>
             </Col>
@@ -368,11 +374,13 @@ function POManagementSystem() {
             </Col>
             <Col xs="auto" lg="3">
               <Form.Group>
-                <Form.Label className="fw-semibold">{t("POManagement.PoNo")}</Form.Label>
+                <Form.Label className="fw-semibold">
+                  {t("POManagement.PoNo")}
+                </Form.Label>
                 <Form.Control
                   type="text"
                   placeholder={t("POManagement.EnterPoNumber")}
-                  onKeyDown={(e)=>PoId(e)}
+                  onKeyDown={(e) => PoId(e)}
                   className="mr-sm-2 py-2"
                 />
               </Form.Group>

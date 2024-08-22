@@ -26,19 +26,20 @@ import {
 import { API_URL } from "../../redux/constants/Constants";
 import { Card, Modal, Tab, Tabs } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  AddManualPO,
-  AddPO,
-  AddSchedulePO,
-  ManualOrScheduledPoDetailsData,
-  PoDetailsData,
-} from "../../redux/actions/P2SystemActions";
 import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import PoDetailsModal from "./PoDetailsModal";
 import ShowAlert from "../../utils/ShowAlert";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import {
+  AddManualPO,
+  AddPO,
+  AddSchedulePO,
+  ManualOrScheduledPoDetailsData,
+  PoDetailsData,
+} from "../../Redux2/slices/P2SystemSlice";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -95,17 +96,40 @@ function OrderManagementSystem() {
   const [imageURL, setImageURL] = useState("");
   const [imageId, setImageId] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
-  );
 
-  const poLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isPoDetailsData
-  );
+  const factoryData = useSelector((state) => state?.factory?.factories);
+
+  const poLoader = useSelector((state) => state?.p2System?.isLoading);
 
   const manualOrScheduledPoLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isManualOrScheduledPoDetailsData
+    (state) => state?.p2System?.isLoading
   );
+
+  const poDetailsDataa = useSelector((state) => state?.p2System?.poDetailsData);
+
+  const manualOrScheduledPoDetailsDataa = useSelector(
+    (state) => state?.p2System?.manualOrScheduledPoDetailsData
+  );
+
+  const addedPoDataa = useSelector((state) => state?.p2System?.addedPoData);
+  const addedSchedulePoDataa = useSelector(
+    (state) => state?.p2System?.addedSchedulePoData
+  );
+  const addedManualPoDataa = useSelector(
+    (state) => state?.p2System?.addedManualPoData
+  );
+
+  console.log(addedPoDataa, "added po data from redux toolkit");
+  useEffect(() => {
+    dispatch(fetchAllFactories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+    }
+  }, [factoryData]);
 
   function handleAttributeChange(event, rowIndex, attributeName) {
     const newValue = event.target.value;
@@ -202,7 +226,7 @@ function OrderManagementSystem() {
 
   const ImageModule = (rowData) => {
     setImageURL(rowData.product_image);
-    setImageId(rowData.item_id)
+    setImageId(rowData.item_id);
     setShowEditModal(true);
   };
 
@@ -526,38 +550,31 @@ function OrderManagementSystem() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
-  useEffect(() => {
-    dispatch(AllFactoryActions());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data);
-    }
-  }, [allFactoryDatas]);
-
   const fetchOrders = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}`;
+      let apiUrl = `wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
-      await dispatch(PoDetailsData({ apiUrl })).then((response) => {
-        let data = response.data.pre_orders.map((v, i) => ({
+      dispatch(PoDetailsData(apiUrl)).then(({ payload }) => {
+        let data = payload?.pre_orders?.map((v, i) => ({
           ...v,
           id: i + currentStartIndex,
         }));
         setOrders(data);
-        setTotalPages(response.data.total_pages);
+        setTotalPages(payload.total_pages);
       });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
+  useEffect(() => {
+    fetchOrders();
+  }, [endDate, selectedFactory, pageSize, page, currentStartIndex]);
+
   const manualPO = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
+      let apiUrl = `wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
@@ -576,7 +593,7 @@ function OrderManagementSystem() {
 
   const scheduledPO = async () => {
     try {
-      let apiUrl = `${API_URL}wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
+      let apiUrl = `wp-json/custom-manual-po/v1/get-product-manual/?&per_page=${pageSize}&page=${page}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
       if (manualProductF) apiUrl += `&product_name=${manualProductF}`;
 
@@ -601,8 +618,8 @@ function OrderManagementSystem() {
   ) => {
     let data;
     await dispatch(ManualOrScheduledPoDetailsData({ apiUrl })).then(
-      (response) => {
-        data = response.data.products.map((v, i) => ({
+      ({ payload }) => {
+        data = payload.products.map((v, i) => ({
           ...v,
           id: i + currentStartIndex,
         }));
@@ -633,8 +650,8 @@ function OrderManagementSystem() {
           });
         }
 
-        if (response.data.products) {
-          setTotalPages(response.data.total_pages);
+        if (payload.products) {
+          setTotalPages(payload.total_pages);
           return data;
         }
       }
@@ -795,7 +812,7 @@ function OrderManagementSystem() {
 
   // PO Generate
   const handleGeneratePO = () => {
-    setIsDisabled(true);
+    // setIsDisabled(true);
     if (activeKey === "against_PO") handleGenerateAgainstPO();
     else if (activeKey === "manual_PO") handleGenerateManualPO();
     else if (activeKey === "scheduled_PO") handleGenerateScheduledPO();
@@ -843,9 +860,19 @@ function OrderManagementSystem() {
             .join(",") || 0,
       };
       try {
-        const response = await dispatch(AddPO(payload, navigate));
-        if (response.status == 200) {
-          setIsDisabled(true);
+        dispatch(AddPO(payload));
+        if (addedPoDataa.status == 200) {
+          const result = await ShowAlert(
+            "Success",
+            addedPoDataa.data,
+            "success",
+            true,
+            false,
+            "OK"
+          );
+          if (result.isConfirmed) {
+            navigate("/PO_ManagementSystem");
+          }
         }
       } catch (error) {
         console.error("Error generating PO IDs:", error);
@@ -876,9 +903,18 @@ function OrderManagementSystem() {
         note: manualNote,
       };
       try {
-        const response = await dispatch(AddManualPO(payload, navigate));
-        if (response.status == 200) {
+        dispatch(AddManualPO(payload));
+        if (addedManualPoDataa.status == 200) {
           setIsDisabled(true);
+          const result = await ShowAlert(
+            "Success",
+            addedManualPoDataa.data,
+            "success",
+            true,
+            false,
+            "OK"
+          );
+          if (result.isConfirmed) navigate("/PO_ManagementSystem");
         }
       } catch (error) {
         console.error("Error generating PO IDs:", error);
@@ -922,9 +958,18 @@ function OrderManagementSystem() {
           reminder_date: remainderDate,
         };
         try {
-          const response = await dispatch(AddSchedulePO(payload, navigate));
-          if (response.status == 200) {
+          dispatch(AddSchedulePO(payload));
+          if (addedSchedulePoDataa.status == 200) {
             setIsDisabled(true);
+            const result = await ShowAlert(
+              "Success",
+              addedSchedulePoDataa.data,
+              "success",
+              true,
+              false,
+              "OK"
+            );
+            if (result.isConfirmed) navigate("/PO_ManagementSystem");
           }
         } catch (error) {
           console.error("Error generating PO IDs:", error);
@@ -941,7 +986,6 @@ function OrderManagementSystem() {
           "",
           1000
         );
-        setIsDisabled(true);
       }
     } else {
       await ShowAlert(

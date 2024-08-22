@@ -93,7 +93,7 @@ export const QuantityPoDetailsForModalInView = createAsyncThunk(
 
 export const AddPO = createAsyncThunk(
   "P2System/AddPO",
-  async ({payload}, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-po-number/v1/po-id-generate/`,
@@ -125,7 +125,7 @@ export const AddManualPO = createAsyncThunk(
 
 export const AddSchedulePO = createAsyncThunk(
   "P2System/AddSchedulePO",
-  async ({ payload }, { rejectWithValue }) => {
+  async ( payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-schedule-order/v1/post-order-schedule/`,
@@ -194,7 +194,7 @@ export const OrderNotAvailableDataPo = createAsyncThunk(
         `wp-json/custom-so-create/v1/convert-so-order/`,
         requestData
       );
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);

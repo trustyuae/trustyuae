@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Alert, Button, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { QuantityPoDetails } from "../../redux/actions/P2SystemActions";
 import Loader from "../../utils/Loader";
+import { QuantityPoDetails } from "../../Redux2/slices/P2SystemSlice";
 
 const PoDetailsModal = ({
   show,
@@ -19,7 +19,7 @@ const PoDetailsModal = ({
   const [productData, setProductData] = useState([]);
   const [overAllData, setOverAllData] = useState("");
   const loader = useSelector(
-    (state) => state?.orderNotAvailable?.isQuantityDetailsData
+    (state) => state?.p2System?.isLoading
   );
 
   useEffect(() => {
@@ -40,13 +40,15 @@ const PoDetailsModal = ({
     }
     
       try {
-        const response = await dispatch(QuantityPoDetails(productId,{payload}));
-        const data = response?.data?.orders.map((v, id) => ({
-          ...v,
-          id,
-        }));
-        setOverAllData(response?.data);
-        setProductData(data);
+        dispatch(QuantityPoDetails(productId,{payload})).then(({payload})=>{
+          console.log(payload,'payload of QuantityPoDetails')
+          const data = payload?.orders.map((v, id) => ({
+            ...v,
+            id,
+          }));
+          setOverAllData(payload);
+          setProductData(data);
+        })
       } catch (error) {
         console.error(error);
       }

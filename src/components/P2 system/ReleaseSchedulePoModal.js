@@ -2,8 +2,9 @@ import { Box } from "@mui/material";
 import React, { useState } from "react";
 import { Button, Form, Modal, Table } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { OrderNotAvailableDataPo } from "../../redux/actions/P2SystemActions";
+// import { OrderNotAvailableDataPo } from "../../redux/actions/P2SystemActions";
 import ShowAlert from "../../utils/ShowAlert";
+import { OrderNotAvailableDataPo } from "../../Redux2/slices/P2SystemSlice";
 
 const ReleaseSchedulePoModal = ({
   handleCloseReleaseSchedulePoModal,
@@ -39,8 +40,8 @@ const ReleaseSchedulePoModal = ({
     };
 
     await dispatch(OrderNotAvailableDataPo(requestData))
-      .then(async (response) => {
-        if (response.data.message) {
+      .then(async ({ payload }) => {
+        if (payload.message) {
           const result = await ShowAlert(
             "Uploaded Successfully!",
             "",

@@ -15,16 +15,15 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-import { API_URL } from "../../redux/constants/Constants";
 import { Card, Modal } from "react-bootstrap";
-import { AllFactoryActions } from "../../redux/actions/AllFactoryActions";
 import Loader from "../../utils/Loader";
 import ShowAlert from "../../utils/ShowAlert";
 import Form from "react-bootstrap/Form";
+import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import {
   OrderNotAvailableData,
   OrderNotAvailableDataStatus,
-} from "../../redux/actions/P2SystemActions";
+} from "../../Redux2/slices/P2SystemSlice";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -44,24 +43,50 @@ function OrderNotAvailable() {
   const [imageURL, setImageURL] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const allFactoryDatas = useSelector(
-    (state) => state?.allFactoryData?.factory
-  );
+  const factoryData = useSelector((state) => state?.factory?.factories);
 
   const orderNotAvailableLoader = useSelector(
-    (state) => state?.orderNotAvailable?.isOrdersNotAvailable
+    (state) => state?.p2System?.isLoading
+  );
+
+  const ordersNotAvailableOverAllData = useSelector(
+    (state) => state?.p2System?.ordersNotAvailable
   );
 
   useEffect(() => {
-    dispatch(AllFactoryActions());
+    dispatch(fetchAllFactories());
   }, [dispatch]);
 
   useEffect(() => {
-    if (allFactoryDatas && allFactoryDatas.factories) {
-      let data = allFactoryDatas.factories.map((item) => ({ ...item }));
-      setFactories(data); 
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
     }
-  }, [allFactoryDatas]);
+  }, [factoryData]);
+
+  useEffect(() => {
+    if (ordersNotAvailableOverAllData) {
+      const orderNotAvailable = ordersNotAvailableOverAllData?.orders?.map(
+        (v, i) => ({
+          ...v,
+          id: i + currentStartIndex,
+          isSelected: false,
+        })
+      );
+      if (selectedOrderNotAvailable.length > 0) {
+        selectedOrderNotAvailable.forEach((order) => {
+          orderNotAvailable.forEach((o) => {
+            if (o.id === order.id) {
+              o.isSelected = true;
+              o.customer_status = order.customer_status;
+            }
+          });
+        });
+      }
+      setOrdersNotAvailableData(orderNotAvailable);
+      setTotalPages(orderNotAvailable?.total_pages);
+    }
+  }, [ordersNotAvailableOverAllData]);
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
@@ -106,35 +131,12 @@ function OrderNotAvailable() {
   };
 
   async function fetchOrdersNotAvailableData() {
-    let apiUrl = `${API_URL}wp-json/custom-order-not/v1/order-not-available/?`;
-
-    await dispatch(
+    let apiUrl = `wp-json/custom-order-not/v1/order-not-available/?`;
+    dispatch(
       OrderNotAvailableData({
         apiUrl: `${apiUrl}per_page=${pageSize}&page=${page}`,
       })
-    )
-      .then((response) => {
-        let data = response.data.orders.map((v, i) => ({
-          ...v,
-          id: i + currentStartIndex,
-          isSelected: false,
-        }));
-        if (selectedOrderNotAvailable.length > 0) {
-          selectedOrderNotAvailable.forEach((order) => {
-            data.forEach((o) => {
-              if (o.id === order.id) {
-                o.isSelected = true;
-                o.customer_status = order.customer_status;
-              }
-            });
-          });
-        }
-        setOrdersNotAvailableData(data);
-        setTotalPages(response.data.total_pages);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleGenerateSchedulePo = async () => {
@@ -251,7 +253,7 @@ function OrderNotAvailable() {
     };
 
     dispatch(OrderNotAvailableDataStatus(requestedDataS))
-      .then((response) => {
+      .then(() => {
         setOrdersNotAvailableData((prevData) => {
           const newData = prevData.map((order) => {
             const isSelected = selectedOrderNotAvailable.some(
@@ -276,11 +278,9 @@ function OrderNotAvailable() {
   const handleModalClose = async () => {
     setOrdersNotAvailableData((prevData) => {
       const newData = prevData.map((order) => {
-        const isSelected = selectedOrderNotAvailable.some(
-          (selectedOrder) => {
-            return selectedOrder?.id === order?.id;
-          }
-        );
+        const isSelected = selectedOrderNotAvailable.some((selectedOrder) => {
+          return selectedOrder?.id === order?.id;
+        });
         if (isSelected) {
           return { ...order, isSelected: false };
         }
