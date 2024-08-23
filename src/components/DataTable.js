@@ -2,10 +2,13 @@ import * as React from 'react';
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 import { Box, Pagination } from '@mui/material';
 
-export default function DataTable({ columns, rows, page = 1, totalPages = 1, handleChange = () => { }, pageSize = 10, checkboxSelection = false, onCellEditStart = () => { }, processRowUpdate = () => { }, rowHeight}) {
+export default function DataTable({ columns, rows, page = 1, totalPages = 1, handleChange = () => { }, pageSize = 10, checkboxSelection = false, onCellEditStart = () => { }, processRowUpdate = () => { }, rowHeight},showAllRows = false) {
+  const actualPageSize = showAllRows ? 100 : pageSize;
   return (
     <Box style={{
       width: '100%',
+      height: showAllRows ? 'auto' : 400, // Set height or 'auto' if all rows should be visible
+      overflow: showAllRows ? 'auto' : 'hidden', // Allow scrolling if needed
       [`.${gridClasses.cell}.hot`]: {
         backgroundColor: '#ff943975',
         color: '#1a3e72',
@@ -20,7 +23,7 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
         disableColumnSorting
         disableColumnMenu
         initialState={{
-          pagination: { paginationModel: { pageSize: pageSize } },
+          pagination: { paginationModel: { pageSize: actualPageSize } },
         }}
         sx={{
           marginBottom: 3,

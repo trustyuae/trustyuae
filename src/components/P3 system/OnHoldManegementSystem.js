@@ -57,7 +57,7 @@ function OnHoldManegementSystem() {
 
   const getall = async () => {
     let url = `${API_URL}wp-json/custom-api-product/v1/get-product/?`;
-    const response = await axios.get(url,{headers});
+    const response = await axios.get(url, { headers });
     setoptionsArray(
       response.data.products.map((user) => ({
         label: user.product_name,
@@ -339,53 +339,130 @@ function OnHoldManegementSystem() {
     setuserName(info.first_name + " " + info.last_name);
   }, []);
 
-  const handalADDProduct = () => {
-    let data = [...tableData, ...singleProductD];
-    let Updatedata = data.map((v, i) => ({
-      ...v,
-      id: i,
-      Quantity: v.Quantity !== "" ? v.Quantity : 1,
-      variationColor:
-        v.variation_values.attribute_color !== undefined
-          ? v.variation_values.attribute_color
-          : "",
-      variationSize:
-        v.variation_values.attribute_size !== undefined
-          ? v.variation_values.attribute_size
-          : "",
-    }));
-    validateForm(Updatedata);
+  // const handalADDProduct = () => {
+  //   let data = [...tableData, ...singleProductD];
+  //   let Updatedata = data.map((v, i) => ({
+  //     ...v,
+  //     id: i,
+  //     Quantity: v.Quantity !== "" ? v.Quantity : 1,
+  //     variationColor:
+  //       v.variation_values.attribute_color !== undefined
+  //         ? v.variation_values.attribute_color
+  //         : "",
+  //     variationSize:
+  //       v.variation_values.attribute_size !== undefined
+  //         ? v.variation_values.attribute_size
+  //         : "",
+  //   }));
+  //   validateForm(Updatedata);
 
-    const mergedData = Updatedata.reduce((acc, item) => {
-      // Create a unique key based on product_name and variation_values
+  //   const mergedData = Updatedata.reduce((acc, item) => {
+  //     // Create a unique key based on product_name and variation_values
+  //     const key = JSON.stringify({
+  //       product_name: item.product_id,
+  //       variation_values: item.variation_values,
+  //     });
+
+  //     // Check if the key is in the accumulator
+  //     const existingIndex = acc.findIndex(
+  //       (entry) =>
+  //         JSON.stringify({
+  //           product_name: entry.product_id,
+  //           variation_values: entry.variation_values,
+  //         }) === key
+  //     );
+
+  //     if (existingIndex === -1) {
+  //       // If the key is not in the accumulator, add it to the start of the array
+  //       acc.unshift({ ...item, Quantity: item.Quantity });
+  //     } else {
+  //       // If the key exists, increase the Quantity by 1 and move the item to the start of the array
+  //       acc[existingIndex].Quantity = String(
+  //         Number(acc[existingIndex].Quantity) + 1
+  //       );
+  //       const updatedItem = acc.splice(existingIndex, 1)[0];
+  //       acc.unshift(updatedItem);
+  //     }
+  //     return acc;
+  //   }, []);
+  //   setTableData(mergedData);
+  //   setProductName("");
+  //   setProductID("");
+  // };
+
+  const handalADDProduct = () => {
+    const itemMap = new Map();
+
+    tableData.forEach((item) => {
       const key = JSON.stringify({
-        product_name: item.product_id,
+        product_id: item.product_id,
+        variation_values: item.variation_values,
+      });
+      itemMap.set(key, item);
+    });
+
+    // Track items that are updated or new
+    const updatedItems = [];
+
+    // Add or update new items in the map
+    singleProductD.forEach((item) => {
+      const key = JSON.stringify({
+        product_id: item.product_id,
         variation_values: item.variation_values,
       });
 
-      // Check if the key is in the accumulator
-      const existingIndex = acc.findIndex(
-        (entry) =>
-          JSON.stringify({
-            product_name: entry.product_id,
-            variation_values: entry.variation_values,
-          }) === key
-      );
+      if (itemMap.has(key)) {
+        // Update existing item quantity
+        const existingItem = itemMap.get(key);
+        existingItem.Quantity = String(Number(existingItem.Quantity) + 1);
+        itemMap.set(key, existingItem);
 
-      if (existingIndex === -1) {
-        // If the key is not in the accumulator, add it to the start of the array
-        acc.unshift({ ...item, Quantity: item.Quantity });
+        // Add to updated items
+        updatedItems.push(existingItem);
       } else {
-        // If the key exists, increase the Quantity by 1 and move the item to the start of the array
-        acc[existingIndex].Quantity = String(
-          Number(acc[existingIndex].Quantity) + 1
-        );
-        const updatedItem = acc.splice(existingIndex, 1)[0];
-        acc.unshift(updatedItem);
+        // Add new item with an updated id
+        const newItem = {
+          ...item,
+          id: Date.now(), // Use a timestamp or other unique identifier for sorting
+          Quantity: item.Quantity !== "" ? item.Quantity : 1,
+          variationColor:
+            item.variation_values.attribute_color !== undefined
+              ? item.variation_values.attribute_color
+              : "",
+          variationSize:
+            item.variation_values.attribute_size !== undefined
+              ? item.variation_values.attribute_size
+              : "",
+        };
+        itemMap.set(key, newItem);
+        updatedItems.push(newItem);
       }
-      return acc;
-    }, []);
-    setTableData(mergedData);
+    });
+
+    // Convert map to an array
+    const remainingItems = Array.from(itemMap.values());
+
+    // Remove updated items from remaining items to avoid duplicates
+    const remainingItemsWithoutUpdates = remainingItems.filter(
+      (item) =>
+        !updatedItems.some(
+          (updatedItem) =>
+            JSON.stringify({
+              product_id: updatedItem.product_id,
+              variation_values: updatedItem.variation_values,
+            }) ===
+            JSON.stringify({
+              product_id: item.product_id,
+              variation_values: item.variation_values,
+            })
+        )
+    );
+
+    // Combine updated items at the top with remaining items
+    const updatedData = [...updatedItems, ...remainingItemsWithoutUpdates];
+
+    // Update state with sorted data
+    setTableData(updatedData);
     setProductName("");
     setProductID("");
   };
@@ -576,6 +653,7 @@ function OnHoldManegementSystem() {
                   // pageSize={pageSize}
                   // totalPages={totalPages}
                   // handleChange={handleChange}
+                  showAllRows={true}
                   rowHeight="auto"
                 />
               </div>
