@@ -27,6 +27,7 @@ function GRNManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [grnList, setGrnList] = useState([]);
@@ -94,7 +95,7 @@ function GRNManagement() {
   const handlGetGRNList = async () => {
     try {
       let apiUrl;
-      apiUrl = `${API_URL}wp-json/custom-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
+      apiUrl = `${API_URL}wp-json/custom-api/v1/get-grns/?per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       await dispatch(GetGRNList({ apiUrl })).then((response) => {
@@ -112,6 +113,11 @@ function GRNManagement() {
     setPage(value);
   };
 
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(1);
+  };
+
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
     setStartDate("")
@@ -121,7 +127,7 @@ function GRNManagement() {
   useEffect(() => {
     handlGetGRNList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endDate, selectedDateRange, statusFilter, page]);
+  }, [endDate, selectedDateRange, statusFilter, page,pageSize]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -182,6 +188,23 @@ function GRNManagement() {
                   </option>
                 ))}
               </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col xs="auto" lg="1">
+            <Form.Group>
+              <Form.Label>PageSize </Form.Label>
+              <Form.Control
+                as="select"
+                className="w-auto"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
           </Col>
         </Row>

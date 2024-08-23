@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { API_URL } from "../../redux/constants/Constants";
-import { Card } from "react-bootstrap";
+import { Card, Form } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -19,19 +19,19 @@ const GRNView = () => {
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.managementSystem?.isGrnView);
+  const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchOrder = async () => {
-    let apiUrl = `${API_URL}wp-json/custom-api/v1/view-grn-details/${id}`;
+    let apiUrl = `${API_URL}wp-json/custom-api/v1/view-grn-details/${id}/?per_page=${pageSize}&page=${page}`;
     await dispatch(GetGRNView({ apiUrl })).then((response) => {
-      let data = response?.data?.map((v, i) => ({ ...v, id: i }));
+      setTotalPages(response?.data?.total_pages);
+      let data = response?.data?.data?.map((v, i) => ({ ...v, id: i }));
       setPO_OrderList(data);
     });
   };
-
-  useEffect(() => {
-    fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const columns = [
     {
@@ -77,7 +77,6 @@ const GRNView = () => {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
-        console.log(value,'valueeeable')
         return (
           <Link
             to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}/${value.row.variation_id}`}
@@ -93,9 +92,25 @@ const GRNView = () => {
       },
     },
   ];
+
+  const handleChange = (event, value) => {
+    console.log(value, "value from handle Change");
+    setPage(value);
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(1);
+  };
+
   const handalBackButton = () => {
     navigate("/GRN_Management");
   };
+
+  useEffect(() => {
+    fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize, page]);
 
   const formatVariations = (variations) => {
     const data = JSON.parse(variations);
@@ -108,7 +123,7 @@ const GRNView = () => {
     }
   };
   return (
-    <Container fluid className="px-5" >
+    <Container fluid className="px-5">
       <MDBRow className="my-3">
         <MDBCol
           md="5"
@@ -131,6 +146,23 @@ const GRNView = () => {
               GRN View
             </Typography>
           </Box>
+          <Box>
+            <Form.Group className="d-flex align-items-baseline justify-content-between">
+              <Form.Label className="me-3">PageSize </Form.Label>
+              <Form.Control
+                as="select"
+                className="w-auto"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          </Box>
         </Box>
       </Card>
 
@@ -144,9 +176,10 @@ const GRNView = () => {
               <DataTable
                 columns={columns}
                 rows={PO_OrderList}
-                // page={pageSO}
-                // pageSize={pageSizeSO}
-                // totalPages={totalPagesSO}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                handleChange={handleChange}
                 rowHeight={100}
               />
             </div>
