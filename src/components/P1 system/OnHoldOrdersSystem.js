@@ -277,7 +277,7 @@ function OnHoldOrdersSystem() {
                 >
                   <option value="all">All</option>
                   <option value="dispatch">Dispatch</option>
-                  <option value="reserve">Reserve</option>
+                  {/* <option value="reserve">Reserve</option> */}
                 </Form.Select>
               </Form.Group>
             </Col>

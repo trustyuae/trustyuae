@@ -40,9 +40,9 @@ const PoDetailsModal = ({
     }
     
       try {
-        dispatch(QuantityPoDetails(productId,{payload})).then(({payload})=>{
+        dispatch(QuantityPoDetails({productId,payload})).then(({payload})=>{
           console.log(payload,'payload of QuantityPoDetails')
-          const data = payload?.orders.map((v, id) => ({
+          const data = payload?.orders?.map((v, id) => ({
             ...v,
             id,
           }));

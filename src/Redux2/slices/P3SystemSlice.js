@@ -13,6 +13,7 @@ const initialState = {
   productOrderDetails: [],
   productOrdersPrep: [],
   productOrdersStock: [],
+  remark: [],
   error: null,
 };
 
@@ -21,7 +22,7 @@ export const GetProductManual = createAsyncThunk(
   async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
-      console.log(response,'response from product manual')
+      console.log(response, "response from product manual");
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -34,7 +35,7 @@ export const AddGrn = createAsyncThunk(
   "factory/AddGrn",
   async (payload, { rejectWithValue }) => {
     try {
-      console.log(payload,'payload')
+      console.log(payload, "payload");
       const response = await axiosInstance.post(
         `wp-json/create-po-grn/v1/create-grn-by-po/`,
         payload,
@@ -136,6 +137,22 @@ export const AddProductOrderForStock = createAsyncThunk(
   }
 );
 
+export const AddRemark = createAsyncThunk(
+  "orderSystem/AddRemark",
+  async ({ selectedGrnNo, requestedMessage }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-remark/v1/grn-remark/${selectedGrnNo}`,
+        requestedMessage
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error adding remark:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const P3SystemSlice = createSlice({
   name: "P3System",
   initialState,
@@ -157,6 +174,7 @@ const P3SystemSlice = createSlice({
       state.productOrderDetails = [];
       state.productOrdersPrep = [];
       state.productOrdersStock = [];
+      state.remark = [];
       state.error = null;
     },
   },
@@ -247,6 +265,17 @@ const P3SystemSlice = createSlice({
         state.productOrdersStock = action.payload;
       })
       .addCase(AddProductOrderForStock.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(AddRemark.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(AddRemark.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.remark = action.payload;
+      })
+      .addCase(AddRemark.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

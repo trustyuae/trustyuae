@@ -191,6 +191,7 @@ function OnHoldOrdersdetailsInChina() {
       setshowMessageModal(false);
       ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
     }
+    await fetchOrder()
   };
 
   useEffect(() => {

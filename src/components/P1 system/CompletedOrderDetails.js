@@ -32,7 +32,7 @@ import Form from "react-bootstrap/Form";
 import { getUserData } from "../../utils/StorageUtils";
 
 function CompletedOrderDetails() {
-  const {id} = useParams();
+  const { id } = useParams();
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
@@ -140,6 +140,7 @@ function CompletedOrderDetails() {
         setshowMessageModal(false);
         ShowAlert("", payload, "success", null, null, null, null, 3000);
       }
+      await fetchOrder();
     });
   };
   const columns = [
@@ -273,11 +274,9 @@ function CompletedOrderDetails() {
               {loader ? (
                 <Loader />
               ) : (
-                <Box className="d-flex justify-content-between">  
+                <Box className="d-flex justify-content-between">
                   <Box>
-                    <Typography className="fw-bold">
-                      Order# {id}
-                    </Typography>
+                    <Typography className="fw-bold">Order# {id}</Typography>
                     <Typography
                       className=""
                       sx={{

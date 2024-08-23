@@ -42,7 +42,7 @@ import { getUserData } from "../../utils/StorageUtils";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 
 function ReserveOrderdetailsInChina() {
-  const {id} = useParams();
+  const { id } = useParams();
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
   const [orderData, setOrderData] = useState([]);
@@ -281,6 +281,7 @@ function ReserveOrderdetailsInChina() {
           2000
         );
       }
+      await fetchOrder();
     });
   };
 

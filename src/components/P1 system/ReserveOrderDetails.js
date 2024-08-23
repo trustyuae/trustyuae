@@ -111,6 +111,7 @@ function ReserveOrderDetails() {
         setshowMessageModal(false);
         ShowAlert("", payload, "success", null, null, null, null, 2000);
       }
+      await fetchOrder()
     });
   };
 

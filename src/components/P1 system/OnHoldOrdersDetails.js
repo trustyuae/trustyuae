@@ -172,12 +172,13 @@ function OnHoldOrdersDetails() {
     };
 
     dispatch(AddMessage(requestedMessage))
-      .then(({ payload }) => {
+      .then(async ({ payload }) => {
         if (payload) {
           setMessage("");
           setshowMessageModal(false);
           ShowAlert("", payload, "success", null, null, null, null, 2000);
         }
+        await fetchOrder();
       })
       .catch((error) => {
         // Handle error if needed

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MDBRow } from "mdb-react-ui-kit";
+import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { Alert, Box, Typography } from "@mui/material";
@@ -11,19 +11,22 @@ import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDa
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { FaEye } from "react-icons/fa";
 import DataTable from "../DataTable";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { GetGRNList } from "../../Redux2/slices/P3SystemSlice";
+import { AddRemark, GetGRNList } from "../../Redux2/slices/P3SystemSlice";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import { getUserData } from "../../utils/StorageUtils";
 import ShowAlert from "../../utils/ShowAlert";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { RiMessage2Line } from "react-icons/ri";
 
 function GRNManagement() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
   const [startDate, setStartDate] = useState("");
@@ -38,6 +41,8 @@ function GRNManagement() {
   const [message, setMessage] = useState("");
   const [selectedGrnNo, setSelectedGrnNo] = useState(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
+  const [showRemarkModal, setShowRemarkModal] = useState(false);
+  const [remark, setRemark] = useState(null);
 
   const grnListData = useSelector((state) => state?.p3System?.grnList);
 
@@ -94,7 +99,6 @@ function GRNManagement() {
   const columns = [
     { field: "grn_no", headerName: "GRN NO", flex: 1 },
     { field: "created_date", headerName: "Date Created", flex: 1 },
-    // { field: "verified_by", headerName: "Created By", flex: 1 },
     {
       field: "total_qty",
       headerName: "Total Items",
@@ -118,8 +122,28 @@ function GRNManagement() {
     {
       field: "grn_note",
       headerName: "Remark",
-      flex: 1,
-      type: "string",
+      flex: 0.5,
+      type: "html",
+      renderCell: (value) => {
+        const GRNnote = value?.row?.grn_note;
+        const handleShowRemark = () => {
+          setRemark(GRNnote);
+          setShowRemarkModal(true);
+        };
+        return (
+          <Box>
+            {GRNnote && GRNnote != "" ? (
+              <Button
+                variant="outline-secondary"
+                className="p-1 bg-transparent text-secondary"
+                onClick={handleShowRemark}
+              >
+                <RiMessage2Line />
+              </Button>
+            ) : null}
+          </Box>
+        );
+      },
     },
     {
       field: "",
@@ -128,10 +152,9 @@ function GRNManagement() {
       type: "html",
       renderCell: (value, row) => {
         const handleShowMessageModal = () => {
-          setSelectedGrnNo(value?.row?.grn_no); // Set the grn_no in state
-          setshowMessageModal(true); // Open the modal
+          setSelectedGrnNo(value?.row?.grn_no);
+          setshowMessageModal(true);
         };
-
         return (
           <Box>
             <Link to={`/GRN_View/${value?.row?.grn_no}`}>
@@ -180,16 +203,18 @@ function GRNManagement() {
   const handleAddRemark = async (e) => {
     const requestedMessage = {
       message: message,
-      Grn_no: selectedGrnNo,
       name: userData.first_name,
     };
-    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
-      if (payload) {
-        setMessage("");
-        setshowMessageModal(false);
-        ShowAlert("", payload, "success", null, null, null, null, 2000);
+    await dispatch(AddRemark({ selectedGrnNo, requestedMessage })).then(
+      async ({ payload }) => {
+        if (payload) {
+          setMessage("");
+          setshowMessageModal(false);
+          ShowAlert("", payload, "success", null, null, null, null, 2000);
+        }
+        await handlGetGRNList();
       }
-    });
+    );
   };
 
   const clearDateRange = () => {
@@ -205,6 +230,18 @@ function GRNManagement() {
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
+      <MDBRow className="my-3">
+        <MDBCol className="d-flex justify-content-start align-items-center">
+          <Button
+            variant="outline-secondary"
+            className="p-1 me-2 bg-transparent text-secondary"
+            onClick={() => navigate("/On_Hold_Manegement_System")}
+          >
+            <ArrowBackIcon className="me-1" />
+          </Button>
+          <Box></Box>
+        </MDBCol>
+      </MDBRow>
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
           GRN Management
@@ -316,29 +353,51 @@ function GRNManagement() {
         </Card>
       </MDBRow>
       <Modal
-        show={showMessageModal}
-        onHide={() => setshowMessageModal(false)}
-        centered
+        show={showMessageModal || showRemarkModal}
+        onHide={() => {
+          setshowMessageModal(false);
+          setShowRemarkModal(false);
+        }}
+        centered={false}
+        style={{
+          position: "fixed",
+          top: "10px",
+          right: "10px",
+          margin: 0,
+        }}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Add Remark</Modal.Title>
+          <Modal.Title
+            style={{
+              fontWeight: showMessageModal ? "normal" : "bold",
+              color: showMessageModal ? "inherit" : "black",
+            }}
+          >
+            {showMessageModal ? "Add Remark" : "Remark"}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Control
             as="textarea"
             placeholder="Enter your message here..."
             rows={3}
-            value={message}
+            style={{
+              fontWeight: showMessageModal ? "normal" : "bold",
+              color: showMessageModal ? "inherit" : "black",
+            }}
+            value={showMessageModal ? message : remark}
             onChange={(e) => setMessage(e.target.value)}
           />
           <Box className="text-end my-3">
-            <Button
-              variant="secondary"
-              className="mt-2 fw-semibold"
-              onClick={handleAddRemark}
-            >
-              Add Message
-            </Button>
+            {showMessageModal ? (
+              <Button
+                variant="primary"
+                className="mt-2 fw-semibold"
+                onClick={handleAddRemark}
+              >
+                Add Message
+              </Button>
+            ) : null}
           </Box>
         </Modal.Body>
       </Modal>

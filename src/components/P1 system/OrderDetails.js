@@ -184,6 +184,7 @@ function OrderDetails() {
         setshowMessageModal(false);
         ShowAlert("", payload, "success", null, null, null, null, 3000);
       }
+     await fetchOrder()
     });
   };
 

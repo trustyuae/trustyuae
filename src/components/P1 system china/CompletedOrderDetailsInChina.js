@@ -175,6 +175,7 @@ function CompletedOrderDetailsInChina() {
           2000
         );
       }
+      await fetchOrder()
     });
   };
 
