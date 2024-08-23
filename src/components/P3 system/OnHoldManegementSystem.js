@@ -1024,6 +1024,7 @@ function OnHoldManegementSystem() {
                   // pageSize={pageSize}
                   // totalPages={totalPages}
                   // handleChange={handleChange}
+                  showAllRows={true}
                   rowHeight="auto"
                 />
               </div>

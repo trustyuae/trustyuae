@@ -31,7 +31,7 @@ function GRNManagement() {
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(50);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -181,7 +181,7 @@ function GRNManagement() {
   const handlGetGRNList = async () => {
     try {
       let apiUrl;
-      apiUrl = `wp-json/custom-get-grns-api/v1/get-grns/?&per_page=${pageSize}&page=${page}`;
+      apiUrl = `wp-json/custom-get-grns-api/v1/get-grns/?per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       dispatch(GetGRNList({ apiUrl }));
@@ -197,7 +197,7 @@ function GRNManagement() {
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
-    // setPage(e.target.value);
+    setPage(1);
   };
 
   const handleAddRemark = async (e) => {

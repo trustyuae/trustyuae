@@ -3,7 +3,7 @@ import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Badge, Card } from "react-bootstrap";
+import { Badge, Card, Form } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -18,23 +18,23 @@ const GRNView = () => {
   const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.p3System?.isLoading);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(50);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [verifiedName, setVerifiedName] =useState("");
+  const [verifiedName, setVerifiedName] = useState("");
   const fetchOrder = () => {
-    const apiUrl = `wp-json/custom-view-grn-api/v1/view-grn-details/${id}`;
-    
+    const apiUrl = `wp-json/custom-view-grn-api/v1/view-grn-details/${id}/?per_page=${pageSize}&page=${page}`;
+
     dispatch(GetGRNView(apiUrl))
       .then((actionResult) => {
         if (GetGRNView.fulfilled.match(actionResult)) {
           const payload = actionResult.payload;
           if (Array.isArray(payload.data)) {
-            console.log(payload, 'payload from GRN view');
             const data = payload.data.map((v, i) => ({ ...v, id: i }));
             setPO_OrderList(data);
             setVerifiedName(payload.verified_by);
+            setTotalPages(payload.total_pages);
           } else {
             console.error("Response data is not an array:", payload);
             setPO_OrderList([]);
@@ -53,7 +53,7 @@ const GRNView = () => {
   useEffect(() => {
     fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize,totalPages]);
+  }, [pageSize, page]);
 
   const columns = [
     {
@@ -123,7 +123,7 @@ const GRNView = () => {
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
-    setPage(e.target.value);
+    setPage(1);
   };
 
   const formatVariations = (variations) => {
@@ -155,17 +155,36 @@ const GRNView = () => {
         </MDBCol>
       </MDBRow>
       <Card className="p-3 mb-3">
-        <Box className="d-flex align-items-center">
-          <Box>
-            <Typography variant="h6" className="fw-bold">
-              GRN View
-            </Typography>
+        <Box className="d-flex align-items-center justify-content-between">
+          <Box className="d-flex">
+            <Box>
+              <Typography variant="h6" className="fw-bold">
+                GRN View
+              </Typography>
+            </Box>
+            <Box className="ms-5">
+              <Typography className="fw-bold">#{verifiedName}</Typography>
+              <Typography>
+                <Badge bg="success">Verified by</Badge>
+              </Typography>
+            </Box>
           </Box>
-          <Box className="ms-5">
-            <Typography className="fw-bold">#{verifiedName}</Typography>
-            <Typography>
-              <Badge bg="success">Verified by</Badge>
-            </Typography>
+          <Box>
+            <Form.Group className="d-flex align-items-baseline ">
+              <Form.Label className="me-3">PageSize </Form.Label>
+              <Form.Control
+                as="select"
+                className="w-auto"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
           </Box>
         </Box>
       </Card>
