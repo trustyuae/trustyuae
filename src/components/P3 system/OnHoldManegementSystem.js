@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -20,7 +20,11 @@ import axiosInstance from "../../utils/AxiosInstance";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
-import { AddGrn, GetProductManual } from "../../Redux2/slices/P3SystemSlice";
+import {
+  AddGrn,
+  GetAllProducts,
+  GetProductManual,
+} from "../../Redux2/slices/P3SystemSlice";
 import ShowAlert from "../../utils/ShowAlert";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 import { MergeRounded } from "@mui/icons-material";
@@ -70,6 +74,10 @@ function OnHoldManegementSystem() {
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
 
+  const allProducts = useSelector(
+    (state) => state?.p3System?.allProducts?.products
+  );
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -95,20 +103,21 @@ function OnHoldManegementSystem() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getall = async () => {
-    let url = `wp-json/custom-api-product/v1/get-product/?`;
-    const response = await axiosInstance.get(url);
-    setoptionsArray(
-      response.data.products.map((user) => ({
-        label: user.product_name,
-        value: user.product_id,
-      }))
-    );
-  };
+  useMemo(() => {
+    if (Array.isArray(allProducts)) {
+      // Ensure allProducts is an array
+      setoptionsArray(
+        allProducts.map((user) => ({
+          label: user?.product_name,
+          value: user?.product_id,
+        }))
+      );
+    }
+  }, [allProducts]);
 
   useEffect(() => {
-    getall();
-  }, []);
+    dispatch(GetAllProducts());
+  }, [dispatch, allProducts]);
 
   useEffect(() => {
     if (selectedOption) {
@@ -625,7 +634,7 @@ function OnHoldManegementSystem() {
 
   const handalADDProduct = () => {
     const itemMap = new Map();
-  
+
     tableData.forEach((item) => {
       const key = JSON.stringify({
         product_id: item.product_id,
@@ -633,23 +642,23 @@ function OnHoldManegementSystem() {
       });
       itemMap.set(key, item);
     });
-  
+
     // Track items that are updated or new
     const updatedItems = [];
-  
+
     // Add or update new items in the map
     singleProductD.forEach((item) => {
       const key = JSON.stringify({
         product_id: item.product_id,
         variation_values: item.variation_values,
       });
-  
+
       if (itemMap.has(key)) {
         // Update existing item quantity
         const existingItem = itemMap.get(key);
         existingItem.Quantity = String(Number(existingItem.Quantity) + 1);
         itemMap.set(key, existingItem);
-  
+
         // Add to updated items
         updatedItems.push(existingItem);
       } else {
@@ -671,32 +680,35 @@ function OnHoldManegementSystem() {
         updatedItems.push(newItem);
       }
     });
-  
+
     // Convert map to an array
     const remainingItems = Array.from(itemMap.values());
-  
+
     // Remove updated items from remaining items to avoid duplicates
-    const remainingItemsWithoutUpdates = remainingItems.filter(item =>
-      !updatedItems.some(updatedItem =>
-        JSON.stringify({
-          product_id: updatedItem.product_id,
-          variation_values: updatedItem.variation_values
-        }) === JSON.stringify({
-          product_id: item.product_id,
-          variation_values: item.variation_values
-        })
-      )
+    const remainingItemsWithoutUpdates = remainingItems.filter(
+      (item) =>
+        !updatedItems.some(
+          (updatedItem) =>
+            JSON.stringify({
+              product_id: updatedItem.product_id,
+              variation_values: updatedItem.variation_values,
+            }) ===
+            JSON.stringify({
+              product_id: item.product_id,
+              variation_values: item.variation_values,
+            })
+        )
     );
-  
+
     // Combine updated items at the top with remaining items
     const updatedData = [...updatedItems, ...remainingItemsWithoutUpdates];
-  
+
     // Update state with sorted data
     setTableData(updatedData);
     setProductName("");
     setProductID("");
   };
-  
+
   const handalonChangeProductId = (e) => {
     if (e.key === "Enter") {
       setProductName("");
