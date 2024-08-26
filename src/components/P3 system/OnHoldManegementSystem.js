@@ -755,6 +755,7 @@ function OnHoldManegementSystem() {
       received_qty: tableData.map((item) => item.Quantity),
       created_date: currentDate,
       verified_by: userData?.first_name + " " + userData?.last_name,
+      note: message,
       status: "Pending for process",
     };
     try {
@@ -829,21 +830,6 @@ function OnHoldManegementSystem() {
     }
   };
 
-  const handleAddRemark = async (e) => {
-    const requestedMessage = {
-      message: message,
-      // order_id: parseInt(id, 10),
-      name: userData.first_name,
-    };
-    await dispatch(AddMessage(requestedMessage)).then(async ({ payload }) => {
-      if (payload) {
-        setMessage("");
-        setshowMessageModal(false);
-        ShowAlert("", payload, "success", null, null, null, null, 2000);
-      }
-    });
-  };
-
   const handleCreateGrn = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
     const payload = {
@@ -853,6 +839,7 @@ function OnHoldManegementSystem() {
       received_qty: poTableData.map((item) => item.received_quantity),
       created_date: currentDate,
       verified_by: userData?.first_name + " " + userData?.last_name || "",
+      note: message,
       status: "Processing",
     };
 
@@ -1053,19 +1040,10 @@ function OnHoldManegementSystem() {
               </div>
               <MDBRow className="justify-content-end px-1">
                 <Button
-                  variant="secondary"
-                  disabled={!isValid}
-                  style={{ width: "130px", marginRight: "5px" }}
-                  // onClick={handleAddRemark}
-                  onClick={() => setshowMessageModal(true)}
-                >
-                  Add Remark
-                </Button>
-                <Button
                   variant="primary"
                   disabled={!isValid}
                   style={{ width: "130px" }}
-                  onClick={handleSubmit}
+                  onClick={() => setshowMessageModal(true)}
                 >
                   submit
                 </Button>
@@ -1091,19 +1069,11 @@ function OnHoldManegementSystem() {
               </div>
               <MDBRow className="justify-content-end px-3 py-2">
                 <Button
-                  variant="secondary"
-                  disabled={!isValid}
-                  style={{ width: "130px", marginRight: "5px" }}
-                  // onClick={handleAddRemark}
-                  onClick={() => setshowMessageModal(true)}
-                >
-                  Add Remark
-                </Button>
-                <Button
                   variant="primary"
                   disabled={!isValid}
                   style={{ width: "130px" }}
-                  onClick={handleCreateGrn}
+                  // onClick={handleCreateGrn}
+                  onClick={() => setshowMessageModal(true)}
                 >
                   Create GRN
                 </Button>
@@ -1136,7 +1106,7 @@ function OnHoldManegementSystem() {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>Message</Modal.Title>
+          <Modal.Title>Add Remark</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Control
@@ -1148,11 +1118,13 @@ function OnHoldManegementSystem() {
           />
           <Box className="text-end my-3">
             <Button
-              variant="secondary"
+              variant="primary"
               className="mt-2 fw-semibold"
-              onClick={handleAddRemark}
+              onClick={
+                selectedFactory.length > 0 ? handleCreateGrn : handleSubmit
+              }
             >
-              Add Message
+              Create GRN
             </Button>
           </Box>
         </Modal.Body>
