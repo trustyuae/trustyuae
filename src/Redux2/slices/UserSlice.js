@@ -4,6 +4,15 @@ import ShowAlert from "../../utils/ShowAlert";
 import { API_URL } from "../../redux/constants/Constants";
 import { saveToken, saveUserData } from "../../utils/StorageUtils";
 
+
+const initialState = {
+  isLoading: false,
+  SyncLoading: false,
+  loginData: [],
+  logoutData: [],
+  error: null,
+};
+
 export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (data, { rejectWithValue }) => {
@@ -31,38 +40,12 @@ export const logoutUser = createAsyncThunk(
   'user/logoutUser',
   async (_, { rejectWithValue }) => {
     try {
-      // Show confirmation alert
-      // const result = await ShowAlert(
-      //   'Do You Want to Log Out?',
-      //   '',
-      //   'question',
-      //   true,
-      //   true,
-      //   'Confirm',
-      //   'Cancel'
-      // );
-
-      // if (result.isConfirmed) {
         const res = await axios.post(
           `${API_URL}wp-json/custom-login/v1/logout`,
           null
         );
         localStorage.clear();
-        // await ShowAlert(
-        //   'Success',
-        //   'You have been logged out successfully.',
-        //   'success',
-        //   false,
-        //   false,
-        //   'OK',
-        //   '',
-        //   1000
-        // );
-
         return res.data; // Return response data for further handling if needed
-      // } else {
-      //   return rejectWithValue('Logout canceled');
-      // }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -71,13 +54,20 @@ export const logoutUser = createAsyncThunk(
 
 const userSlice = createSlice({
   name: "user",
-  initialState: {
-    isLoading: false,
-    data: {},
-  },
+  initialState,
   reducers: {
-    clearStore: (state) => {
-      state.data = {};
+    startSyncLoading: (state) => {
+      state.SyncLoading = true;
+    },
+    stopSyncLoading: (state) => {
+      state.SyncLoading = false;
+    },
+    clearstoredata: (state) => {
+      (state.isLoading = false);
+        (state.SyncLoading = false);
+        (state.loginData = []);
+        (state.logoutData = []);
+        (state.error = null);
     },
   },
   extraReducers: (builder) => {
@@ -87,7 +77,7 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.data = action.data;
+        state.loginData = action.payload;
       })
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
@@ -95,9 +85,9 @@ const userSlice = createSlice({
       .addCase(logoutUser.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(logoutUser.fulfilled, (state) => {
+      .addCase(logoutUser.fulfilled, (state,action) => {
         state.isLoading = false;
-        state.data = {};
+        state.logoutData = action.payload;
       })
       .addCase(logoutUser.rejected, (state) => {
         state.isLoading = false;

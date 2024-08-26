@@ -49,41 +49,45 @@ const Login = () => {
 
     if (isValid) {
       try {
-        const { payload } = dispatch(loginUser({ username, password }));
-        ShowAlert(
-          "Success",
-          "you have Logged In Successfully!",
-          "success",
-          true,
-          false,
-          "OK",
-        ).then(async (result) => {
-          if (result.isConfirmed) {
-            const userData = await getUserData();
-            switch (userData.user_role) {
-              case "administrator":
-              case "packing_assistant":
-                navigate("/ordersystem");
-                break;
-              case "factory_coordinator":
-                navigate("/PO_ManagementSystem");
-                break;
-              case "customer_support":
-                navigate("/order_not_available");
-                break;
-              case "operation_assistant":
-                navigate("/On_Hold_Manegement_System");
-                break;
-              default:
-                console.log("Unknown role");
-            }
+        dispatch(loginUser({ username, password })).then(({ payload }) => {
+          if (payload && payload?.token) {
+            ShowAlert(
+              "Success",
+              payload.message,
+              "success",
+              true,
+              false,
+              "OK"
+            ).then((result) => {
+              if (result.isConfirmed) {
+                switch (payload?.user_data?.user_role) {
+                  case "administrator":
+                  case "packing_assistant":
+                    navigate("/ordersystem");
+                    break;
+                  case "factory_coordinator":
+                    navigate("/PO_ManagementSystem");
+                    break;
+                  case "customer_support":
+                    navigate("/order_not_available");
+                    break;
+                  case "operation_assistant":
+                    navigate("/On_Hold_Manegement_System");
+                    break;
+                  default:
+                    console.log("Unknown role");
+                }
+              }
+            });
+          } else {
+            console.log("User role is undefined or missing in the payload");
           }
         });
       } catch (error) {
-        console.log("Error while login:", error);
+        console.log("Error during login:", error);
       }
     } else {
-      console.log("Error while login");
+      console.log("Validation failed");
     }
   };
 
