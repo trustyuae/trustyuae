@@ -537,10 +537,10 @@ function OnHoldManegementSystem() {
             ...v,
             id: i,
           }));
-          const modifiedData = data.map((item) => ({
+          const modifiedData = data?.map((item) => ({
             ...item,
-            variationColor: item.variation_values.length === 0 ? "" : "",
-            variationSize: item.variation_values.length === 0 ? "" : "",
+            variationColor: item?.variation_values.length === 0 ? "" : "",
+            variationSize: item?.variation_values.length === 0 ? "" : "",
           }));
           setSingleProductD(modifiedData);
           inputRef.current.value = "";

@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, Card, Form } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -192,21 +192,30 @@ const GRNView = () => {
       <Card className="p-3 mb-3">
         <MDBRow className="d-flex justify-content-center align-items-center">
           <MDBCol col="10" md="12" sm="12"></MDBCol>
-          {loader ? (
-            <Loader />
-          ) : (
-            <div className="mt-2">
-              <DataTable
-                columns={columns}
-                rows={PO_OrderList}
-                page={page}
-                pageSize={pageSize}
-                totalPages={totalPages}
-                handleChange={handleChange}
-                rowHeight={100}
-              />
-            </div>
-          )}
+          <div>
+            {loader ? (
+              <Loader />
+            ) : PO_OrderList && PO_OrderList.length != 0 ? (
+              <div className="mt-2">
+                <DataTable
+                  columns={columns}
+                  rows={PO_OrderList}
+                  page={page}
+                  pageSize={pageSize}
+                  totalPages={totalPages}
+                  handleChange={handleChange}
+                  rowHeight={100}
+                />
+              </div>
+            ) : (
+              <Alert
+                severity="warning"
+                sx={{ fontFamily: "monospace", fontSize: "18px" }}
+              >
+                Records are not available for the above filter
+              </Alert>
+            )}
+          </div>
         </MDBRow>
       </Card>
     </Container>
