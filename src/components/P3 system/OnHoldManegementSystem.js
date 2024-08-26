@@ -48,7 +48,7 @@ function OnHoldManegementSystem() {
   const [tableData, setTableData] = useState([]);
   const [poTableData, setPoTableData] = useState([]);
   const [date, setDate] = useState(getTodayDate());
-  const [isValid, setIsValid] = useState(false);
+  const [isValid, setIsValid] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
 
@@ -63,7 +63,7 @@ function OnHoldManegementSystem() {
 
   const [poId, setPoId] = useState("");
 
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -117,7 +117,7 @@ function OnHoldManegementSystem() {
 
   useEffect(() => {
     dispatch(GetAllProducts());
-  }, [dispatch, allProducts]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (selectedOption) {
@@ -716,17 +716,27 @@ function OnHoldManegementSystem() {
     }
   };
 
-  const validateForm = (data) => {
-    let dataa = data.filter(
-      (o) => o.variation_values && Object.keys(o.variation_values).length > 0
-    );
-    const isAllVariationsString = data.every((item) => {
-      const values = Object.values(item.variation_values);
-      return values.every((value) => typeof value === "string");
-    });
+  const validateForm = async (data) => {
+    try {
+      let dataa = data.filter(
+        (o) =>
+          o?.variation_values && Object?.keys(o?.variation_values)?.length > 0
+      );
 
-    const isQuantityAvailable = data.every((item) => item.Quantity !== "");
-    setIsValid(isAllVariationsString && isQuantityAvailable);
+      const isAllVariationsString = dataa?.every((item) => {
+        const values = Object?.values(item?.variation_values);
+        return values.every((value) => typeof value == "string");
+      });
+
+      const isQuantityAvailable = dataa?.every((item) => item.Quantity != "");
+      console.log(isAllVariationsString, "isAllVariationsString");
+      console.log(isQuantityAvailable, "isQuantityAvailable");
+      // Set the validation state
+      setIsValid(isAllVariationsString && isQuantityAvailable);
+    } catch (error) {
+      console.error("Error during validation:", error);
+      setIsValid(false); // or handle the error as needed
+    }
   };
 
   const handleSubmit = async () => {
@@ -1038,6 +1048,7 @@ function OnHoldManegementSystem() {
                   // handleChange={handleChange}
                   showAllRows={true}
                   rowHeight="auto"
+                  hidePagination={true}
                 />
               </div>
               <MDBRow className="justify-content-end px-1">
@@ -1073,10 +1084,12 @@ function OnHoldManegementSystem() {
                   totalPages={totalPages}
                   handleChange={handleChange}
                   rowHeight="auto"
+                  showAllRows={true}
                   // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
+                  hidePagination={true}
                 />
               </div>
-              <MDBRow className="justify-content-end px-3">
+              <MDBRow className="justify-content-end px-3 py-2">
                 <Button
                   variant="secondary"
                   disabled={!isValid}

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { DataGrid, gridClasses } from '@mui/x-data-grid';
 import { Box, Pagination } from '@mui/material';
 
-export default function DataTable({ columns, rows, page = 1, totalPages = 1, handleChange = () => { }, pageSize = 10, checkboxSelection = false, onCellEditStart = () => { }, processRowUpdate = () => { }, rowHeight,showAllRows = false}) {
+export default function DataTable({ columns, rows, page = 1, totalPages = 1, handleChange = () => { }, pageSize = 10, checkboxSelection = false, onCellEditStart = () => { }, processRowUpdate = () => { }, rowHeight,showAllRows = false,hidePagination = false }) {
   const actualPageSize = showAllRows ? 100 : pageSize;
   return (
     <Box style={{
@@ -79,12 +79,14 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
         onCellEditStart={onCellEditStart}
         processRowUpdate={processRowUpdate}
       />
-      <Pagination sx={{
-        marginBottom: 3,
-        '& .MuiPagination-ul ': {
-          justifyContent: 'end'
-        }
-      }} count={totalPages} page={page} variant="outlined" onChange={handleChange} />
+     {!hidePagination && (
+        <Pagination sx={{
+          marginBottom: 3,
+          '& .MuiPagination-ul ': {
+            justifyContent: 'end'
+          }
+        }} count={totalPages} page={page} variant="outlined" onChange={handleChange} />
+      )}
     </Box>
   );
 }
