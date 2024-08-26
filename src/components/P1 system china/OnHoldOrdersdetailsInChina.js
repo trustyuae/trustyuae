@@ -77,7 +77,6 @@ function OnHoldOrdersdetailsInChina() {
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [selectedVariationId, setSelecetedVariationId] = useState("");
-  const [toggleStatus, setToggleStatus] = useState(0);
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
@@ -103,10 +102,6 @@ function OnHoldOrdersdetailsInChina() {
 
   const messageData = useSelector((state) => state?.orderSystemChina?.message);
 
-  const OnHoldCustomOrderDataa = useSelector(
-    (state) => state?.orderSystemChina?.customOrderData
-  );
-
   const OnHoldOrderFinishData = useSelector(
     (state) => state?.orderSystemChina?.customOrderOnHoldFinishData
   );
@@ -120,7 +115,6 @@ function OnHoldOrdersdetailsInChina() {
 
     if (orderDetailsDataOrderId) {
       setOrderDetails(orderDetailsDataOrderId);
-      setToggleStatus(Number(orderDetailsDataOrderId.toggle_status));
 
       if (Array.isArray(orderDetailsDataOrderId.items)) {
         const newData = orderDetailsDataOrderId?.items?.map(
@@ -191,7 +185,7 @@ function OnHoldOrdersdetailsInChina() {
       setshowMessageModal(false);
       ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
     }
-    await fetchOrder()
+    await fetchOrder();
   };
 
   useEffect(() => {
@@ -571,29 +565,25 @@ function OnHoldOrdersdetailsInChina() {
                       setAttachmentZoom(true);
                     }}
                   />
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderDetails?.order_process == "started" &&
-                    toggleStatus != 0 && (
-                      <CancelIcon
-                        sx={{
-                          position: "relative",
-                          top: "-30px",
-                          right: "8px",
-                          cursor: "pointer",
-                          color: "red",
-                          zIndex: 1,
-                          // disabled=isDisabled
-                          opacity: isDisabled ? 0.5 : 1,
-                          pointerEvents: isDisabled ? "none" : "auto",
-                          cursor: isDisabled ? "not-allowed" : "pointer",
-                        }}
-                        onClick={(e) => {
-                          if (!isDisabled) {
-                            handleCancelImg(value.row);
-                          }
-                        }}
-                      />
-                    )}
+                  <CancelIcon
+                    sx={{
+                      position: "relative",
+                      top: "-30px",
+                      right: "8px",
+                      cursor: "pointer",
+                      color: "red",
+                      zIndex: 1,
+                      // disabled=isDisabled
+                      opacity: isDisabled ? 0.5 : 1,
+                      pointerEvents: isDisabled ? "none" : "auto",
+                      cursor: isDisabled ? "not-allowed" : "pointer",
+                    }}
+                    onClick={(e) => {
+                      if (!isDisabled) {
+                        handleCancelImg(value.row);
+                      }
+                    }}
+                  />
                 </Box>
               </Col>
             </Row>
@@ -606,10 +596,7 @@ function OnHoldOrdersdetailsInChina() {
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails?.order_process == "started" &&
-                  qty == avl_qty &&
-                  toggleStatus != 0 ? (
+                  {qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() =>
@@ -646,10 +633,7 @@ function OnHoldOrdersdetailsInChina() {
                   )}
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails?.order_process == "started" &&
-                  qty == avl_qty &&
-                  toggleStatus != 0 ? (
+                  {qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -683,47 +667,6 @@ function OnHoldOrdersdetailsInChina() {
     },
   ];
 
-  const handalswitch = async (e) => {
-    // setLoader(true);
-    if (e) {
-      // setToggleStatus(1)
-      handelSend(e);
-    } else {
-      // setToggleStatus(0)
-      handelSend(e);
-    }
-  };
-  const handelSend = async (e) => {
-    const result = {
-      order_id: parseInt(orderDetails?.order_id, 10),
-      item_id: [],
-      product_name: [],
-      variation_id: [],
-      toggle_status: 0,
-    };
-    orderDetails?.items.forEach((item) => {
-      result.item_id.push(parseInt(item.item_id, 10));
-      result.product_name.push(item.product_name);
-      result.variation_id.push(item.variation_id);
-    });
-
-    if (e) {
-      result.toggle_status = 1;
-      setToggleStatus(1);
-    } else {
-      result.toggle_status = 0;
-      setToggleStatus(0);
-    }
-
-    const response = await axiosInstance.post(
-      `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/?warehouse=China`,
-      result
-    );
-    if (response) {
-      fetchOrder();
-    }
-  };
-
   return (
     <>
       <Container fluid className="px-5">
@@ -737,14 +680,6 @@ function OnHoldOrdersdetailsInChina() {
               <ArrowBackIcon className="me-1" />
             </Button>
           </MDBCol>
-          {orderDetails?.operation_user_id != userData?.user_id &&
-            orderDetails?.order_process == "started" && (
-              <MDBCol md="7" className="d-flex justify-content-center">
-                <Alert variant={"danger"}>
-                  This order has already been taken by another user!
-                </Alert>
-              </MDBCol>
-            )}
           <MDBCol className="d-flex justify-content-end">
             <ButtonGroup>
               {radios.map((radio, idx) => (
@@ -802,65 +737,6 @@ function OnHoldOrdersdetailsInChina() {
               >
                 <LocalPrintshopOutlinedIcon />
               </Button>
-              {userData?.user_id == orderDetails?.operation_user_id &&
-              orderDetails?.order_process == "started" ? (
-                // <Button
-                //   variant="outline-danger"
-                //   className="p-1 me-2 bg-transparent text-danger"
-                //   onClick={handleCancelOrderProcess}
-                // >
-                //   <CancelIcon />
-                // </Button>
-                <Form.Check // prettier-ignore
-                  type="switch"
-                  id="custom-switch"
-                  style={{
-                    width: "105px",
-                    height: "32px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  checked={toggleStatus}
-                  // checked={0}
-                  onChange={(e) => handalswitch(e.target.checked)}
-                  // label="Send"
-                />
-              ) : orderDetails?.order_process == "started" &&
-                userData?.user_id != orderDetails?.operation_user_id ? (
-                // <Button variant="success" disabled>
-                //   Send
-                // </Button>
-                <Form.Check // prettier-ignore
-                  type="switch"
-                  disabled
-                  id="custom-switch"
-                  style={{
-                    width: "105px",
-                    height: "32px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  checked={toggleStatus}
-                  // checked={0}
-                  onChange={(e) => handalswitch(e.target.checked)}
-                  // label="Send"
-                />
-              ) : (
-                <Button
-                  variant="success"
-                  // disabled
-                  onClick={handleStartOrderProcess}
-                >
-                  Send
-                </Button>
-                // <Form.Check // prettier-ignore
-                //   type="switch"
-                //   id="custom-switch"
-                //   style={{width:'105px',height:'32px',display:'flex',alignItems:'center' }}
-                //   onChange={(e)=>handalswitch(e.target.checked)}
-                //   label="Send"
-                // />
-              )}
             </Box>
           </Box>
         </Card>
@@ -1028,9 +904,6 @@ function OnHoldOrdersdetailsInChina() {
                         ) : (
                           <>
                             <Card className="factory-card me-1 shadow-sm mb-0">
-                              {userData?.user_id ==
-                                orderDetails?.operation_user_id &&
-                              orderDetails?.order_process == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -1050,23 +923,9 @@ function OnHoldOrdersdetailsInChina() {
                                     onChange={handleFileInputChange}
                                   />
                                 </>
-                              ) : (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  disabled
-                                >
-                                  <CloudUploadIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Device
-                                  </Typography>
-                                </Button>
-                              )}
                             </Card>
 
                             <Card className="factory-card ms-1 shadow-sm mb-0">
-                              {userData?.user_id ==
-                                orderDetails?.operation_user_id &&
-                              orderDetails?.order_process == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -1076,17 +935,6 @@ function OnHoldOrdersdetailsInChina() {
                                     Camera
                                   </Typography>
                                 </Button>
-                              ) : (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  disabled
-                                >
-                                  <CameraAltIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Camera
-                                  </Typography>
-                                </Button>
-                              )}
                             </Card>
                           </>
                         )}
@@ -1181,13 +1029,11 @@ function OnHoldOrdersdetailsInChina() {
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
-            {userData?.user_id == orderDetails?.operation_user_id &&
-            orderDetails?.order_process == "started" &&
+            {
             tableData?.some((data) => data.dispatch_image != "") ? (
               <>
                 <Button
-                  variant="danger"
-                  disabled={orderDetails.toggle_status == 1 ? false : true}
+                  variant="primary"
                   onClick={handleSendToP2ButtonClick}
                   className="me-3"
                 >
@@ -1195,7 +1041,6 @@ function OnHoldOrdersdetailsInChina() {
                 </Button>
                 <Button
                   variant="danger"
-                  disabled={orderDetails.toggle_status == 1 ? false : true}
                   onClick={handleFinishButtonClick}
                 >
                   {t("P1ChinaSystem.Finish")}
@@ -1204,11 +1049,9 @@ function OnHoldOrdersdetailsInChina() {
             ) : (
               <>
                 <Button
-                  variant="danger"
+                  variant="primary"
                   disabled={
-                    orderDetails?.order_process != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id ||
-                    tableData?.some((data) => data.dispatch_image == "")
+                    tableData?.some((data) => data.dispatch_image === "")
                   }
                   onClick={handleSendToP2ButtonClick}
                   className="me-3"
@@ -1218,10 +1061,7 @@ function OnHoldOrdersdetailsInChina() {
                 <Button
                   variant="danger"
                   disabled={
-                    orderDetails?.order_process != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id ||
-                    // orderDetails.toggle_status==1?true:false||
-                    tableData?.some((data) => data.dispatch_image == "")
+                    tableData?.some((data) => data.dispatch_image === "")
                   }
                   onClick={handleFinishButtonClick}
                 >

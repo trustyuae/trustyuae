@@ -73,6 +73,15 @@ export default function DataTable({ columns, rows, page = 1, totalPages = 1, han
             }
             return params.row.order_status == 'Dispatch' ? 'bg-green' : params.row.order_status == 'Reserve' ? 'bg-yellow' : '';
           }
+          if (params.colDef.className == "complete-order-system-china") {
+            if (!params.row.order_status) {
+              return '';
+            }
+            if (params.row.order_status=="P1 Reserve") {
+              return 'bg-yellow';
+            }
+            return params.row.order_status == 'Completed' ? 'bg-green' : params.row.order_status == 'Reserve' ? 'bg-yellow' : '';
+          }
           
         }}
         checkboxSelection={checkboxSelection}

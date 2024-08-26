@@ -99,27 +99,27 @@ function CompletedOrderSystemInChina() {
   const columns = [
     {
       field: "start_date",
-      headerName:  t("POManagement.StartedDate"),
-      className: "order-system",
+      headerName: t("POManagement.StartedDate"),
+      className: "complete-order-system-china",
       flex: 1,
     },
     {
       field: "order_id",
       headerName: t("P1ChinaSystem.OrderId"),
-      className: "order-system",
+      className: "complete-order-system-china",
       flex: 0.5,
     },
     {
       field: "customer_name",
-      headerName:t("P1ChinaSystem.CustomerName"),
-      className: "order-system",
+      headerName: t("P1ChinaSystem.CustomerName"),
+      className: "complete-order-system-china",
       flex: 1,
     },
     {
       field: "shipping_country",
       headerName: t("P1ChinaSystem.ShippingCountry"),
       type: "string",
-      className: "order-system",
+      className: "complete-order-system-china",
       flex: 1,
       valueGetter: (value, row) => getCountryName(row.shipping_country),
     },
@@ -127,20 +127,20 @@ function CompletedOrderSystemInChina() {
       field: "order_status",
       headerName: t("P1ChinaSystem.OrderStatus"),
       flex: 1,
-      className: "order-system",
+      className: "complete-order-system-china",
       type: "string",
     },
     {
       field: "end_date",
       headerName: t("P1ChinaSystem.EndDate"),
-      className: "order-system",
+      className: "complete-order-system-china",
       flex: 1,
     },
     {
       field: "view_item",
       headerName: t("POManagement.ViewItem"),
       flex: 0.5,
-      className: "order-system",
+      className: "complete-order-system-china",
       type: "html",
       renderCell: (value, row) => {
         return (
@@ -245,7 +245,7 @@ function CompletedOrderSystemInChina() {
     <Container fluid className="py-3">
       <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-        {t("P1ChinaSystem.CompletedOrderSystemInChina")}
+          {t("P1ChinaSystem.CompletedOrderSystemInChina")}
         </Typography>
         <ButtonGroup>
           {radios.map((radio, idx) => (
@@ -269,8 +269,11 @@ function CompletedOrderSystemInChina() {
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-              <Form.Label className="fw-semibold"> {t("P1ChinaSystem.OrderId")}:</Form.Label>
-              <Form.Control
+                <Form.Label className="fw-semibold">
+                  {" "}
+                  {t("P1ChinaSystem.OrderId")}:
+                </Form.Label>
+                <Form.Control
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
@@ -283,7 +286,7 @@ function CompletedOrderSystemInChina() {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
-                {t("P1ChinaSystem.StartDateFilter")}:
+                  {t("P1ChinaSystem.StartDateFilter")}:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -317,7 +320,7 @@ function CompletedOrderSystemInChina() {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold">
-                {t("P1ChinaSystem.CompleteDateFilter")}:
+                  {t("P1ChinaSystem.CompleteDateFilter")}:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -352,7 +355,7 @@ function CompletedOrderSystemInChina() {
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
               <Form.Label className="fw-semibold mb-0 me-2">
-              {t("POManagement.PageSize")}:
+                {t("POManagement.PageSize")}:
               </Form.Label>
               <Form.Control
                 as="select"
@@ -373,14 +376,14 @@ function CompletedOrderSystemInChina() {
               onClick={(e) => handleSearchFilter(e)}
             >
               {t("POManagement.Search")}
-              </Button>
+            </Button>
             <Button
               type="button"
               className="mr-2 mx-1 w-auto"
               onClick={handleReset}
             >
               {t("POManagement.ResetFilter")}
-              </Button>
+            </Button>
           </Box>
         </Form>
       </Row>
@@ -404,13 +407,13 @@ function CompletedOrderSystemInChina() {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-             {t("P1ChinaSystem.RecordsIsNotAlert")}
-             </Alert>
+              {t("P1ChinaSystem.RecordsIsNotAlert")}
+            </Alert>
           )}
         </>
       )}
     </Container>
   );
-};
+}
 
 export default CompletedOrderSystemInChina;

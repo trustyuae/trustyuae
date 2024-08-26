@@ -66,8 +66,6 @@ function OnHoldOrdersDetails() {
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState("");
   const [selectedVariationId, setSelecetedVariationId] = useState("");
-  const [toggleStatus, setToggleStatus] = useState(0);
-
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
 
@@ -104,7 +102,6 @@ function OnHoldOrdersDetails() {
 
     if (orderDetailsDataOrderId) {
       setOrderDetails(orderDetailsDataOrderId);
-      setToggleStatus(Number(orderDetailsDataOrderId.toggle_status));
 
       if (Array.isArray(orderDetailsDataOrderId.items)) {
         const newData = orderDetailsDataOrderId?.items?.map(
@@ -325,38 +322,6 @@ function OnHoldOrdersDetails() {
     }
   };
 
-  const handleStartOrderProcess = async () => {
-    const requestData = {
-      order_id: Number(id),
-      user_id: userData.user_id,
-      start_time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-      end_time: "",
-      order_status: "started",
-    };
-    await dispatch(InsertOrderPickup(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleCancelOrderProcess = async () => {
-    const requestData = {
-      order_id: parseInt(id, 10),
-      operation_id: orderDetails?.operation_user_id,
-      order_status: "Cancelled",
-    };
-    await dispatch(InsertOrderPickupCancel(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
   const handleFinishButtonClick = async () => {
     try {
       const { user_id } = userData ?? {};
@@ -562,29 +527,25 @@ function OnHoldOrdersDetails() {
                       setAttachmentZoom(true);
                     }}
                   />
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderDetails?.order_process == "started" &&
-                    toggleStatus != 0 && (
-                      <CancelIcon
-                        sx={{
-                          position: "relative",
-                          top: "-30px",
-                          right: "8px",
-                          cursor: "pointer",
-                          color: "red",
-                          zIndex: 1,
-                          // disabled=isDisabled
-                          opacity: isDisabled ? 0.5 : 1,
-                          pointerEvents: isDisabled ? "none" : "auto",
-                          cursor: isDisabled ? "not-allowed" : "pointer",
-                        }}
-                        onClick={(e) => {
-                          if (!isDisabled) {
-                            handleCancelImg(value.row);
-                          }
-                        }}
-                      />
-                    )}
+                  <CancelIcon
+                    sx={{
+                      position: "relative",
+                      top: "-30px",
+                      right: "8px",
+                      cursor: "pointer",
+                      color: "red",
+                      zIndex: 1,
+                      // disabled=isDisabled
+                      opacity: isDisabled ? 0.5 : 1,
+                      pointerEvents: isDisabled ? "none" : "auto",
+                      cursor: isDisabled ? "not-allowed" : "pointer",
+                    }}
+                    onClick={(e) => {
+                      if (!isDisabled) {
+                        handleCancelImg(value.row);
+                      }
+                    }}
+                  />
                 </Box>
               </Col>
             </Row>
@@ -597,50 +558,55 @@ function OnHoldOrdersDetails() {
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails?.order_process == "started" &&
-                  qty == avl_qty &&
-                  toggleStatus != 0 ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      onClick={() =>
-                        fileInputRef.current[
+                  {qty == avl_qty ? 
+                   
+                   (<Button
+                    className="bg-transparent border-0 text-black"
+                    onClick={() =>
+                      fileInputRef.current[
+                        selectedVariationId ? selectedVariationId : itemId
+                      ]?.click()
+                    }
+                  >
+                    <CloudUploadIcon />
+                    <Typography style={{ fontSize: "14px" }}>Device</Typography>
+                    <input
+                      type="file"
+                      ref={(input) =>
+                        (fileInputRef.current[
                           selectedVariationId ? selectedVariationId : itemId
-                        ]?.click()
+                        ] = input)
                       }
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                      <input
-                        type="file"
-                        ref={(input) =>
-                          (fileInputRef.current[
-                            selectedVariationId ? selectedVariationId : itemId
-                          ] = input)
-                        }
-                        style={{ display: "none" }}
-                        onChange={handleFileInputChangeForRow}
-                      />
-                    </Button>
+                      style={{ display: "none" }}
+                      onChange={handleFileInputChangeForRow}
+                    />
+                  </Button>
                   ) : (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                    </Button>
+                  <Button
+                    className="bg-transparent border-0 text-black"
+                    onClick={() =>
+                      fileInputRef.current[
+                        selectedVariationId ? selectedVariationId : itemId
+                      ]?.click()
+                    }
+                  >
+                    <CloudUploadIcon />
+                    <Typography style={{ fontSize: "14px" }}>Device</Typography>
+                    <input
+                      type="file"
+                      ref={(input) =>
+                        (fileInputRef.current[
+                          selectedVariationId ? selectedVariationId : itemId
+                        ] = input)
+                      }
+                      style={{ display: "none" }}
+                      onChange={handleFileInputChangeForRow}
+                    />
+                  </Button>
                   )}
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails?.order_process == "started" &&
-                  qty == avl_qty &&
-                  toggleStatus != 0 ? (
+                  {qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
                       onClick={() => {
@@ -674,44 +640,6 @@ function OnHoldOrdersDetails() {
     },
   ];
 
-  const handalswitch = async (e) => {
-    if (e) {
-      handelSend(e);
-    } else {
-      handelSend(e);
-    }
-  };
-  const handelSend = async (e) => {
-    const result = {
-      order_id: parseInt(orderDetails?.order_id, 10),
-      item_id: [],
-      product_name: [],
-      variation_id: [],
-      toggle_status: 0,
-    };
-    orderDetails?.items.forEach((item) => {
-      result.item_id.push(parseInt(item.item_id, 10));
-      result.product_name.push(item.product_name);
-      result.variation_id.push(item.variation_id);
-    });
-
-    if (e) {
-      result.toggle_status = 1;
-      setToggleStatus(1);
-    } else {
-      result.toggle_status = 0;
-      setToggleStatus(0);
-    }
-
-    const response = await axiosInstance.post(
-      `wp-json/custom-onhold-orders-toggle/v1/onhold_orders_toggle/`,
-      result
-    );
-    if (response) {
-      fetchOrder();
-    }
-  };
-
   return (
     <>
       <Container fluid className="px-5">
@@ -729,14 +657,6 @@ function OnHoldOrdersDetails() {
             </Button>
             <Box></Box>
           </MDBCol>
-          {orderDetails?.operation_user_id != userData?.user_id &&
-            orderDetails?.order_process == "started" && (
-              <MDBCol md="7" className="d-flex justify-content-end">
-                <Alert variant={"danger"}>
-                  This order has already been taken by another user!
-                </Alert>
-              </MDBCol>
-            )}
         </MDBRow>
 
         <Card className="p-3 mb-3">
@@ -793,65 +713,6 @@ function OnHoldOrdersDetails() {
               >
                 <LocalPrintshopOutlinedIcon />
               </Button>
-              {userData?.user_id == orderDetails?.operation_user_id &&
-              orderDetails?.order_process == "started" ? (
-                // <Button
-                //   variant="outline-danger"
-                //   className="p-1 me-2 bg-transparent text-danger"
-                //   onClick={handleCancelOrderProcess}
-                // >
-                //   <CancelIcon />
-                // </Button>
-                <Form.Check // prettier-ignore
-                  type="switch"
-                  id="custom-switch"
-                  style={{
-                    width: "105px",
-                    height: "32px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  checked={toggleStatus}
-                  // checked={0}
-                  onChange={(e) => handalswitch(e.target.checked)}
-                  // label="Send"
-                />
-              ) : orderDetails?.order_process == "started" &&
-                userData?.user_id != orderDetails?.operation_user_id ? (
-                // <Button variant="success" disabled>
-                //   Send
-                // </Button>
-                <Form.Check // prettier-ignore
-                  type="switch"
-                  disabled
-                  id="custom-switch"
-                  style={{
-                    width: "105px",
-                    height: "32px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                  checked={toggleStatus}
-                  // checked={0}
-                  onChange={(e) => handalswitch(e.target.checked)}
-                  // label="Send"
-                />
-              ) : (
-                <Button
-                  variant="success"
-                  // disabled
-                  onClick={handleStartOrderProcess}
-                >
-                  Send
-                </Button>
-                // <Form.Check // prettier-ignore
-                //   type="switch"
-                //   id="custom-switch"
-                //   style={{width:'105px',height:'32px',display:'flex',alignItems:'center' }}
-                //   onChange={(e)=>handalswitch(e.target.checked)}
-                //   label="Send"
-                // />
-              )}
             </Box>
           </Box>
         </Card>
@@ -1019,65 +880,35 @@ function OnHoldOrdersDetails() {
                         ) : (
                           <>
                             <Card className="factory-card me-1 shadow-sm mb-0">
-                              {userData?.user_id ==
-                                orderDetails?.operation_user_id &&
-                              orderDetails?.order_process == "started" ? (
-                                <>
-                                  <Button
-                                    className="bg-transparent border-0 text-black"
-                                    onClick={() =>
-                                      fileInputRef?.current?.click()
-                                    }
-                                  >
-                                    <CloudUploadIcon />
-                                    <Typography style={{ fontSize: "14px" }}>
-                                      Device
-                                    </Typography>
-                                  </Button>
-                                  <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    style={{ display: "none" }}
-                                    onChange={handleFileInputChange}
-                                  />
-                                </>
-                              ) : (
+                              <>
                                 <Button
                                   className="bg-transparent border-0 text-black"
-                                  disabled
+                                  onClick={() => fileInputRef?.current?.click()}
                                 >
                                   <CloudUploadIcon />
                                   <Typography style={{ fontSize: "14px" }}>
                                     Device
                                   </Typography>
                                 </Button>
-                              )}
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  style={{ display: "none" }}
+                                  onChange={handleFileInputChange}
+                                />
+                              </>
                             </Card>
 
                             <Card className="factory-card ms-1 shadow-sm mb-0">
-                              {userData?.user_id ==
-                                orderDetails?.operation_user_id &&
-                              orderDetails?.order_process == "started" ? (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  onClick={() => setShowAttachModal(true)}
-                                >
-                                  <CameraAltIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Camera
-                                  </Typography>
-                                </Button>
-                              ) : (
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  disabled
-                                >
-                                  <CameraAltIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Camera
-                                  </Typography>
-                                </Button>
-                              )}
+                              <Button
+                                className="bg-transparent border-0 text-black"
+                                onClick={() => setShowAttachModal(true)}
+                              >
+                                <CameraAltIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Camera
+                                </Typography>
+                              </Button>
                             </Card>
                           </>
                         )}
@@ -1183,13 +1014,10 @@ function OnHoldOrdersDetails() {
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
-            {userData?.user_id == orderDetails?.operation_user_id &&
-            orderDetails?.order_process == "started" &&
-            tableData?.some((data) => data.dispatch_image != "") ? (
+            {tableData?.some((data) => data?.dispatch_image !== "") ? (
               <>
                 <Button
-                  variant="danger"
-                  disabled={orderDetails.toggle_status == 1 ? false : true}
+                  variant="primary"
                   onClick={handleSendToP2ButtonClick}
                   className="me-3"
                 >
@@ -1197,7 +1025,6 @@ function OnHoldOrdersDetails() {
                 </Button>
                 <Button
                   variant="danger"
-                  disabled={orderDetails.toggle_status == 1 ? false : true}
                   onClick={handleFinishButtonClick}
                 >
                   Finish
@@ -1206,12 +1033,10 @@ function OnHoldOrdersDetails() {
             ) : (
               <>
                 <Button
-                  variant="danger"
-                  disabled={
-                    orderDetails?.order_process != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id ||
-                    tableData?.some((data) => data.dispatch_image == "")
-                  }
+                  variant="primary"
+                  disabled={tableData?.some(
+                    (data) => data.dispatch_image == ""
+                  )}
                   onClick={handleSendToP2ButtonClick}
                   className="me-3"
                 >
@@ -1219,11 +1044,9 @@ function OnHoldOrdersDetails() {
                 </Button>
                 <Button
                   variant="danger"
-                  disabled={
-                    orderDetails?.order_process != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id ||
-                    tableData?.some((data) => data.dispatch_image == "")
-                  }
+                  disabled={tableData?.some(
+                    (data) => data.dispatch_image === ""
+                  )}
                   onClick={handleFinishButtonClick}
                 >
                   Finish
