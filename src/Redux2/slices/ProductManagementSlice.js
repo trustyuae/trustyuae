@@ -11,7 +11,7 @@ const initialState = {
 
 export const GetAllProductsList = createAsyncThunk(
   "factory/GetAllProductsList",
-  async ({ apiUrl }, { rejectWithValue }) => {
+  async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
       return response.data;

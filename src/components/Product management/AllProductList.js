@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Modal from "react-bootstrap/Modal";
@@ -13,13 +13,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
 import defaultImage from "../../assets/default.png";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
-import {
-  EditProductsList,
-  GetAllProductsList,
-} from "../../Redux2/slices/ProductManagementSlice";
+import { EditProductsList, GetAllProductsList } from "../../Redux2/slices/ProductManagementSlice";
 
 function AllProductList() {
-  const inputRef = useRef(null);
+  const inputRefId = useRef(null);
+  const inputRefName = useRef(null);
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -34,12 +32,8 @@ function AllProductList() {
   const [totalPages, setTotalPages] = useState(1);
   const [imageURL, setImageURL] = useState("");
   const loader = useSelector((state) => state?.productManagement?.isLoading);
-
   const factoryData = useSelector((state) => state?.factory?.factories);
-
-  const allProductsData = useSelector(
-    (state) => state?.productManagement?.allProducts
-  );
+  const allProductsData = useSelector((state) => state?.productManagement?.allProducts);
 
   useEffect(() => {
     dispatch(fetchAllFactories());
@@ -52,19 +46,16 @@ function AllProductList() {
     }
   }, [factoryData]);
 
-  useEffect(() => {
-    if (allProductsData) {
-      setProducts(allProductsData.products);
-      setTotalPages(allProductsData.total_pages);
-    }
-  }, []);
+  const apiUrl = useMemo(() => {
+    let url = `wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
+    if (searchId) url += `&product_id=${searchId}`;
+    if (searchName) url += `&product_name=${searchName}`;
+    return url;
+  }, [currentPage, searchName, searchId, itemsPerPage]);
 
   const fetchProducts = async () => {
-    let apiUrl = `wp-json/custom-products-api/v1/fetch-products/?page=${currentPage}&per_page=${itemsPerPage}`;
-    if (searchId) apiUrl += `&product_id=${searchId}`;
-    if (searchName) apiUrl += `&product_name=${searchName}`;
     try {
-      dispatch(GetAllProductsList({ apiUrl }));
+      dispatch(GetAllProductsList(apiUrl));
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -72,7 +63,15 @@ function AllProductList() {
 
   useEffect(() => {
     fetchProducts();
-  }, [currentPage, searchName, searchId, itemsPerPage]);
+  }, [apiUrl, dispatch]);
+
+  const memoizedProducts = useMemo(() => allProductsData?.products || [], [allProductsData]);
+  const memoizedTotalPages = useMemo(() => allProductsData?.total_pages || 0, [allProductsData]);
+
+  useEffect(() => {
+    setProducts(memoizedProducts);
+    setTotalPages(memoizedTotalPages);
+  }, [memoizedProducts, memoizedTotalPages]);
 
   const handleEdit = (productId) => {
     const product = products.find((p) => p.id === productId);
@@ -107,7 +106,7 @@ function AllProductList() {
       } else {
         formData.append("factory_image", selectedProduct.factory_image);
       }
-      await dispatch(EditProductsList(formData, id));
+      await dispatch(EditProductsList({ formData, id }));
       setShowEditModal(false);
       fetchProducts();
     } catch (error) {
@@ -117,7 +116,7 @@ function AllProductList() {
 
   const handleFileChange = async (e) => {
     if (e.target.files[0]) {
-      const file = await CompressImage(e?.target?.files[0]);
+      const file = await CompressImage(e.target.files[0]);
       setFile(file);
     }
   };
@@ -128,76 +127,59 @@ function AllProductList() {
   };
 
   const columns = [
-    { field: "product_id", headerName: "Product id", flex: 1 },
-    { field: "product_name", headerName: "Product name", flex: 1 },
+    { field: "product_id", headerName: "Product ID", flex: 1 },
+    { field: "product_name", headerName: "Product Name", flex: 1 },
     {
       field: "factory_image",
       headerName: "Factory Image",
       flex: 1,
-      type: "html",
-      renderCell: (value, row) => {
-        return (
-          <Box
-            className="h-100 w-100 d-flex align-items-center"
-            onClick={(e) =>
-              imageModule(
-                value?.row?.factory_image || value?.row?.product_image
-              )
-            }
-          >
-            <Avatar
-              src={
-                value?.row?.factory_image || value?.row?.product_image
-                  ? value?.row?.factory_image || value?.row?.product_image
-                  : defaultImage
-              }
-              alt="Product Image"
-              sx={{
-                height: "45px",
-                width: "45px",
+      renderCell: (params) => (
+        <Box
+          className="h-100 w-100 d-flex align-items-center"
+          onClick={() => imageModule(params.row.factory_image || params.row.product_image)}
+        >
+          <Avatar
+            src={params.row.factory_image || params.row.product_image || defaultImage}
+            alt="Product Image"
+            sx={{
+              height: "45px",
+              width: "45px",
+              borderRadius: "2px",
+              margin: "0 auto",
+              "& .MuiAvatar-img": {
+                height: "100%",
+                width: "100%",
                 borderRadius: "2px",
-                margin: "0 auto",
-                "& .MuiAvatar-img": {
-                  height: "100%",
-                  width: "100%",
-                  borderRadius: "2px",
-                },
-              }}
-            />
-          </Box>
-        );
-      },
+              },
+            }}
+          />
+        </Box>
+      ),
     },
     {
       field: "factory_id",
       headerName: "Factory",
       flex: 1,
-      renderCell: (params) => {
-        return factories.find((factory) => factory.id === params.row.factory_id)
-          ?.factory_name;
-      },
+      renderCell: (params) => factories.find((factory) => factory.id === params.row.factory_id)?.factory_name,
     },
-    { field: "stock_quantity", headerName: "Quntity", flex: 1 },
+    { field: "stock_quantity", headerName: "Quantity", flex: 1 },
     { field: "stock_status", headerName: "Stock Status", flex: 1 },
     { field: "product_status", headerName: "Product Status", flex: 1 },
     {
       field: "action",
       headerName: "Action",
       flex: 1,
-      type: "html",
-      renderCell: (value) => {
-        return (
-          <Box className="text-center">
-            <Button
-              className="m-2 mx-auto d-flex align-items-center justify-content-center"
-              style={{ padding: "5px 5px", fontSize: "16px" }}
-              onClick={() => handleEdit(value.row.id)}
-            >
-              <EditIcon fontSize="inherit" />
-            </Button>
-          </Box>
-        );
-      },
+      renderCell: (params) => (
+        <Box className="text-center">
+          <Button
+            className="m-2 mx-auto d-flex align-items-center justify-content-center"
+            style={{ padding: "5px 5px", fontSize: "16px" }}
+            onClick={() => handleEdit(params.row.id)}
+          >
+            <EditIcon fontSize="inherit" />
+          </Button>
+        </Box>
+      ),
     },
   ];
 
@@ -207,13 +189,13 @@ function AllProductList() {
 
   const searchIdd = (e) => {
     if (e.key === "Enter") {
-      setSearchId(e.target.value);
+      setSearchId(inputRefId.current.value);
     }
   };
 
   const searchNamee = (e) => {
     if (e.key === "Enter") {
-      setSearchName(e.target.value);
+      setSearchName(inputRefName.current.value);
     }
   };
 
@@ -230,9 +212,9 @@ function AllProductList() {
             <Form.Label className="me-2 fw-semibold">Product ID:</Form.Label>
             <Form.Control
               type="text"
-              ref={inputRef}
+              ref={inputRefId}
               placeholder="Search by Product ID"
-              onKeyDown={(e) => searchIdd(e)}
+              onKeyDown={searchIdd}
               // onChange={(e) => setSearchId(e.target.value)}
             />
           </Form.Group>
@@ -243,8 +225,8 @@ function AllProductList() {
             <Form.Control
               type="text"
               placeholder="Search by Product Name"
-              ref={inputRef}
-              onKeyDown={(e) => searchNamee(e)}
+              ref={inputRefName}
+              onKeyDown={searchNamee}
             />
           </Form.Group>
         </Col>
@@ -397,4 +379,3 @@ function AllProductList() {
 }
 
 export default AllProductList;
-	
