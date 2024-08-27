@@ -1018,6 +1018,18 @@ function OnHoldOrdersDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             <Button
+              variant="success"
+              className=" mx-2"
+              // disabled={
+              //   orderProcess != "started" ||
+              //   userData?.user_id != orderDetails?.operation_user_id
+              //   // tableData?.some((data) => data.dispatch_image == "")
+              // }
+              // onClick={() => setshowMessageOHModal(true)}
+            >
+              OnHold to Order System
+            </Button>
+            <Button
               variant="primary"
               onClick={handleSendToP2ButtonClick}
               className="me-3"

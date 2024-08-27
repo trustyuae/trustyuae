@@ -15,6 +15,9 @@ import {
   List,
   Accordion,
   AccordionSummary,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -67,6 +70,8 @@ function OrderDetails() {
   const [selectedItemId, setSelectedItemId] = useState("");
   const [message, setMessage] = useState("");
   const [messageOH, setOHMessage] = useState("");
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
 
   const [userData, setUserData] = useState(null);
 
@@ -92,10 +97,6 @@ function OrderDetails() {
 
   const orderDetailsData = useSelector(
     (state) => state?.orderSystem?.orderDetails
-  );
-
-  const customOrderDataa = useSelector(
-    (state) => state?.orderSystem?.customOrderData
   );
 
   const CustomOrderOHDataa = useSelector(
@@ -184,7 +185,7 @@ function OrderDetails() {
         setshowMessageModal(false);
         ShowAlert("", payload, "success", null, null, null, null, 3000);
       }
-     await fetchOrder()
+      await fetchOrder();
     });
   };
 
@@ -348,6 +349,21 @@ function OrderDetails() {
     });
   };
 
+  const handleItemSelection = (rowData) => {
+    const selectedIndex = selectedItemIds.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIds.filter((id) => id !== rowData.id)
+        : [...selectedItemIds, rowData.id];
+
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, rowData]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+    }
+    setSelectedItemIds(newSelected);
+  };
+
   const handleSendToChinaSystem = async () => {
     try {
       dispatch(CustomItemSendToChina(id)).then(({ payload }) => {
@@ -419,6 +435,24 @@ function OrderDetails() {
   };
 
   const columns = [
+    {
+      field: "select",
+      headerName: "Select",
+      flex: 0.5,
+      renderCell: (params) => {
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={<Checkbox />}
+              style={{ justifyContent: "center" }}
+              checked={selectedItemIds.includes(params.row.id)}
+              onChange={(event) => handleItemSelection(params.row)}
+            />
+          </FormGroup>
+        );
+      },
+    },
     {
       field: "item_id",
       headerName: "Item Id",
@@ -737,16 +771,34 @@ function OrderDetails() {
               >
                 <LocalPrintshopOutlinedIcon />
               </Button>
-              {userData?.user_id == orderDetails?.operation_user_id &&
-              orderProcess == "started" ? (
-                <Box className="d-flex">
-                  <Button
-                    variant="outline-danger"
-                    className="p-1 me-2 bg-transparent text-danger"
-                    onClick={handleCancelOrderProcess}
-                  >
-                    <CancelIcon />
-                  </Button>
+              <Box className="d-flex">
+                <Box>
+                  {userData?.user_id == orderDetails?.operation_user_id &&
+                  orderProcess == "started" ? (
+                    <Button
+                      variant="outline-danger"
+                      className="p-1 me-2 bg-transparent text-danger"
+                      onClick={handleCancelOrderProcess}
+                    >
+                      <CancelIcon />
+                    </Button>
+                  ) : orderProcess == "started" &&
+                    userData?.user_id != orderDetails?.operation_user_id ? (
+                    <Button variant="success" disabled className="me-3">
+                      Start
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="success"
+                      // disabled
+                      onClick={handleStartOrderProcess}
+                      className="me-3"
+                    >
+                      Start
+                    </Button>
+                  )}
+                </Box>
+                <Box>
                   <Button
                     variant="primary"
                     // disabled
@@ -755,31 +807,7 @@ function OrderDetails() {
                     Send To China
                   </Button>
                 </Box>
-              ) : orderProcess == "started" &&
-                userData?.user_id != orderDetails?.operation_user_id ? (
-                <Box>
-                  <Button variant="success" disabled className="me-3">
-                    Start
-                  </Button>
-                  <Button variant="primary" disabled>
-                    Send To China
-                  </Button>
-                </Box>
-              ) : (
-                <Box className="d-flex">
-                  <Button
-                    variant="success"
-                    // disabled
-                    onClick={handleStartOrderProcess}
-                    className="me-3"
-                  >
-                    Start
-                  </Button>
-                  <Button variant="primary" disabled>
-                    Send To China
-                  </Button>
-                </Box>
-              )}
+              </Box>
             </Box>
           </Box>
         </Card>

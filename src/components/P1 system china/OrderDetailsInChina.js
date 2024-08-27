@@ -24,6 +24,9 @@ import {
   List,
   Accordion,
   AccordionSummary,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -84,6 +87,9 @@ function OrderDetailsInChina() {
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
+
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -213,7 +219,22 @@ function OrderDetailsInChina() {
       setshowMessageModal(false);
       ShowAlert("", messageData.data, "success", null, null, null, null, 2000);
     }
-    await fetchOrder()
+    await fetchOrder();
+  };
+
+  const handleItemSelection = (rowData) => {
+    const selectedIndex = selectedItemIds.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIds.filter((id) => id !== rowData.id)
+        : [...selectedItemIds, rowData.id];
+
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, rowData]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+    }
+    setSelectedItemIds(newSelected);
   };
 
   const handleSendToUAESystem = async () => {
@@ -455,6 +476,24 @@ function OrderDetailsInChina() {
   };
 
   const columns = [
+    {
+      field: "select",
+      headerName: "Select",
+      flex: 0.5,
+      renderCell: (params) => {
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={<Checkbox />}
+              style={{ justifyContent: "center" }}
+              checked={selectedItemIds.includes(params.row.id)}
+              onChange={(event) => handleItemSelection(params.row)}
+            />
+          </FormGroup>
+        );
+      },
+    },
     {
       field: "item_id",
       headerName: t("P1ChinaSystem.ItemId"),
@@ -790,16 +829,34 @@ function OrderDetailsInChina() {
               >
                 <LocalPrintshopOutlinedIcon />
               </Button>
-              {userData?.user_id == orderDetails?.operation_user_id &&
-              orderDetails?.order_process == "started" ? (
+              <Box className="d-flex">
                 <Box>
-                  <Button
-                    variant="outline-danger"
-                    className="p-1 me-2 bg-transparent text-danger"
-                    onClick={handleCancelOrderProcess}
-                  >
-                    <CancelIcon />
-                  </Button>{" "}
+                  {userData?.user_id == orderDetails?.operation_user_id &&
+                  orderDetails?.order_process == "started" ? (
+                    <Button
+                      variant="outline-danger"
+                      className="p-1 me-2 bg-transparent text-danger"
+                      onClick={handleCancelOrderProcess}
+                    >
+                      <CancelIcon />
+                    </Button>
+                  ) : orderDetails?.order_process == "started" &&
+                    userData?.user_id != orderDetails?.operation_user_id ? (
+                    <Button variant="success" disabled className="me-3">
+                      {t("P1ChinaSystem.Start")}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="success"
+                      // disabled
+                      onClick={handleStartOrderProcess}
+                      className="me-3"
+                    >
+                      {t("P1ChinaSystem.Start")}
+                    </Button>
+                  )}
+                </Box>
+                <Box>
                   <Button
                     variant="primary"
                     // disabled
@@ -808,31 +865,7 @@ function OrderDetailsInChina() {
                     {t("P1ChinaSystem.SendToUAE")}
                   </Button>
                 </Box>
-              ) : orderDetails?.order_process == "started" &&
-                userData?.user_id != orderDetails?.operation_user_id ? (
-                <Box>
-                  <Button variant="success" disabled className="me-3">
-                    {t("P1ChinaSystem.Start")}
-                  </Button>
-                  <Button variant="primary" disabled>
-                    {t("P1ChinaSystem.SendToUAE")}
-                  </Button>
-                </Box>
-              ) : (
-                <Box>
-                  <Button
-                    variant="success"
-                    // disabled
-                    onClick={handleStartOrderProcess}
-                    className="me-3"
-                  >
-                    {t("P1ChinaSystem.Start")}
-                  </Button>
-                  <Button variant="primary" disabled>
-                    {t("P1ChinaSystem.SendToUAE")}
-                  </Button>
-                </Box>
-              )}
+              </Box>
             </Box>
           </Box>
         </Card>

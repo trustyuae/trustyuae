@@ -368,7 +368,7 @@ export const CustomItemSendToP2 = createAsyncThunk(
     console.log(payload, "payload from CustomItemSendToP2");
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-onhold-order-convert/v1/onhold_to_backorder/${id}`,
+        `wp-json/custom-onhold-order-convert/v1/onhold-to-backorder/${id}`,
         payload
       );
       return response.data;

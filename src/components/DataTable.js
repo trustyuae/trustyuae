@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DataGrid, gridClasses } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { Box, Pagination } from '@mui/material';
 
 export default function DataTable({
@@ -17,31 +17,36 @@ export default function DataTable({
   hidePagination = false
 }) {
   const actualPageSize = showAllRows ? 100 : pageSize;
+  const rowCount = rows.length;
+  
+  // Calculate height based on row count, row height, and a maximum height
+  const dataGridHeight = Math.min(rowCount * rowHeight + 50, 400); // Adjust as needed
 
   return (
     <Box
-      style={{
+      sx={{
         width: '100%',
-        height: showAllRows ? 'auto' : 400, // Fixed height for scrolling
         display: 'flex',
         flexDirection: 'column',
+        height: '100%',
       }}
     >
       <Box
-        style={{
-          flex: 2.5, // Ensures the DataGrid takes up available space and enables scrolling
-          overflow: 'auto', // Enables vertical scrolling
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          height: showAllRows ? 'auto' : dataGridHeight,
+          minHeight: 125, // Minimum height to handle very few rows gracefully
         }}
       >
         <DataGrid
           rows={rows}
           columns={columns}
-          rowHeight={rowHeight || 50}
+          rowHeight={rowHeight}
           disableColumnSorting
           disableColumnMenu
-          initialState={{
-            pagination: { paginationModel: { pageSize: actualPageSize } },
-          }}
+          pagination
+          pageSize={actualPageSize}
           sx={{
             '& .MuiTablePagination-selectLabel': {
               marginBottom: '0px',
@@ -74,46 +79,6 @@ export default function DataTable({
               fontSize: 16,
             },
           }}
-          getCellClassName={(params) => {
-            if (params.colDef.className === 'order-not-available') {
-              if (!params.row.customer_status) {
-                return '';
-              }
-              return params.row.customer_status === 'Confirmed'
-                ? 'bg-green'
-                : params.row.customer_status === 'Exchange'
-                ? 'bg-yellow'
-                : params.row.customer_status === 'Refund'
-                ? 'bg-danger'
-                : params.row.customer_status === 'NotConfirmed'
-                ? 'bg-secondary'
-                : '';
-            }
-            if (params.colDef.className === 'order-system') {
-              if (!params.row.order_status) {
-                return '';
-              }
-              return params.row.order_status === 'P1 Reserve'
-                ? 'bg-yellow'
-                : params.row.order_status === 'Dispatch'
-                ? 'bg-green'
-                : params.row.order_status === 'Reserve'
-                ? 'bg-yellow'
-                : '';
-            }
-            if (params.colDef.className === 'complete-order-system-china') {
-              if (!params.row.order_status) {
-                return '';
-              }
-              return params.row.order_status === 'P1 Reserve'
-                ? 'bg-yellow'
-                : params.row.order_status === 'Completed'
-                ? 'bg-green'
-                : params.row.order_status === 'Reserve'
-                ? 'bg-yellow'
-                : '';
-            }
-          }}
           checkboxSelection={checkboxSelection}
           onCellEditStart={onCellEditStart}
           processRowUpdate={processRowUpdate}
@@ -121,16 +86,16 @@ export default function DataTable({
       </Box>
       {!hidePagination && (
         <Box
-          style={{
-            marginTop: 'auto', // Pushes pagination to the bottom
+          sx={{
+            marginTop: 'auto',
             display: 'flex',
-            justifyContent: 'flex-end', // Align pagination to the right
-            padding: '8px 0', // Add padding for spacing
+            justifyContent: 'flex-end',
+            padding: '8px 0',
           }}
         >
           <Pagination
             sx={{
-              marginBottom: 0, // Adjust as needed
+              marginBottom: 0,
             }}
             count={totalPages}
             page={page}
