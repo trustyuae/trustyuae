@@ -1070,7 +1070,7 @@ function OnHoldManegementSystem() {
                     !isValid && poTableData.length == 0 && tableData.length == 0
                   }
                   style={{ width: "130px" }}
-                  onClick={() => setshowMessageModal(true)}
+                  onClick={handleSubmit}
                 >
                   submit
                 </Button>
@@ -1115,7 +1115,7 @@ function OnHoldManegementSystem() {
                   }
                   style={{ width: "130px" }}
                   // onClick={handleCreateGrn}
-                  onClick={() => setshowMessageModal(true)}
+                  onClick={handleCreateGrn}
                 >
                   Create GRN
                 </Button>
