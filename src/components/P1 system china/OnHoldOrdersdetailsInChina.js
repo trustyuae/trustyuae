@@ -52,6 +52,7 @@ import {
   AttachmentFileUploadChina,
   CustomItemSendToP2,
   CustomOrderFinishOHChina,
+  CustomOrderOHChina,
   InsertOrderPickupChina,
   OnHoldOrderDetailsChinaGet,
   OverAllAttachmentFileUploadChina,
@@ -80,6 +81,10 @@ function OnHoldOrdersdetailsInChina() {
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
+
+  const CustomOrderOHDataa = useSelector(
+    (state) => state?.orderSystem?.customOrderOnHoldData
+  );
 
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -330,6 +335,40 @@ function OnHoldOrdersdetailsInChina() {
       setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
     }
     setSelectedItemIds(newSelected);
+  };
+
+  const submitOH = async () => {
+    try {
+      const result = {
+        order_id: parseInt(orderDetails.order_id, 10),
+        onhold_status: 0,
+        item_id: [],
+        variation_id: [],
+        user_id: parseInt(orderDetails.user_id, 10),
+        operation_user_id: parseInt(orderDetails.operation_user_id, 10),
+        onhold_note: "",
+      };
+      orderDetails.items.forEach((item) => {
+        result.item_id.push(parseInt(item.item_id, 10));
+        result.variation_id.push(parseInt(item.variation_id, 10));
+      });
+      dispatch(CustomOrderOHChina(result));
+      if (CustomOrderOHDataa.status === 200) {
+        ShowAlert(
+          "",
+          CustomOrderOHDataa.data.message,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+        navigate("/on_hold_orders_system_in_china");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleSendToP2ButtonClick = async () => {
@@ -1035,7 +1074,7 @@ function OnHoldOrdersdetailsInChina() {
               //   userData?.user_id != orderDetails?.operation_user_id
               //   // tableData?.some((data) => data.dispatch_image == "")
               // }
-              // onClick={() => setshowMessageOHModal(true)}
+              onClick={submitOH}
             >
               OnHold to Order System China
             </Button>

@@ -349,10 +349,11 @@ export const CustomOrderPushToUAE = createAsyncThunk(
 
 export const CustomItemSendToChina = createAsyncThunk(
   "orderSystem/CustomItemSendToChina",
-  async (id, { rejectWithValue }) => {
+  async ({ id, payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-push-order/v1/push-order-china/${id}`
+        `wp-json/custom-push-order/v1/push-order-china/${id}`,
+        payload
       );
       return response.data;
     } catch (error) {

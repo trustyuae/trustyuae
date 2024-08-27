@@ -41,6 +41,7 @@ import {
   AttachmentFileUpload,
   CustomItemSendToP2,
   CustomOrderFinishOH,
+  CustomOrderOH,
   InsertOrderPickup,
   InsertOrderPickupCancel,
   OnHoldOrderDetailsGet,
@@ -91,6 +92,10 @@ function OnHoldOrdersDetails() {
 
   const OnHoldOrderFinishData = useSelector(
     (state) => state?.orderSystem?.customOrderOnHoldFinishData
+  );
+
+  const CustomOrderOHDataa = useSelector(
+    (state) => state?.orderSystem?.customOrderOnHoldData
   );
 
   useEffect(() => {
@@ -319,6 +324,40 @@ function OnHoldOrdersDetails() {
       });
     } catch (error) {
       console.error("Error sending items to p2 system:", error);
+    }
+  };
+
+  const submitOH = async () => {
+    try {
+      const result = {
+        order_id: parseInt(orderDetails.order_id, 10),
+        onhold_status: 0,
+        item_id: [],
+        variation_id: [],
+        user_id: parseInt(orderDetails.user_id, 10),
+        operation_user_id: parseInt(orderDetails.operation_user_id, 10),
+        onhold_note:"",
+      };
+      orderDetails.items.forEach((item) => {
+        result.item_id.push(parseInt(item.item_id, 10));
+        result.variation_id.push(parseInt(item.variation_id, 10));
+      });
+      dispatch(CustomOrderOH(result));
+      if (CustomOrderOHDataa.status === 200) {
+        ShowAlert(
+          "",
+          CustomOrderOHDataa.data.message,
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+        navigate("/ordersystem");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -1025,7 +1064,7 @@ function OnHoldOrdersDetails() {
               //   userData?.user_id != orderDetails?.operation_user_id
               //   // tableData?.some((data) => data.dispatch_image == "")
               // }
-              // onClick={() => setshowMessageOHModal(true)}
+              onClick={submitOH}
             >
               OnHold to Order System
             </Button>

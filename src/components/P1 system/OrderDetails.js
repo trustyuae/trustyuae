@@ -193,8 +193,8 @@ function OrderDetails() {
     try {
       const result = {
         order_id: parseInt(orderDetails.order_id, 10),
+        onhold_status: 1,
         item_id: [],
-        product_name: [],
         variation_id: [],
         user_id: parseInt(orderDetails.user_id, 10),
         operation_user_id: parseInt(orderDetails.operation_user_id, 10),
@@ -202,7 +202,6 @@ function OrderDetails() {
       };
       orderDetails.items.forEach((item) => {
         result.item_id.push(parseInt(item.item_id, 10));
-        result.product_name.push(item.product_name);
         result.variation_id.push(parseInt(item.variation_id, 10));
       });
       dispatch(CustomOrderOH(result));
@@ -365,8 +364,17 @@ function OrderDetails() {
   };
 
   const handleSendToChinaSystem = async () => {
+    const selectedProductIds = selectedItems.map((item) => item.item_id);
+    const selectedVariationIds = selectedItems.map((item) => item.variation_id);
+
+    const payload = {
+      product_id: selectedProductIds,
+      variation_id: selectedVariationIds,
+      warehouse: "China",
+    };
+
     try {
-      dispatch(CustomItemSendToChina(id)).then(({ payload }) => {
+      dispatch(CustomItemSendToChina({ id, payload })).then(({ payload }) => {
         Swal.fire({
           title: payload,
           icon: payload ? "success" : "error",
