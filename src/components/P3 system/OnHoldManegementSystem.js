@@ -4,6 +4,7 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { Button, Card, Col, Modal, Row } from "react-bootstrap";
 import {
+  Alert,
   Avatar,
   Box,
   InputLabel,
@@ -22,6 +23,7 @@ import Swal from "sweetalert2";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import {
   AddGrn,
+  FetchPoProductData,
   GetAllProducts,
   GetProductManual,
 } from "../../Redux2/slices/P3SystemSlice";
@@ -798,19 +800,15 @@ function OnHoldManegementSystem() {
 
   const fetchPoProductData = async () => {
     try {
-      const response = await axiosInstance.get(
-        `wp-json/custom-po-details/v1/po-order-details/${selectedPOId}/?page=${page}&per_page=${pageSize}`
-      );
-
-      // Ensure each row has a unique 'id'
-      const data = response.data.line_items.map((item, i) => ({
-        ...item,
-        id: i + currentStartIndex, // or use another unique property
-      }));
-
-      setPoTableData(data);
-      setTotalPages(response.data.total_pages);
-      setPoId(response.data.po_id);
+      dispatch(FetchPoProductData({ selectedPOId })).then(({ payload }) => {
+        const data = payload?.line_items?.map((item, i) => ({
+          ...item,
+          id: i + currentStartIndex,
+        }));
+        setPoTableData(data);
+        setTotalPages(payload.total_pages);
+        setPoId(payload.po_id);
+      });
     } catch (error) {
       console.error("Error fetching PO product data:", error);
     }
@@ -872,7 +870,9 @@ function OnHoldManegementSystem() {
   };
 
   useEffect(() => {
-    selectPOId();
+    if (selectedFactory) {
+      selectPOId();
+    }
   }, [selectedFactory]);
 
   useEffect(() => {
@@ -880,6 +880,7 @@ function OnHoldManegementSystem() {
       fetchPoProductData();
     }
   }, [selectedPOId, selectedFactory, poId, pageSize, page]);
+
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -1038,10 +1039,12 @@ function OnHoldManegementSystem() {
                   hidePagination={true}
                 />
               </div>
-              <MDBRow className="justify-content-end px-1">
+              <MDBRow className="justify-content-end px-3 py-2">
                 <Button
                   variant="primary"
-                  disabled={!isValid}
+                  disabled={
+                    !isValid && poTableData.length == 0 && tableData.length == 0
+                  }
                   style={{ width: "130px" }}
                   onClick={() => setshowMessageModal(true)}
                 >
@@ -1054,23 +1057,38 @@ function OnHoldManegementSystem() {
           {selectedFactory.length > 0 && (
             <>
               <div className="mt-2">
-                <DataTable
-                  columns={poColumns}
-                  rows={poTableData}
-                  page={page}
-                  pageSize={pageSize}
-                  totalPages={totalPages}
-                  handleChange={handleChange}
-                  rowHeight="auto"
-                  showAllRows={true}
-                  // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
-                  hidePagination={true}
-                />
+                {poTableData && poTableData.length != 0 ? (
+                  <>
+                    <DataTable
+                      columns={poColumns}
+                      rows={poTableData}
+                      page={page}
+                      pageSize={pageSize}
+                      totalPages={totalPages}
+                      handleChange={handleChange}
+                      rowHeight="auto"
+                      showAllRows={true}
+                      // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
+                      hidePagination={true}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Alert
+                      severity="warning"
+                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                    >
+                      Records is not Available for above filter
+                    </Alert>
+                  </>
+                )}
               </div>
               <MDBRow className="justify-content-end px-3 py-2">
                 <Button
                   variant="primary"
-                  disabled={!isValid}
+                  disabled={
+                    !isValid && poTableData.length == 0 && tableData.length == 0
+                  }
                   style={{ width: "130px" }}
                   // onClick={handleCreateGrn}
                   onClick={() => setshowMessageModal(true)}
@@ -1120,6 +1138,7 @@ function OnHoldManegementSystem() {
             <Button
               variant="primary"
               className="mt-2 fw-semibold"
+              disabled={poTableData.length == 0 && tableData.length == 0}
               onClick={
                 selectedFactory.length > 0 ? handleCreateGrn : handleSubmit
               }

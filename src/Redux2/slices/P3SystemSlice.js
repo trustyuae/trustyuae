@@ -15,6 +15,7 @@ const initialState = {
   productOrdersStock: [],
   remark: [],
   allProducts: [],
+  poProductData: [],
   error: null,
 };
 
@@ -169,6 +170,22 @@ export const GetAllProducts = createAsyncThunk(
   }
 );
 
+
+export const FetchPoProductData = createAsyncThunk(
+  "orderSystem/FetchPoProductData",
+  async ({selectedPOId}, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/fetch-po-details/v1/get-product-under-po/${selectedPOId}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error while gettting AllProducts:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const P3SystemSlice = createSlice({
   name: "P3System",
   initialState,
@@ -192,6 +209,7 @@ const P3SystemSlice = createSlice({
       state.productOrdersStock = [];
       state.remark = [];
       state.allProducts = [];
+      state.poProductData = [];
       state.error = null;
     },
   },
@@ -304,6 +322,17 @@ const P3SystemSlice = createSlice({
         state.allProducts = action.payload;
       })
       .addCase(GetAllProducts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(FetchPoProductData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(FetchPoProductData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.poProductData = action.payload;
+      })
+      .addCase(FetchPoProductData.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
