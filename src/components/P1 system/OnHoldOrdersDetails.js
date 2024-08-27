@@ -558,51 +558,54 @@ function OnHoldOrdersDetails() {
                 className={`d-flex align-items-center justify-content-center my-1`}
               >
                 <Card className="factory-card me-1 shadow-sm mb-0">
-                  {qty == avl_qty ? 
-                   
-                   (<Button
-                    className="bg-transparent border-0 text-black"
-                    onClick={() =>
-                      fileInputRef.current[
-                        selectedVariationId ? selectedVariationId : itemId
-                      ]?.click()
-                    }
-                  >
-                    <CloudUploadIcon />
-                    <Typography style={{ fontSize: "14px" }}>Device</Typography>
-                    <input
-                      type="file"
-                      ref={(input) =>
-                        (fileInputRef.current[
+                  {qty == avl_qty ? (
+                    <Button
+                      className="bg-transparent border-0 text-black"
+                      onClick={() =>
+                        fileInputRef.current[
                           selectedVariationId ? selectedVariationId : itemId
-                        ] = input)
+                        ]?.click()
                       }
-                      style={{ display: "none" }}
-                      onChange={handleFileInputChangeForRow}
-                    />
-                  </Button>
+                    >
+                      <CloudUploadIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Device
+                      </Typography>
+                      <input
+                        type="file"
+                        ref={(input) =>
+                          (fileInputRef.current[
+                            selectedVariationId ? selectedVariationId : itemId
+                          ] = input)
+                        }
+                        style={{ display: "none" }}
+                        onChange={handleFileInputChangeForRow}
+                      />
+                    </Button>
                   ) : (
-                  <Button
-                    className="bg-transparent border-0 text-black"
-                    onClick={() =>
-                      fileInputRef.current[
-                        selectedVariationId ? selectedVariationId : itemId
-                      ]?.click()
-                    }
-                  >
-                    <CloudUploadIcon />
-                    <Typography style={{ fontSize: "14px" }}>Device</Typography>
-                    <input
-                      type="file"
-                      ref={(input) =>
-                        (fileInputRef.current[
+                    <Button
+                      className="bg-transparent border-0 text-black"
+                      onClick={() =>
+                        fileInputRef.current[
                           selectedVariationId ? selectedVariationId : itemId
-                        ] = input)
+                        ]?.click()
                       }
-                      style={{ display: "none" }}
-                      onChange={handleFileInputChangeForRow}
-                    />
-                  </Button>
+                    >
+                      <CloudUploadIcon />
+                      <Typography style={{ fontSize: "14px" }}>
+                        Device
+                      </Typography>
+                      <input
+                        type="file"
+                        ref={(input) =>
+                          (fileInputRef.current[
+                            selectedVariationId ? selectedVariationId : itemId
+                          ] = input)
+                        }
+                        style={{ display: "none" }}
+                        onChange={handleFileInputChangeForRow}
+                      />
+                    </Button>
                   )}
                 </Card>
                 <Card className="factory-card ms-1 shadow-sm mb-0">
@@ -1014,44 +1017,25 @@ function OnHoldOrdersDetails() {
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
+            <Button
+              variant="primary"
+              onClick={handleSendToP2ButtonClick}
+              className="me-3"
+            >
+              Send to P2 System
+            </Button>
             {tableData?.some((data) => data?.dispatch_image !== "") ? (
-              <>
-                <Button
-                  variant="primary"
-                  onClick={handleSendToP2ButtonClick}
-                  className="me-3"
-                >
-                  Send to P2 System
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={handleFinishButtonClick}
-                >
-                  Finish
-                </Button>
-              </>
+              <Button variant="danger" onClick={handleFinishButtonClick}>
+                Finish
+              </Button>
             ) : (
-              <>
-                <Button
-                  variant="primary"
-                  disabled={tableData?.some(
-                    (data) => data.dispatch_image == ""
-                  )}
-                  onClick={handleSendToP2ButtonClick}
-                  className="me-3"
-                >
-                  Send to P2 System
-                </Button>
-                <Button
-                  variant="danger"
-                  disabled={tableData?.some(
-                    (data) => data.dispatch_image === ""
-                  )}
-                  onClick={handleFinishButtonClick}
-                >
-                  Finish
-                </Button>
-              </>
+              <Button
+                variant="danger"
+                disabled
+                onClick={handleFinishButtonClick}
+              >
+                Finish
+              </Button>
             )}
           </MDBCol>
         </MDBRow>

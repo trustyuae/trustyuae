@@ -904,37 +904,35 @@ function OnHoldOrdersdetailsInChina() {
                         ) : (
                           <>
                             <Card className="factory-card me-1 shadow-sm mb-0">
-                                <>
-                                  <Button
-                                    className="bg-transparent border-0 text-black"
-                                    onClick={() =>
-                                      fileInputRef?.current?.click()
-                                    }
-                                  >
-                                    <CloudUploadIcon />
-                                    <Typography style={{ fontSize: "14px" }}>
-                                      Device
-                                    </Typography>
-                                  </Button>
-                                  <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    style={{ display: "none" }}
-                                    onChange={handleFileInputChange}
-                                  />
-                                </>
+                              <>
+                                <Button
+                                  className="bg-transparent border-0 text-black"
+                                  onClick={() => fileInputRef?.current?.click()}
+                                >
+                                  <CloudUploadIcon />
+                                  <Typography style={{ fontSize: "14px" }}>
+                                    Device
+                                  </Typography>
+                                </Button>
+                                <input
+                                  type="file"
+                                  ref={fileInputRef}
+                                  style={{ display: "none" }}
+                                  onChange={handleFileInputChange}
+                                />
+                              </>
                             </Card>
 
                             <Card className="factory-card ms-1 shadow-sm mb-0">
-                                <Button
-                                  className="bg-transparent border-0 text-black"
-                                  onClick={() => setShowAttachModal(true)}
-                                >
-                                  <CameraAltIcon />
-                                  <Typography style={{ fontSize: "14px" }}>
-                                    Camera
-                                  </Typography>
-                                </Button>
+                              <Button
+                                className="bg-transparent border-0 text-black"
+                                onClick={() => setShowAttachModal(true)}
+                              >
+                                <CameraAltIcon />
+                                <Typography style={{ fontSize: "14px" }}>
+                                  Camera
+                                </Typography>
+                              </Button>
                             </Card>
                           </>
                         )}
@@ -1029,45 +1027,25 @@ function OnHoldOrdersdetailsInChina() {
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
-            {
-            tableData?.some((data) => data.dispatch_image != "") ? (
-              <>
-                <Button
-                  variant="primary"
-                  onClick={handleSendToP2ButtonClick}
-                  className="me-3"
-                >
-                  Send to P2 System
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={handleFinishButtonClick}
-                >
-                  {t("P1ChinaSystem.Finish")}
-                </Button>
-              </>
+            <Button
+              variant="primary"
+              onClick={handleSendToP2ButtonClick}
+              className="me-3"
+            >
+              Send to P2 System
+            </Button>
+            {tableData?.some((data) => data.dispatch_image != "") ? (
+              <Button variant="danger" onClick={handleFinishButtonClick}>
+                {t("P1ChinaSystem.Finish")}
+              </Button>
             ) : (
-              <>
-                <Button
-                  variant="primary"
-                  disabled={
-                    tableData?.some((data) => data.dispatch_image === "")
-                  }
-                  onClick={handleSendToP2ButtonClick}
-                  className="me-3"
-                >
-                  Send to P2 System
-                </Button>
-                <Button
-                  variant="danger"
-                  disabled={
-                    tableData?.some((data) => data.dispatch_image === "")
-                  }
-                  onClick={handleFinishButtonClick}
-                >
-                  {t("P1ChinaSystem.Finish")}
-                </Button>
-              </>
+              <Button
+                variant="danger"
+                disabled
+                onClick={handleFinishButtonClick}
+              >
+                {t("P1ChinaSystem.Finish")}
+              </Button>
             )}
           </MDBCol>
         </MDBRow>
