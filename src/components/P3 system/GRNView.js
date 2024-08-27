@@ -84,7 +84,7 @@ const GRNView = () => {
       headerName: "Variation",
       flex: 2,
       renderCell: (params) => {
-        if (params.row.variations != "") {
+        if (params?.row?.variations != "") {
           return formatVariations(params.row.variations);
         } else {
           return "No any variations";
@@ -127,13 +127,22 @@ const GRNView = () => {
   };
 
   const formatVariations = (variations) => {
-    const data = JSON.parse(variations);
-    if (Object.keys(data).length === 0) {
-      return "No variations";
-    } else {
-      return Object.entries(data)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join(", ");
+    if (!variations) {
+      return "No variations"; // Handle null or undefined variations
+    }
+
+    try {
+      const data = JSON.parse(variations);
+
+      if (Object.keys(data).length === 0) {
+        return "No variations";
+      } else {
+        return Object.entries(data)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(", ");
+      }
+    } catch (e) {
+      return "Invalid variations data";
     }
   };
 
