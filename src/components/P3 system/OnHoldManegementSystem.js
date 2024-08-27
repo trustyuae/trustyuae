@@ -7,6 +7,7 @@ import {
   Alert,
   Avatar,
   Box,
+  IconButton,
   InputLabel,
   MenuItem,
   Select as MuiSelect,
@@ -17,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/AxiosInstance";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import Select from "react-select";
 import Swal from "sweetalert2";
@@ -75,6 +77,7 @@ function OnHoldManegementSystem() {
   const [userData, setUserData] = useState(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
+  const [rows, setRows] = useState([]);
 
   const allProducts = useSelector(
     (state) => state?.p3System?.allProducts?.products
@@ -459,6 +462,19 @@ function OnHoldManegementSystem() {
           </Form.Group>
         );
       },
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 0.5,
+      renderCell: (params) => (
+        <IconButton
+          onClick={() => handleToggle(params.row.id)}
+          disabled={params.row.disabled} // Disable the button if the row is disabled
+        >
+          <DeleteIcon />
+        </IconButton>
+      ),
     },
   ];
 
@@ -868,6 +884,14 @@ function OnHoldManegementSystem() {
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
   };
+
+ const handleToggle = (id) => {
+  setRows((prevRows) =>
+    prevRows.map((row) =>
+      row.id === id ? { ...row, disabled: !row.disabled } : row
+    )
+  );
+};
 
   useEffect(() => {
     if (selectedFactory) {
