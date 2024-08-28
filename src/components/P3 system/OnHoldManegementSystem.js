@@ -846,11 +846,22 @@ function OnHoldManegementSystem() {
 
   const handleCreateGrn = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
+    const filteredData = poTableData.filter((item) => !item.disabled);
+
+    if (filteredData.length === 0) {
+      Swal.fire({
+        title: "No data to submit",
+        icon: "warning",
+        showConfirmButton: true,
+      });
+      return;
+    }
+
     const payload = {
       po_id: poId || "",
-      product_id: poTableData.map((item) => item.product_id),
-      variation_id: poTableData.map((item) => item.variation_id),
-      received_qty: poTableData.map((item) => item.received_quantity),
+      product_id: filteredData.map((item) => item.product_id),
+      variation_id: filteredData.map((item) => item.variation_id),
+      received_qty: filteredData.map((item) => item.received_quantity),
       created_date: currentDate,
       verified_by: userData?.first_name + " " + userData?.last_name || "",
       note: message,
@@ -885,13 +896,13 @@ function OnHoldManegementSystem() {
     setCurrentStartIndex(currIndex, "currIndex");
   };
 
- const handleToggle = (id) => {
-  setRows((prevRows) =>
-    prevRows.map((row) =>
-      row.id === id ? { ...row, disabled: !row.disabled } : row
-    )
-  );
-};
+  const handleToggle = (id) => {
+    setPoTableData((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, disabled: !item.disabled } : item
+      )
+    );
+  };
 
   useEffect(() => {
     if (selectedFactory) {
