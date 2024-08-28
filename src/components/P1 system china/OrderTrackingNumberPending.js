@@ -24,10 +24,11 @@ import PrintModal from "./PrintModalInChina";
 import {
   OrderDetailsChinaGet,
   OrderSystemChinaGet,
+  OrderTrackingSystemChinaGet,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 
-function OrderSystemInChina() {
+function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
@@ -83,11 +84,11 @@ function OrderSystemInChina() {
   }, [orderDetails]);
 
   async function fetchOrders() {
-    let apiUrl = `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=1`;
+    let apiUrl = `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=0`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     dispatch(
-      OrderSystemChinaGet({
+        OrderTrackingSystemChinaGet({
         apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
       })
     );
@@ -136,7 +137,7 @@ function OrderSystemInChina() {
     },
     {
       field: "customer_name",
-      headerName: t("P1ChinaSystem.CustomerName"),
+      headerName: t("P1ChinaSystem.ProductName"),
       className: "order-system",
       flex: 1,
     },
@@ -150,10 +151,20 @@ function OrderSystemInChina() {
     },
     {
       field: "order_status",
-      headerName: t("P1ChinaSystem.OrderStatus"),
+      headerName: t("P1ChinaSystem.TrackingID"),
       flex: 1,
       className: "order-system",
-      type: "string",
+      renderCell: (params) => (
+        <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+          <Form.Control
+            type="text" // Changed from "number" to "text"
+            value={params.row.Quantity || 0}
+            placeholder="0"
+            // onChange={(e) => handleTrackIdAssign(params.row, e)}
+            style={{ width: "50%", textAlign: "center" }}
+          />
+        </Form.Group>
+      ),
     },
     {
       field: "",
@@ -182,32 +193,27 @@ function OrderSystemInChina() {
       type: "html",
       renderCell: (value, row) => {
         return (
-          <Link
-            to={`/order_details_in_china/${value?.row?.order_id}`}
-            className=" d-flex "
-          >
+          <Box display="flex" justifyContent="center" alignItems="center">
             <Button
-              type="button"
-              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+              size="small"
+              variant="primary"
+              color="primary"
+              // onClick={() => handleUpdate(row)}
+              className="buttonStyle"
             >
-              <FaEye className="mb-1" />
+              Update
             </Button>
-            <Typography
-              variant="label"
-              className="fw-semibold text-secondary"
-              sx={{
-                fontSize: 14,
-                textTransform: "capitalize",
-              }}
+            <Button
+              size="small"
+              variant="danger"
+              color="danger"
+              // onClick={() => handlePush(row)}
+              style={{ marginLeft: 8 }} // Adds space between buttons
+              className="buttonStyle"
             >
-              {/* {"  "} */}
-              <Badge bg="success" className="m-2">
-                {value?.row?.order_process == "started"
-                  ? value?.row?.order_process
-                  : null}
-              </Badge>
-            </Typography>
-          </Link>
+              Push
+            </Button>
+          </Box>
         );
       },
     },
@@ -265,13 +271,22 @@ function OrderSystemInChina() {
     setPage(1);
   };
 
-  const orderId = (e) => {
-    if (e.key === "Enter") {
-      setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
-    }
-  };
+//   const handleTrackIdAssign = (index, event) => {
+//     console.log(orders,'orders from..')
+//     console.log(event,'event from..')
+//     console.log(index,'index from..')
+//     const newQuantity = parseFloat(event?.target?.value);
+//     if (!isNaN(newQuantity) && index.target.value >= 0) {
+//       const updatedRecivedQtyData = orders.map((item) => {
+//         console.log(orders,'orders from handleTrackIDAssign')
+//         if (item?.order_id === index?.product_id) {
+//             return { ...item, received_quantity: index?.target?.value };
+//         }
+//         return item;
+//       });
+//       setOrders(updatedRecivedQtyData);
+//     }
+//   };
 
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
@@ -288,7 +303,7 @@ function OrderSystemInChina() {
     <Container fluid className="py-3">
       <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-          {t("P1ChinaSystem.OrderFulfillmentSystemInChina")}
+          {t("P1ChinaSystem.OrderTrackingNumberPending")}
         </Typography>
         <ButtonGroup>
           {radios.map((radio, idx) => (
@@ -442,14 +457,14 @@ function OrderSystemInChina() {
                 className="mr-2 mx-1 w-auto"
                 onClick={handleSearchFilter}
               >
-                {t("P1ChinaSystem.Search")}:
+                {t("P1ChinaSystem.Search")}
               </Button>
               <Button
                 type="button"
                 className="mr-2 mx-1 w-auto"
                 onClick={handleReset}
               >
-                {t("P1ChinaSystem.ResetFilter")}:
+                {t("P1ChinaSystem.ResetFilter")}
               </Button>
             </Box>
           </Box>
@@ -490,4 +505,4 @@ function OrderSystemInChina() {
   );
 }
 
-export default OrderSystemInChina;
+export default OrderTrackingNumberPending;

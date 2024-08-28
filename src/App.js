@@ -38,6 +38,7 @@ import ReserveOrderdetailsInChina from "./components/P1 system china/ReserveOrde
 import OnHoldOrdersdetailsInChina from "./components/P1 system china/OnHoldOrdersdetailsInChina";
 import MissingOrderSystem from "./components/Missing Orders System/MissingOrderSystem";
 import MissingOrderDetails from "./components/Missing Orders System/MissingOrderDetails";
+import OrderTrackingNumberPending from "./components/P1 system china/OrderTrackingNumberPending";
 
 function App() {
   return (
@@ -51,7 +52,7 @@ function App() {
             <Route
               exact
               path="/order_management_system"
-              element={<OrderManagementSystem />} 
+              element={<OrderManagementSystem />}
             />
             <Route exact path="/PO_details/:id" element={<PoDetails />} />
             <Route
@@ -128,6 +129,12 @@ function App() {
               exact
               path="/on_hold_order_details/:id"
               element={<OnHoldOrdersDetails />}
+            />
+
+            <Route
+              exact
+              path="/order_tracking_number_Pending"
+              element={<OrderTrackingNumberPending />}
             />
 
             <Route

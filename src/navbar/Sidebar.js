@@ -368,6 +368,20 @@ const Sidebar = () => {
             >
               <li>
                 <Link
+                  to="/order_tracking_number_Pending"
+                  className={
+                    "nav-link underline" +
+                    (activeMenuItem === "/order_tracking_number_Pending"
+                      ? " active"
+                      : "")
+                  }
+                >
+                  <i className="bi bi-circle"></i>
+                  <span>Order Tracking Number Pending</span>
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/ordersystem_in_china"
                   className={
                     "nav-link underline" +

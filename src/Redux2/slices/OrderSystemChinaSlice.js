@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 const initialState = {
   isLoading: false,
   SyncLoading: false,
+  ordersTracking: [],
   orders: [],
   orderDetails: [],
   completedOrders: [],
@@ -25,6 +26,19 @@ const initialState = {
   customItemSendToP2: [],
   error: null,
 };
+
+export const OrderTrackingSystemChinaGet = createAsyncThunk(
+  "orderSystem/OrderTrackingSystemChinaGet",
+  async ({ apiUrl }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(apiUrl);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 export const OrderSystemChinaGet = createAsyncThunk(
   "orderSystem/OrderSystemGet",
@@ -286,7 +300,8 @@ export const CustomItemSendToUAE = createAsyncThunk(
   async ({ id, payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-push-order/v1/push-order-china/${id}`,payload
+        `wp-json/custom-push-order/v1/push-order-china/${id}`,
+        payload
       );
       return response.data;
     } catch (error) {
@@ -326,6 +341,7 @@ const orderSystemChinaSlice = createSlice({
     clearstoredata: (state) => {
       state.isLoading = false;
       state.SyncLoading = false;
+      state.ordersTracking = [];
       state.orders = [];
       state.orderDetails = [];
       state.completedOrders = [];
@@ -349,6 +365,17 @@ const orderSystemChinaSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(OrderTrackingSystemChinaGet.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(OrderTrackingSystemChinaGet.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.ordersTracking = action.payload;
+      })
+      .addCase(OrderTrackingSystemChinaGet.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
       .addCase(OrderSystemChinaGet.pending, (state) => {
         state.isLoading = true;
       })
