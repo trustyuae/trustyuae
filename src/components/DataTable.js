@@ -47,6 +47,7 @@ export default function DataTable({
           disableColumnMenu
           pagination
           pageSize={actualPageSize}
+          autoHeight={true}
           sx={{
             '& .MuiTablePagination-selectLabel': {
               marginBottom: '0px',
