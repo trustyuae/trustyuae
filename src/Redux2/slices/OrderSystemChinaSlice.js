@@ -24,6 +24,7 @@ const initialState = {
   customOrderOnHoldFinishData: [],
   customItemSendToUAEData: [],
   customItemSendToP2: [],
+  assignTrackID: [],
   error: null,
 };
 
@@ -328,6 +329,23 @@ export const CustomItemSendToP2 = createAsyncThunk(
   }
 );
 
+export const AssignTrackID = createAsyncThunk(
+  "orderSystem/AssignTrackID",
+  async ({ orderId, payload }, { rejectWithValue }) => {
+    console.log(payload, "payload from CustomItemSendToP2");
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-add-trackid/v1/add-trackid-order/${orderId}/?warehouse=China`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const orderSystemChinaSlice = createSlice({
   name: "orderSystem",
   initialState,
@@ -360,6 +378,7 @@ const orderSystemChinaSlice = createSlice({
       state.customOrderOnHoldFinishData = [];
       state.customItemSendToUAEData = [];
       state.customItemSendToP2 = [];
+      state.assignTrackID = [];
       state.error = null;
     },
   },
@@ -571,6 +590,17 @@ const orderSystemChinaSlice = createSlice({
         state.customItemSendToP2 = action.payload;
       })
       .addCase(CustomItemSendToP2.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(AssignTrackID.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(AssignTrackID.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignTrackID = action.payload;
+      })
+      .addCase(AssignTrackID.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

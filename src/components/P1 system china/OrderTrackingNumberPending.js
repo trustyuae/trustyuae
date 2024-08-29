@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Link } from "react-router-dom";
 import { Alert, Box, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -12,8 +11,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge, ButtonGroup, ToggleButton } from "react-bootstrap";
-import { FaEye } from "react-icons/fa";
+import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getCountryName } from "../../utils/GetCountryName";
 import Loader from "../../utils/Loader";
@@ -22,8 +20,8 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import PrintModal from "./PrintModalInChina";
 import {
+  AssignTrackID,
   OrderDetailsChinaGet,
-  OrderSystemChinaGet,
   OrderTrackingSystemChinaGet,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
@@ -54,9 +52,11 @@ function OrderTrackingNumberPending() {
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const ordersData = useSelector(
-    (state) => state?.orderSystemChina?.orders?.orders
+    (state) => state?.orderSystemChina?.ordersTracking?.orders
   );
-  const otherData = useSelector((state) => state?.orderSystemChina?.orders);
+  const otherData = useSelector(
+    (state) => state?.orderSystemChina?.ordersTracking
+  );
   const orderDetails = useSelector(
     (state) => state?.orderSystemChina?.orderDetails
   );
@@ -88,7 +88,7 @@ function OrderTrackingNumberPending() {
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     dispatch(
-        OrderTrackingSystemChinaGet({
+      OrderTrackingSystemChinaGet({
         apiUrl: `${apiUrl}&page=${page}&per_page=${pageSize}&status=${dispatchType}`,
       })
     );
@@ -122,6 +122,36 @@ function OrderTrackingNumberPending() {
     }
   };
 
+  const handleTrackIdAssign = (row, event) => {
+    const { value } = event.target;
+  
+    const updatedItems = row.items.map((item) => ({
+      ...item,
+      tracking_id: value,
+    }));
+
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === row.id ? { ...order, items: updatedItems } : order
+      )
+    );
+  };
+
+  const handleUpdate = (rowData) => {
+    const orderId = rowData.order_id;
+    const productIds = rowData.items.map((item) => parseInt(item.item_id, 10));
+    const variationIds = rowData.items.map((item) =>
+      parseInt(item.variation_id, 10)
+    );
+    const trackingId = rowData.items[0]?.tracking_id; // Assuming the tracking ID is the same for all items
+    const payload = {
+      track_id: trackingId, // Use the updated tracking ID
+      product_id: productIds,
+      variation_id: variationIds,
+    };
+    dispatch(AssignTrackID({ orderId, payload }));
+  };
+
   const columns = [
     {
       field: "date",
@@ -136,10 +166,16 @@ function OrderTrackingNumberPending() {
       flex: 1,
     },
     {
-      field: "customer_name",
+      field: "items",
       headerName: t("P1ChinaSystem.ProductName"),
       className: "order-system",
       flex: 1,
+      renderCell: (params) => {
+        const productNames = params?.row?.items
+          ?.map((item) => item?.product_name)
+          .join(", ");
+        return <div>{productNames}</div>;
+      },
     },
     {
       field: "shipping_country",
@@ -154,17 +190,20 @@ function OrderTrackingNumberPending() {
       headerName: t("P1ChinaSystem.TrackingID"),
       flex: 1,
       className: "order-system",
-      renderCell: (params) => (
-        <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
-          <Form.Control
-            type="text" // Changed from "number" to "text"
-            value={params.row.Quantity || 0}
-            placeholder="0"
-            // onChange={(e) => handleTrackIdAssign(params.row, e)}
-            style={{ width: "50%", textAlign: "center" }}
-          />
-        </Form.Group>
-      ),
+      renderCell: (params) => {
+        const trackId = params.row.items[0]?.tracking_id || "";
+        return (
+          <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+            <Form.Control
+              type="text"
+              value={trackId}
+              placeholder="Enter tracking ID"
+              onChange={(e) => handleTrackIdAssign(params.row, e)}
+              style={{ width: "100%", textAlign: "center" }}
+            />
+          </Form.Group>
+        );
+      },
     },
     {
       field: "",
@@ -191,14 +230,14 @@ function OrderTrackingNumberPending() {
       flex: 1,
       className: "order-system",
       type: "html",
-      renderCell: (value, row) => {
+      renderCell: (params) => {
         return (
           <Box display="flex" justifyContent="center" alignItems="center">
             <Button
               size="small"
               variant="primary"
               color="primary"
-              // onClick={() => handleUpdate(row)}
+              onClick={() => handleUpdate(params.row)}
               className="buttonStyle"
             >
               Update
@@ -270,23 +309,6 @@ function OrderTrackingNumberPending() {
     setDispatchType(e);
     setPage(1);
   };
-
-//   const handleTrackIdAssign = (index, event) => {
-//     console.log(orders,'orders from..')
-//     console.log(event,'event from..')
-//     console.log(index,'index from..')
-//     const newQuantity = parseFloat(event?.target?.value);
-//     if (!isNaN(newQuantity) && index.target.value >= 0) {
-//       const updatedRecivedQtyData = orders.map((item) => {
-//         console.log(orders,'orders from handleTrackIDAssign')
-//         if (item?.order_id === index?.product_id) {
-//             return { ...item, received_quantity: index?.target?.value };
-//         }
-//         return item;
-//       });
-//       setOrders(updatedRecivedQtyData);
-//     }
-//   };
 
   const clearDateRange = () => {
     setSelectedDateRange([null, null]);
