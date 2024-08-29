@@ -4,7 +4,14 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Alert, Box, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Typography,
+} from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -23,8 +30,10 @@ import {
   AssignTrackID,
   OrderDetailsChinaGet,
   OrderTrackingSystemChinaGet,
+  PushTrackOrder,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
+import ShowAlert from "../../utils/ShowAlert";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -49,6 +58,9 @@ function OrderTrackingNumberPending() {
   });
   const [orderData, setOrderData] = useState([]);
   const [showModal, setShowModal] = useState(false);
+
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const ordersData = useSelector(
@@ -94,6 +106,21 @@ function OrderTrackingNumberPending() {
     );
   }
 
+  const handleItemSelection = (rowData) => {
+    const selectedIndex = selectedItemIds.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIds.filter((id) => id !== rowData.id)
+        : [...selectedItemIds, rowData.id];
+
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, rowData]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+    }
+    setSelectedItemIds(newSelected);
+  };
+
   const handleReset = () => {
     inputRef.current.value = "";
     setSearchOrderID("");
@@ -124,7 +151,7 @@ function OrderTrackingNumberPending() {
 
   const handleTrackIdAssign = (row, event) => {
     const { value } = event.target;
-  
+
     const updatedItems = row.items.map((item) => ({
       ...item,
       tracking_id: value,
@@ -152,7 +179,67 @@ function OrderTrackingNumberPending() {
     dispatch(AssignTrackID({ orderId, payload }));
   };
 
+  const handlePush = (rowData) => {
+    const payload = {
+      order_id: [parseInt(rowData.order_id, 10)], // Parse and wrap in an array in one step
+      product_id: rowData.items.map((item) => parseInt(item.item_id, 10)),
+      variation_id: rowData.items.map((item) =>
+        parseInt(item.variation_id, 10)
+      ),
+    };
+    dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
+      ShowAlert("Success", payload, "success", false, false, null, "", 1000);
+    });
+    fetchOrders();
+  };
+
+  const handleSelectedPush = async (rowData) => {
+    const selectedOrderIds = selectedItems.map((item) =>
+      parseInt(item.order_id, 10)
+    );
+    const allProductIds = selectedItems.flatMap(
+      (item) =>
+        item.items?.map((subItem) => parseInt(subItem.item_id, 10)) || []
+    );
+    const allVariationIds = selectedItems.flatMap(
+      (item) =>
+        item.items?.map((subItem) => parseInt(subItem.variation_id, 10)) || []
+    );
+
+    const payload = {
+      order_id: selectedOrderIds,
+      product_id: allProductIds,
+      variation_id: allVariationIds,
+    };
+
+    dispatch(PushTrackOrder({ payload }))
+      .then(({ payload }) => {
+        ShowAlert("Success", payload, "success", false, false, null, "", 1000);
+      })
+      .then(() => {
+        fetchOrders();
+      });
+  };
+
   const columns = [
+    {
+      field: "select",
+      headerName: "Select",
+      flex: 0.5,
+      renderCell: (params) => {
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={<Checkbox />}
+              style={{ justifyContent: "center" }}
+              checked={selectedItemIds.includes(params.row.id)}
+              onChange={(event) => handleItemSelection(params.row)}
+            />
+          </FormGroup>
+        );
+      },
+    },
     {
       field: "date",
       headerName: t("POManagement.Date"),
@@ -240,17 +327,17 @@ function OrderTrackingNumberPending() {
               onClick={() => handleUpdate(params.row)}
               className="buttonStyle"
             >
-              Update
+              {t("P1ChinaSystem.Update")}
             </Button>
             <Button
               size="small"
               variant="danger"
               color="danger"
-              // onClick={() => handlePush(row)}
+              onClick={() => handlePush(params.row)}
               style={{ marginLeft: 8 }} // Adds space between buttons
               className="buttonStyle"
             >
-              Push
+              {t("P1ChinaSystem.Push")}
             </Button>
           </Box>
         );
@@ -517,6 +604,15 @@ function OrderTrackingNumberPending() {
           )}
         </>
       )}
+      <Row className="justify-content-end mt-2 me-1 ">
+        <Button
+          type="button"
+          className="mr-2 mx-1 w-auto"
+          onClick={() => handleSelectedPush()}
+        >
+          {t("P1ChinaSystem.Push")}
+        </Button>
+      </Row>
       <PrintModal
         show={showModal}
         handleClosePrintModal={() => setShowModal(false)}
