@@ -34,9 +34,11 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ShowAlert from "../../utils/ShowAlert";
+import { useNavigate } from "react-router-dom";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
@@ -142,7 +144,7 @@ function OrderTrackingNumberPending() {
 
   const handlePrint = async (orderId) => {
     try {
-      const response = await dispatch(OrderDetailsChinaGet({ id: orderId }));
+      dispatch(OrderDetailsChinaGet({ id: orderId }));
       setShowModal(true);
     } catch (error) {
       console.error(error);
@@ -190,7 +192,7 @@ function OrderTrackingNumberPending() {
     dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
       ShowAlert("Success", payload, "success", false, false, null, "", 1000);
     });
-    fetchOrders();
+    navigate("/ordersystem_in_china");
   };
 
   const handleSelectedPush = async (rowData) => {
@@ -212,13 +214,10 @@ function OrderTrackingNumberPending() {
       variation_id: allVariationIds,
     };
 
-    dispatch(PushTrackOrder({ payload }))
-      .then(({ payload }) => {
-        ShowAlert("Success", payload, "success", false, false, null, "", 1000);
-      })
-      .then(() => {
-        fetchOrders();
-      });
+    dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
+      ShowAlert("Success", payload, "success", false, false, null, "", 1000);
+    });
+    navigate("/ordersystem_in_china");
   };
 
   const columns = [
