@@ -60,7 +60,7 @@ export const OrderDetailsChinaGet = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-orders-new/v1/orders/?warehouse=China&orderid=${id}`
+        `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=1&${id}`
       );
       return response.data;
     } catch (error) {
@@ -349,14 +349,14 @@ export const AssignTrackID = createAsyncThunk(
 
 export const PushTrackOrder = createAsyncThunk(
   "orderSystem/PushTrackOrder",
-  async ({payload}, { rejectWithValue }) => {
+  async ({ payload }, { rejectWithValue }) => {
     console.log(payload, "payload from CustomItemSendToP2");
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-push-trackid/v1/push-trackid-order/?warehouse=China`,
         payload
       );
-      console.log(response.data,'response.data')
+      console.log(response.data, "response.data");
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
