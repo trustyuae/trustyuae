@@ -225,12 +225,15 @@ function OrderTrackingNumberPending() {
       field: "select",
       headerName: "Select",
       flex: 0.5,
+      className: "order-system-track",
       renderCell: (params) => {
+        const selectButtonOff = params.row.exist_item === "1" ? true : false;
         return (
           <FormGroup>
             <FormControlLabel
               className="mx-auto"
               control={<Checkbox />}
+              disabled={!selectButtonOff}
               style={{ justifyContent: "center" }}
               checked={selectedItemIds.includes(params.row.id)}
               onChange={(event) => handleItemSelection(params.row)}
@@ -242,19 +245,19 @@ function OrderTrackingNumberPending() {
     {
       field: "date",
       headerName: t("POManagement.Date"),
-      className: "order-system",
+      className: "order-system-track",
       flex: 1,
     },
     {
       field: "order_id",
       headerName: t("P1ChinaSystem.OrderId"),
-      className: "order-system",
+      className: "order-system-track",
       flex: 1,
     },
     {
       field: "items",
       headerName: t("P1ChinaSystem.ProductName"),
-      className: "order-system",
+      className: "order-system-track",
       flex: 1,
       renderCell: (params) => {
         const productNames = params?.row?.items
@@ -267,7 +270,7 @@ function OrderTrackingNumberPending() {
       field: "shipping_country",
       headerName: t("P1ChinaSystem.ShippingCountry"),
       type: "string",
-      className: "order-system",
+      className: "order-system-track",
       flex: 1,
       valueGetter: (value, row) => getCountryName(row.shipping_country),
     },
@@ -275,7 +278,7 @@ function OrderTrackingNumberPending() {
       field: "order_status",
       headerName: t("P1ChinaSystem.TrackingID"),
       flex: 1,
-      className: "order-system",
+      className: "order-system-track",
       renderCell: (params) => {
         const trackId = params.row.items[0]?.tracking_id || "";
         return (
@@ -295,7 +298,7 @@ function OrderTrackingNumberPending() {
       field: "",
       headerName: t("P1ChinaSystem.printpdf"),
       flex: 0.5,
-      className: "order-system",
+      className: "order-system-track",
       type: "html",
       renderCell: (value, row) => {
         const orderId = value && value.row && value.row.order_id;
@@ -314,9 +317,10 @@ function OrderTrackingNumberPending() {
       field: "view_item",
       headerName: t("POManagement.ViewItem"),
       flex: 1,
-      className: "order-system",
+      className: "order-system-track",
       type: "html",
       renderCell: (params) => {
+        const pushOff = params.row.exist_item === "1" ? true : false;
         return (
           <Box display="flex" justifyContent="center" alignItems="center">
             <Button
@@ -330,6 +334,7 @@ function OrderTrackingNumberPending() {
             </Button>
             <Button
               size="small"
+              disabled={!pushOff}
               variant="danger"
               color="danger"
               onClick={() => handlePush(params.row)}
