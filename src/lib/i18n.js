@@ -140,6 +140,7 @@ i18n.use(initReactI18next).init({
           Push: "推",
           Update: "更新",
           Upload: "上傳",
+          ExcellSheet:'Excel工作表'
         },
       },
     },
@@ -277,6 +278,7 @@ i18n.use(initReactI18next).init({
           Push: "Push",
           Update: "Update",
           Upload: "Upload",
+          ExcellSheet:'ExcellSheet'
         },
       },
     },

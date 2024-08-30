@@ -25,7 +25,6 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
-import PrintModal from "./PrintModalInChina";
 import {
   AssignTrackID,
   OrderDetailsChinaGet,
@@ -36,6 +35,8 @@ import { useTranslation } from "react-i18next";
 import ShowAlert from "../../utils/ShowAlert";
 import { useNavigate } from "react-router-dom";
 import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import * as XLSX from "xlsx";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -227,6 +228,42 @@ function OrderTrackingNumberPending() {
     navigate("/ordersystem_in_china");
   };
 
+  const downloadExcel = async () => {
+    const filteredOrderData = orderData.map((order) => {
+      return {
+        "Order Id": order.order_id,
+        "Product Name": order.items.map((item) => item.product_name).join(", "),
+        "Shipping Country": order.shipping_country,
+        "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
+      };
+    });
+
+    const workbook = XLSX.utils.book_new();
+
+    const worksheet = XLSX.utils.json_to_sheet(filteredOrderData);
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Order Data");
+
+    XLSX.writeFile(workbook, "OrderTrackingData.xlsx");
+  };
+
+  const downloadExcelIndividual = async (rowData) => {
+    const filteredOrderData = [{
+      "Order Id": rowData.order_id,
+      "Product Name": rowData.items.map((item) => item.product_name).join(", "),
+      "Shipping Country": rowData.shipping_country, 
+      "Tracking ID": rowData.items.map((item) => item.tracking_id).join(", "),
+    }];
+
+    const workbook = XLSX.utils.book_new();
+  
+    const worksheet = XLSX.utils.json_to_sheet(filteredOrderData);
+  
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Order Data");
+  
+    XLSX.writeFile(workbook, "OrderTrackingData.xlsx");
+  };
+
   const columns = [
     {
       field: "select",
@@ -303,19 +340,18 @@ function OrderTrackingNumberPending() {
     },
     {
       field: "",
-      headerName: t("P1ChinaSystem.printpdf"),
+      headerName: t("P1ChinaSystem.ExcellSheet"),
       flex: 0.5,
       className: "order-system-track",
       type: "html",
       renderCell: (value, row) => {
-        const orderId = value && value.row && value.row.order_id;
         return (
           <Button
             type="button"
             className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-            onClick={() => handlePrint(orderId)}
+            onClick={() => downloadExcelIndividual(value.row)}
           >
-            <LocalPrintshopOutlinedIcon className="mb-1" />
+            <UploadFileOutlinedIcon className="mb-1" />
           </Button>
         );
       },
@@ -417,7 +453,15 @@ function OrderTrackingNumberPending() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, searchOrderID, page, dispatchType, isReset, setSearchOrderID,itemsData]);
+  }, [
+    pageSize,
+    searchOrderID,
+    page,
+    dispatchType,
+    isReset,
+    setSearchOrderID,
+    itemsData,
+  ]);
 
   return (
     <Container fluid className="py-3">
@@ -586,6 +630,14 @@ function OrderTrackingNumberPending() {
               >
                 {t("P1ChinaSystem.ResetFilter")}
               </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                className="mr-2 mx-1 w-auto"
+                onClick={downloadExcel}
+              >
+                {t("P1ChinaSystem.ExcellSheet")}
+              </Button>
             </Box>
           </Box>
         </Form>
@@ -632,12 +684,6 @@ function OrderTrackingNumberPending() {
           {t("P1ChinaSystem.Push")}
         </Button>
       </Row>
-      <PrintModal
-        show={showModal}
-        handleClosePrintModal={() => setShowModal(false)}
-        showModal={showModal}
-        orderData={orderData}
-      />
       <OrderTrackingFileUpload
         show={showFileUploadModal}
         handleClosePrintModal={() => setShowfileUploadModal(false)}
