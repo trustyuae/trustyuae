@@ -35,6 +35,7 @@ import {
 import { useTranslation } from "react-i18next";
 import ShowAlert from "../../utils/ShowAlert";
 import { useNavigate } from "react-router-dom";
+import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -64,6 +65,8 @@ function OrderTrackingNumberPending() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
 
+  const [showFileUploadModal, setShowfileUploadModal] = useState(false);
+
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const ordersData = useSelector(
     (state) => state?.orderSystemChina?.ordersTracking?.orders
@@ -73,6 +76,10 @@ function OrderTrackingNumberPending() {
   );
   const orderDetails = useSelector(
     (state) => state?.orderSystemChina?.orderDetails
+  );
+
+  const itemsData = useSelector(
+    (state) => state?.orderSystemChina?.ordersTracking?.orders?.items
   );
 
   useEffect(() => {
@@ -233,7 +240,7 @@ function OrderTrackingNumberPending() {
             <FormControlLabel
               className="mx-auto"
               control={<Checkbox />}
-              disabled={!selectButtonOff}
+              disabled={selectButtonOff}
               style={{ justifyContent: "center" }}
               checked={selectedItemIds.includes(params.row.id)}
               onChange={(event) => handleItemSelection(params.row)}
@@ -334,7 +341,7 @@ function OrderTrackingNumberPending() {
             </Button>
             <Button
               size="small"
-              disabled={!pushOff}
+              disabled={pushOff}
               variant="danger"
               color="danger"
               onClick={() => handlePush(params.row)}
@@ -410,7 +417,7 @@ function OrderTrackingNumberPending() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize, searchOrderID, page, dispatchType, isReset, setSearchOrderID]);
+  }, [pageSize, searchOrderID, page, dispatchType, isReset, setSearchOrderID,itemsData]);
 
   return (
     <Container fluid className="py-3">
@@ -608,7 +615,15 @@ function OrderTrackingNumberPending() {
           )}
         </>
       )}
-      <Row className="justify-content-end mt-2 me-1 ">
+      <Row className="d-flex  justify-content-end mt-2 me-1 ">
+        <Button
+          type="button"
+          variant="secondary"
+          className="mr-2 mx-1 w-auto"
+          onClick={() => setShowfileUploadModal(true)}
+        >
+          {t("P1ChinaSystem.Upload")}
+        </Button>
         <Button
           type="button"
           className="mr-2 mx-1 w-auto"
@@ -622,6 +637,11 @@ function OrderTrackingNumberPending() {
         handleClosePrintModal={() => setShowModal(false)}
         showModal={showModal}
         orderData={orderData}
+      />
+      <OrderTrackingFileUpload
+        show={showFileUploadModal}
+        handleClosePrintModal={() => setShowfileUploadModal(false)}
+        showModal={showFileUploadModal}
       />
     </Container>
   );

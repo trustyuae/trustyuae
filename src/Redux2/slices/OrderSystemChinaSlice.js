@@ -26,6 +26,7 @@ const initialState = {
   customItemSendToP2: [],
   assignTrackID: [],
   pushTrackOrder: [],
+  trackIDFileUploadData: [],
   error: null,
 };
 
@@ -365,6 +366,29 @@ export const PushTrackOrder = createAsyncThunk(
   }
 );
 
+export const TrackIDFileUpload = createAsyncThunk(
+  "orderSystem/TrackIDFileUpload",
+  async (formData, { rejectWithValue }) => {
+    console.log(formData,'FormData')
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-csv-file/v1/csv-file-upload/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response.data, 'response.data from TrackIDFileUpload')
+      return response.data;
+    } catch (error) {
+      console.error("Error uploading file:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const orderSystemChinaSlice = createSlice({
   name: "orderSystem",
   initialState,
@@ -399,6 +423,7 @@ const orderSystemChinaSlice = createSlice({
       state.customItemSendToP2 = [];
       state.assignTrackID = [];
       state.pushTrackOrder = [];
+      state.trackIDFileUploadData = [];
       state.error = null;
     },
   },
@@ -632,6 +657,17 @@ const orderSystemChinaSlice = createSlice({
         state.pushTrackOrder = action.payload;
       })
       .addCase(PushTrackOrder.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(TrackIDFileUpload.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(TrackIDFileUpload.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.trackIDFileUploadData = action.payload;
+      })
+      .addCase(TrackIDFileUpload.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
