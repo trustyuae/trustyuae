@@ -290,17 +290,12 @@ const PoDetails = () => {
 
     // Proceed with dispatch update action
     let apiUrl = `wp-json/custom-available-status/v1/estimated-status/${id}`;
-    await dispatch(UpdatePODetails({apiUrl,payload: updatedData})).then(({payload})=>{
-      console.log(payload,'payload from UpdatePODetails')
-     ShowAlert(
-        payload.message,
-        "",
-        "",
-        true,
-        false,
-        "OK"
-      );
-    })
+    await dispatch(UpdatePODetails({ apiUrl, payload: updatedData })).then(
+      ({ payload }) => {
+        console.log(payload, "payload from UpdatePODetails");
+        ShowAlert(payload.message, "", "", true, false, "OK");
+      }
+    );
   };
 
   const handlepayMentStatus = (value) => {
@@ -343,9 +338,9 @@ const PoDetails = () => {
     setPrintModal(true);
   };
 
-  const handlePoModal = (itemId, itemVId) => {
-    setVariationId(itemVId);
-    setProductId(itemId);
+  const handlePoModal = (itemData) => {
+    setVariationId(itemData?.variation_id);
+    setProductId(itemData?.product_id);
     setPoDetailsModal(true);
   };
 
@@ -463,17 +458,15 @@ const PoDetails = () => {
       headerName: t("POManagement.QtyOrdered"),
       flex: 2.5,
       renderCell: (params) => {
-        const handleClick = () => {
-          handlePoModal(params.row.product_id, params.row.variation_id);
-        };
-
         if (params.row.id === "TAX") {
-          return params.row.total_quantity;
+          return params?.row?.total_quantity;
         }
-
         return (
-          <Box variant="outline-primary" onClick={handleClick}>
-            {params.value}
+          <Box
+            variant="outline-primary"
+            onClick={() => handlePoModal(params.row)}
+          >
+            {params?.value}
           </Box>
         );
       },

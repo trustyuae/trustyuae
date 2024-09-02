@@ -18,6 +18,7 @@ const initialState = {
   ordersNotAvailable: [],
   ordersNotAvailablePo: [],
   ordersNotAvailableStatus: [],
+  assignFactory:[],
   error: null,
 };
 
@@ -224,6 +225,23 @@ export const OrderNotAvailableDataStatus = createAsyncThunk(
   }
 );
 
+export const AssignFactoryToProduct = createAsyncThunk(
+  "P2System/AssignFactoryToProduct",
+  async ({ id,payload }, { rejectWithValue }) => {
+    console.log(payload,'requestData from AssignFactoryToProduct')
+    try { 
+      const response = await axiosInstance.post(
+        `wp-json/custom-proimage-update/v1/update-product/${id}`,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error assign factory:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const P2SystemSlice = createSlice({
   name: "P2System",
   initialState,
@@ -250,6 +268,7 @@ const P2SystemSlice = createSlice({
       state.ordersNotAvailable = [];
       state.ordersNotAvailablePo = [];
       state.ordersNotAvailableStatus = [];
+      state.assignFactory = [];
       state.error = null;
     },
   },
@@ -395,6 +414,17 @@ const P2SystemSlice = createSlice({
         state.ordersNotAvailableStatus = action.payload;
       })
       .addCase(OrderNotAvailableDataStatus.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(AssignFactoryToProduct.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(AssignFactoryToProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignFactory = action.payload;
+      })
+      .addCase(AssignFactoryToProduct.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
