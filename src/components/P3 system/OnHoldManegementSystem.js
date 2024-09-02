@@ -29,10 +29,8 @@ import {
   GetAllProducts,
   GetProductManual,
 } from "../../Redux2/slices/P3SystemSlice";
-import ShowAlert from "../../utils/ShowAlert";
-import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
-import { MergeRounded } from "@mui/icons-material";
 import { getUserData } from "../../utils/StorageUtils";
+import OrderModal from "./OrdersModal";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -78,6 +76,9 @@ function OnHoldManegementSystem() {
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
   const [rows, setRows] = useState([]);
+  const [showOrdersModalOpen, setShowOrdersModalOpen] = useState(false);
+  const [productIDD, setProductIDD] = useState(null);
+  const [variationID, setVariationID] = useState(null);
 
   const allProducts = useSelector(
     (state) => state?.p3System?.allProducts?.products
@@ -294,6 +295,13 @@ function OnHoldManegementSystem() {
     );
   };
 
+  const handleOpenOrderModal = (rowData) => {
+    console.log(rowData,'rowData')
+    setProductIDD(rowData.product_id)
+    setVariationID(rowData.variation_id)
+    setShowOrdersModalOpen(true);
+  };
+
   const columns = [
     {
       field: "product_name",
@@ -365,6 +373,22 @@ function OnHoldManegementSystem() {
           onClick={() => handleDelete(params.row.id)}
         >
           <MdDelete className="mb-1" />
+        </Button>
+      ),
+    },
+    {
+      field: "Assign Order",
+      headerName: "Assign Orders",
+      flex: 1,
+      type: "html",
+      renderCell: (params) => (
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-auto w-auto border-0 text-white"
+          onClick={() => handleOpenOrderModal(params.row)}
+        >
+          Assign Order
         </Button>
       ),
     },
@@ -1135,7 +1159,18 @@ function OnHoldManegementSystem() {
           )}
         </Card>
       </MDBRow>
-
+      {showOrdersModalOpen && (
+        <OrderModal
+          show={showOrdersModalOpen}
+          showOrdersModalOpen={showOrdersModalOpen}
+          productIDD={productIDD}
+          variationID={variationID}
+          // productId={productId}
+          // variationId={variationId}
+          handleClosePoDetailsModal={() => setShowOrdersModalOpen(false)}
+          // poId={id}
+        />
+      )}
       <Modal
         show={showEditModal}
         onHide={() => setShowEditModal(false)}

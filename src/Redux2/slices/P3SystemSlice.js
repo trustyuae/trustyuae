@@ -16,6 +16,8 @@ const initialState = {
   remark: [],
   allProducts: [],
   poProductData: [],
+  ordersData: [],
+  assignOrderData: [],
   error: null,
 };
 
@@ -160,7 +162,7 @@ export const GetAllProducts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-api-product/v1/get-product/?`,
+        `wp-json/custom-api-product/v1/get-product/?`
       );
       return response.data;
     } catch (error) {
@@ -172,10 +174,43 @@ export const GetAllProducts = createAsyncThunk(
 
 export const FetchPoProductData = createAsyncThunk(
   "orderSystem/FetchPoProductData",
-  async ({selectedPOId}, { rejectWithValue }) => {
+  async ({ selectedPOId }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/fetch-po-details/v1/get-product-under-po/${selectedPOId}`,
+        `wp-json/fetch-po-details/v1/get-product-under-po/${selectedPOId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error while gettting AllProducts:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const GetOrderIdsData = createAsyncThunk(
+  "orderSystem/GetOrderIdsData",
+  async ({ payload }, { rejectWithValue }) => {
+    console.log("GetOrderIdsData");
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-get-order/v1/get-order-id/`,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error while gettting AllProducts:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const AssignOrders = createAsyncThunk(
+  "orderSystem/AssignOrders",
+  async ({ payload }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-assign-order/v1/assign-item-order/`,
+        payload
       );
       return response.data;
     } catch (error) {
@@ -209,6 +244,8 @@ const P3SystemSlice = createSlice({
       state.remark = [];
       state.allProducts = [];
       state.poProductData = [];
+      state.ordersData = [];
+      state.assignOrderData = [];
       state.error = null;
     },
   },
@@ -332,6 +369,28 @@ const P3SystemSlice = createSlice({
         state.poProductData = action.payload;
       })
       .addCase(FetchPoProductData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(GetOrderIdsData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(GetOrderIdsData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.ordersData = action.payload;
+      })
+      .addCase(GetOrderIdsData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(AssignOrders.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(AssignOrders.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignOrderData = action.payload;
+      })
+      .addCase(AssignOrders.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
