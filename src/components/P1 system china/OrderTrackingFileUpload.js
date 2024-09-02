@@ -5,7 +5,11 @@ import { useDispatch } from "react-redux";
 import { TrackIDFileUpload } from "../../Redux2/slices/OrderSystemChinaSlice";
 import ShowAlert from "../../utils/ShowAlert";
 
-const OrderTrackingFileUpload = ({ show, handleClosePrintModal }) => {
+const OrderTrackingFileUpload = ({
+  show,
+  handleClosePrintModal,
+  onFileUpload,
+}) => {
   const dispatch = useDispatch();
   const [s3Loading, sets3Loading] = useState(false);
   const [fileNotSupported, setFileNotSupported] = useState(false);
@@ -38,7 +42,7 @@ const OrderTrackingFileUpload = ({ show, handleClosePrintModal }) => {
       const payload = new FormData();
       payload.append("csv_file", file);
       dispatch(TrackIDFileUpload(payload)).then(({ payload }) => {
-        handleClosePrintModal()
+        handleClosePrintModal();
         if (payload) {
           ShowAlert(
             "File uploaded Successfully!",
@@ -49,7 +53,7 @@ const OrderTrackingFileUpload = ({ show, handleClosePrintModal }) => {
             "OK",
             "",
             1000
-          ); 
+          );
         } else {
           ShowAlert(
             "failed to upload file!",
@@ -62,6 +66,7 @@ const OrderTrackingFileUpload = ({ show, handleClosePrintModal }) => {
             1000
           );
         }
+        onFileUpload();
       });
     } catch (error) {
       console.error("Error uploading file:", error);

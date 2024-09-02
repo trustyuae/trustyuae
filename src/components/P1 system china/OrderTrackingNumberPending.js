@@ -688,6 +688,7 @@ function OrderTrackingNumberPending() {
         show={showFileUploadModal}
         handleClosePrintModal={() => setShowfileUploadModal(false)}
         showModal={showFileUploadModal}
+        onFileUpload={fetchOrders}
       />
     </Container>
   );
