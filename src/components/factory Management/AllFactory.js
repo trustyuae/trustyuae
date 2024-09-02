@@ -135,7 +135,7 @@ function AllFactory() {
           <Button
             type="button"
             className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-            onClick={() => handleEdit(row.id)}
+            onClick={() => handleEdit(row?.id)}
           >
             <FaEye className="mb-1" />
           </Button>

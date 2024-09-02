@@ -5,7 +5,7 @@ function EditFactoryModal({ show, handleCloseEditModal, selectedFactory, setSele
   return (
     <Modal show={show} onHide={handleCloseEditModal} className="d-flex justify-content-center" >
       <Modal.Header closeButton>
-        <Modal.Title>Edit Product</Modal.Title>
+        <Modal.Title>Edit Factory</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form style={{ width: '466px' }}>
