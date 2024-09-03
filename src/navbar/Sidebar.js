@@ -368,22 +368,25 @@ const Sidebar = () => {
                   className="nav-content collapse "
                   data-bs-parent="#sidebar-nav"
                 >
-                  {userType === "administrator" && !userType === "factory_coordinator" (
-                    <li>
-                      <Link
-                        to="/order_tracking_number_Pending"
-                        className={
-                          "nav-link underline" +
-                          (activeMenuItem === "/order_tracking_number_Pending"
-                            ? " active"
-                            : "")
-                        }
-                      >
-                        <i className="bi bi-circle"></i>
-                        <span>Order Tracking Number Pending</span>
-                      </Link>
-                    </li>
-                  )}
+                  {userType === "administrator" &&
+                    !userType ===
+                      "factory_coordinator"(
+                        <li>
+                          <Link
+                            to="/order_tracking_number_Pending"
+                            className={
+                              "nav-link underline" +
+                              (activeMenuItem ===
+                              "/order_tracking_number_Pending"
+                                ? " active"
+                                : "")
+                            }
+                          >
+                            <i className="bi bi-circle"></i>
+                            <span>Order Tracking Number Pending</span>
+                          </Link>
+                        </li>
+                      )}
                   <li>
                     <Link
                       to="/ordersystem_in_china"
@@ -444,38 +447,40 @@ const Sidebar = () => {
               </li>
             )}
 
-          <li className="nav-item">
-            <a
-              className="nav-link collapsed"
-              data-bs-target="#icons-navv-missing"
-              data-bs-toggle="collapse"
-              href="/"
-            >
-              <i className="bi bi-menu-button-wide"></i>
-              <span>Missing Orders</span>
-              <i className="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul
-              id="icons-navv-missing"
-              className="nav-content collapse "
-              data-bs-parent="#sidebar-nav"
-            >
-              <li>
-                <Link
-                  to="/missing_orders_system"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/missing_orders_system"
-                      ? " active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>Missing order System</span>
-                </Link>
-              </li>
-            </ul>
-          </li>
+          {userType === "administrator" && (
+            <li className="nav-item">
+              <a
+                className="nav-link collapsed"
+                data-bs-target="#icons-navv-missing"
+                data-bs-toggle="collapse"
+                href="/"
+              >
+                <i className="bi bi-menu-button-wide"></i>
+                <span>Missing Orders</span>
+                <i className="bi bi-chevron-down ms-auto"></i>
+              </a>
+              <ul
+                id="icons-navv-missing"
+                className="nav-content collapse "
+                data-bs-parent="#sidebar-nav"
+              >
+                <li>
+                  <Link
+                    to="/missing_orders_system"
+                    className={
+                      "nav-link underline" +
+                      (activeMenuItem === "/missing_orders_system"
+                        ? " active"
+                        : "")
+                    }
+                  >
+                    <i className="bi bi-circle"></i>
+                    <span>Missing order System</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+          )}
         </ul>
       </aside>
     </>
