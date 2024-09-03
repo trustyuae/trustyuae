@@ -27,6 +27,7 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  Snackbar,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -89,6 +90,7 @@ function OrderDetailsInChina() {
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
@@ -740,6 +742,17 @@ function OrderDetailsInChina() {
     },
   ];
 
+  const handleCopy = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setSnackbarOpen(true); // Show the Snackbar
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   return (
     <>
       <Container fluid className="px-5">
@@ -790,7 +803,16 @@ function OrderDetailsInChina() {
                 <Loader />
               ) : (
                 <Box className="d-flex">
-                  <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      textAlign: "center",
+                      borderRadius: 1,
+                    }}
+                  >
                     <Typography className="fw-bold">
                       #{t("P1ChinaSystem.Order")} {id}
                     </Typography>
@@ -806,19 +828,55 @@ function OrderDetailsInChina() {
                   {orderDetails?.operation_user_id != userData?.user_id &&
                     orderDetails?.order_process == "started" && (
                       <Box className="ms-5">
-                        <Typography className="fw-bold">
-                          {orderDetails?.user_name}
-                        </Typography>
-                        <Typography
-                          className=""
+                        <Box
                           sx={{
-                            fontSize: 14,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            textAlign: "center",
+                            borderRadius: 1, // Optional: to add rounded corners
                           }}
                         >
-                          <Badge bg="success">Order Started By</Badge>
-                        </Typography>
+                          <Typography className="fw-bold">
+                            {orderDetails?.user_name}
+                          </Typography>
+                          <Typography
+                            className=""
+                            sx={{
+                              fontSize: 14,
+                            }}
+                          >
+                            <Badge bg="success">Order Started By</Badge>
+                          </Typography>
+                        </Box>
                       </Box>
                     )}
+                  <Box className="ms-5">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        borderRadius: 1, // Optional: to add rounded corners
+                      }}
+                    >
+                      <Typography
+                        className="fw-bold"
+                        sx={{ cursor: "pointer" }} // Add pointer cursor to indicate it's clickable
+                        onClick={() =>
+                          handleCopy(orderDetails?.items[0].tracking_id)
+                        }
+                      >
+                        {orderDetails?.items[0].tracking_id}
+                      </Typography>
+                      <Typography sx={{ fontSize: 14 }}>
+                        <Badge bg="success">Tracking ID</Badge>
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
               )}
             </Box>
@@ -1435,6 +1493,16 @@ function OrderDetailsInChina() {
             </Row>
           </Modal.Body>
         </Modal>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={1000} // Snackbar will auto-dismiss after 3 seconds
+          onClose={() => setSnackbarOpen(false)}
+          message="Tracking ID copied to clipboard!"
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }} 
+        />
       </Container>
     </>
   );

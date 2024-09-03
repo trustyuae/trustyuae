@@ -61,7 +61,7 @@ export const OrderDetailsChinaGet = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=1&${id}`
+        `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=1&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -369,7 +369,7 @@ export const PushTrackOrder = createAsyncThunk(
 export const TrackIDFileUpload = createAsyncThunk(
   "orderSystem/TrackIDFileUpload",
   async (formData, { rejectWithValue }) => {
-    console.log(formData,'FormData')
+    console.log(formData, "FormData");
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-csv-file/v1/csv-file-upload/`,
@@ -380,7 +380,7 @@ export const TrackIDFileUpload = createAsyncThunk(
           },
         }
       );
-      console.log(response.data, 'response.data from TrackIDFileUpload')
+      console.log(response.data, "response.data from TrackIDFileUpload");
       return response.data;
     } catch (error) {
       console.error("Error uploading file:", error.message);

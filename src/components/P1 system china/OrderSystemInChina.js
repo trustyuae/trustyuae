@@ -149,11 +149,16 @@ function OrderSystemInChina() {
       valueGetter: (value, row) => getCountryName(row.shipping_country),
     },
     {
-      field: "order_status",
-      headerName: t("P1ChinaSystem.OrderStatus"),
+      field: "tracking_id",
+      headerName: t("P1ChinaSystem.TrackingID"),
       flex: 1,
       className: "order-system",
       type: "string",
+      renderCell: (params) => {
+        const items = params?.row?.items || [];
+        const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
+        return <div>{trackingID}</div>;
+      },
     },
     {
       field: "",
