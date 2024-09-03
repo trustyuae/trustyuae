@@ -350,79 +350,83 @@ const Sidebar = () => {
             </li>
           )}
 
-          <li className="nav-item">
-            <a
-              className="nav-link collapsed"
-              data-bs-target="#icons-navv"
-              data-bs-toggle="collapse"
-              href="/"
-            >
-              <i className="bi bi-menu-button-wide"></i>
-              <span>P1 System China</span>
-              <i className="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul
-              id="icons-navv"
-              className="nav-content collapse "
-              data-bs-parent="#sidebar-nav"
-            >
-              <li>
-                <Link
-                  to="/order_tracking_number_Pending"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/order_tracking_number_Pending"
-                      ? " active"
-                      : "")
-                  }
+          {userType === "administrator" &&
+            userType === "factory_coordinator" && (
+              <li className="nav-item">
+                <a
+                  className="nav-link collapsed"
+                  data-bs-target="#icons-navv"
+                  data-bs-toggle="collapse"
+                  href="/"
                 >
-                  <i className="bi bi-circle"></i>
-                  <span>Order Tracking Number Pending</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/ordersystem_in_china"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/ordersystem_in_china"
-                      ? " active"
-                      : "")
-                  }
+                  <i className="bi bi-menu-button-wide"></i>
+                  <span>P1 System China</span>
+                  <i className="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul
+                  id="icons-navv"
+                  className="nav-content collapse "
+                  data-bs-parent="#sidebar-nav"
                 >
-                  <i className="bi bi-circle"></i>
-                  <span>Order Fulfillment System</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/completed_order_system_in_china"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/completed_order_system_in_china"
-                      ? " active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>Completed Orders System</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/on_hold_orders_system_in_china"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/on_hold_orders_system_china"
-                      ? "active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>On Hold Orders System</span>
-                </Link>
-              </li>
-              {/* <li>
+                  {userType === "administrator" && !userType === "factory_coordinator" (
+                    <li>
+                      <Link
+                        to="/order_tracking_number_Pending"
+                        className={
+                          "nav-link underline" +
+                          (activeMenuItem === "/order_tracking_number_Pending"
+                            ? " active"
+                            : "")
+                        }
+                      >
+                        <i className="bi bi-circle"></i>
+                        <span>Order Tracking Number Pending</span>
+                      </Link>
+                    </li>
+                  )}
+                  <li>
+                    <Link
+                      to="/ordersystem_in_china"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/ordersystem_in_china"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Order Fulfillment System</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/completed_order_system_in_china"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/completed_order_system_in_china"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Completed Orders System</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/on_hold_orders_system_in_china"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/on_hold_orders_system_china"
+                          ? "active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>On Hold Orders System</span>
+                    </Link>
+                  </li>
+                  {/* <li>
                 <Link
                   to="/reserve_orders_system_in_china"
                   className={
@@ -436,8 +440,9 @@ const Sidebar = () => {
                   <span>Reserve Orders System</span>
                 </Link>
               </li> */}
-            </ul>
-          </li>
+                </ul>
+              </li>
+            )}
 
           <li className="nav-item">
             <a
