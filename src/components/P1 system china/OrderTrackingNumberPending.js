@@ -33,10 +33,11 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ShowAlert from "../../utils/ShowAlert";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
-import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import * as XLSX from "xlsx";
+import { FaEye } from "react-icons/fa";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -225,11 +226,16 @@ function OrderTrackingNumberPending() {
     dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
       ShowAlert("Success", payload, "success", false, false, null, "", 1000);
     });
+    // Deselect all items
+    setSelectedItemIds([]);
+    setSelectedItems([]);
     navigate("/ordersystem_in_china");
   };
 
   const downloadExcel = async () => {
-    const filteredOrderData = orderData.map((order) => {
+    console.log(orders, "orders from downloadexcel");
+    console.log(selectedItems, "selectedItems from downloadexcel");
+    const filteredOrderData = orders.map((order) => {
       return {
         "Order Id": order.order_id,
         "Product Name": order.items.map((item) => item.product_name).join(", "),
@@ -247,20 +253,46 @@ function OrderTrackingNumberPending() {
     XLSX.writeFile(workbook, "OrderTrackingData.xlsx");
   };
 
-  const downloadExcelIndividual = async (rowData) => {
-    const filteredOrderData = [{
-      "Order Id": rowData.order_id,
-      "Product Name": rowData.items.map((item) => item.product_name).join(", "),
-      "Shipping Country": rowData.shipping_country, 
-      "Tracking ID": rowData.items.map((item) => item.tracking_id).join(", "),
-    }];
+  const downloadSelectedItemsExcel = async () => {
+    const filteredOrderData = selectedItems.map((order) => {
+      return {
+        "Order Id": order.order_id,
+        "Product Name": order.items.map((item) => item.product_name).join(", "),
+        "Shipping Country": order.shipping_country,
+        "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
+      };
+    });
 
     const workbook = XLSX.utils.book_new();
-  
+
     const worksheet = XLSX.utils.json_to_sheet(filteredOrderData);
-  
+
     XLSX.utils.book_append_sheet(workbook, worksheet, "Order Data");
-  
+
+    XLSX.writeFile(workbook, "OrderTrackingData.xlsx");
+    // Deselect all items
+    setSelectedItemIds([]);
+    setSelectedItems([]);
+  };
+
+  const downloadExcelIndividual = async (rowData) => {
+    const filteredOrderData = [
+      {
+        "Order Id": rowData.order_id,
+        "Product Name": rowData.items
+          .map((item) => item.product_name)
+          .join(", "),
+        "Shipping Country": rowData.shipping_country,
+        "Tracking ID": rowData.items.map((item) => item.tracking_id).join(", "),
+      },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+
+    const worksheet = XLSX.utils.json_to_sheet(filteredOrderData);
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Order Data");
+
     XLSX.writeFile(workbook, "OrderTrackingData.xlsx");
   };
 
@@ -277,7 +309,7 @@ function OrderTrackingNumberPending() {
             <FormControlLabel
               className="mx-auto"
               control={<Checkbox />}
-              disabled={selectButtonOff}
+              // disabled={selectButtonOff}
               style={{ justifyContent: "center" }}
               checked={selectedItemIds.includes(params.row.id)}
               onChange={(event) => handleItemSelection(params.row)}
@@ -358,8 +390,8 @@ function OrderTrackingNumberPending() {
     },
     {
       field: "view_item",
-      headerName: t("POManagement.ViewItem"),
-      flex: 1,
+      headerName: t("POManagement.Action"),
+      flex: 1.5,
       className: "order-system-track",
       type: "html",
       renderCell: (params) => {
@@ -386,6 +418,17 @@ function OrderTrackingNumberPending() {
             >
               {t("P1ChinaSystem.Push")}
             </Button>
+            <Link
+              to={`/order_tracking_number_pending_details/${params?.row?.order_id}`}
+              className=" d-flex "
+            >
+              <Button
+                type="button"
+                className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+              >
+                <FaEye className="mb-1" />
+              </Button>
+            </Link>
           </Box>
         );
       },
@@ -571,7 +614,7 @@ function OrderTrackingNumberPending() {
                   readOnly
                 />
               </Form.Group>
-              <Form.Group className="d-flex mx-1 align-items-center">
+              {/* <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
                   {t("P1ChinaSystem.DispatchOrders")}:
                 </Form.Label>
@@ -583,7 +626,7 @@ function OrderTrackingNumberPending() {
                   value={overAllData.total_dispatch_orders}
                   readOnly
                 />
-              </Form.Group>
+              </Form.Group> */}
               {/* <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">
                 {t("P1ChinaSystem.ReserveOrders")}:
@@ -597,6 +640,23 @@ function OrderTrackingNumberPending() {
                   readOnly
                 />
               </Form.Group> */}
+              {/* <Row className="d-flex  justify-content-end mt-2 me-1 "> */}
+              <Button
+                type="button"
+                variant="secondary"
+                className="mr-2 mx-1 w-auto"
+                onClick={() => setShowfileUploadModal(true)}
+              >
+                {t("P1ChinaSystem.Upload")}
+              </Button>
+              <Button
+                type="button"
+                className="mr-2 mx-1 w-auto"
+                onClick={() => handleSelectedPush()}
+              >
+                {t("P1ChinaSystem.Push")}
+              </Button>
+              {/* </Row> */}
             </Box>
             <Box className="d-flex">
               <Form.Group className="d-flex mx-1 align-items-center">
@@ -634,7 +694,11 @@ function OrderTrackingNumberPending() {
                 type="button"
                 variant="secondary"
                 className="mr-2 mx-1 w-auto"
-                onClick={downloadExcel}
+                onClick={
+                  selectedItems && selectedItems.length != 0
+                    ? downloadSelectedItemsExcel
+                    : downloadExcel
+                }
               >
                 {t("P1ChinaSystem.ExcellSheet")}
               </Button>
@@ -667,7 +731,7 @@ function OrderTrackingNumberPending() {
           )}
         </>
       )}
-      <Row className="d-flex  justify-content-end mt-2 me-1 ">
+      {/* <Row className="d-flex  justify-content-end mt-2 me-1 ">
         <Button
           type="button"
           variant="secondary"
@@ -683,7 +747,7 @@ function OrderTrackingNumberPending() {
         >
           {t("P1ChinaSystem.Push")}
         </Button>
-      </Row>
+      </Row> */}
       <OrderTrackingFileUpload
         show={showFileUploadModal}
         handleClosePrintModal={() => setShowfileUploadModal(false)}
