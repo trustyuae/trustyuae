@@ -204,7 +204,8 @@ function OrderTrackingNumberPending() {
     navigate("/ordersystem_in_china");
   };
 
-  const handleSelectedPush = async (rowData) => {
+  const handleSelectedPush = async () => {
+    console.log(selectedItems, "selectedItems");
     const selectedOrderIds = selectedItems.map((item) =>
       parseInt(item.order_id, 10)
     );
@@ -216,6 +217,24 @@ function OrderTrackingNumberPending() {
       (item) =>
         item.items?.map((subItem) => parseInt(subItem.variation_id, 10)) || []
     );
+
+    const hasItemsInSystem = selectedItems.some(
+      (item) => item.exist_item === "1"
+    );
+
+    if (hasItemsInSystem) {
+      ShowAlert(
+        "",
+        "This order has items available in P1 system China",
+        "error",
+        false,
+        false,
+        null,
+        "",
+        1000
+      );
+      return;
+    }
 
     const payload = {
       order_id: selectedOrderIds,
@@ -299,7 +318,7 @@ function OrderTrackingNumberPending() {
   const columns = [
     {
       field: "select",
-      headerName: "Select",
+      headerName: t("POManagement.Select"),
       flex: 0.5,
       className: "order-system-track",
       renderCell: (params) => {
@@ -614,33 +633,6 @@ function OrderTrackingNumberPending() {
                   readOnly
                 />
               </Form.Group>
-              {/* <Form.Group className="d-flex mx-1 align-items-center">
-                <Form.Label className="fw-semibold mb-0 me-2">
-                  {t("P1ChinaSystem.DispatchOrders")}:
-                </Form.Label>
-                <Form.Control
-                  as="input"
-                  type="number"
-                  className="color-black"
-                  style={{ width: "100px", textAlign: "center" }} // Add a custom width style here
-                  value={overAllData.total_dispatch_orders}
-                  readOnly
-                />
-              </Form.Group> */}
-              {/* <Form.Group className="d-flex mx-1 align-items-center">
-                <Form.Label className="fw-semibold mb-0 me-2">
-                {t("P1ChinaSystem.ReserveOrders")}:
-                </Form.Label>
-                <Form.Control
-                  as="input"
-                  type="number"
-                  className="color-black"
-                  style={{ width: "100px", textAlign: "center" }} // Add a custom width style here
-                  value={overAllData.total_reserve_orders}
-                  readOnly
-                />
-              </Form.Group> */}
-              {/* <Row className="d-flex  justify-content-end mt-2 me-1 "> */}
               <Button
                 type="button"
                 variant="secondary"
@@ -656,7 +648,6 @@ function OrderTrackingNumberPending() {
               >
                 {t("P1ChinaSystem.Push")}
               </Button>
-              {/* </Row> */}
             </Box>
             <Box className="d-flex">
               <Form.Group className="d-flex mx-1 align-items-center">
@@ -731,23 +722,6 @@ function OrderTrackingNumberPending() {
           )}
         </>
       )}
-      {/* <Row className="d-flex  justify-content-end mt-2 me-1 ">
-        <Button
-          type="button"
-          variant="secondary"
-          className="mr-2 mx-1 w-auto"
-          onClick={() => setShowfileUploadModal(true)}
-        >
-          {t("P1ChinaSystem.Upload")}
-        </Button>
-        <Button
-          type="button"
-          className="mr-2 mx-1 w-auto"
-          onClick={() => handleSelectedPush()}
-        >
-          {t("P1ChinaSystem.Push")}
-        </Button>
-      </Row> */}
       <OrderTrackingFileUpload
         show={showFileUploadModal}
         handleClosePrintModal={() => setShowfileUploadModal(false)}

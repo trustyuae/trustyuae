@@ -485,7 +485,7 @@ function OrderTrackingNumberPendingDetails() {
   const columns = [
     {
       field: "select",
-      headerName: "Select",
+      headerName: t("POManagement.Select"),
       flex: 0.5,
       renderCell: (params) => {
         return (
