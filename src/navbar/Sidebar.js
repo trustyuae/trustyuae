@@ -109,7 +109,6 @@ const Sidebar = () => {
           )}
           {(userType === "administrator" ||
             userType === "operation_assistant" ||
-            userType === "factory_coordinator" ||
             userType === "customer_support") && (
             <li className="nav-item">
               <a
@@ -145,8 +144,7 @@ const Sidebar = () => {
                   </li>
                 )}
                 {(userType === "administrator" ||
-                  userType === "operation_assistant" ||
-                  userType === "factory_coordinator") && (
+                  userType === "operation_assistant") && (
                   <li>
                     <Link
                       to="/PO_ManagementSystem"
