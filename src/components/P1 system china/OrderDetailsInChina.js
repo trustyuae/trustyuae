@@ -799,14 +799,69 @@ function OrderDetailsInChina() {
         <Card className="p-3 mb-3">
           <Row className="d-flex align-items-center justify-content-between">
             <Box>
-              <Typography variant="h6" className="fw-bold mb-3">
-                {t("P1ChinaSystem.OrderDetails")}
-              </Typography>
+              <Box className="d-flex justify-content-between">
+                <Typography variant="h6" className="fw-bold mb-3">
+                  {t("P1ChinaSystem.OrderDetails")}
+                </Typography>
+                <Box className="d-flex">
+                  <Button
+                    variant="outline-secondary"
+                    className="p-1 me-3 bg-transparent text-secondary"
+                    onClick={() => setshowMessageModal(true)}
+                  >
+                    <AddCommentOutlinedIcon />
+                  </Button>
+                  <Button
+                    variant="outline-primary"
+                    className="p-1 me-3 bg-transparent text-primary"
+                    onClick={handlePrint}
+                  >
+                    <LocalPrintshopOutlinedIcon />
+                  </Button>
+                  <Box className="d-flex">
+                    <Box>
+                      {userData?.user_id == orderDetails?.operation_user_id &&
+                      orderProcess == "started" ? (
+                        <Button
+                          variant="outline-danger"
+                          className="p-1 me-2 bg-transparent text-danger"
+                          onClick={handleCancelOrderProcess}
+                        >
+                          <CancelIcon />
+                        </Button>
+                      ) : orderProcess == "started" &&
+                        userData?.user_id != orderDetails?.operation_user_id ? (
+                        <Button variant="success" disabled className="me-3">
+                          Start
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="success"
+                          // disabled
+                          onClick={handleStartOrderProcess}
+                          className="me-3"
+                        >
+                          Start
+                        </Button>
+                      )}
+                    </Box>
+                    <Box>
+                      <Button
+                        variant="primary"
+                        // disabled
+                        onClick={handleSendToUAESystem}
+                      >
+                        Send To UAE
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
               {loader ? (
                 <Loader />
               ) : (
-                <Row className="d-flex">
-                  <Col md={4} className="d-flex align-items-start">
+                <Row className="d-flex mt-3">
+                  <Col md={4} className="d-flex align-items-start mt-1">
                     <Box
                       sx={{
                         display: "flex",
@@ -853,7 +908,7 @@ function OrderDetailsInChina() {
                       )}
                   </Col>
                   <Col md={8}>
-                    <Box className="d-flex justify-content-center">
+                    <Box className="d-flex justify-content-center mt-1">
                       <Box
                         sx={{
                           display: "flex",
@@ -861,7 +916,7 @@ function OrderDetailsInChina() {
                           alignItems: "center",
                           justifyContent: "center",
                           textAlign: "center",
-                          borderRadius: 1, // Optional: to add rounded corners
+                          borderRadius: 1,
                         }}
                       >
                         <Box
@@ -896,13 +951,13 @@ function OrderDetailsInChina() {
                               style: {
                                 textAlign: "center",
                                 fontWeight: "bold",
-                                fontSize: "24px", // Increase font size for the tracking ID
-                                padding: "8px", // Add padding to make the input box larger
+                                fontSize: "24px", 
+                                padding: "8px",
                               },
                             }}
                             sx={{
-                              width: "100%", // Make the input box larger
-                              fontSize: "24px", // Increase font size for the input box text
+                              width: "100%", 
+                              fontSize: "24px", 
                             }}
                           />
                         </Box>
