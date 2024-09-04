@@ -108,7 +108,7 @@ export default function DataTable({
                 ? "bg-yellow"
                 : "";
             }
-            if(params.colDef.className == "order-system-track"){
+            if (params.colDef.className == "order-system-track") {
               if (!params.row.exist_item) {
                 return "";
               }
@@ -117,6 +117,17 @@ export default function DataTable({
               }
               if (params.row.exist_item == "0") {
                 return "bg-green";
+              }
+            }
+            if (params.colDef.className == "complete-order-system-china") {
+              if (!params.row.items.map((item) => item.in_china == 1)) {
+                return "";
+              }
+              if (params.row.items.some((item) => item.in_china == 1)) {
+                return "bg-yellow";
+              }
+              if (params.row.items.some((item) => item.in_china == 0)) {
+                return "  ";
               }
             }
           }}

@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, IconButton, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -20,7 +20,7 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
-import { ButtonGroup, ToggleButton } from "react-bootstrap";
+import { ButtonGroup, Card, Modal, Table, ToggleButton } from "react-bootstrap";
 
 function CompletedOrderSystemInChina() {
   const inputRef = useRef(null);
@@ -42,6 +42,9 @@ function CompletedOrderSystemInChina() {
     null,
     null,
   ]);
+  const [showTrackidModalOpen, setShowTrackidModalOpen] = useState(false);
+  const [modalData, setModaldata] = useState([]);
+
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
 
   const completedOrdersData = useSelector(
@@ -124,11 +127,49 @@ function CompletedOrderSystemInChina() {
       valueGetter: (value, row) => getCountryName(row.shipping_country),
     },
     {
-      field: "order_status",
-      headerName: t("P1ChinaSystem.OrderStatus"),
+      field: "tracking_id",
+      headerName: t("P1ChinaSystem.TrackingID"),
       flex: 1,
       className: "complete-order-system-china",
       type: "string",
+      renderCell: (params) => {
+        const items = params?.row?.items || [];
+        const allSameTrackingID = items.every(
+          (item) => item.tracking_id === items[0]?.tracking_id
+        );
+
+        const trackingID = allSameTrackingID ? items[0]?.tracking_id : "";
+
+        const handleTrackIdModal = () => {};
+        console.log(trackingID, "trackingID");
+
+        return (
+          <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+            {allSameTrackingID ? (
+              <Form.Control
+                type="text"
+                value={trackingID == 0 ? "No Tracking ID" : trackingID}
+                placeholder="Enter tracking ID"
+                style={{
+                  width: "80%",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+                readOnly
+              />
+            ) : (
+              <Button
+                onClick={() => {
+                  setModaldata(params?.row?.items);
+                  setShowTrackidModalOpen(true);
+                }}
+              >
+                <FaEye className="mb-1" />
+              </Button>
+            )}
+          </Form.Group>
+        );
+      },
     },
     {
       field: "end_date",
@@ -412,6 +453,48 @@ function CompletedOrderSystemInChina() {
           )}
         </>
       )}
+
+      <Modal
+        show={showTrackidModalOpen}
+        onHide={() => setShowTrackidModalOpen(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Product Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table responsive className="table-borderless">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Tracking ID</th>
+                <th>Image</th>
+              </tr>
+            </thead>
+            <tbody>
+              {modalData?.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.product_name || "N/A"}</td>
+                  <td>{item.tracking_id || "N/A"}</td>
+                  <td>
+                    <img
+                      src={
+                        item?.imageURL || require("../../assets/default.png")
+                      }
+                      alt="Product"
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 }
