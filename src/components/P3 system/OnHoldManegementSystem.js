@@ -296,9 +296,9 @@ function OnHoldManegementSystem() {
   };
 
   const handleOpenOrderModal = (rowData) => {
-    console.log(rowData,'rowData')
-    setProductIDD(rowData.product_id)
-    setVariationID(rowData.variation_id)
+    console.log(rowData, "rowData");
+    setProductIDD(rowData.product_id);
+    setVariationID(rowData.variation_id);
     setShowOrdersModalOpen(true);
   };
 
@@ -1165,6 +1165,7 @@ function OnHoldManegementSystem() {
           showOrdersModalOpen={showOrdersModalOpen}
           productIDD={productIDD}
           variationID={variationID}
+          poId={poId}
           // productId={productId}
           // variationId={variationId}
           handleClosePoDetailsModal={() => setShowOrdersModalOpen(false)}

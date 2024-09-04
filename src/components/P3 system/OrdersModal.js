@@ -9,6 +9,7 @@ const OrdersModal = ({
   handleClosePoDetailsModal,
   productIDD,
   variationID,
+  poId,
 }) => {
   const dispatch = useDispatch();
   const [ordersData, setOrdersData] = useState([]);
@@ -31,9 +32,13 @@ const OrdersModal = ({
   const fetchOrderIds = () => {
     const payload = {
       product_id: Number(productIDD),
-      variation_id: variationID || 0,
-      po_id: "PO25490",
+      variation_id:
+        Array.isArray(variationID) && variationID.length > 0
+          ? Number(variationID)
+          : 0,
+      po_id: poId ? poId : "",
     };
+
     dispatch(GetOrderIdsData({ payload })).then(({ payload }) => {
       console.log(payload, "payload");
     });
