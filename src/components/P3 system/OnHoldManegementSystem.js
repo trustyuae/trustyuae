@@ -667,7 +667,7 @@ function OnHoldManegementSystem() {
     const updatedItems = [];
 
     // Add or update new items in the map
-    singleProductD.forEach((item) => {
+    singleProductD?.forEach((item) => {
       const key = JSON.stringify({
         product_id: item.product_id,
         variation_values: item.variation_values,

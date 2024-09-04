@@ -99,7 +99,7 @@ function CompletedOrderSystemInChina() {
   const columns = [
     {
       field: "start_date",
-      headerName: t("POManagement.StartedDate"),
+      headerName: t("P1ChinaSystem.StartedDate"),
       className: "complete-order-system-china",
       flex: 1,
     },
