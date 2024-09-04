@@ -56,11 +56,12 @@ import {
   InsertOrderPickupCancelChina,
   InsertOrderPickupChina,
   OrderDetailsChinaGet,
+  OrderTrackingDetailsChinaGet,
   OverAllAttachmentFileUploadChina,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 
-function OrderDetailsInChina() {
+function OrderTrackingNumberPendingDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
   const { t, i18n } = useTranslation();
@@ -104,21 +105,15 @@ function OrderDetailsInChina() {
     (state) => state?.orderSystemChina?.isLoading
   );
 
-  const Finished = useSelector((state) => state?.orderSystemChina?.isLoading);
-
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystemChina?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystemChina?.orderTrackingDetails?.orders?.[0]
   );
 
   const orderDetailsData = useSelector(
-    (state) => state?.orderSystemChina?.orderDetails
+    (state) => state?.orderSystemChina?.orderTrackingDetails
   );
 
   const messageData = useSelector((state) => state?.orderSystemChina?.message);
-
-  const customOrderDataa = useSelector(
-    (state) => state?.orderSystemChina?.customOrderData
-  );
 
   const CustomOrderOHDataa = useSelector(
     (state) => state?.orderSystemChina?.customOrderOnHoldData
@@ -184,7 +179,7 @@ function OrderDetailsInChina() {
 
   async function fetchOrder() {
     try {
-      dispatch(OrderDetailsChinaGet({ id: id }));
+      dispatch(OrderTrackingDetailsChinaGet({ id: id }));
     } catch (error) {
       console.error(error);
     }
@@ -237,33 +232,6 @@ function OrderDetailsInChina() {
       setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
     }
     setSelectedItemIds(newSelected);
-  };
-
-  const handleSendToUAESystem = async () => {
-    const selectedProductIds = selectedItems.map((item) => item.item_id);
-    const selectedVariationIds = selectedItems.map((item) => item.variation_id);
-
-    const payload = {
-      product_id: selectedProductIds,
-      variation_id: selectedVariationIds,
-      warehouse: "",
-    };
-
-    try {
-      dispatch(CustomItemSendToUAE({ id, payload })).then(({ payload }) => {
-        Swal.fire({
-          title: payload,
-          icon: payload ? "success" : "error",
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/ordersystem");
-          }
-        });
-      });
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const submitOH = async () => {
@@ -336,27 +304,6 @@ function OrderDetailsInChina() {
     setSelectedFile(null);
     setShowAttachmentModal(false);
   };
-  const handleCancelImg = async (e) => {
-    Swal.fire({
-      title: "Are you sure you want to delete this image?",
-      icon: "question",
-      showConfirmButton: true,
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await axiosInstance.post(
-          `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}/?warehouse=China`,
-          {
-            variation_id: e.variation_id,
-            image_url: e.dispatch_image,
-          }
-        );
-        fetchOrder();
-      }
-    });
-  };
 
   const handleSubmitAttachment = async () => {
     setAttachmentsubmitbtn(true);
@@ -401,57 +348,6 @@ function OrderDetailsInChina() {
     }
   };
 
-  const handleStartOrderProcess = async () => {
-    const requestData = {
-      order_id: Number(id),
-      user_id: userData.user_id,
-      start_time: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-      end_time: "",
-      order_status: "started",
-    };
-    dispatch(InsertOrderPickupChina(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleCancelOrderProcess = async () => {
-    const requestData = {
-      order_id: parseInt(id, 10),
-      operation_id: orderDetails?.operation_user_id,
-      order_status: "Cancelled",
-    };
-    dispatch(InsertOrderPickupCancelChina(requestData))
-      .then((response) => {
-        fetchOrder();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleFinishButtonClick = async () => {
-    try {
-      const { user_id } = userData ?? {};
-      dispatch(CustomOrderFinishChina({ user_id, id })).then(({ payload }) => {
-        Swal.fire({
-          title: payload.message,
-          icon: payload.status_code === 200 ? "success" : "error",
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/ordersystem_in_china");
-          }
-        });
-      });
-    } catch (error) {
-      console.error("Error while finishing order:", error);
-    }
-  };
-
   const variant = (variations) => {
     const matches = variations.match(
       /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
@@ -486,24 +382,6 @@ function OrderDetailsInChina() {
   };
 
   const columns = [
-    {
-      field: "select",
-      headerName: "Select",
-      flex: 0.5,
-      renderCell: (params) => {
-        return (
-          <FormGroup>
-            <FormControlLabel
-              className="mx-auto"
-              control={<Checkbox />}
-              style={{ justifyContent: "center" }}
-              checked={selectedItemIds.includes(params.row.id)}
-              onChange={(event) => handleItemSelection(params.row)}
-            />
-          </FormGroup>
-        );
-      },
-    },
     {
       field: "item_id",
       headerName: t("P1ChinaSystem.ItemId"),
@@ -586,160 +464,6 @@ function OrderDetailsInChina() {
       className: "order-details",
       type: "string",
     },
-    {
-      field: "dispatch_image",
-      headerName: t("P1ChinaSystem.Attachment"),
-      flex: 1.5,
-      className: "order-details",
-      type: "html",
-      renderCell: (value, row) => {
-        const itemId = value && value.row.item_id ? value.row.item_id : null;
-        const itemVariationId =
-          value && value.row.variation_id ? value.row.variation_id : null;
-        const qty = value.row.quantity;
-        const avl_qty = value.row.avl_quantity;
-        const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId, itemVariationId);
-        };
-
-        if (!fileInputRef.current) {
-          fileInputRef.current = {};
-        }
-        if (value && value.row.dispatch_image) {
-          const isDisabled = orderDetails.order_process !== "started";
-          return (
-            <Row className={`${"justify-content-center"} h-100`}>
-              <Col
-                md={12}
-                className={`d-flex align-items-center justify-content-center my-1`}
-              >
-                <Box className="h-100 w-100 d-flex align-items-center justify-content-center position-relative">
-                  <Avatar
-                    src={value.row.dispatch_image}
-                    alt="Product Image"
-                    sx={{
-                      height: "45px",
-                      width: "45px",
-                      borderRadius: "2px",
-                      margin: "0 auto",
-                      "& .MuiAvatar-img": {
-                        height: "100%",
-                        width: "100%",
-                        borderRadius: "2px",
-                      },
-                    }}
-                    onClick={() => {
-                      ImageModule(value.row.dispatch_image);
-                      setAttachmentZoom(true);
-                    }}
-                  />
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderDetails.order_process == "started" && (
-                      <CancelIcon
-                        sx={{
-                          position: "relative",
-                          top: "-30px",
-                          right: "8px",
-                          cursor: "pointer",
-                          color: "red",
-                          zIndex: 1,
-                          // disabled=isDisabled
-                          opacity: isDisabled ? 0.5 : 1,
-                          pointerEvents: isDisabled ? "none" : "auto",
-                          cursor: isDisabled ? "not-allowed" : "pointer",
-                        }}
-                        onClick={(e) => {
-                          if (!isDisabled) {
-                            handleCancelImg(value.row);
-                          }
-                        }}
-                      />
-                    )}
-                </Box>
-              </Col>
-            </Row>
-          );
-        } else {
-          return (
-            <Row className={`${"justify-content-center"} h-100`}>
-              <Col
-                md={12}
-                className={`d-flex align-items-center justify-content-center my-1`}
-              >
-                <Card className="factory-card me-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails.order_process == "started" &&
-                  qty == avl_qty ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      onClick={() =>
-                        fileInputRef.current[
-                          selectedVariationId ? selectedVariationId : itemId
-                        ]?.click()
-                      }
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                      <input
-                        type="file"
-                        ref={(input) =>
-                          (fileInputRef.current[
-                            selectedVariationId ? selectedVariationId : itemId
-                          ] = input)
-                        }
-                        style={{ display: "none" }}
-                        onChange={handleFileInputChangeForRow}
-                      />
-                    </Button>
-                  ) : (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                    </Button>
-                  )}
-                </Card>
-                <Card className="factory-card ms-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails.order_process == "started" &&
-                  qty == avl_qty ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      onClick={() => {
-                        setShowAttachModal(true);
-                        setSelectedItemId(itemId);
-                        setSelectedVariationId(itemVariationId);
-                      }}
-                    >
-                      <CameraAltIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Camera
-                      </Typography>
-                    </Button>
-                  ) : (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
-                    >
-                      <CameraAltIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Camera
-                      </Typography>
-                    </Button>
-                  )}
-                </Card>
-              </Col>
-            </Row>
-          );
-        }
-      },
-    },
   ];
 
   const handleCopy = (text) => {
@@ -761,19 +485,11 @@ function OrderDetailsInChina() {
             <Button
               variant="outline-secondary"
               className="bg-transparent text-secondary"
-              onClick={() => navigate("/ordersystem_in_china")}
+              onClick={() => navigate("/order_tracking_number_Pending")}
             >
               <ArrowBackIcon className="me-1" />
             </Button>
           </MDBCol>
-          {orderDetails?.operation_user_id != userData?.user_id &&
-            orderDetails?.order_process == "started" && (
-              <MDBCol md="7" className="d-flex justify-content-center">
-                <Alert variant={"danger"}>
-                  {t("P1ChinaSystem.ThisOrderTakenBy")}:
-                </Alert>
-              </MDBCol>
-            )}
           <MDBCol className="d-flex justify-content-end">
             <ButtonGroup>
               {radios.map((radio, idx) => (
@@ -825,33 +541,6 @@ function OrderDetailsInChina() {
                       <Badge bg="success">{orderDetails?.order_status}</Badge>
                     </Typography>
                   </Box>
-                  {orderDetails?.operation_user_id != userData?.user_id &&
-                    orderDetails?.order_process == "started" && (
-                      <Box className="ms-5">
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            textAlign: "center",
-                            borderRadius: 1, // Optional: to add rounded corners
-                          }}
-                        >
-                          <Typography className="fw-bold">
-                            {orderDetails?.user_name}
-                          </Typography>
-                          <Typography
-                            className=""
-                            sx={{
-                              fontSize: 14,
-                            }}
-                          >
-                            <Badge bg="success">Order Started By</Badge>
-                          </Typography>
-                        </Box>
-                      </Box>
-                    )}
                   <Box className="ms-5">
                     <Box
                       sx={{
@@ -879,59 +568,6 @@ function OrderDetailsInChina() {
                   </Box>
                 </Box>
               )}
-            </Box>
-            <Box className="d-flex">
-              <Button
-                variant="outline-secondary"
-                className="p-1 me-3 bg-transparent text-secondary"
-                onClick={() => setshowMessageModal(true)}
-              >
-                <AddCommentOutlinedIcon />
-              </Button>
-              <Button
-                variant="outline-primary"
-                className="p-1 me-3 bg-transparent text-primary"
-                onClick={handlePrint}
-              >
-                <LocalPrintshopOutlinedIcon />
-              </Button>
-              <Box className="d-flex">
-                <Box>
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails?.order_process == "started" ? (
-                    <Button
-                      variant="outline-danger"
-                      className="p-1 me-2 bg-transparent text-danger"
-                      onClick={handleCancelOrderProcess}
-                    >
-                      <CancelIcon />
-                    </Button>
-                  ) : orderDetails?.order_process == "started" &&
-                    userData?.user_id != orderDetails?.operation_user_id ? (
-                    <Button variant="success" disabled className="me-3">
-                      {t("P1ChinaSystem.Start")}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="success"
-                      // disabled
-                      onClick={handleStartOrderProcess}
-                      className="me-3"
-                    >
-                      {t("P1ChinaSystem.Start")}
-                    </Button>
-                  )}
-                </Box>
-                <Box>
-                  <Button
-                    variant="primary"
-                    // disabled
-                    onClick={handleSendToUAESystem}
-                  >
-                    {t("P1ChinaSystem.SendToUAE")}
-                  </Button>
-                </Box>
-              </Box>
             </Box>
           </Box>
         </Card>
@@ -1248,72 +884,6 @@ function OrderDetailsInChina() {
         <Alert variant={"info"}>
           <label>Customer Note :-</label> "There is a customer note!"
         </Alert>
-        <MDBRow>
-          <MDBCol md="12" className="d-flex justify-content-end">
-            {userData?.user_id == orderDetails?.operation_user_id &&
-            orderDetails?.order_process == "started" &&
-            tableData?.some((data) => data.dispatch_image != "") ? (
-              <>
-                <Button
-                  variant="success"
-                  className=" mx-2"
-                  onClick={() => setshowMessageOHModal(true)}
-                >
-                  {t("P1ChinaSystem.OnHold")}
-                </Button>
-                {Finished ? (
-                  <Button
-                    variant="danger"
-                    disabled
-                    onClick={handleFinishButtonClick}
-                  >
-                    {t("P1ChinaSystem.Finish")}
-                  </Button>
-                ) : (
-                  <Button variant="danger" onClick={handleFinishButtonClick}>
-                    {t("P1ChinaSystem.Finish")}
-                  </Button>
-                )}
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="success"
-                  className=" mx-2"
-                  disabled={
-                    orderDetails?.order_process != "started" ||
-                    userData?.user_id != orderDetails?.operation_user_id
-                    // tableData?.some((data) => data.dispatch_image == "")
-                  }
-                  onClick={() => setshowMessageOHModal(true)}
-                >
-                  {t("P1ChinaSystem.OnHold")}
-                </Button>
-                {Finished ? (
-                  <Button
-                    variant="danger"
-                    disabled
-                    onClick={handleFinishButtonClick}
-                  >
-                    {t("P1ChinaSystem.Finish")}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="danger"
-                    disabled={
-                      orderDetails?.order_process != "started" ||
-                      userData?.user_id != orderDetails?.operation_user_id ||
-                      tableData?.some((data) => data.dispatch_image == "")
-                    }
-                    onClick={handleFinishButtonClick}
-                  >
-                    {t("P1ChinaSystem.Finish")}
-                  </Button>
-                )}
-              </>
-            )}
-          </MDBCol>
-        </MDBRow>
         <Modal
           show={showAttachModal}
           onHide={() => setShowAttachModal(false)}
@@ -1501,10 +1071,10 @@ function OrderDetailsInChina() {
           anchorOrigin={{
             vertical: "top",
             horizontal: "center",
-          }} 
+          }}
         />
       </Container>
     </>
   );
 }
-export default OrderDetailsInChina;
+export default OrderTrackingNumberPendingDetails;

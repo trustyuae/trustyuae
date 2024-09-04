@@ -39,6 +39,7 @@ import OnHoldOrdersdetailsInChina from "./components/P1 system china/OnHoldOrder
 import MissingOrderSystem from "./components/Missing Orders System/MissingOrderSystem";
 import MissingOrderDetails from "./components/Missing Orders System/MissingOrderDetails";
 import OrderTrackingNumberPending from "./components/P1 system china/OrderTrackingNumberPending";
+import OrderTrackingNumberPendingDetails from "./components/P1 system china/OrderTrackingNumberPendingDetails";
 
 function App() {
   return (
@@ -135,6 +136,12 @@ function App() {
               exact
               path="/order_tracking_number_Pending"
               element={<OrderTrackingNumberPending />}
+            />
+
+            <Route
+              exact
+              path="/order_tracking_number_pending_details/:id"
+              element={<OrderTrackingNumberPendingDetails />}
             />
 
             <Route

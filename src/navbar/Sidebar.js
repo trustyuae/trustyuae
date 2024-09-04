@@ -32,6 +32,7 @@ const Sidebar = () => {
       <aside id="sidebar" className="sidebar" style={{ left: "0" }}>
         <ul className="sidebar-nav" id="sidebar-nav">
           {(userType === "administrator" ||
+            userType === "operation_assistant" ||
             userType === "packing_assistant") && (
             <li className="nav-item">
               <a
@@ -107,7 +108,7 @@ const Sidebar = () => {
             </li>
           )}
           {(userType === "administrator" ||
-            userType === "factory_coordinator" ||
+            userType === "operation_assistant" ||
             userType === "customer_support") && (
             <li className="nav-item">
               <a
@@ -125,7 +126,8 @@ const Sidebar = () => {
                 className="nav-content collapse "
                 data-bs-parent="#sidebar-nav"
               >
-                {userType === "administrator" && (
+                {(userType === "administrator" ||
+                  userType === "operation_assistant") && (
                   <li>
                     <Link
                       to="/order_management_system"
@@ -142,7 +144,7 @@ const Sidebar = () => {
                   </li>
                 )}
                 {(userType === "administrator" ||
-                  userType === "factory_coordinator") && (
+                  userType === "operation_assistant") && (
                   <li>
                     <Link
                       to="/PO_ManagementSystem"
@@ -159,6 +161,7 @@ const Sidebar = () => {
                   </li>
                 )}
                 {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
                   userType === "customer_support") && (
                   <li>
                     <Link
@@ -225,7 +228,8 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {userType === "administrator" && (
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
@@ -273,7 +277,8 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {userType === "administrator" && (
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
@@ -317,7 +322,8 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {userType === "administrator" && (
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
@@ -350,127 +356,138 @@ const Sidebar = () => {
             </li>
           )}
 
-          <li className="nav-item">
-            <a
-              className="nav-link collapsed"
-              data-bs-target="#icons-navv"
-              data-bs-toggle="collapse"
-              href="/"
-            >
-              <i className="bi bi-menu-button-wide"></i>
-              <span>P1 System China</span>
-              <i className="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul
-              id="icons-navv"
-              className="nav-content collapse "
-              data-bs-parent="#sidebar-nav"
-            >
-              <li>
-                <Link
-                  to="/order_tracking_number_Pending"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/order_tracking_number_Pending"
-                      ? " active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>Order Tracking Number Pending</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/ordersystem_in_china"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/ordersystem_in_china"
-                      ? " active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>Order Fulfillment System</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/completed_order_system_in_china"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/completed_order_system_in_china"
-                      ? " active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>Completed Orders System</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/on_hold_orders_system_in_china"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/on_hold_orders_system_china"
-                      ? "active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>On Hold Orders System</span>
-                </Link>
-              </li>
-              {/* <li>
-                <Link
-                  to="/reserve_orders_system_in_china"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/reserve_orders_system_in_china"
-                      ? "active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>Reserve Orders System</span>
-                </Link>
-              </li> */}
-            </ul>
-          </li>
+          {(userType === "administrator" ||
+            userType === "operation_assistant" ||
+            userType === "factory_coordinator") && (
+            <li className="nav-item">
+              <a
+                className="nav-link collapsed"
+                data-bs-target="#icons-navv"
+                data-bs-toggle="collapse"
+                href="/"
+              >
+                <i className="bi bi-menu-button-wide"></i>
+                <span>P1 System China</span>
+                <i className="bi bi-chevron-down ms-auto"></i>
+              </a>
+              <ul
+                id="icons-navv"
+                className="nav-content collapse"
+                data-bs-parent="#sidebar-nav"
+              >
+                {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
+                  userType !== "factory_coordinator") && (
+                  <li>
+                    <Link
+                      to="/order_tracking_number_Pending"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/order_tracking_number_Pending"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Order Tracking Number Pending</span>
+                    </Link>
+                  </li>
+                )}
+                <li>
+                  <Link
+                    to="/ordersystem_in_china"
+                    className={
+                      "nav-link underline" +
+                      (activeMenuItem === "/ordersystem_in_china"
+                        ? " active"
+                        : "")
+                    }
+                  >
+                    <i className="bi bi-circle"></i>
+                    <span>Order Fulfillment System</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/completed_order_system_in_china"
+                    className={
+                      "nav-link underline" +
+                      (activeMenuItem === "/completed_order_system_in_china"
+                        ? " active"
+                        : "")
+                    }
+                  >
+                    <i className="bi bi-circle"></i>
+                    <span>Completed Orders System</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/on_hold_orders_system_in_china"
+                    className={
+                      "nav-link underline" +
+                      (activeMenuItem === "/on_hold_orders_system_china"
+                        ? " active"
+                        : "")
+                    }
+                  >
+                    <i className="bi bi-circle"></i>
+                    <span>On Hold Orders System</span>
+                  </Link>
+                </li>
+                {/* <li>
+          <Link
+            to="/reserve_orders_system_in_china"
+            className={
+              "nav-link underline" +
+              (activeMenuItem === "/reserve_orders_system_in_china"
+                ? " active"
+                : "")
+            }
+          >
+            <i className="bi bi-circle"></i>
+            <span>Reserve Orders System</span>
+          </Link>
+        </li> */}
+              </ul>
+            </li>
+          )}
 
-          <li className="nav-item">
-            <a
-              className="nav-link collapsed"
-              data-bs-target="#icons-navv-missing"
-              data-bs-toggle="collapse"
-              href="/"
-            >
-              <i className="bi bi-menu-button-wide"></i>
-              <span>Missing Orders</span>
-              <i className="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul
-              id="icons-navv-missing"
-              className="nav-content collapse "
-              data-bs-parent="#sidebar-nav"
-            >
-              <li>
-                <Link
-                  to="/missing_orders_system"
-                  className={
-                    "nav-link underline" +
-                    (activeMenuItem === "/missing_orders_system"
-                      ? " active"
-                      : "")
-                  }
-                >
-                  <i className="bi bi-circle"></i>
-                  <span>Missing order System</span>
-                </Link>
-              </li>
-            </ul>
-          </li>
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
+            <li className="nav-item">
+              <a
+                className="nav-link collapsed"
+                data-bs-target="#icons-navv-missing"
+                data-bs-toggle="collapse"
+                href="/"
+              >
+                <i className="bi bi-menu-button-wide"></i>
+                <span>Missing Orders</span>
+                <i className="bi bi-chevron-down ms-auto"></i>
+              </a>
+              <ul
+                id="icons-navv-missing"
+                className="nav-content collapse "
+                data-bs-parent="#sidebar-nav"
+              >
+                <li>
+                  <Link
+                    to="/missing_orders_system"
+                    className={
+                      "nav-link underline" +
+                      (activeMenuItem === "/missing_orders_system"
+                        ? " active"
+                        : "")
+                    }
+                  >
+                    <i className="bi bi-circle"></i>
+                    <span>Missing order System</span>
+                  </Link>
+                </li>
+              </ul>
+            </li>
+          )}
         </ul>
       </aside>
     </>

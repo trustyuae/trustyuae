@@ -84,6 +84,8 @@ function OnHoldManegementSystem() {
     (state) => state?.p3System?.allProducts?.products
   );
 
+  const loading = useSelector((state) => state?.p3System.isLoading);
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -1099,16 +1101,29 @@ function OnHoldManegementSystem() {
                 />
               </div>
               <MDBRow className="justify-content-end px-3 py-2">
-                <Button
-                  variant="primary"
-                  disabled={
-                    !isValid && poTableData.length == 0 && tableData.length == 0
-                  }
-                  style={{ width: "130px" }}
-                  onClick={handleSubmit}
-                >
-                  submit
-                </Button>
+                {loading ? (
+                  <Button
+                    variant="primary"
+                    disabled
+                    style={{ width: "130px" }}
+                    onClick={handleSubmit}
+                  >
+                    submit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    disabled={
+                      !isValid &&
+                      poTableData.length == 0 &&
+                      tableData.length == 0
+                    }
+                    style={{ width: "130px" }}
+                    onClick={handleSubmit}
+                  >
+                    submit
+                  </Button>
+                )}
               </MDBRow>
             </>
           )}
@@ -1143,17 +1158,31 @@ function OnHoldManegementSystem() {
                 )}
               </div>
               <MDBRow className="justify-content-end px-3 py-2">
-                <Button
-                  variant="primary"
-                  disabled={
-                    !isValid && poTableData.length == 0 && tableData.length == 0
-                  }
-                  style={{ width: "130px" }}
-                  // onClick={handleCreateGrn}
-                  onClick={handleCreateGrn}
-                >
-                  Create GRN
-                </Button>
+                {loading ? (
+                  <Button
+                    variant="primary"
+                    disabled
+                    style={{ width: "130px" }}
+                    // onClick={handleCreateGrn}
+                    onClick={handleCreateGrn}
+                  >
+                    Create GRN
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    disabled={
+                      !isValid &&
+                      poTableData.length == 0 &&
+                      tableData.length == 0
+                    }
+                    style={{ width: "130px" }}
+                    // onClick={handleCreateGrn}
+                    onClick={handleCreateGrn}
+                  >
+                    Create GRN
+                  </Button>
+                )}
               </MDBRow>
             </>
           )}

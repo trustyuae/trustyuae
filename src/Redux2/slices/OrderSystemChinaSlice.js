@@ -6,6 +6,7 @@ const initialState = {
   isLoading: false,
   SyncLoading: false,
   ordersTracking: [],
+  orderTrackingDetails: [],
   orders: [],
   orderDetails: [],
   completedOrders: [],
@@ -43,6 +44,21 @@ export const OrderTrackingSystemChinaGet = createAsyncThunk(
   }
 );
 
+export const OrderTrackingDetailsChinaGet = createAsyncThunk(
+  "orderSystem/OrderTrackingDetailsChinaGet",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=0&orderid=${id}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const OrderSystemChinaGet = createAsyncThunk(
   "orderSystem/OrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
@@ -61,7 +77,7 @@ export const OrderDetailsChinaGet = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=1&${id}`
+        `wp-json/custom-orders-new/v1/orders/?warehouse=China&trackorder=1&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -369,7 +385,7 @@ export const PushTrackOrder = createAsyncThunk(
 export const TrackIDFileUpload = createAsyncThunk(
   "orderSystem/TrackIDFileUpload",
   async (formData, { rejectWithValue }) => {
-    console.log(formData,'FormData')
+    console.log(formData, "FormData");
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-csv-file/v1/csv-file-upload/`,
@@ -380,7 +396,7 @@ export const TrackIDFileUpload = createAsyncThunk(
           },
         }
       );
-      console.log(response.data, 'response.data from TrackIDFileUpload')
+      console.log(response.data, "response.data from TrackIDFileUpload");
       return response.data;
     } catch (error) {
       console.error("Error uploading file:", error.message);
@@ -403,6 +419,7 @@ const orderSystemChinaSlice = createSlice({
       state.isLoading = false;
       state.SyncLoading = false;
       state.ordersTracking = [];
+      state.orderTrackingDetails = [];
       state.orders = [];
       state.orderDetails = [];
       state.completedOrders = [];
@@ -437,6 +454,17 @@ const orderSystemChinaSlice = createSlice({
         state.ordersTracking = action.payload;
       })
       .addCase(OrderTrackingSystemChinaGet.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(OrderTrackingDetailsChinaGet.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(OrderTrackingDetailsChinaGet.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.orderTrackingDetails = action.payload;
+      })
+      .addCase(OrderTrackingDetailsChinaGet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
