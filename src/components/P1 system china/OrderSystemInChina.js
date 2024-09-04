@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, IconButton, Snackbar, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -26,6 +26,7 @@ import {
   OrderSystemChinaGet,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function OrderSystemInChina() {
   const dispatch = useDispatch();
@@ -50,6 +51,7 @@ function OrderSystemInChina() {
   });
   const [orderData, setOrderData] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const ordersData = useSelector(
@@ -121,6 +123,17 @@ function OrderSystemInChina() {
     }
   };
 
+  const handleCopy = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setSnackbarOpen(true); // Show the Snackbar
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   const columns = [
     {
       field: "date",
@@ -157,7 +170,20 @@ function OrderSystemInChina() {
       renderCell: (params) => {
         const items = params?.row?.items || [];
         const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
-        return <div>{trackingID}</div>;
+        return (
+          <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+            <Form.Control
+              type="text"
+              value={trackingID}
+              placeholder="Enter tracking ID"
+              style={{ width: "80%", textAlign: "center", fontWeight: "bold" }}
+              readOnly
+            />
+            <IconButton onClick={() => handleCopy(trackingID)}>
+              <ContentCopyIcon />
+            </IconButton>
+          </Form.Group>
+        );
       },
     },
     {
@@ -490,6 +516,17 @@ function OrderSystemInChina() {
         handleClosePrintModal={() => setShowModal(false)}
         showModal={showModal}
         orderData={orderData}
+      />
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000} // Snackbar will auto-dismiss after 3 seconds
+        onClose={() => setSnackbarOpen(false)}
+        message="Tracking ID copied to clipboard!"
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
       />
     </Container>
   );

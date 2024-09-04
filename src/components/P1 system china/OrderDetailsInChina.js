@@ -28,6 +28,8 @@ import {
   FormControlLabel,
   FormGroup,
   Snackbar,
+  TextField,
+  IconButton,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -59,6 +61,7 @@ import {
   OverAllAttachmentFileUploadChina,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function OrderDetailsInChina() {
   const { id } = useParams();
@@ -793,7 +796,7 @@ function OrderDetailsInChina() {
             </ButtonGroup>
           </MDBCol>
         </MDBRow>
-        <Card className="p-3 mb-3">
+        {/* <Card className="p-3 mb-3">
           <Box className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
@@ -934,6 +937,127 @@ function OrderDetailsInChina() {
               </Box>
             </Box>
           </Box>
+        </Card> */}
+        <Card className="p-3 mb-3">
+          <Row className="d-flex align-items-center justify-content-between">
+            <Box>
+              <Typography variant="h6" className="fw-bold mb-3">
+                {t("P1ChinaSystem.OrderDetails")}
+              </Typography>
+              {loader ? (
+                <Loader />
+              ) : (
+                <Row className="d-flex">
+                  <Col md={4} className="d-flex align-items-start">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center", // Align content to the start
+                        justifyContent: "center", // Align content to the start
+                        textAlign: "center",
+                        borderRadius: 1, // Optional: to add rounded corners
+                      }}
+                    >
+                      <Typography className="fw-bold">
+                        #{t("P1ChinaSystem.Order")} {id}
+                      </Typography>
+                      <Typography sx={{ fontSize: 14 }}>
+                        <Badge bg="success">{orderDetails?.order_status}</Badge>
+                      </Typography>
+                    </Box>
+                    {orderDetails?.operation_user_id != userData?.user_id &&
+                      orderDetails?.order_process == "started" && (
+                        <Box className="ms-5">
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              textAlign: "center",
+                              borderRadius: 1, // Optional: to add rounded corners
+                            }}
+                          >
+                            <Typography className="fw-bold">
+                              {orderDetails?.user_name}
+                            </Typography>
+                            <Typography
+                              className=""
+                              sx={{
+                                fontSize: 14,
+                              }}
+                            >
+                              <Badge bg="success">Order Started By</Badge>
+                            </Typography>
+                          </Box>
+                        </Box>
+                      )}
+                  </Col>
+                  <Col md={8}>
+                    <Box className="d-flex justify-content-center">
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          textAlign: "center",
+                          borderRadius: 1, // Optional: to add rounded corners
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "0px",
+                          }}
+                        >
+                          <TextField
+                            variant="outlined"
+                            value={orderDetails?.items[0].tracking_id || ""}
+                            InputProps={{
+                              readOnly: true,
+                              endAdornment: (
+                                <IconButton
+                                  onClick={() =>
+                                    handleCopy(
+                                      orderDetails?.items[0].tracking_id
+                                    )
+                                  }
+                                  sx={{
+                                    cursor: "pointer",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  <ContentCopyIcon />
+                                </IconButton>
+                              ),
+                            }}
+                            inputProps={{
+                              style: {
+                                textAlign: "center",
+                                fontWeight: "bold",
+                                fontSize: "24px", // Increase font size for the tracking ID
+                                padding: "8px", // Add padding to make the input box larger
+                              },
+                            }}
+                            sx={{
+                              width: "100%", // Make the input box larger
+                              fontSize: "24px", // Increase font size for the input box text
+                            }}
+                          />
+                        </Box>
+                        <Typography sx={{ fontSize: 16 }}>
+                          <Badge bg="success">Tracking ID</Badge>
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Col>
+                </Row>
+              )}
+            </Box>
+          </Row>
         </Card>
         <Row className="mb-3">
           <Col
@@ -1501,7 +1625,7 @@ function OrderDetailsInChina() {
           anchorOrigin={{
             vertical: "top",
             horizontal: "center",
-          }} 
+          }}
         />
       </Container>
     </>
