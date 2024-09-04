@@ -173,9 +173,11 @@ function OrderSystemInChina() {
         return (
           <Box className="d-flex align-items-center justify-content-center">
             <Typography>{trackingID}</Typography>
-            <IconButton onClick={() => handleCopy(trackingID)}>
-              <ContentCopyIcon />
-            </IconButton>
+            {trackingID !== "0" && (
+              <IconButton onClick={() => handleCopy(trackingID)}>
+                <ContentCopyIcon />
+              </IconButton>
+            )}
           </Box>
         );
       },

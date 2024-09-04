@@ -866,10 +866,10 @@ function OrderDetailsInChina() {
                       sx={{
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center", // Align content to the start
-                        justifyContent: "center", // Align content to the start
+                        alignItems: "center",
+                        justifyContent: "center",
                         textAlign: "center",
-                        borderRadius: 1, // Optional: to add rounded corners
+                        borderRadius: 1,
                       }}
                     >
                       <Typography className="fw-bold">
@@ -928,23 +928,32 @@ function OrderDetailsInChina() {
                         >
                           <TextField
                             variant="outlined"
-                            value={orderDetails?.items[0].tracking_id || ""}
+                            value={
+                              orderDetails?.items[0].tracking_id !== "0"
+                                ? orderDetails?.items[0].tracking_id
+                                : "No Tracking ID Avl"
+                            }
                             InputProps={{
                               readOnly: true,
                               endAdornment: (
-                                <IconButton
-                                  onClick={() =>
-                                    handleCopy(
-                                      orderDetails?.items[0].tracking_id
-                                    )
-                                  }
-                                  sx={{
-                                    cursor: "pointer",
-                                    textAlign: "center",
-                                  }}
-                                >
-                                  <ContentCopyIcon />
-                                </IconButton>
+                                <>
+                                  {orderDetails?.items[0].tracking_id !==
+                                    "0" && (
+                                    <IconButton
+                                      onClick={() =>
+                                        handleCopy(
+                                          orderDetails?.items[0].tracking_id
+                                        )
+                                      }
+                                      sx={{
+                                        cursor: "pointer",
+                                        textAlign: "center",
+                                      }}
+                                    >
+                                      <ContentCopyIcon />
+                                    </IconButton>
+                                  )}
+                                </>
                               ),
                             }}
                             inputProps={{
