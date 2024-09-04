@@ -522,7 +522,7 @@ function OrderTrackingNumberPendingDetails() {
                 <Loader />
               ) : (
                 <Row className="d-flex">
-                  <Col md={4} className="d-flex flex-column align-items-start">
+                  <Col md={4} className="d-flex align-items-start">
                     <Box
                       sx={{
                         display: "flex",
@@ -542,7 +542,7 @@ function OrderTrackingNumberPendingDetails() {
                     </Box>
                   </Col>
                   <Col md={8}>
-                    <Box className="d-flex justify-content-start">
+                    <Box className="d-flex justify-content-center">
                       <Box
                         sx={{
                           display: "flex",
@@ -580,22 +580,22 @@ function OrderTrackingNumberPendingDetails() {
                                   <ContentCopyIcon />
                                 </IconButton>
                               ),
-                              sx: {
-                                textAlign: "center",
-                                fontWeight: "bold",
-                                padding: "0px" // Make the text bold
-                              },
                             }}
                             inputProps={{
                               style: {
                                 textAlign: "center",
                                 fontWeight: "bold",
-                                padding: "0px"
-                              }, 
+                                fontSize: "24px", // Increase font size for the tracking ID
+                                padding: "8px", // Add padding to make the input box larger
+                              },
+                            }}
+                            sx={{
+                              width: "100%", // Make the input box larger
+                              fontSize: "24px", // Increase font size for the input box text
                             }}
                           />
                         </Box>
-                        <Typography sx={{ fontSize: 14 }}>
+                        <Typography sx={{ fontSize: 16 }}>
                           <Badge bg="success">Tracking ID</Badge>
                         </Typography>
                       </Box>
