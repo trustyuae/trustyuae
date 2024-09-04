@@ -30,8 +30,8 @@ const OrdersModal = ({
 
   const fetchOrderIds = () => {
     const payload = {
-      product_id: productIDD,
-      variation_id: variationID,
+      product_id: Number(productIDD),
+      variation_id: variationID || 0,
       po_id: "PO25490",
     };
     dispatch(GetOrderIdsData({ payload })).then(({ payload }) => {

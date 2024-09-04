@@ -190,12 +190,14 @@ export const FetchPoProductData = createAsyncThunk(
 export const GetOrderIdsData = createAsyncThunk(
   "orderSystem/GetOrderIdsData",
   async ({ payload }, { rejectWithValue }) => {
+    console.log(payload,'payload')
     console.log("GetOrderIdsData");
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-get-order/v1/get-order-id/`,
         payload
       );
+      console.log(response,'response')
       return response;
     } catch (error) {
       console.error("Error while gettting AllProducts:", error.message);
