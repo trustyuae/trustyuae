@@ -537,9 +537,9 @@ function OrderManagementSystem() {
   };
 
   useEffect(() => {
-    if (activeKey === "against_PO") {
-      fetchOrders();
-    }
+    // if (activeKey === "against_PO") {
+    //   fetchOrders();
+    // }
     if (activeKey === "manual_PO") {
       manualPO();
     }
@@ -547,7 +547,7 @@ function OrderManagementSystem() {
       scheduledPO();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, endDate, selectedFactory, manualProductF]);
+  }, [page, pageSize, endDate, selectedFactory, manualProductF,currentStartIndex]);
 
   const fetchOrders = async () => {
     try {
