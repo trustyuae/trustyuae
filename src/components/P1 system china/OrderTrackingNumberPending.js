@@ -10,6 +10,8 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
+  IconButton,
+  Snackbar,
   Typography,
 } from "@mui/material";
 import DataTable from "../DataTable";
@@ -38,6 +40,7 @@ import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import * as XLSX from "xlsx";
 import { FaEye } from "react-icons/fa";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -56,6 +59,7 @@ function OrderTrackingNumberPending() {
   const [totalPages, setTotalPages] = useState(1);
   const [isReset, setIsReset] = useState(false);
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [overAllData, setOverAllData] = useState({
     total_count: 0,
     total_dispatch_orders: 0,
@@ -315,6 +319,17 @@ function OrderTrackingNumberPending() {
     XLSX.writeFile(workbook, "OrderTrackingData.xlsx");
   };
 
+  const handleCopy = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setSnackbarOpen(true); // Show the Snackbar
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   const columns = [
     {
       field: "select",
@@ -383,8 +398,14 @@ function OrderTrackingNumberPending() {
               value={trackId}
               placeholder="Enter tracking ID"
               onChange={(e) => handleTrackIdAssign(params.row, e)}
-              style={{ width: "100%", textAlign: "center" }}
+              style={{ width: "80%", textAlign: "center",fontWeight: "bold" }} 
+              readOnly
             />
+            <IconButton
+              onClick={() => handleCopy(trackId)}
+            >
+              <ContentCopyIcon />
+            </IconButton>
           </Form.Group>
         );
       },
@@ -727,6 +748,16 @@ function OrderTrackingNumberPending() {
         handleClosePrintModal={() => setShowfileUploadModal(false)}
         showModal={showFileUploadModal}
         onFileUpload={fetchOrders}
+      />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000} // Snackbar will auto-dismiss after 3 seconds
+        onClose={() => setSnackbarOpen(false)}
+        message="Tracking ID copied to clipboard!"
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
       />
     </Container>
   );

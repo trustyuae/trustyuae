@@ -28,6 +28,8 @@ import {
   FormControlLabel,
   FormGroup,
   Snackbar,
+  TextField,
+  IconButton,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -60,6 +62,7 @@ import {
   OverAllAttachmentFileUploadChina,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function OrderTrackingNumberPendingDetails() {
   const { id } = useParams();
@@ -510,7 +513,7 @@ function OrderTrackingNumberPendingDetails() {
           </MDBCol>
         </MDBRow>
         <Card className="p-3 mb-3">
-          <Box className="d-flex align-items-center justify-content-between">
+          <Row className="d-flex align-items-center justify-content-between">
             <Box>
               <Typography variant="h6" className="fw-bold mb-3">
                 {t("P1ChinaSystem.OrderDetails")}
@@ -518,58 +521,90 @@ function OrderTrackingNumberPendingDetails() {
               {loader ? (
                 <Loader />
               ) : (
-                <Box className="d-flex">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      textAlign: "center",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography className="fw-bold">
-                      #{t("P1ChinaSystem.Order")} {id}
-                    </Typography>
-                    <Typography
-                      className=""
-                      sx={{
-                        fontSize: 14,
-                      }}
-                    >
-                      <Badge bg="success">{orderDetails?.order_status}</Badge>
-                    </Typography>
-                  </Box>
-                  <Box className="ms-5">
+                <Row className="d-flex">
+                  <Col md={4} className="d-flex flex-column align-items-start">
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        alignItems: "center", // Align content to the start
+                        justifyContent: "center", // Align content to the start
                         textAlign: "center",
                         borderRadius: 1, // Optional: to add rounded corners
                       }}
                     >
-                      <Typography
-                        className="fw-bold"
-                        sx={{ cursor: "pointer" }} // Add pointer cursor to indicate it's clickable
-                        onClick={() =>
-                          handleCopy(orderDetails?.items[0].tracking_id)
-                        }
-                      >
-                        {orderDetails?.items[0].tracking_id}
+                      <Typography className="fw-bold">
+                        #{t("P1ChinaSystem.Order")} {id}
                       </Typography>
                       <Typography sx={{ fontSize: 14 }}>
-                        <Badge bg="success">Tracking ID</Badge>
+                        <Badge bg="success">{orderDetails?.order_status}</Badge>
                       </Typography>
                     </Box>
-                  </Box>
-                </Box>
+                  </Col>
+                  <Col md={8}>
+                    <Box className="d-flex justify-content-start">
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          textAlign: "center",
+                          borderRadius: 1, // Optional: to add rounded corners
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "0px",
+                          }}
+                        >
+                          <TextField
+                            variant="outlined"
+                            value={orderDetails?.items[0].tracking_id || ""}
+                            InputProps={{
+                              readOnly: true,
+                              endAdornment: (
+                                <IconButton
+                                  onClick={() =>
+                                    handleCopy(
+                                      orderDetails?.items[0].tracking_id
+                                    )
+                                  }
+                                  sx={{
+                                    cursor: "pointer",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  <ContentCopyIcon />
+                                </IconButton>
+                              ),
+                              sx: {
+                                textAlign: "center",
+                                fontWeight: "bold",
+                                padding: "0px" // Make the text bold
+                              },
+                            }}
+                            inputProps={{
+                              style: {
+                                textAlign: "center",
+                                fontWeight: "bold",
+                                padding: "0px"
+                              }, 
+                            }}
+                          />
+                        </Box>
+                        <Typography sx={{ fontSize: 14 }}>
+                          <Badge bg="success">Tracking ID</Badge>
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Col>
+                </Row>
               )}
             </Box>
-          </Box>
+          </Row>
         </Card>
         <Row className="mb-3">
           <Col
