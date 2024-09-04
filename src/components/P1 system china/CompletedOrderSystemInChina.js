@@ -460,10 +460,10 @@ function CompletedOrderSystemInChina() {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>Product Details</Modal.Title>
+          <Modal.Title>TrackingID Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Table responsive className="table-borderless">
+          <Table responsive className="table-bordered">
             <thead>
               <tr>
                 <th>Product Name</th>
@@ -479,7 +479,8 @@ function CompletedOrderSystemInChina() {
                   <td>
                     <img
                       src={
-                        item?.imageURL || require("../../assets/default.png")
+                        item?.product_image ||
+                        require("../../assets/default.png")
                       }
                       alt="Product"
                       style={{

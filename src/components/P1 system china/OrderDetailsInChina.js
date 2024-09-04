@@ -806,14 +806,14 @@ function OrderDetailsInChina() {
                 <Box className="d-flex">
                   <Button
                     variant="outline-secondary"
-                    className="p-1 me-3 bg-transparent text-secondary"
+                    className="me-3 bg-transparent text-secondary"
                     onClick={() => setshowMessageModal(true)}
                   >
                     <AddCommentOutlinedIcon />
                   </Button>
                   <Button
                     variant="outline-primary"
-                    className="p-1 me-3 bg-transparent text-primary"
+                    className="me-3 bg-transparent text-primary"
                     onClick={handlePrint}
                   >
                     <LocalPrintshopOutlinedIcon />
@@ -908,7 +908,7 @@ function OrderDetailsInChina() {
                       )}
                   </Col>
                   <Col md={8}>
-                    <Box className="d-flex justify-content-center mt-1">
+                    <Box className="d-flex justify-content-start mt-1">
                       <Box
                         sx={{
                           display: "flex",
@@ -951,13 +951,13 @@ function OrderDetailsInChina() {
                               style: {
                                 textAlign: "center",
                                 fontWeight: "bold",
-                                fontSize: "24px", 
+                                fontSize: "24px",
                                 padding: "8px",
                               },
                             }}
                             sx={{
-                              width: "100%", 
-                              fontSize: "24px", 
+                              width: "100%",
+                              fontSize: "24px",
                             }}
                           />
                         </Box>

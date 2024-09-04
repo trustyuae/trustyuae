@@ -171,18 +171,12 @@ function OrderSystemInChina() {
         const items = params?.row?.items || [];
         const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
         return (
-          <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
-            <Form.Control
-              type="text"
-              value={trackingID}
-              placeholder="Enter tracking ID"
-              style={{ width: "80%", textAlign: "center", fontWeight: "bold" }}
-              readOnly
-            />
+          <Box className="d-flex align-items-center justify-content-center">
+            <Typography>{trackingID}</Typography>
             <IconButton onClick={() => handleCopy(trackingID)}>
               <ContentCopyIcon />
             </IconButton>
-          </Form.Group>
+          </Box>
         );
       },
     },
