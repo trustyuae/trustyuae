@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
 import { QuantityPoDetailsForModalInView } from "../../Redux2/slices/P2SystemSlice";
 
-const   PoDetailsModalInView = ({
+const PoDetailsModalInView = ({
   show,
   handleClosePoDetailsModal,
   productId,
@@ -14,13 +14,13 @@ const   PoDetailsModalInView = ({
 }) => {
   const dispatch = useDispatch();
   const [productData, setProductData] = useState([]);
-  const loader = useSelector(
-    (state) => state?.p2System?.isLoading
-  );
+  const loader = useSelector((state) => state?.p2System?.isLoading);
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch(QuantityPoDetailsForModalInView(productId, variationId, poId))
+      dispatch(
+        QuantityPoDetailsForModalInView({ productId, variationId, poId })
+      )
         .then(({ payload }) => {
           const data = payload?.orders.map((v, id) => ({
             ...v,
@@ -28,24 +28,21 @@ const   PoDetailsModalInView = ({
           }));
           setProductData(data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("Error fetching data:", error);
         });
     };
-  
+
     if (show) {
       fetchData();
     }
   }, [show, dispatch, productId, variationId, poId]);
-  
 
   return (
     <div>
       <Modal show={poDetailsModal} onHide={handleClosePoDetailsModal}>
         <Modal.Header closeButton>
-          <Modal.Title>
-            Product ID: {productId}
-          </Modal.Title>
+          <Modal.Title>Product ID: {productId}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div style={{ display: "flex", justifyContent: "center" }}>
