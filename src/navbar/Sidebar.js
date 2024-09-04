@@ -32,6 +32,7 @@ const Sidebar = () => {
       <aside id="sidebar" className="sidebar" style={{ left: "0" }}>
         <ul className="sidebar-nav" id="sidebar-nav">
           {(userType === "administrator" ||
+            userType === "operation_assistant" ||
             userType === "packing_assistant") && (
             <li className="nav-item">
               <a
@@ -107,6 +108,7 @@ const Sidebar = () => {
             </li>
           )}
           {(userType === "administrator" ||
+            userType === "operation_assistant" ||
             userType === "factory_coordinator" ||
             userType === "customer_support") && (
             <li className="nav-item">
@@ -125,7 +127,8 @@ const Sidebar = () => {
                 className="nav-content collapse "
                 data-bs-parent="#sidebar-nav"
               >
-                {userType === "administrator" && (
+                {(userType === "administrator" ||
+                  userType === "operation_assistant") && (
                   <li>
                     <Link
                       to="/order_management_system"
@@ -142,6 +145,7 @@ const Sidebar = () => {
                   </li>
                 )}
                 {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
                   userType === "factory_coordinator") && (
                   <li>
                     <Link
@@ -159,6 +163,7 @@ const Sidebar = () => {
                   </li>
                 )}
                 {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
                   userType === "customer_support") && (
                   <li>
                     <Link
@@ -225,7 +230,8 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {userType === "administrator" && (
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
@@ -273,7 +279,8 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {userType === "administrator" && (
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
@@ -317,7 +324,8 @@ const Sidebar = () => {
               </ul>
             </li>
           )}
-          {userType === "administrator" && (
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
@@ -351,6 +359,7 @@ const Sidebar = () => {
           )}
 
           {(userType === "administrator" ||
+            userType === "operation_assistant" ||
             userType === "factory_coordinator") && (
             <li className="nav-item">
               <a
@@ -369,22 +378,23 @@ const Sidebar = () => {
                 data-bs-parent="#sidebar-nav"
               >
                 {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
                   userType !== "factory_coordinator") && (
-                    <li>
-                      <Link
-                        to="/order_tracking_number_Pending"
-                        className={
-                          "nav-link underline" +
-                          (activeMenuItem === "/order_tracking_number_Pending"
-                            ? " active"
-                            : "")
-                        }
-                      >
-                        <i className="bi bi-circle"></i>
-                        <span>Order Tracking Number Pending</span>
-                      </Link>
-                    </li>
-                  )}
+                  <li>
+                    <Link
+                      to="/order_tracking_number_Pending"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/order_tracking_number_Pending"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Order Tracking Number Pending</span>
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <Link
                     to="/ordersystem_in_china"
@@ -445,7 +455,8 @@ const Sidebar = () => {
             </li>
           )}
 
-          {userType === "administrator" && (
+          {(userType === "administrator" ||
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
