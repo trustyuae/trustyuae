@@ -171,7 +171,17 @@ const GRNView = () => {
                 GRN View
               </Typography>
             </Box>
-            <Box className="ms-5">
+            <Box
+              className="ms-5"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                borderRadius: 1,
+              }}
+            >
               <Typography className="fw-bold">#{verifiedName}</Typography>
               <Typography>
                 <Badge bg="success">Verified by</Badge>
