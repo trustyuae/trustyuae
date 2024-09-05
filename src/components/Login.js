@@ -19,6 +19,8 @@ const Login = () => {
   const [usernameError, setUserNameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
+  const loader = useSelector((state)=>state?.user?.isLoading)
+
   const handleUsername = (e) => {
     setUserName(e.target.value);
   };
@@ -95,8 +97,6 @@ const Login = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loading = useSelector((state) => state?.loginUser?.loading);
-
   return (
     <MDBContainer style={{ height: "100vh" }} className="p-3">
       <Row className="d-flex justify-content-center align-items-center h-100">
@@ -164,7 +164,7 @@ const Login = () => {
                       labelClass="custom-label-style1"
                     />
                   </div>
-                  {loading ? (
+                  {loader ? (
                     <Button
                       className="w-100"
                       variant="primary"
@@ -172,7 +172,7 @@ const Login = () => {
                       onClick={handleSubmit}
                       disabled
                     >
-                      <strong>{loading ? "Signing In..." : "Sign In"}</strong>
+                      <strong>{loader ? "Signing In..." : "Sign In"}</strong>
                     </Button>
                   ) : (
                     <Button
