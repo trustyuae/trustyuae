@@ -63,6 +63,7 @@ const Login = () => {
                 switch (payload?.user_data?.user_role) {
                   case "administrator":
                   case "packing_assistant":
+                  case "operation_assistant":
                     navigate("/ordersystem");
                     break;
                   case "factory_coordinator":
@@ -70,9 +71,6 @@ const Login = () => {
                     break;
                   case "customer_support":
                     navigate("/order_not_available");
-                    break;
-                  case "operation_assistant":
-                    navigate("/On_Hold_Manegement_System");
                     break;
                   default:
                     console.log("Unknown role");
