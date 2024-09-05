@@ -109,7 +109,7 @@ export const GetProductOrderDetails = createAsyncThunk(
 
 export const AddProductOrderForPre = createAsyncThunk(
   "factory/AddProductOrderForPre",
-  async (requestedDataP, { rejectWithValue }) => {
+  async ({requestedDataP}, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `wp-json/order-preparation-api/v1/order-send-by-product/`,

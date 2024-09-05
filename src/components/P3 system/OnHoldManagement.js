@@ -116,7 +116,7 @@ function OnHoldManagement() {
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
     const quantity = selectedOrders.map((order) => order.qty_fullfilled);
-
+  
     if (selectedOrders.length === 0) {
       await ShowAlert(
         "Please select products for fulfilling orders",
@@ -131,7 +131,7 @@ function OnHoldManagement() {
       );
       return;
     }
-
+  
     const systemSelection = await ShowAlert2(
       "Please select the system to send data",
       "",
@@ -145,11 +145,11 @@ function OnHoldManagement() {
       1,
       2
     );
-
+  
     if (systemSelection === "Cancel") {
       return;
     }
-
+  
     const confirmation = await ShowAlert(
       `Are you sure you want to send the data to ${systemSelection}?`,
       "",
@@ -160,10 +160,11 @@ function OnHoldManagement() {
       "Cancel",
       0
     );
-
+  
     if (confirmation === "Cancel") {
       return;
     }
+  
     const requestedDataP = {
       product_id: params.id,
       po_id: productOverallData.po_id,
@@ -173,38 +174,50 @@ function OnHoldManagement() {
       variation_id: params.variation_id,
       warehouse: systemSelection === "P1 System UAE" ? "" : "China",
     };
-
+  
     try {
-      const response = await dispatch(
-        AddProductOrderForPre(requestedDataP)
-      ).then(({ payload }) => {
-        console.log(payload, "payload from  AddProductOrderForPre");
-        if (response?.data?.status_code === 200) {
+      await dispatch(AddProductOrderForPre({ requestedDataP })).then(({ payload }) => {
+        console.log(payload,'payload from AddProductOrderForPre')
+        if (payload?.status_code === 200) {
           ShowAlert(
-            response?.data?.Message,
+            payload?.Message,
             "",
-            "success", // Assuming success icon
+            "success",
             false,
             false,
             "",
             "",
             "",
-            3500
+            1500
+          );
+        }else{
+          ShowAlert(
+            payload,
+            "",
+            "error",
+            false,
+            false,
+            "",
+            "",
+            "",
+            1500
           );
         }
       });
+  
+      // Fetch updated product order details
       await fetchProductOrderDetails();
+  
+      // Reset selected orders and deselect checkboxes
+      setSelectedOrders([]);
       setProductData((prevProductData) =>
         prevProductData.map((row) => ({ ...row, isSelected: false }))
       );
-      setSelectedOrders([]);
-      if (selectedOrders.length === productData.length) {
-        setProductData([]);
-      }
     } catch (error) {
       console.error("Error occurred:", error);
     }
   };
+  
 
   const handleOrderStock = async () => {
     const product_id = params.id;
