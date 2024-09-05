@@ -290,17 +290,12 @@ const PoDetails = () => {
 
     // Proceed with dispatch update action
     let apiUrl = `wp-json/custom-available-status/v1/estimated-status/${id}`;
-    await dispatch(UpdatePODetails({apiUrl,payload: updatedData})).then(({payload})=>{
-      console.log(payload,'payload from UpdatePODetails')
-     ShowAlert(
-        payload.message,
-        "",
-        "",
-        true,
-        false,
-        "OK"
-      );
-    })
+    await dispatch(UpdatePODetails({ apiUrl, payload: updatedData })).then(
+      ({ payload }) => {
+        console.log(payload, "payload from UpdatePODetails");
+        ShowAlert(payload.message, "", "", true, false, "OK");
+      }
+    );
   };
 
   const handlepayMentStatus = (value) => {
@@ -479,40 +474,12 @@ const PoDetails = () => {
       },
     },
     {
-      field: "rmb_price",
-      headerName: t("POManagement.RMBPrice"),
-      flex: 3,
-      valueGetter: (value, row) => {
-        if (row.id === "TAX") {
-          return row.taxTotal;
-        }
-        return value;
-      },
-    },
-    {
-      field: "total_price",
-      headerName: t("POManagement.AEDPrice"),
-      flex: 3,
-      colSpan: (value, row) => {
-        if (row.id === "TAX") {
-          return 1;
-        }
-        return undefined;
-      },
-      valueGetter: (value, row) => {
-        if (row.id === "TAX") {
-          return `${row.total_cost}`;
-        }
-        return value;
-      },
-    },
-    {
       field: "received_quantity",
       headerName: t("POManagement.ReceivedQty"),
       flex: 2.5,
       colSpan: (value, row) => {
         if (row?.id == "TAX") {
-          return 5;
+          return 4;
         }
         return undefined;
       },
@@ -657,6 +624,34 @@ const PoDetails = () => {
             </option>
           </Form.Select>
         );
+      },
+    },
+    {
+      field: "rmb_price",
+      headerName: t("POManagement.RMBPrice"),
+      flex: 3,
+      valueGetter: (value, row) => {
+        if (row.id === "TAX") {
+          return row.taxTotal;
+        }
+        return value;
+      },
+    },
+    {
+      field: "total_price",
+      headerName: t("POManagement.AEDPrice"),
+      flex: 3,
+      colSpan: (value, row) => {
+        if (row.id === "TAX") {
+          return 1;
+        }
+        return undefined;
+      },
+      valueGetter: (value, row) => {
+        if (row.id === "TAX") {
+          return `${row.total_cost}`;
+        }
+        return value;
       },
     },
   ];

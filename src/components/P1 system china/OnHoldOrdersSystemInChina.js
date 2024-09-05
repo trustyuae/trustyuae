@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, IconButton, Snackbar, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -21,6 +21,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { OnHoldOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function OnHoldOrdersSystemInChina() {
   const inputRef = useRef(null);
@@ -44,11 +45,12 @@ function OnHoldOrdersSystemInChina() {
     null,
     null,
   ]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const OnholdOrdersData = useSelector(
     (state) => state?.orderSystemChina?.onHoldOrders
   );
-  
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -93,6 +95,17 @@ function OnHoldOrdersSystemInChina() {
     setPage(1);
   };
 
+  const handleCopy = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setSnackbarOpen(true); // Show the Snackbar
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   const columns = [
     {
       field: "date",
@@ -121,11 +134,25 @@ function OnHoldOrdersSystemInChina() {
       valueGetter: (value, row) => getCountryName(row.shipping_country),
     },
     {
-      field: "order_status",
-      headerName: t("P1ChinaSystem.OrderStatus"),
+      field: "tracking_id",
+      headerName: t("P1ChinaSystem.TrackingID"),
       flex: 1,
       className: "order-system",
       type: "string",
+      renderCell: (params) => {
+        const items = params?.row?.items || [];
+        const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
+        return (
+          <Box className="d-flex align-items-center justify-content-center">
+            <Typography>{trackingID}</Typography>
+            {trackingID !== "0" && (
+              <IconButton onClick={() => handleCopy(trackingID)}>
+                <ContentCopyIcon />
+              </IconButton>
+            )}
+          </Box>
+        );
+      },
     },
     {
       field: "view_item",
@@ -233,9 +260,9 @@ function OnHoldOrdersSystemInChina() {
 
   return (
     <Container fluid className="py-3">
-       <Box className="d-flex mb-4 justify-content-between">
+      <Box className="d-flex mb-4 justify-content-between">
         <Typography variant="h4" className="fw-semibold">
-        {t("P1ChinaSystem.OnHoldOrdersSystemInChina")}
+          {t("P1ChinaSystem.OnHoldOrdersSystemInChina")}
         </Typography>
         <ButtonGroup>
           {radios.map((radio, idx) => (
@@ -259,8 +286,10 @@ function OnHoldOrdersSystemInChina() {
           <Row className="mb-4 align-items-center">
             <Col xs="auto" lg="4">
               <Form.Group>
-              <Form.Label className="fw-semibold">{t("P1ChinaSystem.OrderId")}:</Form.Label>
-              <Form.Control
+                <Form.Label className="fw-semibold">
+                  {t("P1ChinaSystem.OrderId")}:
+                </Form.Label>
+                <Form.Control
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   // value={searchOrderID}
@@ -273,7 +302,7 @@ function OnHoldOrdersSystemInChina() {
             <Col xs="auto" lg="4">
               <Form.Group style={{ position: "relative" }}>
                 <Form.Label className="fw-semibold mb-0">
-                {t("POManagement.DateFilter")}:
+                  {t("POManagement.DateFilter")}:
                 </Form.Label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={["SingleInputDateRangeField"]}>
@@ -305,13 +334,17 @@ function OnHoldOrdersSystemInChina() {
             </Col>
             <Col xs="auto" lg="4">
               <Form.Group>
-              <Form.Label className="fw-semibold">{t("P1ChinaSystem.Dispatchtype")}:</Form.Label>
-              <Form.Select
+                <Form.Label className="fw-semibold">
+                  {t("P1ChinaSystem.Dispatchtype")}:
+                </Form.Label>
+                <Form.Select
                   className="mr-sm-2 py-2"
                   onChange={(e) => searchDispatchTypeFilter(e.target.value)}
                 >
-                    <option value="all">{t("POManagement.All")}</option>
-                  <option value="dispatch">{t("P1ChinaSystem.dispatch")}</option>
+                  <option value="all">{t("POManagement.All")}</option>
+                  <option value="dispatch">
+                    {t("P1ChinaSystem.dispatch")}
+                  </option>
                   {/* <option value="reserve">{t("P1ChinaSystem.reserve")}</option> */}
                 </Form.Select>
               </Form.Group>
@@ -320,7 +353,7 @@ function OnHoldOrdersSystemInChina() {
           <Box className="d-flex justify-content-end">
             <Form.Group className="d-flex mx-1 align-items-center">
               <Form.Label className="fw-semibold mb-0 me-2">
-              {t("P1ChinaSystem.PageSize")}:
+                {t("P1ChinaSystem.PageSize")}:
               </Form.Label>
               <Form.Control
                 as="select"
@@ -340,7 +373,7 @@ function OnHoldOrdersSystemInChina() {
               className="mr-2 mx-1 w-auto"
               onClick={(e) => handleSearchFilter(e)}
             >
-               {t("P1ChinaSystem.Search")}
+              {t("P1ChinaSystem.Search")}
             </Button>
             <Button
               type="button"
@@ -348,7 +381,7 @@ function OnHoldOrdersSystemInChina() {
               onClick={handleReset}
             >
               {t("P1ChinaSystem.ResetFilter")}
-              </Button>
+            </Button>
           </Box>
         </Form>
       </Row>
@@ -372,13 +405,23 @@ function OnHoldOrdersSystemInChina() {
               severity="warning"
               sx={{ fontFamily: "monospace", fontSize: "18px" }}
             >
-               {t("P1ChinaSystem.RecordsIsNotAlert")}:
-               </Alert>
+              {t("P1ChinaSystem.RecordsIsNotAlert")}:
+            </Alert>
           )}
         </>
       )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000} // Snackbar will auto-dismiss after 3 seconds
+        onClose={() => setSnackbarOpen(false)}
+        message="Tracking ID copied to clipboard!"
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
     </Container>
   );
-};
+}
 
 export default OnHoldOrdersSystemInChina;

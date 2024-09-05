@@ -127,7 +127,18 @@ export default function DataTable({
                 return "bg-yellow";
               }
               if (params.row.items.some((item) => item.in_china == 0)) {
-                return "  ";
+                return "";
+              }
+            }
+            if (params.colDef.className == "completed-order-system") {
+              if (!params.row.items.map((item) => item.in_china == 1)) {
+                return "";
+              }
+              if (params.row.items.some((item) => item.in_china == 1)) {
+                return "bg-yellow";
+              }
+              if (params.row.items.some((item) => item.in_china == 0)) {
+                return "";
               }
             }
           }}
