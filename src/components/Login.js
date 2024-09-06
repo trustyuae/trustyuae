@@ -19,7 +19,7 @@ const Login = () => {
   const [usernameError, setUserNameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const loader = useSelector((state)=>state?.user?.isLoading)
+  const loader = useSelector((state) => state?.user?.isLoading);
 
   const handleUsername = (e) => {
     setUserName(e.target.value);
@@ -69,7 +69,7 @@ const Login = () => {
                     navigate("/ordersystem");
                     break;
                   case "factory_coordinator":
-                    navigate("/PO_ManagementSystem");
+                    navigate("/ordersystem_in_china");
                     break;
                   case "customer_support":
                     navigate("/order_not_available");
