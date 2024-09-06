@@ -210,87 +210,30 @@ function OnHoldManegementSystem() {
   };
 
   const renderVariationValuesPoColumn = (params) => {
-    // Check if params.row and params.row.variation_values are defined
-    const variationValues = params.row?.variation_values;
+    const variationValues = params.row?.variation_value;
 
-    // Handle case where variationValues is undefined or null
     if (!variationValues || typeof variationValues !== "object") {
       return (
         <Box className="d-flex justify-content-around align-items-center w-100">
-          <Box>No any variation</Box>
+          <Box>No variation available</Box>
         </Box>
       );
     }
 
-    // Convert variationValues object to an array of objects
-    const variationArray = Object.entries(variationValues).map(
-      ([key, value]) => ({ [key]: value })
-    );
+    const variationArray = Object.entries(variationValues);
 
-    const noVariation = variationArray.length === 0;
     return (
       <Box className="d-flex justify-content-around align-items-center w-100">
-        {noVariation ? (
-          <Box>No any variation</Box>
+        {variationArray.length === 0 ? (
+          <Box>No variation available</Box>
         ) : (
-          <div className="container mt-4 mb-4">
-            {variationArray.map((item, index) => {
-              const attributeName = Object.keys(item)[0];
-              const attributeValue = Object.values(item)[0];
-
-              return (
-                <React.Fragment key={index}>
-                  <div
-                    className={`row mb-${
-                      typeof attributeValue === "string" ? "3" : "4"
-                    }`}
-                  >
-                    <div className="col-6 d-flex justify-content-end align-items-center">
-                      <InputLabel
-                        id={`customer-color-${params.row.id}-label`}
-                        className="d-flex"
-                        style={{ marginRight: "10px", width: "100px" }}
-                      >
-                        {attributeName}:
-                      </InputLabel>
-                    </div>
-                    <div className="col-6 d-flex justify-content-start align-items-center">
-                      {typeof attributeValue === "string" ? (
-                        <div className="d-flex" style={{ flex: 1 }}>
-                          {attributeValue}
-                        </div>
-                      ) : (
-                        <MuiSelect
-                          labelId={`customer-color-${params.row.id}-label`}
-                          id={`customer-color-${params.row.id}`}
-                          onChange={(event) =>
-                            handleAttributeChange(
-                              event,
-                              params.row,
-                              attributeName
-                            )
-                          }
-                          fullWidth
-                          style={{
-                            height: "40px",
-                            width: "279px",
-                            marginLeft: "10px",
-                          }}
-                          value={params.row[attributeName] || ""}
-                        >
-                          {attributeValue?.map((value) => (
-                            <MenuItem key={value} value={value}>
-                              {value}
-                            </MenuItem>
-                          ))}
-                        </MuiSelect>
-                      )}
-                    </div>
-                  </div>
-                </React.Fragment>
-              );
-            })}
-          </div>
+          <Box>
+            {variationArray.map(([key, value], index) => (
+              <div key={index}>
+                {key}: {value}
+              </div>
+            ))}
+          </Box>
         )}
       </Box>
     );
@@ -352,8 +295,8 @@ function OnHoldManegementSystem() {
     {
       field: "variation_values",
       headerName: "Variation Values",
-      flex: 1,
-      renderCell: renderVariationValues,
+      flex: 1.5,
+      renderCell: renderVariationValuesPoColumn,
     },
     {
       field: "",
@@ -817,8 +760,9 @@ function OnHoldManegementSystem() {
   };
 
   const fetchPoProductData = async () => {
+    const apiUrl = `wp-json/fetch-po-details/v1/get-product-under-po/${selectedPOId}/?per_page=${pageSize}&page=${page}`
     try {
-      dispatch(FetchPoProductData({ selectedPOId })).then(({ payload }) => {
+      dispatch(FetchPoProductData({ apiUrl })).then(({ payload }) => {
         const data = payload?.line_items?.map((item, i) => ({
           ...item,
           id: i + currentStartIndex,
@@ -1072,7 +1016,7 @@ function OnHoldManegementSystem() {
                   // totalPages={totalPages}
                   // handleChange={handleChange}
                   showAllRows={true}
-                  rowHeight="auto"
+                  // rowHeight="auto"
                   hidePagination={true}
                 />
               </div>
@@ -1117,9 +1061,9 @@ function OnHoldManegementSystem() {
                       totalPages={totalPages}
                       handleChange={handleChange}
                       rowHeight="auto"
-                      showAllRows={true}
+                      // showAllRows={true}
                       // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
-                      hidePagination={true}
+                      // hidePagination={true}
                     />
                   </>
                 ) : (
@@ -1199,16 +1143,29 @@ function OnHoldManegementSystem() {
             onChange={(e) => setMessage(e.target.value)}
           />
           <Box className="text-end my-3">
-            <Button
-              variant="primary"
-              className="mt-2 fw-semibold"
-              disabled={poTableData.length == 0 && tableData.length == 0}
-              onClick={
-                selectedFactory.length > 0 ? handleCreateGrn : handleSubmit
-              }
-            >
-              Create GRN
-            </Button>
+            {loading ? (
+              <Button
+                variant="primary"
+                className="mt-2 fw-semibold"
+                disabled={poTableData?.length == 0 && tableData?.length == 0}
+                onClick={
+                  selectedFactory.length > 0 ? handleCreateGrn : handleSubmit
+                }
+              >
+                Create GRN
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                className="mt-2 fw-semibold"
+                disabled={poTableData?.length == 0 && tableData?.length == 0}
+                onClick={
+                  selectedFactory.length > 0 ? handleCreateGrn : handleSubmit
+                }
+              >
+                Create GRN
+              </Button>
+            )}
           </Box>
         </Modal.Body>
       </Modal>
