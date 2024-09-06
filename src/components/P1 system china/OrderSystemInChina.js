@@ -146,6 +146,21 @@ function OrderSystemInChina() {
       headerName: t("P1ChinaSystem.OrderId"),
       className: "order-system",
       flex: 1,
+      type: "string",
+      renderCell: (params) => {
+        const items = params?.row?.items || [];
+        const orderID = items.length > 0 ? items[0]?.item_id : "";
+        return (
+          <Box className="d-flex align-items-center justify-content-center">
+            <Typography>{orderID}</Typography>
+            {orderID !== "0" && (
+              <IconButton onClick={() => handleCopy(orderID)}>
+                <ContentCopyIcon />
+              </IconButton>
+            )}
+          </Box>
+        );
+      },
     },
     {
       field: "customer_name",
