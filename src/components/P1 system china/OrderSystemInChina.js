@@ -148,13 +148,13 @@ function OrderSystemInChina() {
       flex: 1,
       type: "string",
       renderCell: (params) => {
-        const items = params?.row?.items || [];
+        const items = params?.row?.order_id || [];
         const orderID = items.length > 0 ? items[0]?.item_id : "";
         return (
           <Box className="d-flex align-items-center justify-content-center">
-            <Typography>{orderID}</Typography>
-            {orderID !== "0" && (
-              <IconButton onClick={() => handleCopy(orderID)}>
+            <Typography>{items}</Typography>
+            {items !== "0" && (
+              <IconButton onClick={() => handleCopy(items)}>
                 <ContentCopyIcon />
               </IconButton>
             )}
