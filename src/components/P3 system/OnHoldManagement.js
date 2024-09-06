@@ -294,6 +294,8 @@ function OnHoldManagement() {
     setPage(e.target.value);
   };
 
+  console.log(productData, "productData from onhold management system");
+
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
@@ -405,7 +407,9 @@ function OnHoldManagement() {
             </div>
           ) : (
             <div className="mt-2">
-              {productData && productData.length !== 0 ? (
+              {productData &&
+              productData.length !== 0 &&
+              productData.every((item) => item.order_id !== "0") ? (
                 <DataTable
                   columns={columns}
                   rows={productData}
@@ -419,7 +423,8 @@ function OnHoldManagement() {
                   severity="warning"
                   sx={{ fontFamily: "monospace", fontSize: "18px" }}
                 >
-                  Above product doesn't have any order yet!
+                  One or more products having an order ID zero, so no data can
+                  be shown!
                 </Alert>
               )}
             </div>
