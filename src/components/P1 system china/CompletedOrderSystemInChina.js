@@ -153,7 +153,7 @@ function CompletedOrderSystemInChina() {
                 style={{
                   width: "80%",
                   textAlign: "center",
-                  fontWeight: "bold",
+                  fontWeight: trackingID == 0 ? "lighter" : "bold",
                 }}
                 readOnly
               />
