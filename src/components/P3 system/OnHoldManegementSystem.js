@@ -808,19 +808,68 @@ function OnHoldManegementSystem() {
     }
   };
 
+  // const handleCreateGrn = async () => {
+  //   const currentDate = new Date().toISOString().split("T")[0];
+  //   const filteredData = poTableData.filter((item) => !item.disabled);
+
+  //   if (filteredData.length === 0) {
+  //     Swal.fire({
+  //       title: "No data to submit",
+  //       icon: "warning",
+  //       showConfirmButton: true,
+  //     });
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     po_id: poId || "",
+  //     product_id: filteredData.map((item) => item.product_id),
+  //     variation_id: filteredData.map((item) => item.variation_id),
+  //     received_qty: filteredData.map((item) => item.received_quantity),
+  //     created_date: currentDate,
+  //     verified_by: userData?.first_name + " " + userData?.last_name || "",
+  //     note: message,
+  //     status: "Processing",
+  //   };
+
+  //   try {
+  //     await dispatch(AddGrn(payload)).then(({ payload }) => {
+  //       Swal.fire({
+  //         title: payload.data,
+  //         icon: payload.status === 200 ? "success" : "error",
+  //         showConfirmButton: true,
+  //       }).then((result) => {
+  //         if (result.isConfirmed) {
+  //           navigate("/GRN_Management");
+  //         }
+  //       });
+  //     });
+  //     const updatedPoTableData = poTableData.map((item) => ({
+  //       ...item,
+  //       received_quantity: 0,
+  //     }));
+  //     setPoTableData(updatedPoTableData);
+  //   } catch (error) {
+  //     console.error("Error submitting data:", error);
+  //   }
+  // };  
+
   const handleCreateGrn = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
-    const filteredData = poTableData.filter((item) => !item.disabled);
-
+    
+    // Filter data to get items that are not disabled and have a non-zero received quantity
+    const filteredData = poTableData.filter((item) => !item.disabled && item.received_quantity > 0);
+  
+    // If no data has a non-zero received quantity, show warning and return
     if (filteredData.length === 0) {
       Swal.fire({
-        title: "No data to submit",
+        title: "No items with received quantity",
         icon: "warning",
         showConfirmButton: true,
       });
       return;
     }
-
+  
     const payload = {
       po_id: poId || "",
       product_id: filteredData.map((item) => item.product_id),
@@ -831,8 +880,9 @@ function OnHoldManegementSystem() {
       note: message,
       status: "Processing",
     };
-
+  
     try {
+      // Dispatch the action and handle the result
       await dispatch(AddGrn(payload)).then(({ payload }) => {
         Swal.fire({
           title: payload.data,
@@ -844,6 +894,8 @@ function OnHoldManegementSystem() {
           }
         });
       });
+  
+      // Reset the received_quantity to 0 for all items in poTableData
       const updatedPoTableData = poTableData.map((item) => ({
         ...item,
         received_quantity: 0,
@@ -852,7 +904,7 @@ function OnHoldManegementSystem() {
     } catch (error) {
       console.error("Error submitting data:", error);
     }
-  };
+  }; 
 
   const handleChange = (event, value) => {
     setPage(value);

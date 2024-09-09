@@ -494,6 +494,8 @@ const PoDetails = () => {
               type="number"
               value={params.row.received_quantity}
               placeholder="0"
+              min={0} // Prevent negative values
+              max={params.row.quantity} // Set maximum value to quantity
               onChange={(e) => handleRecievedQtyChange(e, params.row)}
             />
           </Form.Group>
