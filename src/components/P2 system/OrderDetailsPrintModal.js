@@ -324,7 +324,9 @@ const OrderDetailsPrintModal = ({
         id: item.id,
         product_name: item.id === "total" ? "Total:" : item.product_name,
         quantity: item.quantity || 0,
-        order_ids: item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
+        order_ids: Array.isArray(item.order_ids)
+          ? item.order_ids.join(", ")
+          : "N/A",
         colspan: 2,
         factory_image: item.factory_image
           ? item.factory_image
@@ -334,7 +336,7 @@ const OrderDetailsPrintModal = ({
       };
     }
   });
-  
+
   useEffect(() => {
     // Effect to handle changes in PO_OrderList, if needed
   }, [PO_OrderList]);
