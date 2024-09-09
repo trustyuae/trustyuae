@@ -382,10 +382,14 @@ function OrderTrackingNumberPending() {
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
             <Form.Control
               type="text"
-              value={trackId}
+              value={trackId !== "0" ? trackId : "Enter Tracking ID"}
               placeholder="Enter tracking ID"
               onChange={(e) => handleTrackIdAssign(params.row, e)}
-              style={{ width: "80%", textAlign: "center",fontWeight: "bold" }} 
+              style={{
+                width: "80%",
+                textAlign: "center",
+                fontWeight: trackId !== "0" ? "bold" : "normal", // Conditionally set the font weight
+              }}
             />
           </Form.Group>
         );
