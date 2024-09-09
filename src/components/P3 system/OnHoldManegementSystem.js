@@ -795,7 +795,7 @@ function OnHoldManegementSystem() {
   };
 
   const handleRecievedQtyChange = (index, event) => {
-    if (index.target.value >= 0) {
+    if (index.target.value >= 0 && index.target.value <= event.quantity) {
       const updatedRecivedQtyData = poTableData.map((item) => {
         if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {

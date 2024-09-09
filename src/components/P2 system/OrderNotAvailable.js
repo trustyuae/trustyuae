@@ -448,7 +448,7 @@ function OrderNotAvailable() {
         </Typography>
       </Box>
       <Box className="d-flex justify-content-end my-3">
-        <Form.Group className="d-flex mx-1 align-items-center">
+        <Form.Group className="d-flex mx-1 align-items-center mb-auto">
           <Form.Label className="fw-semibold mb-0 me-2">Page Size:</Form.Label>
           <Form.Control
             as="select"

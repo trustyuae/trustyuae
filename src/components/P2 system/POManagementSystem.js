@@ -50,6 +50,7 @@ function POManagementSystem() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const pageSizeOptions = [5, 10, 20, 50, 100];
   const [totalPages, setTotalPages] = useState(1);
   const [lang, setLang] = useState("En");
 
@@ -97,7 +98,7 @@ function POManagementSystem() {
           apiUrl: `${apiUrl}&${new URLSearchParams(params).toString()}`,
         })
       ).then(({ payload }) => {
-        console.log(payload,'payload data')
+        console.log(payload, "payload data");
         const data = payload?.pre_orders?.map((v, i) => ({ ...v, id: i }));
         setOrderList(data);
         setTotalPages(payload.total_pages);
@@ -114,7 +115,16 @@ function POManagementSystem() {
 
   useEffect(() => {
     POM_system_products();
-  }, [page, startDate, endDate, selectedFactory, PoStatus, searchPoID, poType]);
+  }, [
+    page,
+    pageSize,
+    startDate,
+    endDate,
+    selectedFactory,
+    PoStatus,
+    searchPoID,
+    poType,
+  ]);
 
   const handleDateChange = (newDateRange) => {
     setSelectedDateRange(newDateRange);
@@ -165,12 +175,15 @@ function POManagementSystem() {
       headerName: t("POManagement.Quantity"),
       flex: 1.5,
     },
-    { field: "", headerName: t("POManagement.RMBPrice"), flex: 1.5,
+    {
+      field: "",
+      headerName: t("POManagement.RMBPrice"),
+      flex: 1.5,
       type: "html",
       renderCell: (value, row) => {
-        return (value.row.estimated_cost_aed*1.92).toFixed(2)
+        return (value.row.estimated_cost_aed * 1.92).toFixed(2);
       },
-     },
+    },
     {
       field: "estimated_cost_aed",
       headerName: t("POManagement.AEDPrice"),
@@ -276,6 +289,12 @@ function POManagementSystem() {
     setStartDate("");
     setEndDate("");
   };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+    setPage(1);
+  };
+
   return (
     <Container fluid className="p-5">
       <Box className="d-flex justify-content-between align-items-center">
@@ -384,6 +403,25 @@ function POManagementSystem() {
                 />
               </Form.Group>
             </Col>
+          </Row>
+          <Row>
+            <Form.Group className="d-flex justify-content-end align-items-center">
+              <Form.Label className="fw-semibold text-center me-2">
+                Page Size:
+              </Form.Label>
+              <Form.Control
+                as="select"
+                className="w-auto"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
           </Row>
         </Form>
       </Row>
