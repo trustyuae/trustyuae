@@ -420,7 +420,7 @@ function OrderTrackingNumberPending() {
       className: "order-system-track",
       type: "html",
       renderCell: (params) => {
-        const pushOff = params.row.exist_item === "1" ? true : false;
+        const pushOff = params.row.exist_item === "1" || params.row.items[0]?.tracking_id === "0"  ? true : false;
         return (
           <Box display="flex" justifyContent="center" alignItems="center">
             <Button

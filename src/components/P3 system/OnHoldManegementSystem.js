@@ -351,6 +351,24 @@ function OnHoldManegementSystem() {
       ),
     },
     {
+      field: "product_name",
+      headerName: "product Name",
+      flex: 1,
+      className: " d-flex justify-content-center align-items-center",
+    },
+    {
+      field: "order_ids",
+      headerName: "Order ID's",
+      flex: 1,
+      className: "d-flex justify-content-center align-items-center",
+      renderCell: (params) => {
+        const orders = params.row.order_ids
+          .map((order) => order)
+          .join(", ");
+        return <Box>{orders}</Box>;
+      },
+    },
+    {
       field: "variation_values",
       headerName: "Variation Values",
       flex: 1.5,
@@ -760,7 +778,7 @@ function OnHoldManegementSystem() {
   };
 
   const fetchPoProductData = async () => {
-    const apiUrl = `wp-json/fetch-po-details/v1/get-product-under-po/${selectedPOId}/?per_page=${pageSize}&page=${page}`
+    const apiUrl = `wp-json/fetch-po-details/v1/get-product-under-po/${selectedPOId}/?per_page=${pageSize}&page=${page}`;
     try {
       dispatch(FetchPoProductData({ apiUrl })).then(({ payload }) => {
         const data = payload?.line_items?.map((item, i) => ({

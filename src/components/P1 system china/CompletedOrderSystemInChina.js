@@ -65,7 +65,7 @@ function CompletedOrderSystemInChina() {
   }, [completedOrdersData]);
 
   async function fetchOrders() {
-    let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?&page=${page}&per_page=${pageSize}`;
+    let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
     if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
     if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
     if (completedEndDate)
