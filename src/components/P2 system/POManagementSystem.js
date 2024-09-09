@@ -98,7 +98,7 @@ function POManagementSystem() {
         })
       ).then(({ payload }) => {
         console.log(payload,'payload data')
-        const data = payload.pre_orders.map((v, i) => ({ ...v, id: i }));
+        const data = payload?.pre_orders?.map((v, i) => ({ ...v, id: i }));
         setOrderList(data);
         setTotalPages(payload.total_pages);
       });

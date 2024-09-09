@@ -307,7 +307,7 @@ const PoDetails = () => {
   };
 
   const handleRecievedQtyChange = (index, event) => {
-    if (index.target.value >= 0) {
+    if (index.target.value >= 0 && index.target.value <= event.quantity) {
       const updatedRecivedQtyData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {
@@ -494,8 +494,6 @@ const PoDetails = () => {
               type="number"
               value={params.row.received_quantity}
               placeholder="0"
-              min={0} // Prevent negative values
-              max={params.row.available_quantity} // Set maximum value to quantity
               onChange={(e) => handleRecievedQtyChange(e, params.row)}
             />
           </Form.Group>
