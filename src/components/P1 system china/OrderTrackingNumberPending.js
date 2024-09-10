@@ -182,7 +182,7 @@ function OrderTrackingNumberPending() {
 
     const updatedItems = row.items.map((item) => ({
       ...item,
-      tracking_id: value,
+      tracking_id: value, // Allow value to be 0 or any valid input
     }));
 
     setOrders((prevOrders) =>
@@ -198,12 +198,15 @@ function OrderTrackingNumberPending() {
     const variationIds = rowData.items.map((item) =>
       parseInt(item.variation_id, 10)
     );
-    const trackingId = rowData.items[0]?.tracking_id; // Assuming the tracking ID is the same for all items
+    const trackingId = rowData.items[0]?.tracking_id; // Get tracking ID (allow 0)
+
+    // Ensure trackingId is handled even when 0
     const payload = {
-      track_id: trackingId, // Use the updated tracking ID
+      track_id: trackingId,
       product_id: productIds,
       variation_id: variationIds,
     };
+
     dispatch(AssignTrackID({ orderId, payload }));
   };
 
@@ -375,7 +378,7 @@ function OrderTrackingNumberPending() {
       field: "order_id",
       headerName: t("P1ChinaSystem.OrderId"),
       className: "order-system-track",
-      flex: 1,
+      flex: 0.5,
     },
     {
       field: "items",
@@ -400,7 +403,7 @@ function OrderTrackingNumberPending() {
     {
       field: "order_status",
       headerName: t("P1ChinaSystem.TrackingID"),
-      flex: 1,
+      flex: 1.5,
       className: "order-system-track",
       renderCell: (params) => {
         const trackId = params.row.items[0]?.tracking_id || "";
@@ -408,13 +411,19 @@ function OrderTrackingNumberPending() {
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
             <Form.Control
               type="text"
-              value={trackId !== "0" ? trackId : ""} // Show trackId if not "0", otherwise show an empty string
-              placeholder={trackId === "0" ? "Enter tracking ID" : ""} // Show placeholder if trackId is "0"
+              value={trackId} // Assign tracking ID directly, including "0"
               onChange={(e) => handleTrackIdAssign(params.row, e)}
+              onPaste={(e) => {
+                e.preventDefault();
+                const pastedText = e.clipboardData.getData("text");
+                handleTrackIdAssign(params.row, {
+                  target: { value: pastedText },
+                });
+              }} // Handle paste event and replace any placeholder
               style={{
-                width: "80%",
+                width: "90%",
                 textAlign: "center",
-                fontWeight: trackId !== "0" ? "bold" : "normal", // Conditionally set the font weight
+                fontWeight: trackId !== "" ? "bold" : "normal", // Conditionally set font weight
               }}
             />
           </Form.Group>
