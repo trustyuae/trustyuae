@@ -68,6 +68,7 @@ function OrderTrackingNumberPending() {
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
+  const [allSelected, setAllSelected] = useState(false);
 
   const [showFileUploadModal, setShowfileUploadModal] = useState(false);
 
@@ -119,6 +120,20 @@ function OrderTrackingNumberPending() {
     );
   }
 
+  const onSelectAll = () => {
+    if (allSelected) {
+      // Deselect all items on the current page
+      setSelectedItemIds([]);
+      setSelectedItems([]);
+    } else {
+      // Select all items on the current page
+      const allIdsOnPage = orders.map((order) => order.id); // Update to get IDs of items on the current page
+      setSelectedItemIds(allIdsOnPage);
+      setSelectedItems(orders); // Select all items on the current page
+    }
+    setAllSelected(!allSelected);
+  };
+
   const handleItemSelection = (rowData) => {
     const selectedIndex = selectedItemIds.indexOf(rowData.id);
     const newSelected =
@@ -165,10 +180,10 @@ function OrderTrackingNumberPending() {
   const handleTrackIdAssign = (row, event) => {
     const { value } = event.target;
 
-      const updatedItems = row.items.map((item) => ({
-        ...item,
-        tracking_id: value,
-      }));
+    const updatedItems = row.items.map((item) => ({
+      ...item,
+      tracking_id: value,
+    }));
 
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
@@ -322,22 +337,33 @@ function OrderTrackingNumberPending() {
       field: "select",
       headerName: t("POManagement.Select"),
       flex: 0.5,
-      className: "order-system-track",
-      renderCell: (params) => {
-        const selectButtonOff = params.row.exist_item === "1" ? true : false;
-        return (
-          <FormGroup>
-            <FormControlLabel
-              className="mx-auto"
-              control={<Checkbox />}
-              // disabled={selectButtonOff}
-              style={{ justifyContent: "center" }}
-              checked={selectedItemIds.includes(params.row.id)}
-              onChange={(event) => handleItemSelection(params.row)}
+      renderHeader: (params) => (
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={allSelected}
+              onChange={() => onSelectAll()}
+              indeterminate={selectedItemIds.length > 0 && !allSelected} // Show indeterminate state if some but not all items are selected
             />
-          </FormGroup>
-        );
-      },
+          }
+          label={t("POManagement.Select")}
+          style={{ justifyContent: "center" }}
+        />
+      ),
+      renderCell: (params) => (
+        <FormGroup>
+          <FormControlLabel
+            className="mx-auto"
+            control={
+              <Checkbox
+                checked={selectedItemIds.includes(params.row.id)}
+                onChange={() => handleItemSelection(params.row)}
+              />
+            }
+            style={{ justifyContent: "center" }}
+          />
+        </FormGroup>
+      ),
     },
     {
       field: "date",
