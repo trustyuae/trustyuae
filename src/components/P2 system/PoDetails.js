@@ -400,7 +400,21 @@ const PoDetails = () => {
     );
   };
 
+  let rowIndex = 1;
   const columns = [
+    {
+      field: "index",
+      headerName: "#",
+      flex: 1,
+      renderCell: (params) => {
+        if (params.row.id === "TAX") {
+          return null;
+        }
+
+        const index = rowIndex++;
+        return index;
+      },
+    },
     {
       field: "product_name",
       headerName: t("POManagement.ProductName"),
