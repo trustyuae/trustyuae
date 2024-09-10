@@ -197,10 +197,7 @@ function OnHoldManagement() {
         }
       );
 
-      // Fetch updated product order details
       await fetchProductOrderDetails();
-
-      // Reset selected orders and deselect checkboxes
       setSelectedOrders([]);
       setProductData((prevProductData) =>
         prevProductData.map((row) => ({ ...row, isSelected: false }))
@@ -252,7 +249,7 @@ function OnHoldManagement() {
         const orderId =
           params.row.order_id !== "0" ? params.row.order_id : "No Order ID Avl";
         return (
-          <div>{orderId}</div> // Adjust rendering as needed
+          <div>{orderId}</div> 
         );
       },
     },
