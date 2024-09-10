@@ -362,9 +362,7 @@ function OnHoldManegementSystem() {
       flex: 1,
       className: "d-flex justify-content-center align-items-center",
       renderCell: (params) => {
-        const orders = params.row.order_ids
-          .map((order) => order)
-          .join(", ");
+        const orders = params?.row?.order_ids?.map((order) => order).join(", ");
         return <Box>{orders}</Box>;
       },
     },
@@ -852,14 +850,16 @@ function OnHoldManegementSystem() {
   //   } catch (error) {
   //     console.error("Error submitting data:", error);
   //   }
-  // };  
+  // };
 
   const handleCreateGrn = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
-    
+
     // Filter data to get items that are not disabled and have a non-zero received quantity
-    const filteredData = poTableData.filter((item) => !item.disabled && item.received_quantity > 0);
-  
+    const filteredData = poTableData.filter(
+      (item) => !item.disabled && item.received_quantity > 0
+    );
+
     // If no data has a non-zero received quantity, show warning and return
     if (filteredData.length === 0) {
       Swal.fire({
@@ -869,9 +869,14 @@ function OnHoldManegementSystem() {
       });
       return;
     }
-  
+
     const payload = {
       po_id: poId || "",
+      order_id: filteredData.flatMap((item) =>
+        Array.isArray(item.order_ids)
+          ? item.order_ids.map((id) => id.toString())
+          : [item.order_ids.toString()]
+      ),
       product_id: filteredData.map((item) => item.product_id),
       variation_id: filteredData.map((item) => item.variation_id),
       received_qty: filteredData.map((item) => item.received_quantity),
@@ -880,7 +885,7 @@ function OnHoldManegementSystem() {
       note: message,
       status: "Processing",
     };
-  
+
     try {
       // Dispatch the action and handle the result
       await dispatch(AddGrn(payload)).then(({ payload }) => {
@@ -894,7 +899,7 @@ function OnHoldManegementSystem() {
           }
         });
       });
-  
+
       // Reset the received_quantity to 0 for all items in poTableData
       const updatedPoTableData = poTableData.map((item) => ({
         ...item,
@@ -904,7 +909,7 @@ function OnHoldManegementSystem() {
     } catch (error) {
       console.error("Error submitting data:", error);
     }
-  }; 
+  };
 
   const handleChange = (event, value) => {
     setPage(value);

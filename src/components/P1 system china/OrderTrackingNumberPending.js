@@ -165,10 +165,10 @@ function OrderTrackingNumberPending() {
   const handleTrackIdAssign = (row, event) => {
     const { value } = event.target;
 
-    const updatedItems = row.items.map((item) => ({
-      ...item,
-      tracking_id: value,
-    }));
+      const updatedItems = row.items.map((item) => ({
+        ...item,
+        tracking_id: value,
+      }));
 
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
@@ -382,8 +382,8 @@ function OrderTrackingNumberPending() {
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
             <Form.Control
               type="text"
-              value={trackId !== "0" ? trackId : "Enter Tracking ID"}
-              placeholder="Enter tracking ID"
+              value={trackId !== "0" ? trackId : ""} // Show trackId if not "0", otherwise show an empty string
+              placeholder={trackId === "0" ? "Enter tracking ID" : ""} // Show placeholder if trackId is "0"
               onChange={(e) => handleTrackIdAssign(params.row, e)}
               style={{
                 width: "80%",
@@ -420,7 +420,11 @@ function OrderTrackingNumberPending() {
       className: "order-system-track",
       type: "html",
       renderCell: (params) => {
-        const pushOff = params.row.exist_item === "1" || params.row.items[0]?.tracking_id === "0"  ? true : false;
+        const pushOff =
+          params.row.exist_item === "1" ||
+          params.row.items[0]?.tracking_id === "0"
+            ? true
+            : false;
         return (
           <Box display="flex" justifyContent="center" alignItems="center">
             <Button
