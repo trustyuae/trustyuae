@@ -117,7 +117,7 @@ export const AddProductOrderForPre = createAsyncThunk(
         requestedDataP
       );
       console.log(response,'response from AddProductOrderForPre')
-      return response;
+      return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);

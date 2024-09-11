@@ -38,52 +38,57 @@ function OnHoldManagement() {
   const [showImageModal, setShowImageModal] = useState(false);
   const loader = useSelector((state) => state?.p3System?.isLoading);
 
-  const loader2 = useSelector((state) => state?.p3System?.isLoading);
+  const productDetailsDataa = useSelector(
+    (state) => state?.p3System?.productDetails
+  );
+
+  const productDataa = useSelector(
+    (state) => state?.p3System?.productOrderDetails
+  );
+
+  useEffect(() => {
+    if (productDetailsDataa) {
+      setProductDetailsData(productDetailsDataa);
+    }
+  }, [productDetailsDataa]);
+
+  useEffect(() => {
+    if (productDataa) {
+      setProductOverallData(productDataa);
+      let data = productDataa.records.map((v, i) => ({
+        ...v,
+        id: i,
+        isSelected: false,
+      }));
+      if (selectedOrders.length > 0) {
+        selectedOrders.forEach((order) => {
+          data.forEach((o) => {
+            if (o.id === order.id) {
+              o.isSelected = true;
+            }
+          });
+        });
+      }
+      setProductData(data);
+    }
+  }, [productDataa]);
 
   async function fetchProductDetails() {
     let apiUrl = `wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
-    await dispatch(
+    dispatch(
       GetProductDetails({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then(({ payload }) => {
-        let data = payload;
-        setProductDetailsData(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   async function fetchProductOrderDetails() {
     let apiUrl = `wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
-    await dispatch(
+    dispatch(
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
       })
-    )
-      .then(({ payload }) => {
-        setProductOverallData(payload);
-        let data = payload.records.map((v, i) => ({
-          ...v,
-          id: i,
-          isSelected: false,
-        }));
-        if (selectedOrders.length > 0) {
-          selectedOrders.forEach((order) => {
-            data.forEach((o) => {
-              if (o.id === order.id) {
-                o.isSelected = true;
-              }
-            });
-          });
-        }
-        setProductData(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    );
   }
 
   const handleCheckboxChange = (e, rowData) => {
@@ -247,9 +252,7 @@ function OnHoldManagement() {
       renderCell: (params) => {
         const orderId =
           params.row.order_id !== "0" ? params.row.order_id : "No Order ID Avl";
-        return (
-          <div>{orderId}</div> 
-        );
+        return <div>{orderId}</div>;
       },
     },
     { field: "shipping_country", headerName: "Shipping Country", flex: 1 },
@@ -304,7 +307,7 @@ function OnHoldManagement() {
           <Typography variant="h6" className="fw-bold mb-3">
             Product Details
           </Typography>
-          {loader2 ? (
+          {loader ? (
             <Loader />
           ) : (
             <Box>
