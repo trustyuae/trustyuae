@@ -110,12 +110,14 @@ export const GetProductOrderDetails = createAsyncThunk(
 export const AddProductOrderForPre = createAsyncThunk(
   "factory/AddProductOrderForPre",
   async ({ requestedDataP }, { rejectWithValue }) => {
+    console.log(requestedDataP,'requestedDataP')
     try {
       const response = await axiosInstance.post(
         `wp-json/order-preparation-api/v1/order-send-by-product/`,
         requestedDataP
       );
-      return response.data;
+      console.log(response,'response from AddProductOrderForPre')
+      return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
       return rejectWithValue(error.message);

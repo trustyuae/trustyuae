@@ -179,9 +179,9 @@ function OnHoldManagement() {
       await dispatch(AddProductOrderForPre({ requestedDataP })).then(
         ({ payload }) => {
           console.log(payload, "payload from AddProductOrderForPre");
-          if (payload?.status_code === 200) {
+          if (payload?.status === 200) {
             ShowAlert(
-              payload?.Message,
+              payload?.data,
               "",
               "success",
               false,
@@ -191,13 +191,12 @@ function OnHoldManagement() {
               "",
               1500
             );
+            fetchProductOrderDetails();
           } else {
             ShowAlert(payload, "", "error", false, false, "", "", "", 1500);
           }
         }
       );
-
-      await fetchProductOrderDetails();
       setSelectedOrders([]);
       setProductData((prevProductData) =>
         prevProductData.map((row) => ({ ...row, isSelected: false }))

@@ -71,6 +71,7 @@ function OrderTrackingNumberPending() {
   const [allSelected, setAllSelected] = useState(false);
 
   const [showFileUploadModal, setShowfileUploadModal] = useState(false);
+  const [tempTrackIds, setTempTrackIds] = useState({});
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const ordersData = useSelector(
@@ -179,17 +180,10 @@ function OrderTrackingNumberPending() {
 
   const handleTrackIdAssign = (row, event) => {
     const { value } = event.target;
-
-    const updatedItems = row.items.map((item) => ({
-      ...item,
-      tracking_id: value, // Allow value to be 0 or any valid input
+    setTempTrackIds((prev) => ({
+      ...prev,
+      [row.id]: value, // Temporarily store tracking ID for this row
     }));
-
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === row.id ? { ...order, items: updatedItems } : order
-      )
-    );
   };
 
   const handleUpdate = (rowData) => {
@@ -198,16 +192,37 @@ function OrderTrackingNumberPending() {
     const variationIds = rowData.items.map((item) =>
       parseInt(item.variation_id, 10)
     );
-    const trackingId = rowData.items[0]?.tracking_id; // Get tracking ID (allow 0)
-
-    // Ensure trackingId is handled even when 0
+    const trackingId = tempTrackIds[rowData.id]; // Use the temporary tracking ID
     const payload = {
-      track_id: trackingId,
+      track_id: trackingId, // Use the updated tracking ID
       product_id: productIds,
       variation_id: variationIds,
     };
 
+    // Update the row with the new tracking ID
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === rowData.id
+          ? {
+              ...order,
+              items: order.items.map((item) => ({
+                ...item,
+                tracking_id: trackingId,
+              })),
+            }
+          : order
+      )
+    );
+
+    // Dispatch the update action
     dispatch(AssignTrackID({ orderId, payload }));
+
+    // Optionally: Clear the temporary tracking ID after the update
+    setTempTrackIds((prev) => {
+      const newState = { ...prev };
+      delete newState[rowData.id];
+      return newState;
+    });
   };
 
   const handlePush = (rowData) => {
@@ -406,12 +421,14 @@ function OrderTrackingNumberPending() {
       flex: 1.5,
       className: "order-system-track",
       renderCell: (params) => {
-        const trackId = params.row.items[0]?.tracking_id || "";
+        const trackId =
+          tempTrackIds[params.row.id] || params.row.items[0]?.tracking_id || "";
         return (
           <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
             <Form.Control
               type="text"
-              value={trackId} // Assign tracking ID directly, including "0"
+              value={trackId !== "0" ? trackId : ""} // Assign tracking ID directly, including "0"
+              placeholder={trackId === "0" || trackId === "" ? "Please Enter trackID" : trackId}
               onChange={(e) => handleTrackIdAssign(params.row, e)}
               onPaste={(e) => {
                 e.preventDefault();
@@ -457,7 +474,9 @@ function OrderTrackingNumberPending() {
       renderCell: (params) => {
         const pushOff =
           params.row.exist_item === "1" ||
-          params.row.items[0]?.tracking_id === "0"
+          params.row.items[0]?.tracking_id === "0" ||
+          params.row.items[0]?.tracking_id === "" ||
+          tempTrackIds[params.row.id]
             ? true
             : false;
         return (
