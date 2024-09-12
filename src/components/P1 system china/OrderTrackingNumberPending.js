@@ -178,13 +178,43 @@ function OrderTrackingNumberPending() {
     }
   };
 
+  // const handleTrackIdAssign = (row, event) => {
+  //   const { value } = event.target;
+  //   setTempTrackIds((prev) => ({
+  //     ...prev,
+  //     [row.id]: value, // Temporarily store tracking ID for this row
+  //   }));
+  // };
+
   const handleTrackIdAssign = (row, event) => {
+    console.log(row,'row===');
+    
     const { value } = event.target;
+    console.log(value,'value');
+    
     setTempTrackIds((prev) => ({
       ...prev,
       [row.id]: value, // Temporarily store tracking ID for this row
     }));
+
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === row.id
+          ? {
+              ...order,
+              items: order.items.map((item) => ({
+                ...item,
+                tracking_id: value,
+              })),
+            }
+          : order
+      )
+    );
+
+    console.log(tempTrackIds,'tempTrackIds');
+    
   };
+
 
   const handleUpdate = (rowData) => {
     const orderId = rowData.order_id;
@@ -415,6 +445,39 @@ function OrderTrackingNumberPending() {
       flex: 1,
       valueGetter: (value, row) => getCountryName(row.shipping_country),
     },
+    // {
+    //   field: "order_status",
+    //   headerName: t("P1ChinaSystem.TrackingID"),
+    //   flex: 1.5,
+    //   className: "order-system-track",
+    //   renderCell: (params) => {
+    //     console.log(params.row,'params.row====');
+    //     const trackId =
+    //       tempTrackIds[params.row.id] || params.row.items[0]?.tracking_id || "";
+    //     return (
+    //       <Form.Group className="fw-semibold d-flex align-items-center justify-content-center h-100">
+    //         <Form.Control
+    //           type="text"
+    //           value={trackId !== "0" ? trackId : ""} // Assign tracking ID directly, including "0"
+    //           placeholder={trackId === "0" || trackId === "" ? "Please Enter trackID" : trackId}
+    //           onChange={(e) => handleTrackIdAssign(params.row, e)}
+    //           onPaste={(e) => {
+    //             e.preventDefault();
+    //             const pastedText = e.clipboardData.getData("text");
+    //             handleTrackIdAssign(params.row, {
+    //               target: { value: pastedText },
+    //             });
+    //           }} // Handle paste event and replace any placeholder
+    //           style={{
+    //             width: "90%",
+    //             textAlign: "center",
+    //             fontWeight: trackId !== "" ? "bold" : "normal", // Conditionally set font weight
+    //           }}
+    //         />
+    //       </Form.Group>
+    //     );
+    //   },
+    // },
     {
       field: "order_status",
       headerName: t("P1ChinaSystem.TrackingID"),
