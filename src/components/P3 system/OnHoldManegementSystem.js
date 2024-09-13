@@ -502,6 +502,22 @@ function OnHoldManegementSystem() {
         </IconButton>
       ),
     },
+    {
+      field: "Assign Order",
+      headerName: "Assign Orders",
+      flex: 1,
+      type: "html",
+      renderCell: (params) => (
+        <Button
+          type="button"
+          variant="secondary"
+          className="w-auto w-auto border-0 text-white"
+          onClick={() => handleOpenOrderModal(params.row)}
+        >
+          Assign Order
+        </Button>
+      ),
+    },
   ];
 
   function handleAttributeChange(event, rowIndex, attributeName) {
@@ -1238,7 +1254,7 @@ function OnHoldManegementSystem() {
             <Button
               variant="primary"
               className="mt-2 fw-semibold"
-              disabled={poTableData.length == 0 && tableData.length == 0}
+              disabled={poTableData?.length == 0 && tableData?.length == 0}
               onClick={
                 selectedFactory.length > 0 ? handleCreateGrn : handleSubmit
               }
