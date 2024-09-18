@@ -409,7 +409,6 @@ export const TrackIDFileUpload = createAsyncThunk(
 export const TrackingIDUpdate = createAsyncThunk(
   "orderSystem/TrackingIDUpdate",
   async ({id,payload}, { rejectWithValue }) => {
-    console.log(formData, "FormData");
     try {
       const response = await axiosInstance.post(`wp-json/custom-add-trackid/v1/add-trackid-order/${id}/?warehouse=China`,payload)
       return response.data;
