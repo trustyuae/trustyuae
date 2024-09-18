@@ -50,7 +50,7 @@ function GRNManagement() {
     if (grnListData) {
       const grnData = grnListData?.data?.map((v, i) => ({ ...v, id: i }));
       setGrnList(grnData);
-      setTotalPages(grnData?.total_pages);
+      setTotalPages(grnListData?.total_pages);
     }
   }, [grnListData]);
 

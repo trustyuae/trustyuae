@@ -5,14 +5,21 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Alert, Box, IconButton, Snackbar, Typography } from "@mui/material";
+import { Alert, Avatar, Box, IconButton, Snackbar, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { Badge, ButtonGroup, ToggleButton } from "react-bootstrap";
+import {
+  Badge,
+  ButtonGroup,
+  Card,
+  Modal,
+  Table,
+  ToggleButton,
+} from "react-bootstrap";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { getCountryName } from "../../utils/GetCountryName";
@@ -38,7 +45,7 @@ function OrderSystemInChina() {
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(20);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,6 +59,10 @@ function OrderSystemInChina() {
   const [orderData, setOrderData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [showTrackidModalOpen, setShowTrackidModalOpen] = useState(false);
+  const [modalData, setModaldata] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [imageURL, setImageURL] = useState("");
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   const ordersData = useSelector(
@@ -63,6 +74,7 @@ function OrderSystemInChina() {
   );
 
   useEffect(() => {
+    // localStorage.removeItem('paginationData')
     if (ordersData) {
       const oData = ordersData.map((v, i) => ({ ...v, id: i }));
       setOrders(oData);
@@ -78,6 +90,13 @@ function OrderSystemInChina() {
   }, [ordersData, otherData]);
 
   useEffect(() => {
+    let data = localStorage.getItem("paginationData");
+    let dataAll = JSON.parse(data);
+    console.log(dataAll, "dataAll");
+    if (dataAll) {
+      setPage(dataAll.page);
+      setPageSize(dataAll.pageSize);
+    }
     if (orderDetails) {
       const oDetails = orderDetails?.orders?.map((v, i) => ({ ...v, id: i }));
       setOrderData(oDetails);
@@ -206,13 +225,23 @@ function OrderSystemInChina() {
       renderCell: (value, row) => {
         const orderId = value && value.row && value.row.order_id;
         return (
-          <Button
+          <>
+            {/* <Button
             type="button"
             className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
             onClick={() => handlePrint(orderId)}
           >
             <LocalPrintshopOutlinedIcon className="mb-1" />
-          </Button>
+          </Button> */}
+            <Button
+              onClick={() => {
+                setModaldata(value?.row?.items);
+                setShowTrackidModalOpen(true);
+              }}
+            >
+              <FaEye className="mb-1" />
+            </Button>
+          </>
         );
       },
     },
@@ -223,6 +252,10 @@ function OrderSystemInChina() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
+        localStorage.setItem(
+          "paginationData",
+          JSON.stringify({ page, pageSize, dispatchType })
+        );
         return (
           <Link
             to={`/order_details_in_china/${value?.row?.order_id}`}
@@ -319,6 +352,46 @@ function OrderSystemInChina() {
     setSelectedDateRange([null, null]);
     setStartDate("");
     setEndDate("");
+  };
+
+  const variant = (variations) => {
+    console.log(variations, "variations");
+
+    const matches = variations.match(
+      /"display_key";s:\d+:"([^"]+)";s:\d+:"display_value";s:\d+:"([^"]+)";/
+    );
+    if (matches) {
+      const key = matches[1];
+      const value = matches[2].replace(/<[^>]*>/g, ""); // Remove HTML tags
+      return `${key}: ${value}`;
+    } else {
+      return "Variant data not available";
+    }
+  };
+
+  const variant2 = (variations) => {
+    const { Color, Size } = variations;
+
+    if (!Color && !Size) {
+      return "Variant data not available";
+    }
+
+    let details = [];
+
+    if (Size) {
+      details.push(`Size: ${Size}`);
+    }
+
+    if (Color) {
+      details.push(`Color: ${Color}`);
+    }
+
+    return details.join(", ");
+  };
+
+  const ImageModule = (url) => {
+    setImageURL(url);
+    setShowEditModal(true);
   };
 
   useEffect(() => {
@@ -539,6 +612,99 @@ function OrderSystemInChina() {
           horizontal: "center",
         }}
       />
+
+      <Modal
+        show={showTrackidModalOpen}
+        onHide={() => setShowTrackidModalOpen(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>TrackingID Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table responsive className="table-bordered">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>variation</th>
+                <th>Image</th>
+              </tr>
+            </thead>
+            <tbody>
+              {modalData?.map((item, index) => {
+                const getVariationContent = () => {
+                  if (
+                    item.variations &&
+                    Object.keys(item.variations).length !== 0
+                  ) {
+                    return variant2(item.variations);
+                  } else if (
+                    item.variation_value &&
+                    item.variation_value !== ""
+                  ) {
+                    return variant(item.variation_value);
+                  } else {
+                    return "No variations available";
+                  }
+                };
+                return (
+                  <tr key={index}>
+                    <td>{item.product_name || "N/A"}</td>
+                    {/* <td>{item.tracking_id || "N/A"}</td> */}
+                    <td>{getVariationContent()}</td>
+                    <td>
+                      <Box
+                        className="h-100 w-100 d-flex align-items-center"
+                        onClick={() => {
+                          ImageModule(item?.product_image);
+                          // setAttachmentZoom(false);
+                        }}
+                      >
+                        <Avatar
+                          src={
+                            item.product_image || require("../../assets/default.png")
+                          }
+                          alt="Product Image"
+                          sx={{
+                            height: "45px",
+                            width: "45px",
+                            borderRadius: "2px",
+                            margin: "0 auto",
+                            "& .MuiAvatar-img": {
+                              height: "100%",
+                              width: "100%",
+                              borderRadius: "2px",
+                            },
+                          }}
+                        />
+                      </Box>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </Modal.Body>
+      </Modal>
+
+      {/* image popup */}
+      <Modal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {/* {attachmentZoom ? "Attached Image" : "Product Image"} */}
+            Product Image
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card className="factory-card">
+            <img src={imageURL} alt="Product" />
+          </Card>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 }
