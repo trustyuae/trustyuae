@@ -63,7 +63,6 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import axios from "axios";
 function OrderDetailsInChina() {
   const { id } = useParams();
   const fileInputRef = useRef({});
@@ -133,44 +132,46 @@ function OrderDetailsInChina() {
   );
   const [isEditing, setIsEditing] = useState(false);
   const [originalTrackingId, setOriginalTrackingId] = useState(trackingId);
-  const [trakingEdit,setTrakingEdit]=useState(false)
+  const [trakingEdit, setTrakingEdit] = useState(false);
+  
   const handleEdit = () => {
-    setOriginalTrackingId(trackingId); // Save the original tracking ID
-    setIsEditing(true); // Switch to editing mode
+    setOriginalTrackingId(trackingId); 
+    setIsEditing(true);
   };
 
   const handleUpdate = () => {
-    // Logic to update the tracking ID can be added here
-    setOriginalTrackingId(trackingId); // Update the original tracking ID to the new value
-    setIsEditing(false); // Switch back to read-only mode
-    updateTrackingIdApi()
+    setOriginalTrackingId(trackingId); 
+    setIsEditing(false); 
+    updateTrackingIdApi();
   };
 
   const handleCancelTrackingId = () => {
-    setTrackingId(originalTrackingId); // Revert to the original tracking ID
-    setIsEditing(false); // Switch back to read-only mode
+    setTrackingId(originalTrackingId); 
+    setIsEditing(false); 
   };
 
-  
-const updateTrackingIdApi = async () => {
-  const payload = {
-    track_id: trackingId,
-    product_id: tableData.map(res=>res.item_id),
-    variation_id: tableData.map(res=>res.variation_id)
+  const updateTrackingIdApi = async () => {
+    const payload = {
+      track_id: trackingId,
+      product_id: tableData.map((res) => res.item_id),
+      variation_id: tableData.map((res) => res.variation_id),
+    };
+    try {
+      dispatch(TrackingIDUpdate({ id, payload }));
+    } catch (error) {
+      console.error(
+        "Failed to update tracking ID:",
+        error.response ? error.response.data : error.message
+      );
+      throw error;
+    }
   };
-  try {
-    dispatch(TrackingIDUpdate({id,payload}))
-  } catch (error) {
-    console.error('Failed to update tracking ID:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
 
   useEffect(() => {
-    let data=localStorage.getItem('user_data')
-    let userData=JSON.parse(data)
-    if(userData.user_role=='administrator'){
-      setTrakingEdit(true)
+    let data = localStorage.getItem("user_data");
+    let userData = JSON.parse(data);
+    if (userData.user_role == "administrator") {
+      setTrakingEdit(true);
     }
     const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
     setOrderData(oDetails);
@@ -951,81 +952,6 @@ const updateTrackingIdApi = async () => {
                         </Box>
                       )}
                   </Col>
-                  {/* <Col md={8}>
-                    <Box className="d-flex justify-content-start mt-1">
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          textAlign: "center",
-                          borderRadius: 1,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            padding: "0px",
-                          }}
-                        >
-                          <TextField
-                            variant="outlined"
-                            value={
-                              orderDetails?.items[0].tracking_id !== "0"
-                                ? orderDetails?.items[0].tracking_id
-                                : "No Tracking ID Avl"
-                            }
-                            InputProps={{
-                              readOnly: true,
-                              endAdornment: (
-                                <>
-                                  {orderDetails?.items[0].tracking_id !==
-                                    "0" && (
-                                    <IconButton
-                                      onClick={() =>
-                                        handleCopy(
-                                          orderDetails?.items[0].tracking_id
-                                        )
-                                      }
-                                      sx={{
-                                        cursor: "pointer",
-                                        textAlign: "center",
-                                      }}
-                                    >
-                                      <ContentCopyIcon />
-                                    </IconButton>
-                                  )}
-                                </>
-                              ),
-                            }}
-                            inputProps={{
-                              style: {
-                                textAlign: "center",
-                                fontWeight: "bold",
-                                fontSize: "24px",
-                                padding: "8px",
-                              },
-                            }}
-                            sx={{
-                              width: "100%",
-                              fontSize: "24px",
-                            }}
-                          />
-                          <button>
-                            edit
-                          </button>
-                          <button>
-                            Update
-                          </button>
-                        </Box>
-                        <Typography sx={{ fontSize: 16 }}>
-                          <Badge bg="success">Tracking ID</Badge>
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Col> */}
                   <Col md={8}>
                     <Box className="d-flex justify-content-start mt-1">
                       <Box
@@ -1045,86 +971,79 @@ const updateTrackingIdApi = async () => {
                             padding: "0px",
                           }}
                         >
-                          <TextField
-                            variant="outlined"
-                            value={trackingId}
-                            onChange={(e) => setTrackingId(e.target.value)}
-                            InputProps={{
-                              readOnly: !isEditing,
-                              endAdornment: (
-                                <>
-                                  {trackingId !== "No Tracking ID Avl" && (
-                                    <IconButton
-                                      onClick={() => handleCopy(trackingId)}
-                                      sx={{
-                                        cursor: "pointer",
-                                        textAlign: "center",
-                                      }}
-                                    >
-                                      <ContentCopyIcon />
-                                    </IconButton>
-                                  )}
-                                </>
-                              ),
-                            }}
-                            inputProps={{
-                              style: {
-                                textAlign: "center",
-                                fontWeight: "bold",
+                          <Box>
+                            <TextField
+                              variant="outlined"
+                              value={trackingId}
+                              onChange={(e) => setTrackingId(e.target.value)}
+                              InputProps={{
+                                readOnly: !isEditing,
+                                endAdornment: (
+                                  <>
+                                    {trackingId !== "No Tracking ID Avl" && (
+                                      <IconButton
+                                        onClick={() => handleCopy(trackingId)}
+                                        sx={{
+                                          cursor: "pointer",
+                                          textAlign: "center",
+                                        }}
+                                      >
+                                        <ContentCopyIcon />
+                                      </IconButton>
+                                    )}
+                                  </>
+                                ),
+                              }}
+                              inputProps={{
+                                style: {
+                                  textAlign: "center",
+                                  fontWeight: "bold",
+                                  fontSize: "24px",
+                                  padding: "8px",
+                                },
+                              }}
+                              sx={{
+                                width: "100%",
                                 fontSize: "24px",
-                                padding: "8px",
-                              },
-                            }}
-                            sx={{
-                              width: "100%",
-                              fontSize: "24px",
-                            }}
-                          />
-                          {trakingEdit?(
-                          !isEditing? (
-                            <>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleEdit}
-                                sx={{ marginRight: 1 }}
-                              >
-                                Edit
-                              </Button>
-                              {/* {trackingId !== originalTrackingId && (
+                              }}
+                            />
+                            <Typography sx={{ fontSize: 16 }}>
+                              <Badge color="success">Tracking ID</Badge>
+                            </Typography>
+                          </Box>
+                          {trakingEdit ? (
+                            !isEditing ? (
+                              <>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={handleEdit}
+                                  sx={{ marginRight: 1 }}
+                                >
+                                  Edit
+                                </Button>
+                              </>
+                            ) : (
+                              <>
                                 <Button
                                   variant="contained"
                                   color="success"
                                   onClick={handleUpdate}
+                                  sx={{ marginRight: 1 }}
                                 >
-                                  Update
+                                  Save
                                 </Button>
-                              )} */}
-                            </>
-                          ) : (
-                            <>
-                              <Button
-                                variant="contained"
-                                color="success"
-                                onClick={handleUpdate}
-                                sx={{ marginRight: 1 }}
-                              >
-                                Save
-                              </Button>
-                              <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={handleCancelTrackingId}
-                              >
-                                Cancel
-                              </Button>
-                            </>
-                          )):null
-                          }
+                                <Button
+                                  variant="contained"
+                                  color="secondary"
+                                  onClick={handleCancelTrackingId}
+                                >
+                                  Cancel
+                                </Button>
+                              </>
+                            )
+                          ) : null}
                         </Box>
-                        <Typography sx={{ fontSize: 16 }}>
-                          <Badge color="success">Tracking ID</Badge>
-                        </Typography>
                       </Box>
                     </Box>
                   </Col>

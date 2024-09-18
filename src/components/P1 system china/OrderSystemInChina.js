@@ -5,7 +5,14 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Alert, Avatar, Box, IconButton, Snackbar, Typography } from "@mui/material";
+import {
+  Alert,
+  Avatar,
+  Box,
+  IconButton,
+  Snackbar,
+  Typography,
+} from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -226,13 +233,6 @@ function OrderSystemInChina() {
         const orderId = value && value.row && value.row.order_id;
         return (
           <>
-            {/* <Button
-            type="button"
-            className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-            onClick={() => handlePrint(orderId)}
-          >
-            <LocalPrintshopOutlinedIcon className="mb-1" />
-          </Button> */}
             <Button
               onClick={() => {
                 setModaldata(value?.row?.items);
@@ -662,7 +662,8 @@ function OrderSystemInChina() {
                       >
                         <Avatar
                           src={
-                            item.product_image || require("../../assets/default.png")
+                            item.product_image ||
+                            require("../../assets/default.png")
                           }
                           alt="Product Image"
                           sx={{
