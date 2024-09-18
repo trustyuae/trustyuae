@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import ShowAlert from "../../utils/ShowAlert";
-import { API_URL } from "../../redux/constants/Constants";
+import { API_URL } from "../../utils/constants";
 import { saveToken, saveUserData } from "../../utils/StorageUtils";
-
 
 const initialState = {
   isLoading: false,
