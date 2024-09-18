@@ -23,6 +23,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RiMessage2Line } from "react-icons/ri";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -44,15 +45,19 @@ function GRNManagement() {
   const [showRemarkModal, setShowRemarkModal] = useState(false);
   const [remark, setRemark] = useState(null);
 
+  const currentPage = useSelector((state) => state.pagination.currentPage);
   const grnListData = useSelector((state) => state?.p3System?.grnList);
 
   useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (grnListData) {
       const grnData = grnListData?.data?.map((v, i) => ({ ...v, id: i }));
       setGrnList(grnData);
       setTotalPages(grnListData?.total_pages);
     }
-  }, [grnListData]);
+  }, [grnListData, currentPage]);
 
   async function fetchUserData() {
     try {
@@ -192,7 +197,7 @@ function GRNManagement() {
   };
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const handlePageSizeChange = (e) => {

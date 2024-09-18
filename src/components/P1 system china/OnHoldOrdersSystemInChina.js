@@ -22,10 +22,12 @@ import { OnHoldOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaS
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OnHoldOrdersSystemInChina() {
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
   const [lang, setLang] = useState("En");
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
@@ -51,9 +53,12 @@ function OnHoldOrdersSystemInChina() {
     (state) => state?.orderSystemChina?.onHoldOrders
   );
 
-  const dispatch = useDispatch();
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (OnholdOrdersData) {
       const onHoldData = OnholdOrdersData?.orders?.map((v, i) => ({
         ...v,
@@ -62,7 +67,7 @@ function OnHoldOrdersSystemInChina() {
       setOrders(onHoldData);
       setTotalPages(OnholdOrdersData.total_pages);
     }
-  }, [OnholdOrdersData]);
+  }, [OnholdOrdersData, currentPage]);
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
@@ -179,7 +184,7 @@ function OnHoldOrdersSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const radios = [

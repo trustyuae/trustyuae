@@ -13,6 +13,7 @@ import {
   factoryEdit,
   fetchFactoriesByFilterParam,
 } from "../../Redux2/slices/FactoriesSlice";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -32,6 +33,8 @@ function AllFactory() {
 
   const loading = useSelector((state) => state?.factory?.isLoading);
 
+  const currentPage = useSelector((state) => state.pagination.currentPage);
+
   const factoryData = useSelector(
     (state) => state?.factory?.factoriesWithParams
   );
@@ -43,6 +46,12 @@ function AllFactory() {
       setTotalPages(factoryData.total_pages);
     }
   }, [factoryData]);
+
+  useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
+  }, [currentPage]);
 
   async function fetchFactories() {
     try {
@@ -82,10 +91,6 @@ function AllFactory() {
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
-  };
-
-  const handleChange = (event, value) => {
-    setPage(value);
   };
 
   const handleSaveEdit = async () => {
@@ -143,6 +148,10 @@ function AllFactory() {
       },
     },
   ];
+
+  const handleChange = (event, value) => {
+    dispatch(setCurrentPage(value));
+  };
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>

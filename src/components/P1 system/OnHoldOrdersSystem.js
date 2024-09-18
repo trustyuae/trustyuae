@@ -19,9 +19,11 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { OnHoldOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OnHoldOrdersSystem() {
   const inputRef = useRef(null);
+  const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -44,10 +46,12 @@ function OnHoldOrdersSystem() {
   const OnholdOrdersData = useSelector(
     (state) => state?.orderSystem?.onHoldOrders
   );
-  
-  const dispatch = useDispatch();
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (OnholdOrdersData) {
       const onHoldData = OnholdOrdersData?.orders?.map((v, i) => ({
         ...v,
@@ -56,7 +60,7 @@ function OnHoldOrdersSystem() {
       setOrders(onHoldData);
       setTotalPages(OnholdOrdersData.total_pages);
     }
-  }, [OnholdOrdersData]);
+  }, [OnholdOrdersData, currentPage]);
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-onhold-orders/v1/onhold-orders/?&page=${page}&per_page=${pageSize}`;
@@ -148,7 +152,7 @@ function OnHoldOrdersSystem() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const handleDateChange = async (newDateRange) => {

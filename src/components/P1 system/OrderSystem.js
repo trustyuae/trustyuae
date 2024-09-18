@@ -25,6 +25,7 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import PrintModal from "./PrintModal";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderSystem() {
   const dispatch = useDispatch();
@@ -52,10 +53,13 @@ function OrderSystem() {
   const ordersData = useSelector((state) => state?.orderSystem?.orders?.orders);
   const otherData = useSelector((state) => state?.orderSystem?.orders);
   const orderDetails = useSelector((state) => state?.orderSystem?.orderDetails);
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (ordersData) {
-      console.log(ordersData,'ordersData from useEffect')
       const oData = ordersData.map((v, i) => ({ ...v, id: i }));
       setOrders(oData);
     }
@@ -67,16 +71,15 @@ function OrderSystem() {
       });
       setTotalPages(otherData?.total_pages);
     }
-  }, [ordersData, otherData]);
+  }, [ordersData, otherData, currentPage]);
 
-  console.log(orders,'orders')
+  console.log(orders, "orders");
   useEffect(() => {
     if (orderDetails) {
       const oDetails = orderDetails?.orders?.map((v, i) => ({ ...v, id: i }));
       setOrderData(oDetails);
     }
   }, [orderDetails]);
-
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-orders-new/v1/orders/?`;
@@ -205,7 +208,7 @@ function OrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const handleDateChange = async (newDateRange) => {
@@ -259,7 +262,6 @@ function OrderSystem() {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, searchOrderID, page, dispatchType, isReset, setSearchOrderID]);
-
 
   return (
     <Container fluid className="py-3">

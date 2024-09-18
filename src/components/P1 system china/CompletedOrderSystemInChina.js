@@ -21,10 +21,12 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, Card, Modal, Table, ToggleButton } from "react-bootstrap";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function CompletedOrderSystemInChina() {
   const inputRef = useRef(null);
   const { t, i18n } = useTranslation();
+  const dispatch = useDispatch();
   const [lang, setLang] = useState("En");
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
@@ -51,9 +53,12 @@ function CompletedOrderSystemInChina() {
     (state) => state?.orderSystemChina?.completedOrders
   );
 
-  const dispatch = useDispatch();
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (completedOrdersData) {
       const completedData = completedOrdersData?.orders?.map((v, i) => ({
         ...v,
@@ -62,7 +67,7 @@ function CompletedOrderSystemInChina() {
       setOrders(completedData);
       setTotalPages(completedOrdersData.total_pages);
     }
-  }, [completedOrdersData]);
+  }, [completedOrdersData,currentPage]);
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&page=${page}&per_page=${pageSize}`;
@@ -202,7 +207,7 @@ function CompletedOrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const radios = [

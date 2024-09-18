@@ -41,6 +41,7 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderSystemInChina() {
   const dispatch = useDispatch();
@@ -79,9 +80,12 @@ function OrderSystemInChina() {
   const orderDetails = useSelector(
     (state) => state?.orderSystemChina?.orderDetails
   );
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
-    // localStorage.removeItem('paginationData')
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (ordersData) {
       const oData = ordersData.map((v, i) => ({ ...v, id: i }));
       setOrders(oData);
@@ -94,16 +98,9 @@ function OrderSystemInChina() {
       });
       setTotalPages(otherData?.total_pages);
     }
-  }, [ordersData, otherData]);
+  }, [ordersData, otherData, currentPage]);
 
   useEffect(() => {
-    let data = localStorage.getItem("paginationData");
-    let dataAll = JSON.parse(data);
-    console.log(dataAll, "dataAll");
-    if (dataAll) {
-      setPage(dataAll.page);
-      setPageSize(dataAll.pageSize);
-    }
     if (orderDetails) {
       const oDetails = orderDetails?.orders?.map((v, i) => ({ ...v, id: i }));
       setOrderData(oDetails);
@@ -142,7 +139,7 @@ function OrderSystemInChina() {
 
   const handlePrint = async (orderId) => {
     try {
-      const response = await dispatch(OrderDetailsChinaGet({ id: orderId }));
+      dispatch(OrderDetailsChinaGet({ id: orderId }));
       setShowModal(true);
     } catch (error) {
       console.error(error);
@@ -175,7 +172,6 @@ function OrderSystemInChina() {
       type: "string",
       renderCell: (params) => {
         const items = params?.row?.order_id || [];
-        const orderID = items.length > 0 ? items[0]?.item_id : "";
         return (
           <Box className="d-flex align-items-center justify-content-center">
             <Typography>{items}</Typography>
@@ -230,7 +226,6 @@ function OrderSystemInChina() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        const orderId = value && value.row && value.row.order_id;
         return (
           <>
             <Button
@@ -252,10 +247,6 @@ function OrderSystemInChina() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        localStorage.setItem(
-          "paginationData",
-          JSON.stringify({ page, pageSize, dispatchType })
-        );
         return (
           <Link
             to={`/order_details_in_china/${value?.row?.order_id}`}
@@ -289,7 +280,7 @@ function OrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const radios = [

@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import { GetErManagementData } from "../../Redux2/slices/ErManagementSlice";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function ERManagement() {
   const dispatch = useDispatch();
@@ -38,6 +39,8 @@ function ERManagement() {
 
   const factoryData = useSelector((state) => state?.factory?.factories);
 
+  const currentPage = useSelector((state) => state.pagination.currentPage);
+
   const radios = [
     { name: "English", value: "En" },
     { name: "中國人", value: "Zn" },
@@ -53,6 +56,12 @@ function ERManagement() {
       setFactories(factData);
     }
   }, [factoryData]);
+
+  useEffect(()=>{
+    if (currentPage) {
+      setPage(currentPage);
+    }
+  },[currentPage])
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-er-fetch/v1/fetch-all-er/?per_page=${pageSize}&page=${page}`;
@@ -147,7 +156,7 @@ function ERManagement() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const handleDateChange = async (newDateRange) => {

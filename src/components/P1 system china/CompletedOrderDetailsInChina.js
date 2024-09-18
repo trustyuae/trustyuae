@@ -175,7 +175,7 @@ function CompletedOrderDetailsInChina() {
           2000
         );
       }
-      await fetchOrder()
+      await fetchOrder();
     });
   };
 
@@ -575,25 +575,28 @@ function CompletedOrderDetailsInChina() {
                           style={{ maxHeight: "200px", overflowY: "auto" }}
                         >
                           <List>
-                            {orderDetailsDataOrderId?.operation_user_note.map(
-                              (message, i) => (
-                                <ListItem
-                                  key={i}
-                                  className="d-flex justify-content-start"
-                                >
-                                  <ListItemText
-                                    primary={message.message}
-                                    secondary={message.user}
-                                    className="rounded p-2"
-                                    style={{
-                                      maxWidth: "70%",
-                                      minWidth: "50px",
-                                      backgroundColor: "#bfdffb",
-                                    }}
-                                  />
-                                </ListItem>
-                              )
-                            )}
+                            {(Array.isArray(
+                              orderDetailsDataOrderId?.operation_user_note
+                            )
+                              ? orderDetailsDataOrderId.operation_user_note
+                              : []
+                            ).map((message, i) => (
+                              <ListItem
+                                key={i}
+                                className="d-flex justify-content-start"
+                              >
+                                <ListItemText
+                                  primary={message.message}
+                                  secondary={message.user}
+                                  className="rounded p-2"
+                                  style={{
+                                    maxWidth: "70%",
+                                    minWidth: "50px",
+                                    backgroundColor: "#bfdffb",
+                                  }}
+                                />
+                              </ListItem>
+                            ))}
                           </List>
                         </AccordionDetails>
                       </Accordion>

@@ -19,9 +19,11 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function CompletedOrderSystem() {
   const inputRef = useRef(null);
+  const dispatch = useDispatch();
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -44,9 +46,12 @@ function CompletedOrderSystem() {
     (state) => state?.orderSystem?.completedOrders
   );
 
-  const dispatch = useDispatch();
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (completedOrdersData) {
       const completedData = completedOrdersData?.orders?.map((v, i) => ({
         ...v,
@@ -55,7 +60,7 @@ function CompletedOrderSystem() {
       setOrders(completedData);
       setTotalPages(completedOrdersData.total_pages);
     }
-  }, [completedOrdersData]);
+  }, [completedOrdersData,currentPage]);
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?&page=${page}&per_page=${pageSize}`;
@@ -157,7 +162,7 @@ function CompletedOrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const handleDateChange = async (newDateRange) => {

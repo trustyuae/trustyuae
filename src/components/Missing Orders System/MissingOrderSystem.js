@@ -19,9 +19,11 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { MissingOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function MissingOrderSystem() {
   const inputRef = useRef(null);
+  const dispatch = useDispatch();
   const [dispatchType, setDispatchType] = useState("all");
   const [orders, setOrders] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
@@ -39,8 +41,13 @@ function MissingOrderSystem() {
     total_reserve_orders: 0,
   });
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
+  const currentPage = useSelector((state) => state.pagination.currentPage);
 
-  const dispatch = useDispatch();
+  useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
+  }, [currentPage]);
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-missing-orders/v1/missing-orders/?`;
@@ -139,7 +146,7 @@ function MissingOrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
 
   const handleDateChange = async (newDateRange) => {

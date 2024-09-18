@@ -40,6 +40,7 @@ import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import * as XLSX from "xlsx";
 import { FaEye } from "react-icons/fa";
+import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -88,7 +89,12 @@ function OrderTrackingNumberPending() {
     (state) => state?.orderSystemChina?.ordersTracking?.orders?.items
   );
 
+  const currentPage = useSelector((state) => state.pagination.currentPage);
+
   useEffect(() => {
+    if (currentPage) {
+      setPage(currentPage);
+    }
     if (ordersData) {
       const oData = ordersData.map((v, i) => ({ ...v, id: i }));
       setOrders(oData);
@@ -101,7 +107,7 @@ function OrderTrackingNumberPending() {
       });
       setTotalPages(otherData?.total_pages);
     }
-  }, [ordersData, otherData]);
+  }, [ordersData, otherData,currentPage]);
 
   useEffect(() => {
     if (orderDetails) {
@@ -539,9 +545,9 @@ function OrderTrackingNumberPending() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage(value));
   };
-
+  
   const radios = [
     { name: "English", value: "En" },
     { name: "中國人", value: "Zn" },
