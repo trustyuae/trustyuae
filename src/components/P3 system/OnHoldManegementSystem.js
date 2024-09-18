@@ -29,9 +29,6 @@ import {
   GetAllProducts,
   GetProductManual,
 } from "../../Redux2/slices/P3SystemSlice";
-import ShowAlert from "../../utils/ShowAlert";
-import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
-import { MergeRounded } from "@mui/icons-material";
 import { getUserData } from "../../utils/StorageUtils";
 
 function OnHoldManegementSystem() {
@@ -77,7 +74,6 @@ function OnHoldManegementSystem() {
   const [userData, setUserData] = useState(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [message, setMessage] = useState("");
-  const [rows, setRows] = useState([]);
 
   const allProducts = useSelector(
     (state) => state?.p3System?.allProducts?.products
@@ -449,21 +445,6 @@ function OnHoldManegementSystem() {
     validateForm(updatedData);
   }
 
-  // const handleQtyChange = (index, event) => {
-  //   const newQuantity = parseFloat(event?.target?.value);
-  //   if (!isNaN(newQuantity) && index.target.value >= 0) {
-  //     const updatedRecivedQtyData = poTableData.map((item) => {
-  //       if (item?.product_id === event?.product_id) {
-  //         if (item.variation_id == event.variation_id) {
-  //           return { ...item, received_quantity: index?.target?.value };
-  //         }
-  //       }
-  //       return item;
-  //     });
-  //     setPoTableData(updatedRecivedQtyData);
-  //   }
-  // };
-
   const handleFieldChange = (id, field, value) => {
     const updatedData = tableData.map((item) => {
       if (item.id === value.id) {
@@ -559,57 +540,6 @@ function OnHoldManegementSystem() {
     getAllProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productNameF, productIDF, tableData]);
-
-  // const handalADDProduct = () => {
-  //   let data = [...tableData, ...singleProductD];
-  //   let Updatedata = data.map((v, i) => ({
-  //     ...v,
-  //     id: i,
-  //     Quantity: v.Quantity !== "" ? v.Quantity : 1,
-  //     variationColor:
-  //       v.variation_values.attribute_color !== undefined
-  //         ? v.variation_values.attribute_color
-  //         : "",
-  //     variationSize:
-  //       v.variation_values.attribute_size !== undefined
-  //         ? v.variation_values.attribute_size
-  //         : "",
-  //   }));
-  //   validateForm(Updatedata);
-
-  //   const mergedData = Updatedata.reduce((acc, item) => {
-  //     // Create a unique key based on product_name and variation_values
-  //     const key = JSON.stringify({
-  //       product_name: item.product_id,
-  //       variation_values: item.variation_values,
-  //     });
-
-  //     // Check if the key is in the accumulator
-  //     const existingIndex = acc.findIndex(
-  //       (entry) =>
-  //         JSON.stringify({
-  //           product_name: entry.product_id,
-  //           variation_values: entry.variation_values,
-  //         }) === key
-  //     );
-
-  //     if (existingIndex === -1) {
-  //       // If the key is not in the accumulator, add it to the start of the array
-  //       acc.unshift({ ...item, Quantity: item.Quantity });
-  //     } else {
-  //       // If the key exists, increase the Quantity by 1 and move the item to the start of the array
-  //       acc[existingIndex].Quantity = String(
-  //         Number(acc[existingIndex].Quantity) + 1
-  //       );
-  //       const updatedItem = acc.splice(existingIndex, 1)[0];
-  //       acc.unshift(updatedItem);
-  //     }
-  //     return acc;
-  //   }, []);
-  //   setTableData(mergedData);
-  //   setProductName("");
-  //   setProductID("");
-  // };
 
   const handalADDProduct = () => {
     const itemMap = new Map();
@@ -766,17 +696,27 @@ function OnHoldManegementSystem() {
   const selectPOId = async () => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/get-po-ids/v1/show-po-id/${selectedFactory}`
+        `wp-json/get-po-ids/v1/show-po-id/`,
+        {
+          params: {
+            factory_id: selectedFactory,
+            po_id: selectedPOId,
+          },
+        }
       );
-      let data = response.data;
-      setAllPoIds(data);
+      const formattedPoIds = response.data.map((poId) => ({
+        value: poId,
+        label: poId,
+      }));
+      setAllPoIds(formattedPoIds);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching PO IDs:", error);
     }
   };
 
   const fetchPoProductData = async () => {
     const apiUrl = `wp-json/fetch-po-details/v1/get-product-under-po/${selectedPOId}/?per_page=${pageSize}&page=${page}`;
+    console.log(apiUrl, "apiurl");
     try {
       dispatch(FetchPoProductData({ apiUrl })).then(({ payload }) => {
         const data = payload?.line_items?.map((item, i) => ({
@@ -805,52 +745,6 @@ function OnHoldManegementSystem() {
       setPoTableData(updatedRecivedQtyData);
     }
   };
-
-  // const handleCreateGrn = async () => {
-  //   const currentDate = new Date().toISOString().split("T")[0];
-  //   const filteredData = poTableData.filter((item) => !item.disabled);
-
-  //   if (filteredData.length === 0) {
-  //     Swal.fire({
-  //       title: "No data to submit",
-  //       icon: "warning",
-  //       showConfirmButton: true,
-  //     });
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     po_id: poId || "",
-  //     product_id: filteredData.map((item) => item.product_id),
-  //     variation_id: filteredData.map((item) => item.variation_id),
-  //     received_qty: filteredData.map((item) => item.received_quantity),
-  //     created_date: currentDate,
-  //     verified_by: userData?.first_name + " " + userData?.last_name || "",
-  //     note: message,
-  //     status: "Processing",
-  //   };
-
-  //   try {
-  //     await dispatch(AddGrn(payload)).then(({ payload }) => {
-  //       Swal.fire({
-  //         title: payload.data,
-  //         icon: payload.status === 200 ? "success" : "error",
-  //         showConfirmButton: true,
-  //       }).then((result) => {
-  //         if (result.isConfirmed) {
-  //           navigate("/GRN_Management");
-  //         }
-  //       });
-  //     });
-  //     const updatedPoTableData = poTableData.map((item) => ({
-  //       ...item,
-  //       received_quantity: 0,
-  //     }));
-  //     setPoTableData(updatedPoTableData);
-  //   } catch (error) {
-  //     console.error("Error submitting data:", error);
-  //   }
-  // };
 
   const handleCreateGrn = async () => {
     const currentDate = new Date().toISOString().split("T")[0];
@@ -925,11 +819,18 @@ function OnHoldManegementSystem() {
     );
   };
 
-  useEffect(() => {
-    if (selectedFactory) {
-      selectPOId();
+  const handleChangePoID = (selectedOption) => {
+    if (selectedOption) {
+      setSelectedPOId(selectedOption.value); // Set only the value
+      console.log('Selected PO ID:', selectedOption.value);
+    } else {
+      setSelectedPOId(null); // Clear selection if no option
     }
-  }, [selectedFactory]);
+  };
+
+  useEffect(() => {
+    selectPOId();
+  }, [selectedFactory, selectedPOId]);
 
   useEffect(() => {
     if (selectedPOId) {
@@ -990,21 +891,17 @@ function OnHoldManegementSystem() {
             </Form.Group>
           </Col>
           <Col xs="auto" lg="3">
-            <Form.Group>
-              <Form.Label className="fw-semibold">Select PO ID</Form.Label>
-              <Form.Select
-                className="mr-sm-2 py-2"
-                value={selectedPOId}
-                onChange={(e) => setSelectedPOId(e.target.value)} // Update this to set the selected PO type
-              >
-                <option value="">Select...</option>
-                {allPoIds?.map((po) => (
-                  <option key={po.id} value={po.id}>
-                    {po}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+            <Form.Label className="fw-semibold">Select PO ID</Form.Label>
+            <Select
+              options={allPoIds} // Pass formatted PO IDs
+              value={allPoIds.find((option) => option.value === selectedPOId)} // Bind the selected PO ID object
+              onChange={handleChangePoID} // Handle PO ID change
+              isClearable // Allow clearing the selection
+              placeholder="Select PO ID" // Placeholder text
+              noOptionsMessage={() => "No PO IDs found"} // Message when no options are available
+              getOptionLabel={(option) => option.label} // Display the label
+              getOptionValue={(option) => option.value} // Use the value as identifier
+            />
           </Col>
         </Row>
         {selectedFactory.length > 0 && (
