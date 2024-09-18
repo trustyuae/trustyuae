@@ -28,6 +28,7 @@ const initialState = {
   assignTrackID: [],
   pushTrackOrder: [],
   trackIDFileUploadData: [],
+  updateTrackingID:[],
   error: null,
 };
 
@@ -405,6 +406,20 @@ export const TrackIDFileUpload = createAsyncThunk(
   }
 );
 
+export const TrackingIDUpdate = createAsyncThunk(
+  "orderSystem/TrackingIDUpdate",
+  async ({id,payload}, { rejectWithValue }) => {
+    console.log(formData, "FormData");
+    try {
+      const response = await axiosInstance.post(`wp-json/custom-add-trackid/v1/add-trackid-order/${id}/?warehouse=China`,payload)
+      return response.data;
+    } catch (error) {
+      console.error("Error uploading file:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const orderSystemChinaSlice = createSlice({
   name: "orderSystem",
   initialState,
@@ -441,6 +456,7 @@ const orderSystemChinaSlice = createSlice({
       state.assignTrackID = [];
       state.pushTrackOrder = [];
       state.trackIDFileUploadData = [];
+      state.updateTrackingID = [];
       state.error = null;
     },
   },
@@ -696,6 +712,17 @@ const orderSystemChinaSlice = createSlice({
         state.trackIDFileUploadData = action.payload;
       })
       .addCase(TrackIDFileUpload.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(TrackingIDUpdate.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(TrackingIDUpdate.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.updateTrackingID = action.payload;
+      })
+      .addCase(TrackingIDUpdate.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

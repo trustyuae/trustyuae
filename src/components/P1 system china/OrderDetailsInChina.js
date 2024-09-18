@@ -59,6 +59,7 @@ import {
   InsertOrderPickupChina,
   OrderDetailsChinaGet,
   OverAllAttachmentFileUploadChina,
+  TrackingIDUpdate,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -158,9 +159,7 @@ const updateTrackingIdApi = async () => {
     variation_id: tableData.map(res=>res.variation_id)
   };
   try {
-    const response = await axiosInstance.post(`wp-json/custom-add-trackid/v1/add-trackid-order/${id}/?warehouse=China`,payload)
-    console.log('Tracking ID updated successfully:', response.data);
-    return response.data;
+    dispatch(TrackingIDUpdate({id,payload}))
   } catch (error) {
     console.error('Failed to update tracking ID:', error.response ? error.response.data : error.message);
     throw error;

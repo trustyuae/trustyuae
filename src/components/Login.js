@@ -8,7 +8,6 @@ import styled from "styled-components";
 import { Box, CardContent } from "@mui/material";
 import { Card, Col, Row } from "react-bootstrap";
 import { loginUser, loginUserWithToken } from "../Redux2/slices/UserSlice";
-import { getUserData } from "../utils/StorageUtils";
 import ShowAlert from "../utils/ShowAlert";
 
 const Login = () => {
