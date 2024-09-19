@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -83,7 +83,7 @@ function ReserveOrderdetailsInChina() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (reserveOrderDetailsData) {
       const reserveOrderData = reserveOrderDetailsData?.orders?.map((v, i) => ({
         ...v,

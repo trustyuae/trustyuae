@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -103,7 +103,7 @@ function OrderDetails() {
     (state) => state?.orderSystem?.customOrderOnHoldData
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
     setOrderData(oDetails);
 
