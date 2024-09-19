@@ -69,6 +69,7 @@ function OnHoldManagement() {
           });
         });
       }
+      console.log(data,'data from useEffect')
       setProductData(data);
     }
   }, [productDataa]);
@@ -184,9 +185,9 @@ function OnHoldManagement() {
       await dispatch(AddProductOrderForPre({ requestedDataP })).then(
         ({ payload }) => {
           console.log(payload, "payload from AddProductOrderForPre");
-          if (payload?.status === 200) {
+          if (payload?.status_code === 200) {
             ShowAlert(
-              payload?.data,
+              payload?.Message,
               "",
               "success",
               false,
@@ -198,7 +199,7 @@ function OnHoldManagement() {
             );
             fetchProductOrderDetails();
           } else {
-            ShowAlert(payload, "", "error", false, false, "", "", "", 1500);
+            ShowAlert(payload.Message, "", "error", false, false, "", "", "", 1500);
           }
         }
       );
