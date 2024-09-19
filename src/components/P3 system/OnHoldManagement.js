@@ -42,37 +42,11 @@ function OnHoldManagement() {
     (state) => state?.p3System?.productDetails
   );
 
-  const productDataa = useSelector(
-    (state) => state?.p3System?.productOrderDetails
-  );
-
   useEffect(() => {
     if (productDetailsDataa) {
       setProductDetailsData(productDetailsDataa);
     }
   }, [productDetailsDataa]);
-
-  useEffect(() => {
-    if (productDataa) {
-      setProductOverallData(productDataa);
-      let data = productDataa.records.map((v, i) => ({
-        ...v,
-        id: i,
-        isSelected: false,
-      }));
-      if (selectedOrders.length > 0) {
-        selectedOrders.forEach((order) => {
-          data.forEach((o) => {
-            if (o.id === order.id) {
-              o.isSelected = true;
-            }
-          });
-        });
-      }
-      console.log(data,'data from useEffect')
-      setProductData(data);
-    }
-  }, [productDataa]);
 
   async function fetchProductDetails() {
     let apiUrl = `wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
@@ -89,7 +63,26 @@ function OnHoldManagement() {
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
       })
-    );
+    ).then(({ payload }) => {
+      if (payload) {
+        setProductOverallData(payload);
+        let data = payload?.records?.map((v, i) => ({
+          ...v,
+          id: i,
+          isSelected: false,
+        }));
+        if (selectedOrders.length > 0) {
+          selectedOrders.forEach((order) => {
+            data.forEach((o) => {
+              if (o.id === order.id) {
+                o.isSelected = true;
+              }
+            });
+          });
+        }
+        setProductData(data);
+      }
+    });
   }
 
   const handleCheckboxChange = (e, rowData) => {
@@ -117,7 +110,7 @@ function OnHoldManagement() {
   useEffect(() => {
     fetchProductOrderDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setSelectedOrders, setProductData]);
+  }, [params.id, params.grn_no, params.variation_id]);
 
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
@@ -199,7 +192,17 @@ function OnHoldManagement() {
             );
             fetchProductOrderDetails();
           } else {
-            ShowAlert(payload.Message, "", "error", false, false, "", "", "", 1500);
+            ShowAlert(
+              payload.Message,
+              "",
+              "error",
+              false,
+              false,
+              "",
+              "",
+              "",
+              1500
+            );
           }
         }
       );
@@ -433,7 +436,7 @@ function OnHoldManagement() {
       </MDBRow>
       <MDBRow>
         <MDBCol md="12" className="d-flex justify-content-end">
-          {productData.length === 0 ? (
+          {productData?.length === 0 ? (
             <Button variant="success" disabled onClick={handleOrderStock}>
               Send For InStock
             </Button>
