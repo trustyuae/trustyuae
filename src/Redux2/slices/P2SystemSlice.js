@@ -18,6 +18,7 @@ const initialState = {
   ordersNotAvailable: [],
   ordersNotAvailablePo: [],
   ordersNotAvailableStatus: [],
+  assignFactory: [],
   error: null,
 };
 
@@ -99,7 +100,7 @@ export const AddPO = createAsyncThunk(
         `wp-json/custom-po-number/v1/po-id-generate/`,
         payload
       );
-      console.log(response,'response from Add PO')
+      console.log(response, "response from Add PO");
       return response;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
@@ -126,7 +127,7 @@ export const AddManualPO = createAsyncThunk(
 
 export const AddSchedulePO = createAsyncThunk(
   "P2System/AddSchedulePO",
-  async ( payload, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-schedule-order/v1/post-order-schedule/`,
@@ -226,8 +227,8 @@ export const OrderNotAvailableDataStatus = createAsyncThunk(
 
 export const AssignFactoryToProduct = createAsyncThunk(
   "P2System/AssignFactoryToProduct",
-  async ({ id,payload }, { rejectWithValue }) => {
-    try { 
+  async ({ id, payload }, { rejectWithValue }) => {
+    try {
       const response = await axiosInstance.post(
         `wp-json/custom-proimage-update/v1/update-product/${id}`,
         payload
@@ -266,6 +267,7 @@ const P2SystemSlice = createSlice({
       state.ordersNotAvailable = [];
       state.ordersNotAvailablePo = [];
       state.ordersNotAvailableStatus = [];
+      state.assignFactory = [];
       state.error = null;
     },
   },
@@ -411,6 +413,17 @@ const P2SystemSlice = createSlice({
         state.ordersNotAvailableStatus = action.payload;
       })
       .addCase(OrderNotAvailableDataStatus.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(AssignFactoryToProduct.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(AssignFactoryToProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignFactory = action.payload;
+      })
+      .addCase(AssignFactoryToProduct.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

@@ -11,6 +11,7 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import DataTable from "../DataTable";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Alert,
   Avatar,
@@ -35,6 +36,7 @@ import {
   AddManualPO,
   AddPO,
   AddSchedulePO,
+  AssignFactoryToProduct,
   ManualOrScheduledPoDetailsData,
   PoDetailsData,
 } from "../../Redux2/slices/P2SystemSlice";
@@ -229,6 +231,27 @@ function OrderManagementSystem() {
     setShowEditModal(true);
   };
 
+  const handleFactoryChange = (value, event) => {
+    const updatedData = orders.map((item) => {
+      if (item.item_id === event.item_id) {
+        if (item.variation_id == event.variation_id) {
+          return { ...item, factory_id: value };
+        }
+      }
+      return item;
+    });
+    setOrders(updatedData);
+  };
+
+  const handleUpdate = (rowData) => {
+    const id = rowData.item_id;
+    const factoryId = rowData.factory_id;
+    const payload = {
+      factory_id: factoryId,
+    };
+    dispatch(AssignFactoryToProduct({ id, payload }));
+  };
+
   // po ogainst order colum
   const columns1 = [
     {
@@ -317,11 +340,46 @@ function OrderManagementSystem() {
       headerName: "Factory Name",
       flex: 1,
       renderCell: (params) => {
+        console.log(params, "params......");
         const factory = factories.find(
           (factory) => factory.id === params.row.factory_id
         );
-        return factory ? factory.factory_name : "Please Assign factory";
+        return (
+          <Form.Group className="fw-semibold mb-0">
+            <Form.Select
+              as="select"
+              className="mr-sm-2"
+              value={factory ? factory.factory_name : "Please Assign factory"}
+              onChange={(e) => handleFactoryChange(e.target.value, params.row)}
+            >
+              <option value="">
+                {factory ? factory.factory_name : "Please Assign factory"}
+              </option>
+              {factories?.map((factory) => (
+                <option key={factory.id} value={factory.id}>
+                  {factory.factory_name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        );
       },
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 0.5,
+      renderCell: (params) => (
+        <Box className="text-center">
+          <Button
+            className="m-2 mx-auto d-flex align-items-center justify-content-center"
+            style={{ padding: "5px 5px", fontSize: "16px" }}
+            onClick={() => handleUpdate(params.row)}
+          >
+            <EditIcon fontSize="inherit" />
+          </Button>
+        </Box>
+      ),
     },
   ];
   //MPO
@@ -537,9 +595,9 @@ function OrderManagementSystem() {
   };
 
   useEffect(() => {
-    // if (activeKey === "against_PO") {
-    //   fetchOrders();
-    // }
+    if (activeKey === "against_PO") {
+      fetchOrders();
+    }
     if (activeKey === "manual_PO") {
       manualPO();
     }
@@ -547,7 +605,7 @@ function OrderManagementSystem() {
       scheduledPO();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, endDate, selectedFactory, manualProductF,currentStartIndex]);
+  }, [page, pageSize, endDate, selectedFactory, manualProductF]);
 
   const fetchOrders = async () => {
     try {
