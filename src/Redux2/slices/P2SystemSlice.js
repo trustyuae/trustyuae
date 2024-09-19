@@ -224,6 +224,22 @@ export const OrderNotAvailableDataStatus = createAsyncThunk(
   }
 );
 
+export const AssignFactoryToProduct = createAsyncThunk(
+  "P2System/AssignFactoryToProduct",
+  async ({ id,payload }, { rejectWithValue }) => {
+    try { 
+      const response = await axiosInstance.post(
+        `wp-json/custom-proimage-update/v1/update-product/${id}`,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error assign factory:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const P2SystemSlice = createSlice({
   name: "P2System",
   initialState,
