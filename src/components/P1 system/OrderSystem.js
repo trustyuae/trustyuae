@@ -175,33 +175,41 @@ function OrderSystem() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
+        console.log(value, "value from view item");
         return (
-          <Link
-            to={`/order_details/${value?.row?.order_id}`}
-            className=" d-flex "
-          >
-            <Button
-              type="button"
-              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-            >
-              <FaEye className="mb-1" />
-            </Button>
-            <Typography
-              variant="label"
-              className="fw-semibold text-secondary"
-              sx={{
-                fontSize: 14,
-                textTransform: "capitalize",
-              }}
-            >
-              {/* {"  "} */}
-              <Badge bg="success" className="m-2">
-                {value?.row?.order_process == "started"
-                  ? value?.row?.order_process
-                  : null}
-              </Badge>
-            </Typography>
-          </Link>
+          <Box className="d-flex justify-content-center align-items-center">
+            <Box>
+              <Link
+                to={`/order_details/${value?.row?.order_id}`}
+                className=" d-flex "
+              >
+                <Button
+                  type="button"
+                  className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+                >
+                  <FaEye className="mb-1" />
+                </Button>
+              </Link>
+            </Box>
+            {value?.row?.order_process !== "" && (
+              <Box>
+                <Typography
+                  variant="label"
+                  className="fw-semibold text-secondary"
+                  sx={{
+                    fontSize: 14,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  <Badge bg="success" className="m-2">
+                    {value?.row?.order_process == "started"
+                      ? value?.row?.order_process
+                      : null}
+                  </Badge>
+                </Typography>
+              </Box>
+            )}
+          </Box>
         );
       },
     },
