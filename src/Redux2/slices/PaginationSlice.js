@@ -26,6 +26,9 @@ const paginationSlice = createSlice({
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
     },
+    resetPage: (state) => {
+      state.currentPage = 1;
+    }
   },
 });
 
@@ -34,5 +37,6 @@ export const {
   startSyncLoading,
   stopSyncLoading,
   setCurrentPage,
+  resetPage
 } = paginationSlice.actions;
 export default paginationSlice.reducer;

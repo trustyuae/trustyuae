@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Alert, Box, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -25,7 +25,8 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import PrintModal from "./PrintModal";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { resetPage, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import usePrevious, { usePreviousLocation } from "../../utils/UsePrevious";
 
 function OrderSystem() {
   const dispatch = useDispatch();
@@ -54,6 +55,10 @@ function OrderSystem() {
   const otherData = useSelector((state) => state?.orderSystem?.orders);
   const orderDetails = useSelector((state) => state?.orderSystem?.orderDetails);
   const currentPage = useSelector((state) => state.pagination.currentPage);
+
+  const location = useLocation();
+  const prevLocation = usePreviousLocation();
+  // const history = useHistory();
 
   useEffect(() => {
     if (currentPage) {
@@ -270,6 +275,14 @@ function OrderSystem() {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, searchOrderID, page, dispatchType, isReset, setSearchOrderID]);
+
+  useEffect(() => {
+    const isNavigatingFromDetails = prevLocation?.pathname?.startsWith("/order_details/");
+
+    if (isNavigatingFromDetails && location?.pathname !== "/ordersystem") {
+      dispatch(resetPage()); // Reset to page 1 if navigating from other routes
+    }
+  }, [location.pathname, prevLocation, dispatch]);
 
   return (
     <Container fluid className="py-3">
