@@ -23,6 +23,7 @@ import {
   GetProductDetails,
   GetProductOrderDetails,
 } from "../../Redux2/slices/P3SystemSlice";
+import Swal from "sweetalert2";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -71,9 +72,9 @@ function OnHoldManagement() {
           id: i,
           isSelected: false,
         }));
-        if (selectedOrders.length > 0) {
-          selectedOrders.forEach((order) => {
-            data.forEach((o) => {
+        if (selectedOrders?.length > 0) {
+          selectedOrders?.forEach((order) => {
+            data?.forEach((o) => {
               if (o.id === order.id) {
                 o.isSelected = true;
               }
@@ -142,76 +143,79 @@ function OnHoldManagement() {
       "Cancel",
       0,
       1,
-      2
+      2,
+      {
+        allowOutsideClick: false, // Disable clicking outside
+        allowEscapeKey: false, // Disable closing on Escape key
+      }
     );
 
     if (systemSelection === "Cancel") {
       return;
     }
 
-    const confirmation = await ShowAlert(
-      `Are you sure you want to send the data to ${systemSelection}?`,
-      "",
-      "question",
-      true,
-      true,
-      "Yes",
-      "Cancel",
-      0
-    );
+    const confirmation = await Swal.fire({
+      title: `Are you sure you want to send the data to ${systemSelection}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      allowOutsideClick: false, // Disable clicking outside
+      allowEscapeKey: false, // Disable escape key
+    });
 
-    if (confirmation === "Cancel") {
-      return;
-    }
+    if (confirmation.isConfirmed) {
+      const requestedDataP = {
+        product_id: params.id,
+        po_id: productOverallData.po_id,
+        order_id: orderId,
+        quantity: quantity,
+        grn_no: params.grn_no,
+        variation_id: params.variation_id,
+        warehouse: systemSelection === "P1 System UAE" ? "" : "China",
+      };
 
-    const requestedDataP = {
-      product_id: params.id,
-      po_id: productOverallData.po_id,
-      order_id: orderId,
-      quantity: quantity,
-      grn_no: params.grn_no,
-      variation_id: params.variation_id,
-      warehouse: systemSelection === "P1 System UAE" ? "" : "China",
-    };
-
-    try {
-      await dispatch(AddProductOrderForPre({ requestedDataP })).then(
-        ({ payload }) => {
-          console.log(payload, "payload from AddProductOrderForPre");
-          if (payload?.status_code === 200) {
-            ShowAlert(
-              payload?.Message,
-              "",
-              "success",
-              false,
-              false,
-              "",
-              "",
-              "",
-              1500
-            );
-            fetchProductOrderDetails();
-          } else {
-            ShowAlert(
-              payload.Message,
-              "",
-              "error",
-              false,
-              false,
-              "",
-              "",
-              "",
-              1500
-            );
+      try {
+        await dispatch(AddProductOrderForPre({ requestedDataP })).then(
+          ({ payload }) => {
+            console.log(payload, "payload from AddProductOrderForPre");
+            if (payload?.status_code === 200) {
+              ShowAlert(
+                payload?.Message,
+                "",
+                "success",
+                false,
+                false,
+                "",
+                "",
+                "",
+                1500
+              );
+              fetchProductOrderDetails();
+            } else {
+              ShowAlert(
+                payload.Message,
+                "",
+                "error",
+                false,
+                false,
+                "",
+                "",
+                "",
+                1500
+              );
+            }
           }
-        }
-      );
-      setSelectedOrders([]);
-      setProductData((prevProductData) =>
-        prevProductData.map((row) => ({ ...row, isSelected: false }))
-      );
-    } catch (error) {
-      console.error("Error occurred:", error);
+        );
+        setSelectedOrders([]);
+        setProductData((prevProductData) =>
+          prevProductData.map((row) => ({ ...row, isSelected: false }))
+        );
+      } catch (error) {
+        console.error("Error occurred:", error);
+      }
+    } else if (confirmation.isDismissed) {
+      return;
     }
   };
 
