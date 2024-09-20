@@ -167,10 +167,8 @@ function OrderDetailsInChina() {
     }
   };
 
-  useEffect(() => {
-    let data = localStorage.getItem("user_data");
-    let userData = JSON.parse(data);
-    if (userData.user_role == "administrator") {
+  useLayoutEffect(() => {
+    if (userData && userData.user_role === "administrator") {
       setTrakingEdit(true);
     }
     const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
