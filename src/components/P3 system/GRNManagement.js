@@ -125,6 +125,12 @@ function GRNManagement() {
       },
     },
     {
+      field: "factory",
+      headerName: "Factory",
+      flex: 1,
+      type: "string",
+    },
+    {
       field: "grn_note",
       headerName: "Remark",
       flex: 0.5,

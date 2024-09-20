@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from "react-router-dom";
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, IconButton, Snackbar, Typography } from "@mui/material";
 import DataTable from "../DataTable";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -20,6 +20,7 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
 import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function CompletedOrderSystem() {
   const inputRef = useRef(null);
@@ -40,6 +41,7 @@ function CompletedOrderSystem() {
     null,
     null,
   ]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
 
   const completedOrdersData = useSelector(
@@ -97,6 +99,17 @@ function CompletedOrderSystem() {
     setPage(1);
   };
 
+  const handleCopy = (text) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setSnackbarOpen(true); 
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   const columns = [
     {
       field: "start_date",
@@ -109,6 +122,19 @@ function CompletedOrderSystem() {
       headerName: "Order ID",
       className: "completed-order-system",
       flex: 0.5,
+      renderCell: (params) => {
+        const OrderIDD = params?.row?.order_id || [];
+        return (
+          <Box className="d-flex align-items-center justify-content-center">
+            <Typography>{OrderIDD}</Typography>
+            {OrderIDD !== "0" && (
+              <IconButton onClick={() => handleCopy(OrderIDD)}>
+                <ContentCopyIcon />
+              </IconButton>
+            )}
+          </Box>
+        );
+      },
     },
     {
       field: "customer_name",
@@ -376,6 +402,17 @@ function CompletedOrderSystem() {
           )}
         </>
       )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000} // Snackbar will auto-dismiss after 3 seconds
+        onClose={() => setSnackbarOpen(false)}
+        message="Tracking ID copied to clipboard!"
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      />
+
     </Container>
   );
 }

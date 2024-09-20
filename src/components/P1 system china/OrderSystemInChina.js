@@ -150,7 +150,7 @@ function OrderSystemInChina() {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        setSnackbarOpen(true); // Show the Snackbar
+        setSnackbarOpen(true); 
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
@@ -171,12 +171,12 @@ function OrderSystemInChina() {
       flex: 1,
       type: "string",
       renderCell: (params) => {
-        const items = params?.row?.order_id || [];
+        const OrderIDD = params?.row?.order_id || [];
         return (
           <Box className="d-flex align-items-center justify-content-center">
-            <Typography>{items}</Typography>
-            {items !== "0" && (
-              <IconButton onClick={() => handleCopy(items)}>
+            <Typography>{OrderIDD}</Typography>
+            {OrderIDD !== "0" && (
+              <IconButton onClick={() => handleCopy(OrderIDD)}>
                 <ContentCopyIcon />
               </IconButton>
             )}
