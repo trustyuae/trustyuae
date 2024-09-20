@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -48,6 +54,7 @@ import {
   OrderDetailsGet,
   OverAllAttachmentFileUpload,
 } from "../../Redux2/slices/OrderSystemSlice";
+import { useDropzone } from "react-dropzone";
 
 function OrderDetails() {
   const { id } = useParams();
@@ -72,13 +79,16 @@ function OrderDetails() {
   const [messageOH, setOHMessage] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
-
   const [userData, setUserData] = useState(null);
+  const [uploadImageModalOpen, setUploadImageModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
+  const [itemID, setItemID] = useState(null);
+  const [itemVariationID, setItemVariationID] = useState(null);
+
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
   if (!fileInputRef.current) {
     fileInputRef.current = {};
@@ -103,6 +113,20 @@ function OrderDetails() {
     (state) => state?.orderSystem?.customOrderOnHoldData
   );
 
+  async function fetchUserData() {
+    try {
+      const userdata = await getUserData();
+      setUserData(userdata || {});
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useLayoutEffect(() => {
     const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
     setOrderData(oDetails);
@@ -125,19 +149,13 @@ function OrderDetails() {
     }
   }, [orderDetailsData, orderDetailsDataOrderId]);
 
-  async function fetchUserData() {
+  async function fetchOrder() {
     try {
-      const userdata = await getUserData();
-      setUserData(userdata || {});
+      dispatch(OrderDetailsGet(id));
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error(error);
     }
   }
-
-  useEffect(() => {
-    fetchUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -160,14 +178,6 @@ function OrderDetails() {
   const retake = () => {
     setSelectedFileUrl(null);
   };
-
-  async function fetchOrder() {
-    try {
-      dispatch(OrderDetailsGet(id));
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   const handleChange = (e) => {
     setMessage(e.target.value);
@@ -239,7 +249,7 @@ function OrderDetails() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e, itemId, itemVariationId) => {
+  const handleFileInputChange = async (e) => {
     if (e.target.files[0]) {
       const file = await CompressImage(e.target.files[0]);
       const fr = new FileReader();
@@ -247,12 +257,28 @@ function OrderDetails() {
         setSelectedFileUrl(fr.result);
         setSelectedFile(file);
         setShowAttachmentModal(true);
-        setSelectedItemId(itemId);
-        setSelectedVariationId(itemVariationId);
+        setUploadImageModalOpen(false);
+        setSelectedItemId(itemID);
+        setSelectedVariationId(itemVariationID);
       };
       fr.readAsDataURL(file);
     }
   };
+
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      if (acceptedFiles[0]) {
+        handleFileInputChange({ target: { files: acceptedFiles } });
+      }
+    },
+    [handleFileInputChange]
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: "image/*",
+    noClick: true,
+  });
 
   const handleCancel = () => {
     setSelectedFileUrl(null);
@@ -553,6 +579,8 @@ function OrderDetails() {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const itemVariationId =
           value && value.row.variation_id ? value.row.variation_id : null;
+        setItemID(itemId);
+        setItemVariationID(itemVariationId);
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
@@ -629,26 +657,12 @@ function OrderDetails() {
                   qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
-                      onClick={() =>
-                        fileInputRef.current[
-                          selectedVariationId ? selectedVariationId : itemId
-                        ]?.click()
-                      }
+                      onClick={() => setUploadImageModalOpen(true)}
                     >
                       <CloudUploadIcon />
                       <Typography style={{ fontSize: "14px" }}>
                         Device
                       </Typography>
-                      <input
-                        type="file"
-                        ref={(input) =>
-                          (fileInputRef.current[
-                            selectedVariationId ? selectedVariationId : itemId
-                          ] = input)
-                        }
-                        style={{ display: "none" }}
-                        onChange={handleFileInputChangeForRow}
-                      />
                     </Button>
                   ) : (
                     <Button
@@ -1372,6 +1386,64 @@ function OrderDetails() {
                       Submitt
                     </Button>
                   )}
+                </Box>
+              </Col>
+            </Row>
+          </Modal.Body>
+        </Modal>
+        <Modal
+          show={uploadImageModalOpen}
+          onHide={() => setUploadImageModalOpen(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Upload Image</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="py-4">
+            <Row className="justify-content-center">
+              <Col md={10}>
+                <Box
+                  {...getRootProps()}
+                  sx={{
+                    height: "150px",
+                    width: "100%",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#e0e0e0",
+                    transition: "background-color 0.3s",
+                    border: "2px dotted #6c757d", // Dotted border style
+                    borderRadius: "12px", // Optional rounded corners
+                  }}
+                  className="dropzone mx-auto mb-4"
+                >
+                  <Box className="d-flex flex-column justify-content-center align-items-center">
+                    <Box>
+                      Drag & drop some images here, or click to select files
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={(e) => handleFileInputChange(e)}
+                      />
+                    </Box>
+                    <Box>OR</Box>
+                    <Box>
+                      <Button
+                        onClick={() => fileInputRef.current.click()}
+                        style={{ backgroundColor: "cornflowerblue" }}
+                      >
+                        Select File
+                      </Button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={(e) => handleFileInputChange(e)}
+                      />
+                    </Box>
+                  </Box>
                 </Box>
               </Col>
             </Row>
