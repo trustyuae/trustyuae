@@ -406,7 +406,7 @@ function CompletedOrderSystem() {
         open={snackbarOpen}
         autoHideDuration={1000} // Snackbar will auto-dismiss after 3 seconds
         onClose={() => setSnackbarOpen(false)}
-        message="Tracking ID copied to clipboard!"
+        message="Order ID copied to clipboard!"
         anchorOrigin={{
           vertical: "top",
           horizontal: "center",
