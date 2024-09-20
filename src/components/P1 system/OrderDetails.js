@@ -1006,21 +1006,13 @@ function OrderDetails() {
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
-                                    onClick={() =>
-                                      fileInputRef?.current?.click()
-                                    }
+                                    onClick={() => setUploadImageModalOpen(true)}
                                   >
                                     <CloudUploadIcon />
                                     <Typography style={{ fontSize: "14px" }}>
                                       Device
                                     </Typography>
                                   </Button>
-                                  <input
-                                    type="file"
-                                    ref={fileInputRef}
-                                    style={{ display: "none" }}
-                                    onChange={handleFileInputChange}
-                                  />
                                 </>
                               ) : (
                                 <Button
