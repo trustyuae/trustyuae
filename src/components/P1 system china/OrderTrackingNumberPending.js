@@ -185,7 +185,6 @@ function OrderTrackingNumberPending() {
   };
 
   const handleTrackIdAssign = (row, event) => {
-
     const { value } = event.target;
 
     setTempTrackIds((prev) => ({
@@ -505,10 +504,18 @@ function OrderTrackingNumberPending() {
           tempTrackIds[params.row.id]
             ? true
             : false;
+
+        const updateOff =
+          params.row.items[0]?.tracking_id === "0" ||
+          params.row.items[0]?.tracking_id === "" ||
+          !tempTrackIds[params.row.id]
+            ? true
+            : false;
         return (
           <Box display="flex" justifyContent="center" alignItems="center">
             <Button
               size="small"
+              disabled={updateOff}
               variant="primary"
               color="primary"
               onClick={() => handleUpdate(params.row)}

@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -98,7 +104,7 @@ function OnHoldOrdersDetails() {
     (state) => state?.orderSystem?.customOrderOnHoldData
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const onHoldOrderData = OnHoldOrderDetailsData?.orders?.map((v, i) => ({
       ...v,
       id: i,
@@ -336,7 +342,7 @@ function OnHoldOrdersDetails() {
         variation_id: [],
         user_id: parseInt(orderDetails.user_id, 10),
         operation_user_id: parseInt(orderDetails.operation_user_id, 10),
-        onhold_note:"",
+        onhold_note: "",
       };
       orderDetails.items.forEach((item) => {
         result.item_id.push(parseInt(item.item_id, 10));

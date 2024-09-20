@@ -23,6 +23,7 @@ import {
   GetProductDetails,
   GetProductOrderDetails,
 } from "../../Redux2/slices/P3SystemSlice";
+import Swal from "sweetalert2";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -42,36 +43,11 @@ function OnHoldManagement() {
     (state) => state?.p3System?.productDetails
   );
 
-  const productDataa = useSelector(
-    (state) => state?.p3System?.productOrderDetails
-  );
-
   useEffect(() => {
     if (productDetailsDataa) {
       setProductDetailsData(productDetailsDataa);
     }
   }, [productDetailsDataa]);
-
-  useEffect(() => {
-    if (productDataa) {
-      setProductOverallData(productDataa);
-      let data = productDataa.records.map((v, i) => ({
-        ...v,
-        id: i,
-        isSelected: false,
-      }));
-      if (selectedOrders.length > 0) {
-        selectedOrders.forEach((order) => {
-          data.forEach((o) => {
-            if (o.id === order.id) {
-              o.isSelected = true;
-            }
-          });
-        });
-      }
-      setProductData(data);
-    }
-  }, [productDataa]);
 
   async function fetchProductDetails() {
     let apiUrl = `wp-json/custom-product-details/v1/product-details-for-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
@@ -88,7 +64,26 @@ function OnHoldManagement() {
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
       })
-    );
+    ).then(({ payload }) => {
+      if (payload) {
+        setProductOverallData(payload);
+        let data = payload?.records?.map((v, i) => ({
+          ...v,
+          id: i,
+          isSelected: false,
+        }));
+        if (selectedOrders?.length > 0) {
+          selectedOrders?.forEach((order) => {
+            data?.forEach((o) => {
+              if (o.id === order.id) {
+                o.isSelected = true;
+              }
+            });
+          });
+        }
+        setProductData(data);
+      }
+    });
   }
 
   const handleCheckboxChange = (e, rowData) => {
@@ -116,7 +111,7 @@ function OnHoldManagement() {
   useEffect(() => {
     fetchProductOrderDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setSelectedOrders, setProductData]);
+  }, [params.id, params.grn_no, params.variation_id]);
 
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
@@ -148,66 +143,79 @@ function OnHoldManagement() {
       "Cancel",
       0,
       1,
-      2
+      2,
+      {
+        allowOutsideClick: false, // Disable clicking outside
+        allowEscapeKey: false, // Disable closing on Escape key
+      }
     );
 
     if (systemSelection === "Cancel") {
       return;
     }
 
-    const confirmation = await ShowAlert(
-      `Are you sure you want to send the data to ${systemSelection}?`,
-      "",
-      "question",
-      true,
-      true,
-      "Yes",
-      "Cancel",
-      0
-    );
+    const confirmation = await Swal.fire({
+      title: `Are you sure you want to send the data to ${systemSelection}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      allowOutsideClick: false, // Disable clicking outside
+      allowEscapeKey: false, // Disable escape key
+    });
 
-    if (confirmation === "Cancel") {
-      return;
-    }
+    if (confirmation.isConfirmed) {
+      const requestedDataP = {
+        product_id: params.id,
+        po_id: productOverallData.po_id,
+        order_id: orderId,
+        quantity: quantity,
+        grn_no: params.grn_no,
+        variation_id: params.variation_id,
+        warehouse: systemSelection === "P1 System UAE" ? "" : "China",
+      };
 
-    const requestedDataP = {
-      product_id: params.id,
-      po_id: productOverallData.po_id,
-      order_id: orderId,
-      quantity: quantity,
-      grn_no: params.grn_no,
-      variation_id: params.variation_id,
-      warehouse: systemSelection === "P1 System UAE" ? "" : "China",
-    };
-
-    try {
-      await dispatch(AddProductOrderForPre({ requestedDataP })).then(
-        ({ payload }) => {
-          console.log(payload, "payload from AddProductOrderForPre");
-          if (payload?.status === 200) {
-            ShowAlert(
-              payload?.data,
-              "",
-              "success",
-              false,
-              false,
-              "",
-              "",
-              "",
-              1500
-            );
-            fetchProductOrderDetails();
-          } else {
-            ShowAlert(payload, "", "error", false, false, "", "", "", 1500);
+      try {
+        await dispatch(AddProductOrderForPre({ requestedDataP })).then(
+          ({ payload }) => {
+            console.log(payload, "payload from AddProductOrderForPre");
+            if (payload?.status_code === 200) {
+              ShowAlert(
+                payload?.Message,
+                "",
+                "success",
+                false,
+                false,
+                "",
+                "",
+                "",
+                1500
+              );
+              fetchProductOrderDetails();
+            } else {
+              ShowAlert(
+                payload.Message,
+                "",
+                "error",
+                false,
+                false,
+                "",
+                "",
+                "",
+                1500
+              );
+            }
           }
-        }
-      );
-      setSelectedOrders([]);
-      setProductData((prevProductData) =>
-        prevProductData.map((row) => ({ ...row, isSelected: false }))
-      );
-    } catch (error) {
-      console.error("Error occurred:", error);
+        );
+        setSelectedOrders([]);
+        setProductData((prevProductData) =>
+          prevProductData.map((row) => ({ ...row, isSelected: false }))
+        );
+      } catch (error) {
+        console.error("Error occurred:", error);
+      }
+    } else if (confirmation.isDismissed) {
+      return;
     }
   };
 
@@ -432,7 +440,7 @@ function OnHoldManagement() {
       </MDBRow>
       <MDBRow>
         <MDBCol md="12" className="d-flex justify-content-end">
-          {productData.length === 0 ? (
+          {productData?.length === 0 ? (
             <Button variant="success" disabled onClick={handleOrderStock}>
               Send For InStock
             </Button>
