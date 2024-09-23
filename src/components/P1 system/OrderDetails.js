@@ -274,6 +274,20 @@ function OrderDetails() {
     [handleFileInputChange]
   );
 
+  const handlePaste = useCallback(
+    (e) => {
+      const items = e.clipboardData.items;
+      for (let item of items) {
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          handleFileInputChange({ target: { files: [file] } });
+          break;
+        }
+      }
+    },
+    [handleFileInputChange]
+  );
+
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: "image/*",
@@ -285,6 +299,7 @@ function OrderDetails() {
     setSelectedFile(null);
     setShowAttachmentModal(false);
   };
+
   const handleCancelImg = async (e) => {
     Swal.fire({
       title: "Are you sure you want to delete this image?",
@@ -713,6 +728,14 @@ function OrderDetails() {
     },
   ];
 
+  useEffect(() => {
+    document.addEventListener("paste", handlePaste);
+
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, [handlePaste]);
+
   return (
     <>
       <Container fluid className="px-5">
@@ -1006,7 +1029,9 @@ function OrderDetails() {
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
-                                    onClick={() => setUploadImageModalOpen(true)}
+                                    onClick={() =>
+                                      setUploadImageModalOpen(true)
+                                    }
                                   >
                                     <CloudUploadIcon />
                                     <Typography style={{ fontSize: "14px" }}>
@@ -1425,6 +1450,7 @@ function OrderDetails() {
                       <Button
                         onClick={() => fileInputRef.current.click()}
                         style={{ backgroundColor: "cornflowerblue" }}
+                        className="buttonStyle"
                       >
                         Select File
                       </Button>
@@ -1434,6 +1460,20 @@ function OrderDetails() {
                         style={{ display: "none" }}
                         onChange={(e) => handleFileInputChange(e)}
                       />
+                    </Box>
+                    <Box>OR</Box>
+                    <Box>
+                      <Button
+                        onClick={() => {
+                          setShowAttachModal(true);
+                          setSelectedItemId(itemID);
+                          setSelectedVariationId(itemVariationID);
+                          setUploadImageModalOpen(false);
+                        }}
+                        className="buttonStyle"
+                      >
+                        Camera
+                      </Button>
                     </Box>
                   </Box>
                 </Box>
