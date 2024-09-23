@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -63,6 +69,8 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { useDropzone } from "react-dropzone";
+
 function OrderDetailsInChina() {
   const { id } = useParams();
   const fileInputRef = useRef({});
@@ -94,6 +102,9 @@ function OrderDetailsInChina() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [uploadImageModalOpen, setUploadImageModalOpen] = useState(false);
+  const [itemID, setItemID] = useState(null);
+  const [itemVariationID, setItemVariationID] = useState(null);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
@@ -133,21 +144,21 @@ function OrderDetailsInChina() {
   const [isEditing, setIsEditing] = useState(false);
   const [originalTrackingId, setOriginalTrackingId] = useState(trackingId);
   const [trakingEdit, setTrakingEdit] = useState(false);
-  
+
   const handleEdit = () => {
-    setOriginalTrackingId(trackingId); 
+    setOriginalTrackingId(trackingId);
     setIsEditing(true);
   };
 
   const handleUpdate = () => {
-    setOriginalTrackingId(trackingId); 
-    setIsEditing(false); 
+    setOriginalTrackingId(trackingId);
+    setIsEditing(false);
     updateTrackingIdApi();
   };
 
   const handleCancelTrackingId = () => {
-    setTrackingId(originalTrackingId); 
-    setIsEditing(false); 
+    setTrackingId(originalTrackingId);
+    setIsEditing(false);
   };
 
   const updateTrackingIdApi = async () => {
@@ -370,12 +381,42 @@ function OrderDetailsInChina() {
         setSelectedFileUrl(fr.result);
         setSelectedFile(file);
         setShowAttachmentModal(true);
-        setSelectedItemId(itemId);
-        setSelectedVariationId(itemVariationId);
+        setUploadImageModalOpen(false);
+        setSelectedItemId(itemID);
+        setSelectedVariationId(itemVariationID);
       };
       fr.readAsDataURL(file);
     }
   };
+
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      if (acceptedFiles[0]) {
+        handleFileInputChange({ target: { files: acceptedFiles } });
+      }
+    },
+    [handleFileInputChange]
+  );
+
+  const handlePaste = useCallback(
+    (e) => {
+      const items = e.clipboardData.items;
+      for (let item of items) {
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          handleFileInputChange({ target: { files: [file] } });
+          break;
+        }
+      }
+    },
+    [handleFileInputChange]
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: "image/*",
+    noClick: true,
+  });
 
   const handleCancel = () => {
     setSelectedFileUrl(null);
@@ -642,6 +683,8 @@ function OrderDetailsInChina() {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const itemVariationId =
           value && value.row.variation_id ? value.row.variation_id : null;
+          setItemID(itemId);
+          setItemVariationID(itemVariationId);
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
@@ -718,11 +761,7 @@ function OrderDetailsInChina() {
                   qty == avl_qty ? (
                     <Button
                       className="bg-transparent border-0 text-black"
-                      onClick={() =>
-                        fileInputRef.current[
-                          selectedVariationId ? selectedVariationId : itemId
-                        ]?.click()
-                      }
+                      onClick={() => setUploadImageModalOpen(true)}
                     >
                       <CloudUploadIcon />
                       <Typography style={{ fontSize: "14px" }}>
@@ -798,6 +837,14 @@ function OrderDetailsInChina() {
         console.error("Failed to copy text: ", err);
       });
   };
+
+  useEffect(() => {
+    document.addEventListener("paste", handlePaste);
+
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, [handlePaste]);
 
   return (
     <>
@@ -1224,7 +1271,7 @@ function OrderDetailsInChina() {
                                   <Button
                                     className="bg-transparent border-0 text-black"
                                     onClick={() =>
-                                      fileInputRef?.current?.click()
+                                      setUploadImageModalOpen(true)
                                     }
                                   >
                                     <CloudUploadIcon />
@@ -1603,6 +1650,79 @@ function OrderDetailsInChina() {
                       Submitt
                     </Button>
                   )}
+                </Box>
+              </Col>
+            </Row>
+          </Modal.Body>
+        </Modal>
+        <Modal
+          show={uploadImageModalOpen}
+          onHide={() => setUploadImageModalOpen(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Upload Image</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="py-4">
+            <Row className="justify-content-center">
+              <Col md={10}>
+                <Box
+                  {...getRootProps()}
+                  sx={{
+                    height: "150px",
+                    width: "100%",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#e0e0e0",
+                    transition: "background-color 0.3s",
+                    border: "2px dotted #6c757d", // Dotted border style
+                    borderRadius: "12px", // Optional rounded corners
+                  }}
+                  className="dropzone mx-auto mb-4"
+                >
+                  <Box className="d-flex flex-column justify-content-center align-items-center">
+                    <Box>
+                      Drag & drop some images here, or click to select files
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={(e) => handleFileInputChange(e)}
+                      />
+                    </Box>
+                    <Box>OR</Box>
+                    <Box>
+                      <Button
+                        onClick={() => fileInputRef.current.click()}
+                        style={{ backgroundColor: "cornflowerblue" }}
+                        className="buttonStyle"
+                      >
+                        Select File
+                      </Button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={(e) => handleFileInputChange(e)}
+                      />
+                    </Box>
+                    <Box>OR</Box>
+                    <Box>
+                      <Button
+                        onClick={() => {
+                          setShowAttachModal(true);
+                          setSelectedItemId(itemID);
+                          setSelectedVariationId(itemVariationID);
+                          setUploadImageModalOpen(false);
+                        }}
+                        className="buttonStyle"
+                      >
+                        Camera
+                      </Button>
+                    </Box>
+                  </Box>
                 </Box>
               </Col>
             </Row>
