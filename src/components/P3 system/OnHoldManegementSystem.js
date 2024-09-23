@@ -936,7 +936,7 @@ function OnHoldManegementSystem() {
           <Col xs="auto" lg="3">
             <Form.Label className="fw-semibold">Select PO ID</Form.Label>
             <Select
-              defaultMenuIsOpen
+              // defaultMenuIsOpen
               options={allPoIds} // Pass formatted PO IDs
               value={allPoIds.find((option) => option.value === selectedPOId)} // Bind the selected PO ID object
               onChange={handleChangePoID} // Handle PO ID change

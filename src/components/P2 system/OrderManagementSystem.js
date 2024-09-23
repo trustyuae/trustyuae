@@ -24,6 +24,7 @@ import {
   Typography,
   Select as MuiSelect,
 } from "@mui/material";
+import Select from "react-select";
 import { Card, Modal, Tab, Tabs } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
@@ -97,6 +98,7 @@ function OrderManagementSystem() {
   const [imageURL, setImageURL] = useState("");
   const [imageId, setImageId] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedFactoryName, setSelectedFactoryName] = useState("");
 
   const factoryData = useSelector((state) => state?.factory?.factories);
 
@@ -120,7 +122,6 @@ function OrderManagementSystem() {
     (state) => state?.p2System?.addedManualPoData
   );
 
-  console.log(addedPoDataa, "added po data from redux toolkit");
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -243,6 +244,31 @@ function OrderManagementSystem() {
     setOrders(updatedData);
   };
 
+  const handleChangeFactoryForMul = (selectedOption) => {
+    if (selectedOption) {
+      setSelectedFactoryName(selectedOption.value);
+    } else {
+      setSelectedFactoryName(null);
+    }
+  };
+
+  const handleFactoryChangeForSelectedProducts = async () => {
+    const updatedData = selectedOrderIds.map((item, index) => {
+      return {
+        ...item,
+        factory_id: selectedFactoryName,
+        id: item.id || index, // Ensure each item has a unique `id`
+      };
+    });
+
+    setOrders(updatedData);
+    handleUpdateFactoryForMultipleProducts();
+    console.log(
+      updatedData,
+      "updatedData from handleFactoryChangeForSelectedProducts"
+    );
+  };
+
   const handleUpdate = (rowData) => {
     const id = rowData.item_id;
     const factoryId = rowData.factory_id;
@@ -250,6 +276,10 @@ function OrderManagementSystem() {
       factory_id: factoryId,
     };
     dispatch(AssignFactoryToProduct({ id, payload }));
+  };
+
+  const handleUpdateFactoryForMultipleProducts = () => {
+    console.log("handleUpdateFactoryForMultipleProducts");
   };
 
   // po ogainst order colum
@@ -1247,6 +1277,7 @@ function OrderManagementSystem() {
                       onChange={(e) => setSelectedFactory(e.target.value)}
                     >
                       <option value="">All Factory</option>
+                      <option value="Please Assign Factory">Please Assign Factory</option>
                       {factories?.map((factory) => (
                         <option key={factory.id} value={factory.id}>
                           {factory.factory_name}
@@ -1288,6 +1319,48 @@ function OrderManagementSystem() {
                     </Form.Control>
                   </Form.Group>
                 </Col>
+              </Row>
+              <Row className="mt-3">
+                <Box className="d-flex justify-content-end">
+                  {/* <Form.Group className="fw-semibold mb-0">
+                    <Form.Select
+                      as="select"
+                      className="mr-sm-2"
+                      value={selectedFactoryName} // Keep track of the selected factory
+                      onChange={(e) => setSelectedFactoryName(e.target.value)}
+                    >
+                      <option value="">{"Please Assign factory"}</option>
+                      {factories?.map((factory) => (
+                        <option key={factory.id} value={factory.id}>
+                          {factory.factory_name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group> */}
+                  <Select
+                    options={factories?.map((factory) => ({
+                      label: factory.factory_name,
+                      value: factory.id,
+                    }))}
+                    value={factories.find(
+                      (option) => option.value === selectedFactoryName
+                    )}
+                    onChange={handleChangeFactoryForMul}
+                    isClearable
+                    placeholder="Select Factory"
+                    noOptionsMessage={() => "No Factory found"}
+                    getOptionLabel={(option) => option.label}
+                    getOptionValue={(option) => option.value}
+                    closeMenuOnSelect={false}
+                  />
+
+                  <Button
+                    className="ms-2"
+                    onClick={() => handleFactoryChangeForSelectedProducts()}
+                  >
+                    Update Factory
+                  </Button>
+                </Box>
               </Row>
             </Form>
           </Row>
