@@ -59,6 +59,7 @@ import { useDropzone } from "react-dropzone";
 function OrderDetails() {
   const { id } = useParams();
   const fileInputRef = useRef({});
+  const dropzoneRef = useRef(null);
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [selectedVariationId, setSelectedVariationId] = useState("");
@@ -276,12 +277,16 @@ function OrderDetails() {
 
   const handlePaste = useCallback(
     (e) => {
-      const items = e.clipboardData.items;
-      for (let item of items) {
-        if (item.kind === "file") {
-          const file = item.getAsFile();
-          handleFileInputChange({ target: { files: [file] } });
-          break;
+      if (dropzoneRef.current && dropzoneRef.current.contains(e.target)) {
+        const items = e.clipboardData.items;
+        for (let item of items) {
+          if (item.kind === "file") {
+            const file = item.getAsFile();
+            handleFileInputChange(
+              { target: { files: [file] } }
+            );
+            break;
+          }
         }
       }
     },
@@ -671,6 +676,7 @@ function OrderDetails() {
                   qty == avl_qty ? (
                     <Box
                       {...getRootProps()}
+                      ref={dropzoneRef}
                       sx={{
                         width: "100%",
                         position: "relative",
@@ -679,8 +685,8 @@ function OrderDetails() {
                         justifyContent: "center",
                         backgroundColor: "#e0e0e0",
                         transition: "background-color 0.3s",
-                        border: "2px dotted #6c757d", 
-                        borderRadius: "2px", 
+                        border: "2px dotted #6c757d",
+                        borderRadius: "2px",
                       }}
                       className="dropzone mx-auto"
                     >
@@ -738,8 +744,8 @@ function OrderDetails() {
                   ) : (
                     <Box
                       {...getRootProps({
-                        onClick: (e) => e.preventDefault(), 
-                        onDrop: (e) => e.preventDefault(), 
+                        onClick: (e) => e.preventDefault(),
+                        onDrop: (e) => e.preventDefault(),
                       })}
                       sx={{
                         width: "100%",
@@ -751,8 +757,8 @@ function OrderDetails() {
                         transition: "background-color 0.3s",
                         border: "2px dotted #6c757d",
                         borderRadius: "2px",
-                        cursor: "not-allowed", 
-                        pointerEvents: "none", 
+                        cursor: "not-allowed",
+                        pointerEvents: "none",
                       }}
                       className="dropzone mx-auto"
                     >
@@ -781,7 +787,7 @@ function OrderDetails() {
                               onClick={() => fileInputRef.current.click()}
                               style={{ backgroundColor: "cornflowerblue" }}
                               className="buttonStyle"
-                              disabled 
+                              disabled
                             >
                               <CloudUploadIcon />
                             </Button>
@@ -790,7 +796,7 @@ function OrderDetails() {
                               ref={fileInputRef}
                               style={{ display: "none" }}
                               onChange={(e) => handleFileInputChange(e)}
-                              disabled 
+                              disabled
                             />
                           </Box>
                           <Box>
@@ -803,7 +809,7 @@ function OrderDetails() {
                               }}
                               style={{ backgroundColor: "cornflowerblue" }}
                               className="buttonStyle"
-                              disabled 
+                              disabled
                             >
                               <CameraAltIcon />
                             </Button>
