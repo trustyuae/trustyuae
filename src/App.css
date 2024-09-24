@@ -164,3 +164,7 @@
 padding: 3px 12px !important;
 font-size: 12px !important;
 }
+
+.css-qx0nb3-MuiDataGrid-root .MuiDataGrid-cell {
+  line-height: unset;
+}

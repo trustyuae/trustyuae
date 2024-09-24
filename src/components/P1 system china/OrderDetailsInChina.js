@@ -683,8 +683,8 @@ function OrderDetailsInChina() {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const itemVariationId =
           value && value.row.variation_id ? value.row.variation_id : null;
-          setItemID(itemId);
-          setItemVariationID(itemVariationId);
+        setItemID(itemId);
+        setItemVariationID(itemVariationId);
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
@@ -753,70 +753,154 @@ function OrderDetailsInChina() {
             <Row className={`${"justify-content-center"} h-100`}>
               <Col
                 md={12}
-                className={`d-flex align-items-center justify-content-center my-1`}
+                className={`d-flex align-items-center justify-content-center`}
               >
-                <Card className="factory-card me-1 shadow-sm mb-0">
+                <Card className="factory-card  shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
                   orderDetails.order_process == "started" &&
                   qty == avl_qty ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      onClick={() => setUploadImageModalOpen(true)}
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                      <input
-                        type="file"
-                        ref={(input) =>
-                          (fileInputRef.current[
-                            selectedVariationId ? selectedVariationId : itemId
-                          ] = input)
-                        }
-                        style={{ display: "none" }}
-                        onChange={handleFileInputChangeForRow}
-                      />
-                    </Button>
-                  ) : (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
-                    >
-                      <CloudUploadIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Device
-                      </Typography>
-                    </Button>
-                  )}
-                </Card>
-                <Card className="factory-card ms-1 shadow-sm mb-0">
-                  {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails.order_process == "started" &&
-                  qty == avl_qty ? (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      onClick={() => {
-                        setShowAttachModal(true);
-                        setSelectedItemId(itemId);
-                        setSelectedVariationId(itemVariationId);
+                    <Box
+                      {...getRootProps()}
+                      sx={{
+                        width: "100%",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#e0e0e0",
+                        transition: "background-color 0.3s",
+                        border: "2px dotted #6c757d",
+                        borderRadius: "2px",
                       }}
+                      className="dropzone mx-auto"
                     >
-                      <CameraAltIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Camera
-                      </Typography>
-                    </Button>
+                      <Box
+                        className="d-flex flex-column justify-content-center align-items-center"
+                        sx={{
+                          height: "70px",
+                          width: "170px",
+                          lineHeight: "normal",
+                        }}
+                      >
+                        <Box>
+                          Drag & drop image
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            onChange={(e) => handleFileInputChange(e)}
+                          />
+                        </Box>
+                        <Box>OR</Box>
+                        <Box className="d-flex justify-content-between">
+                          <Box sx={{ mr: 2 }}>
+                            <Button
+                              onClick={() => fileInputRef.current.click()}
+                              style={{ backgroundColor: "cornflowerblue" }}
+                              className="buttonStyle"
+                            >
+                              <CloudUploadIcon />
+                            </Button>
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              style={{ display: "none" }}
+                              onChange={(e) => handleFileInputChange(e)}
+                            />
+                          </Box>
+                          <Box>
+                            <Button
+                              onClick={() => {
+                                setShowAttachModal(true);
+                                setSelectedItemId(itemID);
+                                setSelectedVariationId(itemVariationID);
+                                setUploadImageModalOpen(false);
+                              }}
+                              style={{ backgroundColor: "cornflowerblue" }}
+                              className="buttonStyle"
+                            >
+                              <CameraAltIcon />
+                            </Button>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
                   ) : (
-                    <Button
-                      className="bg-transparent border-0 text-black"
-                      disabled
+                    <Box
+                      {...getRootProps({
+                        onClick: (e) => e.preventDefault(),
+                        onDrop: (e) => e.preventDefault(),
+                      })}
+                      sx={{
+                        width: "100%",
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#e0e0e0",
+                        transition: "background-color 0.3s",
+                        border: "2px dotted #6c757d",
+                        borderRadius: "2px",
+                        cursor: "not-allowed",
+                        pointerEvents: "none",
+                      }}
+                      className="dropzone mx-auto"
                     >
-                      <CameraAltIcon />
-                      <Typography style={{ fontSize: "14px" }}>
-                        Camera
-                      </Typography>
-                    </Button>
+                      <Box
+                        className="d-flex flex-column justify-content-center align-items-center"
+                        sx={{
+                          height: "70px",
+                          width: "170px",
+                          lineHeight: "normal",
+                        }}
+                      >
+                        <Box>
+                          Drag & drop image
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            onChange={(e) => handleFileInputChange(e)}
+                            disabled
+                          />
+                        </Box>
+                        <Box>OR</Box>
+                        <Box className="d-flex justify-content-between">
+                          <Box sx={{ mr: 2 }}>
+                            <Button
+                              onClick={() => fileInputRef.current.click()}
+                              style={{ backgroundColor: "cornflowerblue" }}
+                              className="buttonStyle"
+                              disabled
+                            >
+                              <CloudUploadIcon />
+                            </Button>
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              style={{ display: "none" }}
+                              onChange={(e) => handleFileInputChange(e)}
+                              disabled
+                            />
+                          </Box>
+                          <Box>
+                            <Button
+                              onClick={() => {
+                                setShowAttachModal(true);
+                                setSelectedItemId(itemID);
+                                setSelectedVariationId(itemVariationID);
+                                setUploadImageModalOpen(false);
+                              }}
+                              style={{ backgroundColor: "cornflowerblue" }}
+                              className="buttonStyle"
+                              disabled
+                            >
+                              <CameraAltIcon />
+                            </Button>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
                   )}
                 </Card>
               </Col>
@@ -1650,79 +1734,6 @@ function OrderDetailsInChina() {
                       Submitt
                     </Button>
                   )}
-                </Box>
-              </Col>
-            </Row>
-          </Modal.Body>
-        </Modal>
-        <Modal
-          show={uploadImageModalOpen}
-          onHide={() => setUploadImageModalOpen(false)}
-          centered
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Upload Image</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="py-4">
-            <Row className="justify-content-center">
-              <Col md={10}>
-                <Box
-                  {...getRootProps()}
-                  sx={{
-                    height: "150px",
-                    width: "100%",
-                    position: "relative",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#e0e0e0",
-                    transition: "background-color 0.3s",
-                    border: "2px dotted #6c757d", // Dotted border style
-                    borderRadius: "12px", // Optional rounded corners
-                  }}
-                  className="dropzone mx-auto mb-4"
-                >
-                  <Box className="d-flex flex-column justify-content-center align-items-center">
-                    <Box>
-                      Drag & drop some images here, or click to select files
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: "none" }}
-                        onChange={(e) => handleFileInputChange(e)}
-                      />
-                    </Box>
-                    <Box>OR</Box>
-                    <Box>
-                      <Button
-                        onClick={() => fileInputRef.current.click()}
-                        style={{ backgroundColor: "cornflowerblue" }}
-                        className="buttonStyle"
-                      >
-                        Select File
-                      </Button>
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: "none" }}
-                        onChange={(e) => handleFileInputChange(e)}
-                      />
-                    </Box>
-                    <Box>OR</Box>
-                    <Box>
-                      <Button
-                        onClick={() => {
-                          setShowAttachModal(true);
-                          setSelectedItemId(itemID);
-                          setSelectedVariationId(itemVariationID);
-                          setUploadImageModalOpen(false);
-                        }}
-                        className="buttonStyle"
-                      >
-                        Camera
-                      </Button>
-                    </Box>
-                  </Box>
                 </Box>
               </Col>
             </Row>

@@ -175,7 +175,7 @@ function OrderSystemInChina() {
         return (
           <Box className="d-flex align-items-center justify-content-center">
             <Typography>{OrderIDD}</Typography>
-            {OrderIDD !== "0" && (
+            {OrderIDD !== "0" && OrderIDD !== "" && (
               <IconButton onClick={() => handleCopy(OrderIDD)}>
                 <ContentCopyIcon />
               </IconButton>
