@@ -250,7 +250,9 @@ function OrderDetails() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e) => {
+  const handleFileInputChange = async (e, itemId, itemVariationId) => {
+    console.log(itemId, "itemId");
+    console.log(itemVariationId, "itemVariationId");
     if (e.target.files[0]) {
       const file = await CompressImage(e.target.files[0]);
       const fr = new FileReader();
@@ -259,8 +261,8 @@ function OrderDetails() {
         setSelectedFile(file);
         setShowAttachmentModal(true);
         setUploadImageModalOpen(false);
-        setSelectedItemId(itemID);
-        setSelectedVariationId(itemVariationID);
+        setSelectedItemId(itemId);
+        setSelectedVariationId(itemVariationId);
       };
       fr.readAsDataURL(file);
     }
@@ -282,9 +284,7 @@ function OrderDetails() {
         for (let item of items) {
           if (item.kind === "file") {
             const file = item.getAsFile();
-            handleFileInputChange(
-              { target: { files: [file] } }
-            );
+            handleFileInputChange({ target: { files: [file] } });
             break;
           }
         }
@@ -599,8 +599,6 @@ function OrderDetails() {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const itemVariationId =
           value && value.row.variation_id ? value.row.variation_id : null;
-        setItemID(itemId);
-        setItemVariationID(itemVariationId);
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
@@ -610,6 +608,7 @@ function OrderDetails() {
         if (!fileInputRef.current) {
           fileInputRef.current = {};
         }
+
         if (value && value.row.dispatch_image) {
           const isDisabled = orderDetails.order_process !== "started";
           return (
@@ -711,18 +710,33 @@ function OrderDetails() {
                         <Box className="d-flex justify-content-between">
                           <Box sx={{ mr: 2 }}>
                             <Button
-                              onClick={() => fileInputRef.current.click()}
+                              onClick={() =>
+                                fileInputRef.current[
+                                  selectedVariationId
+                                    ? selectedVariationId
+                                    : itemId
+                                ]?.click()
+                              }
                               style={{ backgroundColor: "cornflowerblue" }}
                               className="buttonStyle"
                             >
                               <CloudUploadIcon />
+                              <input
+                                type="file"
+                                ref={(input) => {
+                                  if (!fileInputRef.current) {
+                                    fileInputRef.current = {};
+                                  }
+                                  fileInputRef.current[
+                                    selectedVariationId
+                                      ? selectedVariationId
+                                      : itemId
+                                  ] = input;
+                                }}
+                                style={{ display: "none" }}
+                                onChange={handleFileInputChangeForRow}
+                              />
                             </Button>
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              style={{ display: "none" }}
-                              onChange={(e) => handleFileInputChange(e)}
-                            />
                           </Box>
                           <Box>
                             <Button
