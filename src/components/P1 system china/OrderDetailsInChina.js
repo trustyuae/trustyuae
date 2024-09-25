@@ -74,6 +74,7 @@ import { useDropzone } from "react-dropzone";
 function OrderDetailsInChina() {
   const { id } = useParams();
   const fileInputRef = useRef({});
+  const dropzoneRef = useRef(null);
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
   const [userData, setUserData] = useState(null);
@@ -103,8 +104,6 @@ function OrderDetailsInChina() {
   const [selectedItemIds, setSelectedItemIds] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [uploadImageModalOpen, setUploadImageModalOpen] = useState(false);
-  const [itemID, setItemID] = useState(null);
-  const [itemVariationID, setItemVariationID] = useState(null);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
@@ -224,7 +223,8 @@ function OrderDetailsInChina() {
     fetch(imageSrc)
       .then((res) => res.blob())
       .then((blob) => {
-        const file = new File([blob], "screenshot.jpg", {
+        const uniqueFilename = `screenshot_${Date.now()}.jpg`;
+        const file = new File([blob], uniqueFilename, {
           type: "image/jpeg",
         });
         setSelectedFile(file);
@@ -374,6 +374,8 @@ function OrderDetailsInChina() {
   };
 
   const handleFileInputChange = async (e, itemId, itemVariationId) => {
+    console.log(itemId, "itemId");
+    console.log(itemVariationId, "itemVariationId");
     if (e.target.files[0]) {
       const file = await CompressImage(e.target.files[0]);
       const fr = new FileReader();
@@ -382,8 +384,8 @@ function OrderDetailsInChina() {
         setSelectedFile(file);
         setShowAttachmentModal(true);
         setUploadImageModalOpen(false);
-        setSelectedItemId(itemID);
-        setSelectedVariationId(itemVariationID);
+        setSelectedItemId(itemId);
+        setSelectedVariationId(itemVariationId);
       };
       fr.readAsDataURL(file);
     }
@@ -400,12 +402,14 @@ function OrderDetailsInChina() {
 
   const handlePaste = useCallback(
     (e) => {
-      const items = e.clipboardData.items;
-      for (let item of items) {
-        if (item.kind === "file") {
-          const file = item.getAsFile();
-          handleFileInputChange({ target: { files: [file] } });
-          break;
+      if (dropzoneRef.current && dropzoneRef.current.contains(e.target)) {
+        const items = e.clipboardData.items;
+        for (let item of items) {
+          if (item.kind === "file") {
+            const file = item.getAsFile();
+            handleFileInputChange({ target: { files: [file] } });
+            break;
+          }
         }
       }
     },
@@ -683,8 +687,6 @@ function OrderDetailsInChina() {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
         const itemVariationId =
           value && value.row.variation_id ? value.row.variation_id : null;
-        setItemID(itemId);
-        setItemVariationID(itemVariationId);
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
@@ -761,6 +763,7 @@ function OrderDetailsInChina() {
                   qty == avl_qty ? (
                     <Box
                       {...getRootProps()}
+                      ref={dropzoneRef}
                       sx={{
                         width: "100%",
                         position: "relative",
@@ -795,25 +798,41 @@ function OrderDetailsInChina() {
                         <Box className="d-flex justify-content-between">
                           <Box sx={{ mr: 2 }}>
                             <Button
-                              onClick={() => fileInputRef.current.click()}
+                              onClick={() =>
+                                fileInputRef.current[
+                                  selectedVariationId
+                                    ? selectedVariationId
+                                    : itemId
+                                ]?.click()
+                              }
                               style={{ backgroundColor: "cornflowerblue" }}
                               className="buttonStyle"
                             >
                               <CloudUploadIcon />
+                              <input
+                                type="file"
+                                ref={(input) => {
+                                  if (!fileInputRef.current) {
+                                    fileInputRef.current = {};
+                                  }
+                                  fileInputRef.current[
+                                    selectedVariationId
+                                      ? selectedVariationId
+                                      : itemId
+                                  ] = input;
+                                }}
+                                style={{ display: "none" }}
+                                onChange={handleFileInputChangeForRow}
+                              />
                             </Button>
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              style={{ display: "none" }}
-                              onChange={(e) => handleFileInputChange(e)}
-                            />
                           </Box>
                           <Box>
                             <Button
                               onClick={() => {
+                                setSelectedFileUrl(null);
                                 setShowAttachModal(true);
-                                setSelectedItemId(itemID);
-                                setSelectedVariationId(itemVariationID);
+                                setSelectedItemId(itemId);
+                                setSelectedVariationId(itemVariationId);
                                 setUploadImageModalOpen(false);
                               }}
                               style={{ backgroundColor: "cornflowerblue" }}
@@ -887,8 +906,8 @@ function OrderDetailsInChina() {
                             <Button
                               onClick={() => {
                                 setShowAttachModal(true);
-                                setSelectedItemId(itemID);
-                                setSelectedVariationId(itemVariationID);
+                                setSelectedItemId(itemId);
+                                setSelectedVariationId(itemVariationId);
                                 setUploadImageModalOpen(false);
                               }}
                               style={{ backgroundColor: "cornflowerblue" }}
