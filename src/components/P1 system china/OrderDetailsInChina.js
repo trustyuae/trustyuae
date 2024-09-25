@@ -374,10 +374,8 @@ function OrderDetailsInChina() {
   };
 
   const handleFileInputChange = async (e, itemId, itemVariationId) => {
-    console.log(itemId, "itemId");
-    console.log(itemVariationId, "itemVariationId");
-    if (e.target.files[0]) {
-      const file = await CompressImage(e.target.files[0]);
+    if (e.files[0]) {
+      const file = await CompressImage(e.files[0]);
       const fr = new FileReader();
       fr.onload = function () {
         setSelectedFileUrl(fr.result);
@@ -391,33 +389,7 @@ function OrderDetailsInChina() {
     }
   };
 
-  const onDrop = useCallback(
-    (acceptedFiles) => {
-      if (acceptedFiles[0]) {
-        handleFileInputChange({ target: { files: acceptedFiles } });
-      }
-    },
-    [handleFileInputChange]
-  );
-
-  const handlePaste = useCallback(
-    (e) => {
-      if (dropzoneRef.current && dropzoneRef.current.contains(e.target)) {
-        const items = e.clipboardData.items;
-        for (let item of items) {
-          if (item.kind === "file") {
-            const file = item.getAsFile();
-            handleFileInputChange({ target: { files: [file] } });
-            break;
-          }
-        }
-      }
-    },
-    [handleFileInputChange]
-  );
-
   const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
     accept: "image/*",
     noClick: true,
   });
@@ -679,7 +651,7 @@ function OrderDetailsInChina() {
     },
     {
       field: "dispatch_image",
-      headerName: t("P1ChinaSystem.Attachment"),
+      headerName: "Attachment",
       flex: 1.5,
       className: "order-details",
       type: "html",
@@ -689,13 +661,35 @@ function OrderDetailsInChina() {
           value && value.row.variation_id ? value.row.variation_id : null;
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
+
         const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId, itemVariationId);
+          handleFileInputChange(e.target, itemId, itemVariationId);
         };
 
-        if (!fileInputRef.current) {
-          fileInputRef.current = {};
-        }
+        const onDrop = (event) => {
+          event.preventDefault();
+          handleFileInputChange(event.dataTransfer, itemId, itemVariationId);
+        };
+
+        const handlePaste = (e) => {
+          e.preventDefault();
+          const items = e.clipboardData.items;
+
+          for (let item of items) {
+            if (item.kind === "file") {
+              const file = item.getAsFile();
+              requestAnimationFrame(() => {
+                handleFileInputChange(
+                  { files: [file] },
+                  itemId,
+                  itemVariationId
+                );
+              });
+              break;
+            }
+          }
+        };
+
         if (value && value.row.dispatch_image) {
           const isDisabled = orderDetails.order_process !== "started";
           return (
@@ -725,7 +719,7 @@ function OrderDetailsInChina() {
                     }}
                   />
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                    orderDetails.order_process == "started" && (
+                    orderProcess == "started" && (
                       <CancelIcon
                         sx={{
                           position: "relative",
@@ -734,7 +728,6 @@ function OrderDetailsInChina() {
                           cursor: "pointer",
                           color: "red",
                           zIndex: 1,
-                          // disabled=isDisabled
                           opacity: isDisabled ? 0.5 : 1,
                           pointerEvents: isDisabled ? "none" : "auto",
                           cursor: isDisabled ? "not-allowed" : "pointer",
@@ -757,9 +750,9 @@ function OrderDetailsInChina() {
                 md={12}
                 className={`d-flex align-items-center justify-content-center`}
               >
-                <Card className="factory-card  shadow-sm mb-0">
+                <Card className="factory-card shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderDetails.order_process == "started" &&
+                  orderProcess == "started" &&
                   qty == avl_qty ? (
                     <Box
                       {...getRootProps()}
@@ -776,6 +769,9 @@ function OrderDetailsInChina() {
                         borderRadius: "2px",
                       }}
                       className="dropzone mx-auto"
+                      onDrop={onDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                      onPaste={handlePaste}
                     >
                       <Box
                         className="d-flex flex-column justify-content-center align-items-center"
@@ -790,8 +786,8 @@ function OrderDetailsInChina() {
                           <input
                             type="file"
                             ref={fileInputRef}
+                            {...getInputProps}
                             style={{ display: "none" }}
-                            onChange={(e) => handleFileInputChange(e)}
                           />
                         </Box>
                         <Box>OR</Box>
@@ -940,14 +936,6 @@ function OrderDetailsInChina() {
         console.error("Failed to copy text: ", err);
       });
   };
-
-  useEffect(() => {
-    document.addEventListener("paste", handlePaste);
-
-    return () => {
-      document.removeEventListener("paste", handlePaste);
-    };
-  }, [handlePaste]);
 
   return (
     <>

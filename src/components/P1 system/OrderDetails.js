@@ -87,8 +87,6 @@ function OrderDetails() {
   const dispatch = useDispatch();
   const [attachmentZoom, setAttachmentZoom] = useState(false);
   const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
-  const [itemID, setItemID] = useState(null);
-  const [itemVariationID, setItemVariationID] = useState(null);
 
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
   if (!fileInputRef.current) {
@@ -252,9 +250,6 @@ function OrderDetails() {
   };
 
   const handleFileInputChange = async (e, itemId, itemVariationId) => {
-    console.log(itemId, "itemId");
-    console.log(itemVariationId, "itemVariationId");
-    console.log(e.files,'<=== files')
     if (e.files[0]) {
       const file = await CompressImage(e.files[0]);
       const fr = new FileReader();
@@ -270,24 +265,7 @@ function OrderDetails() {
     }
   };
 
-  const handlePaste = useCallback(
-    (e) => {
-      if (dropzoneRef.current && dropzoneRef.current.contains(e.target)) {
-        const items = e.clipboardData.items;
-        for (let item of items) {
-          if (item.kind === "file") {
-            const file = item.getAsFile();
-            handleFileInputChange({ target: { files: [file] } });
-            break;
-          }
-        }
-      }
-    },
-    [handleFileInputChange]
-  );
-
   const { getRootProps, getInputProps } = useDropzone({
-    // onDrop,
     accept: "image/*",
     noClick: true,
   });
@@ -372,7 +350,7 @@ function OrderDetails() {
       order_status: "started",
     };
     dispatch(InsertOrderPickup(requestData)).then(() => {
-      fetchOrder(); // Ensure this fetches updated data
+      fetchOrder();
     });
   };
 
@@ -383,7 +361,7 @@ function OrderDetails() {
       order_status: "Cancelled",
     };
     dispatch(InsertOrderPickupCancel(requestData)).then(() => {
-      fetchOrder(); // Ensure this fetches updated data
+      fetchOrder();
     });
   };
 
@@ -594,18 +572,34 @@ function OrderDetails() {
           value && value.row.variation_id ? value.row.variation_id : null;
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
+
         const handleFileInputChangeForRow = (e) => {
           handleFileInputChange(e.target, itemId, itemVariationId);
         };
 
         const onDrop = (event) => {
-          event.preventDefault(); 
+          event.preventDefault();
           handleFileInputChange(event.dataTransfer, itemId, itemVariationId);
         };
 
-        if (!fileInputRef.current) {
-          fileInputRef.current = {};
-        }
+        const handlePaste = (e) => {
+          e.preventDefault();
+          const items = e.clipboardData.items;
+
+          for (let item of items) {
+            if (item.kind === "file") {
+              const file = item.getAsFile();
+              requestAnimationFrame(() => {
+                handleFileInputChange(
+                  { files: [file] },
+                  itemId,
+                  itemVariationId
+                );
+              });
+              break; 
+            }
+          }
+        };
 
         if (value && value.row.dispatch_image) {
           const isDisabled = orderDetails.order_process !== "started";
@@ -687,7 +681,8 @@ function OrderDetails() {
                       }}
                       className="dropzone mx-auto"
                       onDrop={onDrop}
-                      onDragOver={(e) => e.preventDefault()} 
+                      onDragOver={(e) => e.preventDefault()}
+                      onPaste={handlePaste}
                     >
                       <Box
                         className="d-flex flex-column justify-content-center align-items-center"
@@ -704,9 +699,6 @@ function OrderDetails() {
                             ref={fileInputRef}
                             {...getInputProps}
                             style={{ display: "none" }}
-                            onChange={(e) =>
-                              handleFileInputChange(e, itemId, itemVariationId)
-                            } 
                           />
                         </Box>
                         <Box>OR</Box>
@@ -821,8 +813,8 @@ function OrderDetails() {
                             <Button
                               onClick={() => {
                                 setShowAttachModal(true);
-                                setSelectedItemId(itemID);
-                                setSelectedVariationId(itemVariationID);
+                                setSelectedItemId(itemId);
+                                setSelectedVariationId(itemVariationId);
                                 setUploadImageModalOpen(false);
                               }}
                               style={{ backgroundColor: "cornflowerblue" }}
@@ -844,14 +836,6 @@ function OrderDetails() {
       },
     },
   ];
-
-  useEffect(() => {
-    document.addEventListener("paste", handlePaste);
-
-    return () => {
-      document.removeEventListener("paste", handlePaste);
-    };
-  }, [handlePaste]);
 
   return (
     <>
