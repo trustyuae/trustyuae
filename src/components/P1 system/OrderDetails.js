@@ -254,8 +254,9 @@ function OrderDetails() {
   const handleFileInputChange = async (e, itemId, itemVariationId) => {
     console.log(itemId, "itemId");
     console.log(itemVariationId, "itemVariationId");
-    if (e.target.files[0]) {
-      const file = await CompressImage(e.target.files[0]);
+    console.log(e.files,'<=== files')
+    if (e.files[0]) {
+      const file = await CompressImage(e.files[0]);
       const fr = new FileReader();
       fr.onload = function () {
         setSelectedFileUrl(fr.result);
@@ -268,15 +269,6 @@ function OrderDetails() {
       fr.readAsDataURL(file);
     }
   };
-
-  const onDrop = useCallback(
-    (acceptedFiles) => {
-      if (acceptedFiles[0]) {
-        handleFileInputChange({ target: { files: acceptedFiles } });
-      }
-    },
-    [handleFileInputChange]
-  );
 
   const handlePaste = useCallback(
     (e) => {
@@ -295,7 +287,7 @@ function OrderDetails() {
   );
 
   const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
+    // onDrop,
     accept: "image/*",
     noClick: true,
   });
@@ -603,7 +595,12 @@ function OrderDetails() {
         const qty = value.row.quantity;
         const avl_qty = value.row.avl_quantity;
         const handleFileInputChangeForRow = (e) => {
-          handleFileInputChange(e, itemId, itemVariationId);
+          handleFileInputChange(e.target, itemId, itemVariationId);
+        };
+
+        const onDrop = (event) => {
+          event.preventDefault(); 
+          handleFileInputChange(event.dataTransfer, itemId, itemVariationId);
         };
 
         if (!fileInputRef.current) {
@@ -689,6 +686,8 @@ function OrderDetails() {
                         borderRadius: "2px",
                       }}
                       className="dropzone mx-auto"
+                      onDrop={onDrop}
+                      onDragOver={(e) => e.preventDefault()} 
                     >
                       <Box
                         className="d-flex flex-column justify-content-center align-items-center"
@@ -703,8 +702,11 @@ function OrderDetails() {
                           <input
                             type="file"
                             ref={fileInputRef}
+                            {...getInputProps}
                             style={{ display: "none" }}
-                            onChange={(e) => handleFileInputChange(e)}
+                            onChange={(e) =>
+                              handleFileInputChange(e, itemId, itemVariationId)
+                            } 
                           />
                         </Box>
                         <Box>OR</Box>
