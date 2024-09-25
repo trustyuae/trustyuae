@@ -44,9 +44,18 @@ function GRNManagement() {
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showRemarkModal, setShowRemarkModal] = useState(false);
   const [remark, setRemark] = useState(null);
+  const [factories, setFactories] = useState([]);
 
+  const factoryData = useSelector((state) => state?.factory?.factories);
   const currentPage = useSelector((state) => state.pagination.currentPage);
   const grnListData = useSelector((state) => state?.p3System?.grnList);
+
+  useEffect(() => {
+    if (factoryData) {
+      const factData = factoryData?.factories?.map((item) => ({ ...item }));
+      setFactories(factData);
+    }
+  }, [factoryData]);
 
   useEffect(() => {
     if (currentPage) {
@@ -125,10 +134,15 @@ function GRNManagement() {
       },
     },
     {
-      field: "factory",
-      headerName: "Factory",
+      field: "factory_id",
+      headerName: "Factory Name",
       flex: 1,
-      type: "string",
+      renderCell: (params) => {
+        const factory = factories.find(
+          (factory) => factory.id == params.row.factory_id
+        );
+        return <Box>{factory?.factory_name}</Box>;
+      },
     },
     {
       field: "grn_note",
