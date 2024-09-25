@@ -321,22 +321,22 @@ function OnHoldManegementSystem() {
         </Button>
       ),
     },
-    {
-      field: "Assign Order",
-      headerName: "Assign Orders",
-      flex: 1,
-      type: "html",
-      renderCell: (params) => (
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-auto w-auto border-0 text-white"
-          onClick={() => handleOpenOrderModal(params.row)}
-        >
-          Assign Order
-        </Button>
-      ),
-    },
+    // {
+    //   field: "Assign Order",
+    //   headerName: "Assign Orders",
+    //   flex: 1,
+    //   type: "html",
+    //   renderCell: (params) => (
+    //     <Button
+    //       type="button"
+    //       variant="secondary"
+    //       className="w-auto w-auto border-0 text-white"
+    //       onClick={() => handleOpenOrderModal(params.row)}
+    //     >
+    //       Assign Order
+    //     </Button>
+    //   ),
+    // },
   ];
 
   const poColumns = [
@@ -461,22 +461,22 @@ function OnHoldManegementSystem() {
         </IconButton>
       ),
     },
-    {
-      field: "Assign Order",
-      headerName: "Assign Orders",
-      flex: 1,
-      type: "html",
-      renderCell: (params) => (
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-auto w-auto border-0 text-white"
-          onClick={() => handleOpenOrderModal(params.row)}
-        >
-          Assign Order
-        </Button>
-      ),
-    },
+    // {
+    //   field: "Assign Order",
+    //   headerName: "Assign Orders",
+    //   flex: 1,
+    //   type: "html",
+    //   renderCell: (params) => (
+    //     <Button
+    //       type="button"
+    //       variant="secondary"
+    //       className="w-auto w-auto border-0 text-white"
+    //       onClick={() => handleOpenOrderModal(params.row)}
+    //     >
+    //       Assign Order
+    //     </Button>
+    //   ),
+    // },
   ];
 
   function handleAttributeChange(event, rowIndex, attributeName) {
@@ -973,7 +973,7 @@ function OnHoldManegementSystem() {
           </Row>
         )}
       </Form>
-      {selectedFactory.length <= 0 && (
+      {selectedFactory.length <= 0 && selectedPOId.length <= 0 && (
         <MDBRow className="px-3">
           <Card className="py-3">
             <Row className=" justify-content-start">
@@ -1021,7 +1021,7 @@ function OnHoldManegementSystem() {
       )}
       <MDBRow className="px-3">
         <Card className="py-3">
-          {tableData.length > 0 && selectedFactory.length <= 0 && (
+          {tableData.length > 0 && selectedFactory.length <= 0 && selectedPOId.length <= 0 && (
             <>
               <div className="mt-2">
                 <DataTable
