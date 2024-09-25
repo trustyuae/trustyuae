@@ -37,6 +37,7 @@ import {
   AddManualPO,
   AddPO,
   AddSchedulePO,
+  AssignFactoryToMultiProduct,
   AssignFactoryToProduct,
   ManualOrScheduledPoDetailsData,
   PoDetailsData,
@@ -252,21 +253,26 @@ function OrderManagementSystem() {
     }
   };
 
-  const handleFactoryChangeForSelectedProducts = async () => {
-    const updatedData = selectedOrderIds.map((item, index) => {
-      return {
-        ...item,
-        factory_id: selectedFactoryName,
-        id: item.id || index, // Ensure each item has a unique `id`
-      };
-    });
-
-    setOrders(updatedData);
-    handleUpdateFactoryForMultipleProducts();
-    console.log(
-      updatedData,
-      "updatedData from handleFactoryChangeForSelectedProducts"
+  const handleUpdateForMultiProd = () => {
+    const ProductIds = selectedAgainstOrderDetails.map((order) =>
+      parseInt(order.item_id, 10)
     );
+    const payload = {
+      product_id: ProductIds,
+      factory_id: selectedFactoryName,
+    };
+    dispatch(AssignFactoryToMultiProduct({ payload })).then(({ payload }) => {
+      setSelectedOrderIds([]);
+      setSelectedFactoryName("");
+      if (payload) {
+        Swal.fire({
+          title: payload.data.message,
+          icon: payload.status === 200 ? "success" : "error",
+          showConfirmButton: true,
+        });
+        fetchOrders();
+      }
+    });
   };
 
   const handleUpdate = (rowData) => {
@@ -276,10 +282,6 @@ function OrderManagementSystem() {
       factory_id: factoryId,
     };
     dispatch(AssignFactoryToProduct({ id, payload }));
-  };
-
-  const handleUpdateFactoryForMultipleProducts = () => {
-    console.log("handleUpdateFactoryForMultipleProducts");
   };
 
   // po ogainst order colum
@@ -1277,7 +1279,9 @@ function OrderManagementSystem() {
                       onChange={(e) => setSelectedFactory(e.target.value)}
                     >
                       <option value="">All Factory</option>
-                      <option value="Please Assign Factory">Please Assign Factory</option>
+                      <option value="Please Assign Factory">
+                        Please Assign Factory
+                      </option>
                       {factories?.map((factory) => (
                         <option key={factory.id} value={factory.id}>
                           {factory.factory_name}
@@ -1356,7 +1360,7 @@ function OrderManagementSystem() {
 
                   <Button
                     className="ms-2"
-                    onClick={() => handleFactoryChangeForSelectedProducts()}
+                    onClick={() => handleUpdateForMultiProd()}
                   >
                     Update Factory
                   </Button>

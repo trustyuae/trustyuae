@@ -103,11 +103,11 @@ function OrderDetails() {
   const Finished = useSelector((state) => state?.orderSystem?.isLoading);
 
   const orderDetailsDataOrderId = useSelector(
-    (state) => state?.orderSystem?.orderDetails?.orders?.[0]
+    (state) => state?.orderSystem?.orderDetailsData?.orders?.[0]
   );
 
   const orderDetailsData = useSelector(
-    (state) => state?.orderSystem?.orderDetails
+    (state) => state?.orderSystem?.orderDetailsData
   );
 
   const CustomOrderOHDataa = useSelector(
@@ -165,7 +165,8 @@ function OrderDetails() {
     fetch(imageSrc)
       .then((res) => res.blob())
       .then((blob) => {
-        const file = new File([blob], "screenshot.jpg", {
+        const uniqueFilename = `screenshot_${Date.now()}.jpg`;
+        const file = new File([blob], uniqueFilename, {
           type: "image/jpeg",
         });
         setSelectedFile(file);
@@ -741,9 +742,10 @@ function OrderDetails() {
                           <Box>
                             <Button
                               onClick={() => {
+                                setSelectedFileUrl(null);
                                 setShowAttachModal(true);
-                                setSelectedItemId(itemID);
-                                setSelectedVariationId(itemVariationID);
+                                setSelectedItemId(itemId);
+                                setSelectedVariationId(itemVariationId);
                                 setUploadImageModalOpen(false);
                               }}
                               style={{ backgroundColor: "cornflowerblue" }}

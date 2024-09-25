@@ -19,6 +19,7 @@ const initialState = {
   ordersNotAvailablePo: [],
   ordersNotAvailableStatus: [],
   assignFactory: [],
+  assignFactoryToMultiProd: [],
   error: null,
 };
 
@@ -241,6 +242,22 @@ export const AssignFactoryToProduct = createAsyncThunk(
   }
 );
 
+export const AssignFactoryToMultiProduct = createAsyncThunk(
+  "P2System/AssignFactoryToMultiProduct",
+  async ({payload }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-factory-update/v1/update-bulk-factory/`,
+        payload
+      );
+      return response;
+    } catch (error) {
+      console.error("Error assign factory:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const P2SystemSlice = createSlice({
   name: "P2System",
   initialState,
@@ -268,6 +285,7 @@ const P2SystemSlice = createSlice({
       state.ordersNotAvailablePo = [];
       state.ordersNotAvailableStatus = [];
       state.assignFactory = [];
+      state.assignFactoryToMultiProd = [];
       state.error = null;
     },
   },
@@ -424,6 +442,17 @@ const P2SystemSlice = createSlice({
         state.assignFactory = action.payload;
       })
       .addCase(AssignFactoryToProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(AssignFactoryToMultiProduct.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(AssignFactoryToMultiProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignFactoryToMultiProd = action.payload;
+      })
+      .addCase(AssignFactoryToMultiProduct.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

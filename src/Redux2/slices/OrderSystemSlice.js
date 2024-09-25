@@ -6,7 +6,7 @@ const initialState = {
   isLoading: false,
   SyncLoading: false,
   orders: [],
-  orderDetails: [],
+  orderDetailsData: [],
   completedOrders: [],
   completedOrderDetails: [],
   reserveOrders: [],
@@ -394,7 +394,7 @@ const orderSystemSlice = createSlice({
       state.isLoading = false;
       state.SyncLoading = false;
       state.orders = [];
-      state.orderDetails = [];
+      state.orderDetailsData = [];
       state.completedOrders = [];
       state.completedOrderDetails = [];
       state.reserveOrders = [];
@@ -436,7 +436,7 @@ const orderSystemSlice = createSlice({
       })
       .addCase(OrderDetailsGet.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderDetails = action.payload;
+        state.orderDetailsData = action.payload;
       })
       .addCase(OrderDetailsGet.rejected, (state, action) => {
         state.isLoading = false;
