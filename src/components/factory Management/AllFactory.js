@@ -29,7 +29,7 @@ function AllFactory() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-  // const [loading, setLoading] = useState(false);
+  const [factoryType, setFactoryType] = useState("");
 
   const loading = useSelector((state) => state?.factory?.isLoading);
 
@@ -149,6 +149,11 @@ function AllFactory() {
     },
   ];
 
+  const searchFactoryTypeFilter = (e) => {
+    setFactoryType(e);
+    setPage(1);
+  };
+
   const handleChange = (event, value) => {
     dispatch(setCurrentPage(value));
   };
@@ -210,6 +215,21 @@ function AllFactory() {
             onChange={(e) => setEmail(e.target.value)}
             className="custom-placeholder"
           />
+        </MDBCol>
+      </MDBRow>
+      <MDBRow className="d-flex justify-content-end align-items-center mb-3">
+        <MDBCol md="3">
+          <Form.Group>
+            <Form.Label className="fw-semibold">Factory type:</Form.Label>
+            <Form.Select
+              className="mr-sm-2 py-2"
+              onChange={(e) => searchFactoryTypeFilter(e.target.value)}
+            >
+              <option value="">Select Factory Type</option>
+              <option value="all">Active</option>
+              <option value="dispatch">InActive</option>
+            </Form.Select>
+          </Form.Group>
         </MDBCol>
       </MDBRow>
       <Row>
