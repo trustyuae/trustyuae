@@ -872,13 +872,13 @@ function OnHoldManegementSystem() {
 
   useEffect(() => {
     selectPOId();
-  }, [selectedFactory, selectedPOId]);
+  }, [selectedFactory]);
 
   useEffect(() => {
     if (selectedPOId) {
       fetchPoProductData();
     }
-  }, [selectedPOId, selectedFactory, poId, pageSize, page]);
+  }, [selectedPOId, selectedFactory,pageSize, page]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
