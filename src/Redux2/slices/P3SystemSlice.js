@@ -8,6 +8,7 @@ const initialState = {
   productManual: [],
   grn: [],
   grnList: [],
+  grnListOnOrderIds: [],
   grnView: [],
   productDetails: [],
   productOrderDetails: [],
@@ -59,6 +60,19 @@ export const AddGrn = createAsyncThunk(
 
 export const GetGRNList = createAsyncThunk(
   "factory/GetGRNList",
+  async ({ apiUrl }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(apiUrl);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const GetGRNListOnBasisOrderId = createAsyncThunk(
+  "factory/GetGRNListOnBasisOrderId",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -243,6 +257,7 @@ const P3SystemSlice = createSlice({
       state.productManual = [];
       state.grn = [];
       state.grnList = [];
+      state.grnListOnOrderIds = [];
       state.grnView = [];
       state.productDetails = [];
       state.productOrderDetails = [];
@@ -288,6 +303,17 @@ const P3SystemSlice = createSlice({
         state.grnList = action.payload;
       })
       .addCase(GetGRNList.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(GetGRNListOnBasisOrderId.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(GetGRNListOnBasisOrderId.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.grnListOnOrderIds = action.payload;
+      })
+      .addCase(GetGRNListOnBasisOrderId.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

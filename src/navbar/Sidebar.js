@@ -225,6 +225,18 @@ const Sidebar = () => {
                     <span>GRN Management</span>
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/GRN_Management_On_OrderIds"
+                    className={
+                      "nav-link underline" +
+                      (activeMenuItem === "/GRN_Management_On_OrderIds" ? " active" : "")
+                    }
+                  >
+                    <i className="bi bi-circle"></i>
+                    <span>GRN Management On OrderIds</span>
+                  </Link>
+                </li>
               </ul>
             </li>
           )}
