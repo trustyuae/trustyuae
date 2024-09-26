@@ -15,6 +15,7 @@ export default function DataTable({
   rowHeight,
   showAllRows = false,
   hidePagination = false,
+  paginationPosition = "bottom",
 }) {
   const actualPageSize = showAllRows ? 100 : pageSize;
   const rowCount = rows.length;
@@ -31,6 +32,26 @@ export default function DataTable({
         height: "100%",
       }}
     >
+       {!hidePagination && (paginationPosition === "top") && (
+        <Box
+          sx={{
+            marginTop: "auto",
+            display: "flex",
+            justifyContent: "flex-end",
+            padding: "8px 0",
+          }}
+        >
+          <Pagination
+            sx={{
+              marginBottom: 0,
+            }}
+            count={totalPages}
+            page={page}
+            variant="outlined"
+            onChange={handleChange}
+          />
+        </Box>
+      )}
       <Box
         sx={{
           flex: 1,
@@ -147,7 +168,7 @@ export default function DataTable({
           processRowUpdate={processRowUpdate}
         />
       </Box>
-      {!hidePagination && (
+      {!hidePagination && (paginationPosition !== "top") && (
         <Box
           sx={{
             marginTop: "auto",

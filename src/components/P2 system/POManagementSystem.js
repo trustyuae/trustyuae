@@ -462,6 +462,7 @@ function POManagementSystem() {
                     pageSize={pageSize}
                     totalPages={totalPages}
                     handleChange={handleChange}
+                    paginationPosition="top"
                   />
                 ) : (
                   <Alert
@@ -498,6 +499,7 @@ function POManagementSystem() {
                     pageSize={pageSize}
                     totalPages={totalPages}
                     handleChange={handleChange}
+                    paginationPosition="top"
                   />
                 ) : (
                   <Alert
@@ -534,6 +536,7 @@ function POManagementSystem() {
                     pageSize={pageSize}
                     totalPages={totalPages}
                     handleChange={handleChange}
+                    paginationPosition="top"
                   />
                 ) : (
                   <Alert

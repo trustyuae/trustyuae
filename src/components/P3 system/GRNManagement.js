@@ -363,6 +363,7 @@ function GRNManagement() {
                     pageSize={pageSize}
                     totalPages={totalPages}
                     handleChange={handleChange}
+                    paginationPosition="top"
                   />
                 </div>
               ) : (

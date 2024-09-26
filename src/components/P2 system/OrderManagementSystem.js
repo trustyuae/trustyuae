@@ -1382,6 +1382,7 @@ function OrderManagementSystem() {
                       pageSize={pageSize}
                       totalPages={totalPages}
                       handleChange={handleChange}
+                      paginationPosition="top"
                     />
                   ) : (
                     <Alert
@@ -1407,6 +1408,7 @@ function OrderManagementSystem() {
                       totalPages={totalPages}
                       handleChange={handleChange}
                       rowHeight="auto"
+                      paginationPosition="top"
                     />
                   ) : (
                     <Alert
@@ -1432,6 +1434,7 @@ function OrderManagementSystem() {
                       totalPages={totalPages}
                       handleChange={handleChange}
                       rowHeight="auto"
+                      paginationPosition="top"
                     />
                   ) : (
                     <Alert

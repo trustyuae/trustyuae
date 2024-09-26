@@ -766,7 +766,6 @@ function OnHoldManegementSystem() {
           ...item,
           id: i + currentStartIndex,
         }));
-        console.log(data,'data from fetchPoProductData')
         setPoTableData(data);
         setTotalPages(payload.total_pages);
         setPoId(payload.po_id);
@@ -936,15 +935,14 @@ function OnHoldManegementSystem() {
           <Col xs="auto" lg="3">
             <Form.Label className="fw-semibold">Select PO ID</Form.Label>
             <Select
-              // defaultMenuIsOpen
-              options={allPoIds} // Pass formatted PO IDs
-              value={allPoIds.find((option) => option.value === selectedPOId)} // Bind the selected PO ID object
-              onChange={handleChangePoID} // Handle PO ID change
-              isClearable // Allow clearing the selection
-              placeholder="Select PO ID" // Placeholder text
-              noOptionsMessage={() => "No PO IDs found"} // Message when no options are available
-              getOptionLabel={(option) => option.label} // Display the label
-              getOptionValue={(option) => option.value} // Use the value as identifier
+              options={allPoIds} 
+              value={allPoIds.find((option) => option.value === selectedPOId)} 
+              onChange={handleChangePoID} 
+              isClearable
+              placeholder="Select PO ID" 
+              noOptionsMessage={() => "No PO IDs found"} 
+              getOptionLabel={(option) => option.label} 
+              getOptionValue={(option) => option.value} 
               closeMenuOnSelect={false}
             />
           </Col>
@@ -973,7 +971,7 @@ function OnHoldManegementSystem() {
           </Row>
         )}
       </Form>
-      {selectedFactory.length <= 0 && selectedPOId.length <= 0 && (
+      {selectedFactory?.length <= 0 && selectedPOId?.length <= 0 && (
         <MDBRow className="px-3">
           <Card className="py-3">
             <Row className=" justify-content-start">
@@ -1021,105 +1019,105 @@ function OnHoldManegementSystem() {
       )}
       <MDBRow className="px-3">
         <Card className="py-3">
-          {tableData.length > 0 && selectedFactory.length <= 0 && selectedPOId.length <= 0 && (
-            <>
-              <div className="mt-2">
-                <DataTable
-                  columns={columns}
-                  rows={tableData}
-                  // rowHeight={'auto'}
-                  // page={page}
-                  // pageSize={pageSize}
-                  // totalPages={totalPages}
-                  // handleChange={handleChange}
-                  showAllRows={true}
-                  // rowHeight="auto"
-                  hidePagination={true}
-                />
-              </div>
-              <MDBRow className="justify-content-end px-3 py-2">
-                {loading ? (
-                  <Button
-                    variant="primary"
-                    disabled
-                    style={{ width: "130px" }}
-                    onClick={handleSubmit}
-                  >
-                    submit
-                  </Button>
-                ) : (
-                  <Button
-                    variant="primary"
-                    disabled={
-                      !isValid &&
-                      poTableData.length == 0 &&
-                      tableData.length == 0
-                    }
-                    style={{ width: "130px" }}
-                    onClick={handleSubmit}
-                  >
-                    submit
-                  </Button>
-                )}
-              </MDBRow>
-            </>
-          )}
-            <>
-              <div className="mt-2">
-                {poTableData && poTableData.length != 0 ? (
-                  <>
-                    <DataTable
-                      columns={poColumns}
-                      rows={poTableData}
-                      page={page}
-                      pageSize={pageSize}
-                      totalPages={totalPages}
-                      handleChange={handleChange}
-                      rowHeight="auto"
-                      // showAllRows={true}
-                      // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
-                      // hidePagination={true}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <Alert
-                      severity="warning"
-                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+          {tableData.length > 0 &&
+            selectedFactory.length <= 0 &&
+            selectedPOId.length <= 0 && (
+              <>
+                <div className="mt-2">
+                  <DataTable
+                    columns={columns}
+                    rows={tableData}
+                    // rowHeight={'auto'}
+                    // page={page}
+                    // pageSize={pageSize}
+                    // totalPages={totalPages}
+                    // handleChange={handleChange}
+                    showAllRows={true}
+                    // rowHeight="auto"
+                    hidePagination={true}
+                  />
+                </div>
+                <MDBRow className="justify-content-end px-3 py-2">
+                  {loading ? (
+                    <Button
+                      variant="primary"
+                      disabled
+                      style={{ width: "130px" }}
+                      onClick={handleSubmit}
                     >
-                      Records is not Available for above filter
-                    </Alert>
-                  </>
-                )}
-              </div>
-              <MDBRow className="justify-content-end px-3 py-2">
-                {loading ? (
-                  <Button
-                    variant="primary"
-                    disabled
-                    style={{ width: "130px" }}
-                    // onClick={handleCreateGrn}
-                    onClick={handleCreateGrn}
+                      submit
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      disabled={
+                        !isValid &&
+                        poTableData.length == 0 &&
+                        tableData.length == 0
+                      }
+                      style={{ width: "130px" }}
+                      onClick={handleSubmit}
+                    >
+                      submit
+                    </Button>
+                  )}
+                </MDBRow>
+              </>
+            )}
+          <>
+            <div className="mt-2">
+              {poTableData && poTableData.length != 0 ? (
+                <>
+                  <DataTable
+                    columns={poColumns}
+                    rows={poTableData}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    handleChange={handleChange}
+                    rowHeight="auto"
+                    // showAllRows={true}
+                    // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
+                    // hidePagination={true}
+                  />
+                </>
+              ) : (
+                <>
+                  <Alert
+                    severity="warning"
+                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
                   >
-                    Create GRN
-                  </Button>
-                ) : (
-                  <Button
-                    variant="primary"
-                    disabled={
-                      !isValid &&
-                      poTableData.length == 0 &&
-                      tableData.length == 0
-                    }
-                    style={{ width: "130px" }}
-                    // onClick={handleCreateGrn}
-                    onClick={handleCreateGrn}
-                  >
-                    Create GRN
-                  </Button>
-                )}
-              </MDBRow>
-            </>
+                    Records is not Available for above filter
+                  </Alert>
+                </>
+              )}
+            </div>
+            <MDBRow className="justify-content-end px-3 py-2">
+              {loading ? (
+                <Button
+                  variant="primary"
+                  disabled
+                  style={{ width: "130px" }}
+                  // onClick={handleCreateGrn}
+                  onClick={handleCreateGrn}
+                >
+                  Create GRN
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  disabled={
+                    !isValid && poTableData.length == 0 && tableData.length == 0
+                  }
+                  style={{ width: "130px" }}
+                  // onClick={handleCreateGrn}
+                  onClick={handleCreateGrn}
+                >
+                  Create GRN
+                </Button>
+              )}
+            </MDBRow>
+          </>
         </Card>
       </MDBRow>
       {showOrdersModalOpen && (
