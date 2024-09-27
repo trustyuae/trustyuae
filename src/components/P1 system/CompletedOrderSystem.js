@@ -48,7 +48,8 @@ function CompletedOrderSystem() {
     (state) => state?.orderSystem?.completedOrders
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['CompletedOrderSystem']) || 1;
 
   useEffect(() => {
     if (currentPage) {
@@ -188,7 +189,8 @@ function CompletedOrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'CompletedOrderSystem', page: value }));
   };
 
   const handleDateChange = async (newDateRange) => {

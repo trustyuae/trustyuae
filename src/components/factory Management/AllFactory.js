@@ -33,7 +33,8 @@ function AllFactory() {
 
   const loading = useSelector((state) => state?.factory?.isLoading);
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['AllFactory']) || 1;
 
   const factoryData = useSelector(
     (state) => state?.factory?.factoriesWithParams
@@ -155,7 +156,8 @@ function AllFactory() {
   };
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'AllFactory', page: value }));
   };
 
   return (

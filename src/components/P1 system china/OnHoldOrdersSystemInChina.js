@@ -53,7 +53,7 @@ function OnHoldOrdersSystemInChina() {
     (state) => state?.orderSystemChina?.onHoldOrders
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['OnHoldOrdersSystemInChina']) || 1;
 
   useEffect(() => {
     if (currentPage) {
@@ -184,7 +184,8 @@ function OnHoldOrdersSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OnHoldOrdersSystemInChina', page: value }));
   };
 
   const radios = [

@@ -53,7 +53,7 @@ function CompletedOrderSystemInChina() {
     (state) => state?.orderSystemChina?.completedOrders
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['CompletedOrderSystemInChina']) || 1;
 
   useEffect(() => {
     if (currentPage) {
@@ -207,7 +207,8 @@ function CompletedOrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'CompletedOrderSystemInChina', page: value }));
   };
 
   const radios = [

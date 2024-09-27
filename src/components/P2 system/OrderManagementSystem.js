@@ -373,7 +373,7 @@ function OrderManagementSystem() {
       flex: 1,
       renderCell: (params) => {
         console.log(params, "params......");
-        const factory = factories.find(
+        const factory = factories?.find(
           (factory) => factory.id === params.row.factory_id
         );
         return (
@@ -439,7 +439,7 @@ function OrderManagementSystem() {
       headerName: "Factory Name",
       flex: 1,
       renderCell: (prams) =>
-        factories.find((factory) => factory.id === prams.row.factory_id)
+        factories?.find((factory) => factory.id === prams.row.factory_id)
           ?.factory_name,
     },
     { field: "product_name", headerName: "Product names", flex: 1 },
@@ -524,7 +524,7 @@ function OrderManagementSystem() {
       headerName: "Factory Name",
       flex: 1,
       renderCell: (prams) =>
-        factories.find((factory) => factory.id === prams.row.factory_id)
+        factories?.find((factory) => factory.id === prams.row.factory_id)
           ?.factory_name,
     },
     { field: "product_name", headerName: "Product names", flex: 1 },
@@ -1346,7 +1346,7 @@ function OrderManagementSystem() {
                       label: factory.factory_name,
                       value: factory.id,
                     }))}
-                    value={factories.find(
+                    value={factories?.find(
                       (option) => option.value === selectedFactoryName
                     )}
                     onChange={handleChangeFactoryForMul}

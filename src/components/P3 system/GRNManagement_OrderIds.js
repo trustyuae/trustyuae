@@ -50,6 +50,7 @@ function GRNManagement_OrderIds() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [grnList, setGrnList] = useState([]);
+  const [grnListOverAllData, setGrnListOverAllData] = useState([]);
   const [userData, setUserData] = useState(null);
   const loader = useSelector((state) => state?.p3System?.isLoading);
   const [message, setMessage] = useState("");
@@ -60,13 +61,21 @@ function GRNManagement_OrderIds() {
   const [factories, setFactories] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
 
-  const factoryData = useSelector((state) => state?.factory?.factories);
-  const currentPage = useSelector((state) => state.pagination.currentPage);
-  const grnListData = useSelector(
-    (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
-  );
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
 
-  console.log(grnList, "grnList");
+  const factoryData = useSelector((state) => state?.factory?.factories);
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["GRNManagementOnOrder"]
+    ) || 1;
+
+  // const grnListData = useSelector(
+  //   (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
+  // );
+  const grnListData = useSelector(
+    (state) => state?.p3System?.grnListOnOrderIds
+  );
 
   useEffect(() => {
     if (factoryData) {
@@ -76,14 +85,15 @@ function GRNManagement_OrderIds() {
   }, [factoryData]);
 
   useEffect(() => {
-    console.log(grnListData,'grnListData')
+    console.log(grnListData, "grnListData");
     if (currentPage) {
       setPage(currentPage);
     }
     if (grnListData) {
-      const grnData = grnListData?.items?.map((v, i) => ({ ...v, id: i }));
-      console.log(grnData, "grnData");
-      setGrnList(grnData);
+      // const grnData = grnListData?.items?.map((v, i) => ({ ...v, id: i }));
+      const grnData = grnListData?.orders?.map((v, i) => ({ ...v, id: i }));
+      setGrnListOverAllData(grnData);
+      // setGrnList(grnData);
       setTotalPages(grnListData?.total_pages);
     }
   }, [grnListData, currentPage]);
@@ -134,6 +144,24 @@ function GRNManagement_OrderIds() {
     }
   };
 
+  const handleItemSelection = (rowData) => {
+    const selectedIndex = selectedItemIds.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIds.filter((id) => id !== rowData.id)
+        : [...selectedItemIds, rowData.id];
+
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, rowData]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+    }
+    setSelectedItemIds(newSelected);
+  };
+
+  console.log(grnListOverAllData, "grnListOverAllData");
+  console.log(grnList, "grnList");
+
   const columns = [
     {
       field: "select",
@@ -145,8 +173,8 @@ function GRNManagement_OrderIds() {
             className="mx-auto"
             control={
               <Checkbox
-              // checked={selectedItemIds.includes(params.row.id)}
-              // onChange={() => handleItemSelection(params.row)}
+                checked={selectedItemIds.includes(params.row.id)}
+                onChange={() => handleItemSelection(params.row)}
               />
             }
             style={{ justifyContent: "center" }}
@@ -157,36 +185,53 @@ function GRNManagement_OrderIds() {
     { field: "order_id", headerName: "Order Ids", flex: 1 },
     { field: "order_created_date", headerName: "Order Created Date", flex: 1 },
     {
-      field: "total_qty",
-      headerName: "Total Items",
+      field: "pending_items",
+      headerName: "Pending Items",
       flex: 1,
     },
     {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      type: "string",
-    },
-    {
-      field: "po_id",
-      headerName: "Po Ref No.",
+      field: "aging_days",
+      headerName: "Aging Days",
       flex: 1,
       renderCell: (params) => {
-        const poId = params.row.po_id;
-        return <div>{poId ? poId : "No PO ref"}</div>;
-      },
+        const orderCreatedOn = new Date(params.row.order_created_date); 
+        const todaysDate = new Date(); 
+        // Calculate the difference in time between the two dates (in milliseconds)
+        const timeDifference = Math.abs(todaysDate - orderCreatedOn);
+    
+        // Convert the difference from milliseconds to days (1 day = 24*60*60*1000 ms)
+        const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+    
+        // Return the difference in days as a React component
+        return <Box>{dayDifference} days</Box>;
+      }
     },
-    {
-      field: "factory_id",
-      headerName: "Factory Name",
-      flex: 1,
-      renderCell: (params) => {
-        const factory = factories.find(
-          (factory) => factory.id == params.row.factory_id
-        );
-        return <Box>{factory?.factory_name}</Box>;
-      },
-    },
+    // {
+    //   field: "status",
+    //   headerName: "Status",
+    //   flex: 1,
+    //   type: "string",
+    // },
+    // {
+    //   field: "po_id",
+    //   headerName: "Po Ref No.",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     const poId = params.row.po_id;
+    //     return <div>{poId ? poId : "No PO ref"}</div>;
+    //   },
+    // },
+    // {
+    //   field: "factory_id",
+    //   headerName: "Factory Name",
+    //   flex: 1,
+    //   renderCell: (params) => {
+    //     const factory = factories.find(
+    //       (factory) => factory.id == params.row.factory_id
+    //     );
+    //     return <Box>{factory?.factory_name}</Box>;
+    //   },
+    // },
     {
       field: "grn_note",
       headerName: "Remark",
@@ -251,18 +296,21 @@ function GRNManagement_OrderIds() {
       let apiUrl;
       apiUrl = `wp-json/custom-grn-order/v1/order-by-grn/?per_page=${pageSize}&page=${page}`;
       if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
-      if (selectedOrderDate) apiUrl += `&order_created_date=${selectedOrderDate}`;
+      if (selectedOrderDate)
+        apiUrl += `&order_created_date=${selectedOrderDate}`;
       if (selectedGrnDate) apiUrl += `&grn_date=${selectedGrnDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       dispatch(GetGRNListOnBasisOrderId({ apiUrl }));
     } catch (error) {
       console.error(error);
-      setGrnList([]);
+      // setGrnList([]);
+      grnListOverAllData([]);
     }
   };
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: "GRNManagementOnOrder", page: value }));
   };
 
   const handlePageSizeChange = (e) => {
@@ -296,7 +344,14 @@ function GRNManagement_OrderIds() {
   useEffect(() => {
     handlGetGRNList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchOrderID,statusFilter, page, pageSize,selectedGrnDate,selectedOrderDate]);
+  }, [
+    searchOrderID,
+    statusFilter,
+    page,
+    pageSize,
+    selectedGrnDate,
+    selectedOrderDate,
+  ]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -430,11 +485,11 @@ function GRNManagement_OrderIds() {
             <Loader />
           ) : (
             <>
-              {grnListData && grnListData.length !== 0 && grnList && grnList.length !== 0 ? (
+              {grnListOverAllData && grnListOverAllData.length !== 0 ? (
                 <div className="mt-2">
                   <DataTable
                     columns={columns}
-                    rows={grnList}
+                    rows={grnListOverAllData}
                     page={page}
                     pageSize={pageSize}
                     totalPages={totalPages}

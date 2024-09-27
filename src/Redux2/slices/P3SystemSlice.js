@@ -229,11 +229,12 @@ export const AssignOrders = createAsyncThunk(
   "orderSystem/AssignOrders",
   async ({ payload }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axiosInstance.post(
         `wp-json/custom-assign-order/v1/assign-item-order/`,
         payload
       );
-      return response.data;
+      console.log(response,"response")
+      return response;
     } catch (error) {
       console.error("Error while gettting AllProducts:", error.message);
       return rejectWithValue(error.message);

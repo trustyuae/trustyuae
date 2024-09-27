@@ -406,7 +406,7 @@ const ERDetails = () => {
           <Box>
             <Typography variant="h6" className="fw-bold mb-3">
               {
-                factories.find((factory) => factory.id == factoryName)
+                factories?.find((factory) => factory.id == factoryName)
                   ?.factory_name
               }
             </Typography>

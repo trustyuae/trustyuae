@@ -89,7 +89,8 @@ function OrderTrackingNumberPending() {
     (state) => state?.orderSystemChina?.ordersTracking?.orders?.items
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['OrderTrackingNumberPending']) || 1;
 
   useEffect(() => {
     if (currentPage) {
@@ -552,7 +553,8 @@ function OrderTrackingNumberPending() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OrderTrackingNumberPending', page: value }));
   };
   
   const radios = [

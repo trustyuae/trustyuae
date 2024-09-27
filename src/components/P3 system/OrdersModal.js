@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GetOrderIdsData } from "../../Redux2/slices/P3SystemSlice";
+import {
+  AssignOrders,
+  GetOrderIdsData,
+} from "../../Redux2/slices/P3SystemSlice";
 import { Button, Modal } from "react-bootstrap";
 import DataTable from "../DataTable";
 import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import ShowAlert from "../../utils/ShowAlert";
 
 const OrdersModal = ({
   showOrdersModalOpen,
@@ -62,8 +66,28 @@ const OrdersModal = ({
     setSelectedItemIds(newSelected);
   };
 
-  const handleAssignOrders = async() => {
-    console.log(selectedItems,'selectedItems')
+  const handleAssignOrders = async () => {
+    const orderIds = selectedItems.map((item) => item.order_id);
+    const payload = {
+      product_id: productIDD,
+      variation_id: variationID,
+      order_id: orderIds,
+    };
+    dispatch(AssignOrders({ payload })).then(({ payload }) => {
+      if (payload.status === 200) {
+        ShowAlert(
+          "",
+          "Order Assigned Successfully!",
+          "success",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
+      }
+      handleClosePoDetailsModal();
+    });
   };
 
   const columns = [
