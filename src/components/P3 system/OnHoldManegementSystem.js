@@ -321,22 +321,22 @@ function OnHoldManegementSystem() {
         </Button>
       ),
     },
-    {
-      field: "Assign Order",
-      headerName: "Assign Orders",
-      flex: 1,
-      type: "html",
-      renderCell: (params) => (
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-auto w-auto border-0 text-white"
-          onClick={() => handleOpenOrderModal(params.row)}
-        >
-          Assign Order
-        </Button>
-      ),
-    },
+    // {
+    //   field: "Assign Order",
+    //   headerName: "Assign Orders",
+    //   flex: 1,
+    //   type: "html",
+    //   renderCell: (params) => (
+    //     <Button
+    //       type="button"
+    //       variant="secondary"
+    //       className="w-auto w-auto border-0 text-white"
+    //       onClick={() => handleOpenOrderModal(params.row)}
+    //     >
+    //       Assign Order
+    //     </Button>
+    //   ),
+    // },
   ];
 
   const poColumns = [
@@ -461,22 +461,22 @@ function OnHoldManegementSystem() {
         </IconButton>
       ),
     },
-    {
-      field: "Assign Order",
-      headerName: "Assign Orders",
-      flex: 1,
-      type: "html",
-      renderCell: (params) => (
-        <Button
-          type="button"
-          variant="secondary"
-          className="w-auto w-auto border-0 text-white"
-          onClick={() => handleOpenOrderModal(params.row)}
-        >
-          Assign Order
-        </Button>
-      ),
-    },
+    // {
+    //   field: "Assign Order",
+    //   headerName: "Assign Orders",
+    //   flex: 1,
+    //   type: "html",
+    //   renderCell: (params) => (
+    //     <Button
+    //       type="button"
+    //       variant="secondary"
+    //       className="w-auto w-auto border-0 text-white"
+    //       onClick={() => handleOpenOrderModal(params.row)}
+    //     >
+    //       Assign Order
+    //     </Button>
+    //   ),
+    // },
   ];
 
   function handleAttributeChange(event, rowIndex, attributeName) {

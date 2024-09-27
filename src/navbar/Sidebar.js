@@ -225,7 +225,7 @@ const Sidebar = () => {
                     <span>GRN Management</span>
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link
                     to="/GRN_Management_On_OrderIds"
                     className={
@@ -236,7 +236,7 @@ const Sidebar = () => {
                     <i className="bi bi-circle"></i>
                     <span>GRN Management On OrderIds</span>
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </li>
           )}
