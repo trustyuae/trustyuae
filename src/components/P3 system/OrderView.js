@@ -13,7 +13,7 @@ import Loader from "../../utils/Loader";
 import { GetGRNListOnBasisOrderId } from "../../Redux2/slices/P3SystemSlice";
 
 const OrderView = () => {
-  const params = useParams();
+  const {id} = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.p3System?.isLoading);
@@ -28,8 +28,6 @@ const OrderView = () => {
     (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
   );
 
-  console.log(params,'params')
-
   useEffect(() => {
     if (grnListData) {
       const grnData = grnListData?.items?.map((v, i) => ({ ...v, id: i }));
@@ -41,7 +39,7 @@ const OrderView = () => {
   const fetchItems = async () => {
     try {
       let apiUrl;
-      apiUrl = `wp-json/custom-grn-order/v1/order-by-grn/?per_page=${pageSize}&page=${page}`;
+      apiUrl = `wp-json/custom-grn-order/v1/order-by-grn/?order_id=${id}&per_page=${pageSize}&page=${page}`;
       dispatch(GetGRNListOnBasisOrderId({ apiUrl }));
     } catch (error) {
       console.error(error);
