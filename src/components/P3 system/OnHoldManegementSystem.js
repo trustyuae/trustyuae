@@ -58,7 +58,7 @@ function OnHoldManegementSystem() {
   const [optionsArray, setoptionsArray] = useState([]);
 
   const [selectedFactory, setSelectedFactory] = useState("");
-  const [selectedPOId, setSelectedPOId] = useState("");
+  const [selectedPOId, setSelectedPOId] = useState(null);
   const [factories, setFactories] = useState([]);
 
   const [allPoIds, setAllPoIds] = useState([]);
@@ -870,6 +870,11 @@ function OnHoldManegementSystem() {
     }
   };
 
+  const handleReset = () => {
+    setSelectedPOId(null)
+    setSelectedFactory("")
+  };
+
   useEffect(() => {
     selectPOId();
   }, [selectedFactory]);
@@ -878,7 +883,7 @@ function OnHoldManegementSystem() {
     if (selectedPOId) {
       fetchPoProductData();
     }
-  }, [selectedPOId, selectedFactory,pageSize, page]);
+  }, [selectedPOId, selectedFactory, pageSize, page]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -935,16 +940,27 @@ function OnHoldManegementSystem() {
           <Col xs="auto" lg="3">
             <Form.Label className="fw-semibold">Select PO ID</Form.Label>
             <Select
-              options={allPoIds} 
-              value={allPoIds.find((option) => option.value === selectedPOId)} 
-              onChange={handleChangePoID} 
+              options={allPoIds}
+              value={allPoIds.find((option) => option.value === selectedPOId)}
+              onChange={handleChangePoID}
               isClearable
-              placeholder="Select PO ID" 
-              noOptionsMessage={() => "No PO IDs found"} 
-              getOptionLabel={(option) => option.label} 
-              getOptionValue={(option) => option.value} 
+              placeholder="Select PO ID"
+              noOptionsMessage={() => "No PO IDs found"}
+              getOptionLabel={(option) => option.label}
+              getOptionValue={(option) => option.value}
               closeMenuOnSelect={false}
             />
+          </Col>
+        </Row>
+        <Row className="d-flex justify-content-end mt-2">
+          <Col className="col-auto">
+            <Button
+              type="button"
+              className="mr-2 mx-1 w-auto"
+              onClick={handleReset}
+            >
+              Reset filter
+            </Button>
           </Col>
         </Row>
         {selectedFactory.length > 0 && (
@@ -1066,7 +1082,7 @@ function OnHoldManegementSystem() {
             )}
           <>
             <div className="mt-2">
-              {poTableData && poTableData.length != 0 ? (
+              {poTableData && poTableData.length != 0 && selectedPOId ? (
                 <>
                   <DataTable
                     columns={poColumns}

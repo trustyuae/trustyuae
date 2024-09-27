@@ -6,7 +6,7 @@ import {
 } from "../../Redux2/slices/P3SystemSlice";
 import { Button, Modal } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
+import { Alert, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import ShowAlert from "../../utils/ShowAlert";
 
 const OrdersModal = ({
@@ -85,6 +85,17 @@ const OrdersModal = ({
           null,
           2000
         );
+      }else{
+        ShowAlert(
+          "",
+          "assign order process failed",
+          "error",
+          null,
+          null,
+          null,
+          null,
+          2000
+        );
       }
       handleClosePoDetailsModal();
     });
@@ -125,14 +136,23 @@ const OrdersModal = ({
           <Modal.Title>Orders</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="mt-2">
-            <DataTable
-              columns={columns}
-              rows={ordersData}
-              rowHeight="auto"
-              getRowId={(row) => row.id}
-            />
-          </div>
+          {ordersData && ordersData.length !== 0 ? (
+            <div className="mt-2">
+              <DataTable
+                columns={columns}
+                rows={ordersData}
+                rowHeight="auto"
+                getRowId={(row) => row.id}
+              />
+            </div>
+          ) : (
+            <Alert
+              severity="warning"
+              sx={{ fontFamily: "monospace", fontSize: "18px" }}
+            >
+              Records is not Available for above filter
+            </Alert>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleAssignOrders}>

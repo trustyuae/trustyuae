@@ -37,6 +37,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RiMessage2Line } from "react-icons/ri";
 import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 import { DatePicker } from "@mui/x-date-pickers-pro";
+import PendingItemsDataModal from "./PendingItemsDataModal";
 
 function GRNManagement_OrderIds() {
   const dispatch = useDispatch();
@@ -63,6 +64,9 @@ function GRNManagement_OrderIds() {
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
+  const [pendingItemsDataModal, setPendingItemsDataModal] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [pendingItemType, setPendingItemType] = useState("all");
 
   const factoryData = useSelector((state) => state?.factory?.factories);
   const currentPage =
@@ -188,23 +192,31 @@ function GRNManagement_OrderIds() {
       field: "pending_items",
       headerName: "Pending Items",
       flex: 1,
+      renderCell: (params) => {
+        console.log(params, "params");
+        return (
+          <Box onClick={() => handlePoModal(params.row)}>
+            {params.row.pending_items}
+          </Box>
+        );
+      },
     },
     {
       field: "aging_days",
       headerName: "Aging Days",
       flex: 1,
       renderCell: (params) => {
-        const orderCreatedOn = new Date(params.row.order_created_date); 
-        const todaysDate = new Date(); 
+        const orderCreatedOn = new Date(params.row.order_created_date);
+        const todaysDate = new Date();
         // Calculate the difference in time between the two dates (in milliseconds)
         const timeDifference = Math.abs(todaysDate - orderCreatedOn);
-    
+
         // Convert the difference from milliseconds to days (1 day = 24*60*60*1000 ms)
         const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-    
+
         // Return the difference in days as a React component
         return <Box>{dayDifference} days</Box>;
-      }
+      },
     },
     // {
     //   field: "status",
@@ -341,6 +353,17 @@ function GRNManagement_OrderIds() {
     }
   };
 
+  const handlePoModal = (itemData) => {
+    console.log(itemData, "itemData");
+    setOrderId(itemData.order_id);
+    setPendingItemsDataModal(true);
+  };
+
+  const searchPendingItemTypeFilter = (e) => {
+    setPendingItemType(e);
+    setPage(1);
+  };
+
   useEffect(() => {
     handlGetGRNList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -439,7 +462,7 @@ function GRNManagement_OrderIds() {
               </Form.Group>
             </Col>
             <Col xs="auto" lg="3">
-              <Form.Group>
+              {/* <Form.Group>
                 <Form.Label className="fw-semibold">
                   Filter by Status:
                 </Form.Label>
@@ -454,6 +477,17 @@ function GRNManagement_OrderIds() {
                       {status}
                     </option>
                   ))}
+                </Form.Select>
+              </Form.Group> */}
+              <Form.Group>
+                <Form.Label className="fw-semibold">Pending Item type:</Form.Label>
+                <Form.Select
+                  className="mr-sm-2 py-2"
+                  onChange={(e) => searchPendingItemTypeFilter(e.target.value)}
+                >
+                  <option value="all">All</option>
+                  <option value="zero">Zero</option>
+                  {/* <option value="reserve">Reserve</option> */}
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -558,6 +592,14 @@ function GRNManagement_OrderIds() {
           </Box>
         </Modal.Body>
       </Modal>
+      {pendingItemsDataModal && (
+        <PendingItemsDataModal
+          show={pendingItemsDataModal}
+          pendingItemsDataModal={pendingItemsDataModal}
+          orderId={orderId}
+          handleClosePoDetailsModal={() => setPendingItemsDataModal(false)}
+        />
+      )}
     </Container>
   );
 }

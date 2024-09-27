@@ -19,6 +19,7 @@ const initialState = {
   poProductData: [],
   ordersData: [],
   assignOrderData: [],
+  pendingItemsData: [],
   error: null,
 };
 
@@ -204,8 +205,6 @@ export const FetchPoProductData = createAsyncThunk(
 export const GetOrderIdsData = createAsyncThunk(
   "orderSystem/GetOrderIdsData",
   async ({ payload }, { rejectWithValue }) => {
-    console.log(payload, "payload");
-    console.log("GetOrderIdsData");
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-get-order/v1/get-order-id/`,
@@ -217,7 +216,7 @@ export const GetOrderIdsData = createAsyncThunk(
         }
       );
       console.log(response, "response");
-      return response.data; // Return the actual data from the response
+      return response.data;
     } catch (error) {
       console.error("Error while getting OrderIds:", error.message);
       return rejectWithValue(error.message);
@@ -233,8 +232,23 @@ export const AssignOrders = createAsyncThunk(
         `wp-json/custom-assign-order/v1/assign-item-order/`,
         payload
       );
-      console.log(response,"response")
+      console.log(response, "response");
       return response;
+    } catch (error) {
+      console.error("Error while gettting AllProducts:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const FetchPendingItemsData = createAsyncThunk(
+  "orderSystem/FetchPendingItemsData",
+  async ({ orderId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-not-grn/v1/grn-missing-orders/${orderId}`
+      );
+      return response.data;
     } catch (error) {
       console.error("Error while gettting AllProducts:", error.message);
       return rejectWithValue(error.message);
@@ -269,6 +283,7 @@ const P3SystemSlice = createSlice({
       state.poProductData = [];
       state.ordersData = [];
       state.assignOrderData = [];
+      state.pendingItemsData = [];
       state.error = null;
     },
   },
@@ -425,6 +440,17 @@ const P3SystemSlice = createSlice({
         state.assignOrderData = action.payload;
       })
       .addCase(AssignOrders.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(FetchPendingItemsData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(FetchPendingItemsData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.pendingItemsData = action.payload;
+      })
+      .addCase(FetchPendingItemsData.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
