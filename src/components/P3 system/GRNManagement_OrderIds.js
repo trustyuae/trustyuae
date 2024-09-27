@@ -77,6 +77,7 @@ function GRNManagement_OrderIds() {
   // const grnListData = useSelector(
   //   (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
   // );
+
   const grnListData = useSelector(
     (state) => state?.p3System?.grnListOnOrderIds
   );
@@ -120,12 +121,6 @@ function GRNManagement_OrderIds() {
     setStatusFilter(e.target.value);
   };
 
-  const availabilityStatus = [
-    "All Processed",
-    "Partially Processed",
-    "Pending for Process",
-  ];
-
   const handleDateChangeForOrder = async (newDateRange) => {
     if (newDateRange?.$d) {
       const isoDate = dayjs(newDateRange.$d.toDateString()).format(
@@ -162,9 +157,6 @@ function GRNManagement_OrderIds() {
     }
     setSelectedItemIds(newSelected);
   };
-
-  console.log(grnListOverAllData, "grnListOverAllData");
-  console.log(grnList, "grnList");
 
   const columns = [
     {
@@ -276,13 +268,14 @@ function GRNManagement_OrderIds() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
+        console.log(value.row,'value.row')
         const handleShowMessageModal = () => {
           setSelectedGrnNo(value?.row?.grn_no);
           setshowMessageModal(true);
         };
         return (
           <Box>
-            <Link to={`/GRN_View/${value?.row?.grn_no}`}>
+            <Link to={`/Order_View/${value.row.order_id}`}>
               <Button
                 type="button"
                 className="w-auto bg-transparent border-0 text-secondary fs-5"
@@ -462,23 +455,6 @@ function GRNManagement_OrderIds() {
               </Form.Group>
             </Col>
             <Col xs="auto" lg="3">
-              {/* <Form.Group>
-                <Form.Label className="fw-semibold">
-                  Filter by Status:
-                </Form.Label>
-                <Form.Select
-                  className="mr-sm-2 py-2"
-                  onChange={handleStatusChange}
-                  value={statusFilter}
-                >
-                  <option value="">Select Status</option>
-                  {availabilityStatus.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group> */}
               <Form.Group>
                 <Form.Label className="fw-semibold">Pending Item type:</Form.Label>
                 <Form.Select

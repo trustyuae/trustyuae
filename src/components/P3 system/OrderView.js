@@ -10,12 +10,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
-import { GetGRNView } from "../../Redux2/slices/P3SystemSlice";
+import { GetGRNListOnBasisOrderId } from "../../Redux2/slices/P3SystemSlice";
 
-const GRNView = () => {
-  const { id } = useParams();
+const OrderView = () => {
+  const params = useParams();
   const dispatch = useDispatch();
-  const [PO_OrderList, setPO_OrderList] = useState([]);
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.p3System?.isLoading);
   const [pageSize, setPageSize] = useState(50);
@@ -23,36 +22,35 @@ const GRNView = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [verifiedName, setVerifiedName] = useState("");
+  const [grnList, setGrnList] = useState([]);
 
-  const fetchOrder = () => {
-    const apiUrl = `wp-json/custom-view-grn-api/v1/view-grn-details/${id}/?per_page=${pageSize}&page=${page}`;
+  const grnListData = useSelector(
+    (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
+  );
 
-    dispatch(GetGRNView(apiUrl))
-      .then((actionResult) => {
-        if (GetGRNView.fulfilled.match(actionResult)) {
-          const payload = actionResult.payload;
-          if (Array.isArray(payload.data)) {
-            const data = payload.data.map((v, i) => ({ ...v, id: i }));
-            setPO_OrderList(data);
-            setVerifiedName(payload.verified_by);
-            setTotalPages(payload.total_pages);
-          } else {
-            console.error("Response data is not an array:", payload);
-            setPO_OrderList([]);
-          }
-        } else {
-          console.error("Failed to fetch GRN view:", actionResult.payload);
-          setPO_OrderList([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to fetch GRN view:", error);
-        setPO_OrderList([]);
-      });
+  console.log(params,'params')
+
+  useEffect(() => {
+    if (grnListData) {
+      const grnData = grnListData?.items?.map((v, i) => ({ ...v, id: i }));
+      setGrnList(grnData);
+      setTotalPages(grnListData?.total_pages);
+    }
+  }, [grnListData]);
+
+  const fetchItems = async () => {
+    try {
+      let apiUrl;
+      apiUrl = `wp-json/custom-grn-order/v1/order-by-grn/?per_page=${pageSize}&page=${page}`;
+      dispatch(GetGRNListOnBasisOrderId({ apiUrl }));
+    } catch (error) {
+      console.error(error);
+      setGrnList([]);
+    }
   };
 
   useEffect(() => {
-    fetchOrder();
+    fetchItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, page]);
 
@@ -115,9 +113,11 @@ const GRNView = () => {
       },
     },
   ];
+
   const handalBackButton = () => {
-    navigate("/GRN_Management");
+    navigate("/GRN_Management_On_OrderIds");
   };
+
   const handleChange = (event, value) => {
     setPage(value);
   };
@@ -129,7 +129,7 @@ const GRNView = () => {
 
   const formatVariations = (variations) => {
     if (!variations) {
-      return "No variations"; // Handle null or undefined variations
+      return "No variations";
     }
 
     try {
@@ -169,7 +169,7 @@ const GRNView = () => {
           <Box className="d-flex">
             <Box>
               <Typography variant="h6" className="fw-bold">
-                GRN View
+                Order View
               </Typography>
             </Box>
             <Box
@@ -215,16 +215,17 @@ const GRNView = () => {
           <div>
             {loader ? (
               <Loader />
-            ) : PO_OrderList && PO_OrderList.length != 0 ? (
+            ) : grnList && grnList.length != 0 ? (
               <div className="mt-2">
                 <DataTable
                   columns={columns}
-                  rows={PO_OrderList}
+                  rows={grnList}
                   page={page}
                   pageSize={pageSize}
                   totalPages={totalPages}
                   handleChange={handleChange}
                   rowHeight={100}
+                  paginationPosition="top"
                 />
               </div>
             ) : (
@@ -241,4 +242,4 @@ const GRNView = () => {
     </Container>
   );
 };
-export default GRNView;
+export default OrderView;
