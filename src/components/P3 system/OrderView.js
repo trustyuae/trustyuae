@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, Card, Form } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Alert, Box, Typography } from "@mui/material";
+import { Alert, Box, Checkbox, FormControlLabel, FormGroup, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +13,7 @@ import Loader from "../../utils/Loader";
 import { GetGRNListOnBasisOrderId } from "../../Redux2/slices/P3SystemSlice";
 
 const OrderView = () => {
-  const {id} = useParams();
+  const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.p3System?.isLoading);
@@ -23,6 +23,8 @@ const OrderView = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [verifiedName, setVerifiedName] = useState("");
   const [grnList, setGrnList] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItemIds, setSelectedItemIds] = useState([]);
 
   const grnListData = useSelector(
     (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
@@ -39,12 +41,27 @@ const OrderView = () => {
   const fetchItems = async () => {
     try {
       let apiUrl;
-      apiUrl = `wp-json/custom-grn-order/v1/order-by-grn/?order_id=${id}&per_page=${pageSize}&page=${page}`;
+      apiUrl = `wp-json/custom-grn-order/v1/order-by-grn/?orderid=${id}&per_page=${pageSize}&page=${page}`;
       dispatch(GetGRNListOnBasisOrderId({ apiUrl }));
     } catch (error) {
       console.error(error);
       setGrnList([]);
     }
+  };
+
+  const handleItemSelection = (rowData) => {
+    const selectedIndex = selectedItemIds.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIds.filter((id) => id !== rowData.id)
+        : [...selectedItemIds, rowData.id];
+
+    if (selectedIndex === -1) {
+      setSelectedItems([...selectedItems, rowData]);
+    } else {
+      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+    }
+    setSelectedItemIds(newSelected);
   };
 
   useEffect(() => {
@@ -53,6 +70,25 @@ const OrderView = () => {
   }, [pageSize, page]);
 
   const columns = [
+    {
+      field: "select",
+      headerName: "Select",
+      flex: 0.5,
+      renderCell: (params) => (
+        <FormGroup>
+          <FormControlLabel
+            className="mx-auto"
+            control={
+              <Checkbox
+                checked={selectedItemIds.includes(params.row.id)}
+                onChange={() => handleItemSelection(params.row)}
+              />
+            }
+            style={{ justifyContent: "center" }}
+          />
+        </FormGroup>
+      ),
+    },
     {
       field: "product_name",
       headerName: "Product Name",
@@ -235,6 +271,17 @@ const OrderView = () => {
               </Alert>
             )}
           </div>
+        </MDBRow>
+        <MDBRow>
+          <MDBCol md="12" className="d-flex justify-content-end mt-3">
+            {/* {productData?.length === 0 ? (
+            <Button variant="success" disabled onClick={handleOrderStock}>
+              Send For InStock
+            </Button>
+          ) : ( */}
+            <Button variant="success">Send for Preparation</Button>
+            {/* )} */}
+          </MDBCol>
         </MDBRow>
       </Card>
     </Container>
