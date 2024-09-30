@@ -11,9 +11,12 @@ import { Alert, Box, Typography } from "@mui/material";
 import Loader from "../../utils/Loader";
 import {
   factoryEdit,
+  FactoryStatus,
   fetchFactoriesByFilterParam,
 } from "../../Redux2/slices/FactoriesSlice";
 import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import Swal from "sweetalert2";
+import ShowAlert from "../../utils/ShowAlert";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -34,7 +37,8 @@ function AllFactory() {
   const loading = useSelector((state) => state?.factory?.isLoading);
 
   // const currentPage = useSelector((state) => state.pagination.currentPage);
-  const currentPage = useSelector((state) => state.pagination.currentPage['AllFactory']) || 1;
+  const currentPage =
+    useSelector((state) => state.pagination.currentPage["AllFactory"]) || 1;
 
   const factoryData = useSelector(
     (state) => state?.factory?.factoriesWithParams
@@ -119,32 +123,126 @@ function AllFactory() {
     }
   };
 
+  const handleStatus = async (Data) => {
+    const confirmation = await Swal.fire({
+      title: `Are you sure, you want to Update Factory Status?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    if (confirmation.isConfirmed) {
+      dispatch(FactoryStatus(Data.id)).then(({ payload }) => {
+        if (payload?.status == 200) {
+          ShowAlert(
+            "Factory Status Updated Successfully!",
+            "",
+            "success",
+            false,
+            false,
+            "",
+            "",
+            2000
+          );
+          fetchFactories();
+        } else {
+          ShowAlert(
+            "Error while updating Factory Status",
+            "",
+            "error",
+            false,
+            false,
+            "",
+            "",
+            2000
+          );
+        }
+      });
+    } else if (confirmation.isDismissed) {
+      return;
+    }
+  };
+
   const columns = [
-    { field: "factory_name", headerName: "Factory Name", flex: 1 },
-    { field: "address", headerName: "Address", flex: 1 },
-    { field: "contact_person", headerName: "Contact Person", flex: 1 },
-    { field: "contact_number", headerName: "Contact Number", flex: 1 },
-    { field: "contact_email", headerName: "Contact email", flex: 1 },
+    {
+      field: "factory_name",
+      headerName: "Factory Name",
+      flex: 1,
+      className: "factory-status",
+    },
+    {
+      field: "address",
+      headerName: "Address",
+      flex: 1,
+      className: "factory-status",
+    },
+    {
+      field: "contact_person",
+      headerName: "Contact Person",
+      flex: 1,
+      className: "factory-status",
+    },
+    {
+      field: "contact_number",
+      headerName: "Contact Number",
+      flex: 1,
+      className: "factory-status",
+    },
+    {
+      field: "contact_email",
+      headerName: "Contact email",
+      flex: 1,
+      className: "factory-status",
+    },
     {
       field: "bank_account_details",
       headerName: "Bank Account Details",
       flex: 1,
+      className: "factory-status",
     },
     {
       field: "",
       headerName: "View Item",
       flex: 1,
-      className: "order-system",
+      className: "factory-status",
       type: "html",
-      renderCell: (value, row) => {
+      renderCell: (params, row) => {
+        console.log(params.row,"params.row")
+        const FactoryStatus = params.row.inactive;
         return (
-          <Button
-            type="button"
-            className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
-            onClick={() => handleEdit(row?.id)}
-          >
-            <FaEye className="mb-1" />
-          </Button>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Button
+              type="button"
+              className="w-auto w-auto bg-transparent border-0 text-secondary fs-5"
+              onClick={() => handleEdit(row?.id)}
+            >
+              <FaEye className="mb-1" />
+            </Button>
+            {FactoryStatus && FactoryStatus === "0" ? (
+              <Button
+                size="small"
+                variant="primary"
+                color="primary"
+                onClick={() => handleStatus(params.row)}
+                className="buttonStyle"
+              >
+                InActive
+              </Button>
+            ) : (
+              <Button
+                size="small"
+                variant="secondary"
+                color="primary"
+                onClick={() => handleStatus(params.row)}
+                className="buttonStyle"
+              >
+                Active
+              </Button>
+            )}
+          </Box>
         );
       },
     },
@@ -157,7 +255,7 @@ function AllFactory() {
 
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
-    dispatch(setCurrentPage({ tableId: 'AllFactory', page: value }));
+    dispatch(setCurrentPage({ tableId: "AllFactory", page: value }));
   };
 
   return (

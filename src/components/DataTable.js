@@ -162,6 +162,15 @@ export default function DataTable({
                 return "";
               }
             }
+            if (params.colDef.className == "factory-status") {
+              console.log(params.row.inactive,"params.row.inactive")
+              if (!params.row.inactive) {
+                return "";
+              }
+              if (params.row.inactive === "1") {
+                return "bg-grey";
+              }
+            }
           }}
           checkboxSelection={checkboxSelection}
           onCellEditStart={onCellEditStart}

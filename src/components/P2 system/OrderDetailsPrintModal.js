@@ -7,6 +7,7 @@ import DataTable from "../DataTable";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import defaultImage from "../../assets/default.png"; // Assuming you have a default image
+import html2canvas from "html2canvas";
 
 const OrderDetailsPrintModal = ({
   show,
@@ -17,6 +18,8 @@ const OrderDetailsPrintModal = ({
 }) => {
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
+  const [isDownloadPng, setIsDownloadPng] = useState(false);
+
   const handleExport = async () => {
     setIsDownloadPdf(true);
     const doc = new jsPDF();
@@ -231,6 +234,24 @@ const OrderDetailsPrintModal = ({
     });
   };
 
+  const handleExportPNG = async () => {
+    setIsDownloadPng(true);
+    const element = orderDetailsRef.current;
+    if (element) {
+      try {
+        const canvas = await html2canvas(element);
+        const imgData = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = `PoDetails-invoice.png`;
+        link.click();
+      } catch (error) {
+        console.error("Error exporting PNG:", error);
+      }
+    }
+    setIsDownloadPng(false);
+  };
+
   const handleExportExcel = (e) => {
     const wb = XLSX.utils.book_new();
     const data = PO_OrderList.map((item) => {
@@ -343,7 +364,7 @@ const OrderDetailsPrintModal = ({
 
   return (
     <>
-      <Modal show={show} onHide={handleClosePrintModal} centered>
+      <Modal show={show} onHide={handleClosePrintModal} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Invoice</Modal.Title>
         </Modal.Header>
@@ -386,6 +407,13 @@ const OrderDetailsPrintModal = ({
           </Button>
           <Button variant="primary" onClick={handleExport}>
             {isDownloadPdf ? "Downloading..." : "Download PDF"}
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleExportPNG}
+            disabled={!PO_OrderList.length || isDownloadPng}
+          >
+            {isDownloadPng ? "Generating PNG..." : "Export to PNG"}
           </Button>
           <Button variant="success" onClick={(e) => handleExportExcel(e)}>
             Download Excel

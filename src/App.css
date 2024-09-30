@@ -168,3 +168,7 @@ font-size: 12px !important;
 .css-qx0nb3-MuiDataGrid-root .MuiDataGrid-cell {
   line-height: unset;
 }
+
+.bg-grey {
+  background-color: #d3d3d3; /* Hex code for light grey */
+}
