@@ -24,6 +24,7 @@ import {
   OrderNotAvailableData,
   OrderNotAvailableDataStatus,
 } from "../../Redux2/slices/P2SystemSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -53,6 +54,8 @@ function OrderNotAvailable() {
     (state) => state?.p2System?.ordersNotAvailable
   );
 
+  const currentPage = useSelector((state) => state.pagination.currentPage['OrderNotAvailable']) || 1;
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -63,6 +66,13 @@ function OrderNotAvailable() {
       setFactories(factData);
     }
   }, [factoryData]);
+
+  useEffect(()=>{
+    if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderNotAvailable' }));
+      setPage(currentPage);
+    }
+  },[currentPage])
 
   useEffect(() => {
     if (ordersNotAvailableOverAllData) {
@@ -411,7 +421,8 @@ function OrderNotAvailable() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OrderNotAvailable', page: value }));
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
   };

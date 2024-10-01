@@ -23,7 +23,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RiMessage2Line } from "react-icons/ri";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -60,6 +60,7 @@ function GRNManagement() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'GRNManagement' }));
       setPage(currentPage);
     }
     if (grnListData) {

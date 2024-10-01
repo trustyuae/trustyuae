@@ -43,6 +43,7 @@ import {
   PoDetailsData,
 } from "../../Redux2/slices/P2SystemSlice";
 import Swal from "sweetalert2";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -123,6 +124,8 @@ function OrderManagementSystem() {
     (state) => state?.p2System?.addedManualPoData
   );
 
+  const currentPage = useSelector((state) => state.pagination.currentPage['OrderManagementSystem']) || 1;
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -136,6 +139,14 @@ function OrderManagementSystem() {
       setFactories(filteredData);
     }
   }, [factoryData]);
+
+  useEffect(()=>{
+    if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderManagementSystem' }));
+      setPage(currentPage);
+    }
+  },[currentPage])
+
 
   function handleAttributeChange(event, rowIndex, attributeName) {
     const newValue = event.target.value;
@@ -1121,8 +1132,15 @@ function OrderManagementSystem() {
     return details.join(", ");
   };
 
+  // const handleChange = (event, value) => {
+  //   setPage(value);
+  //   let currIndex = value * pageSize - pageSize + 1;
+  //   setCurrentStartIndex(currIndex, "currIndex");
+  // };
+
   const handleChange = (event, value) => {
-    setPage(value);
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OrderManagementSystem', page: value }));
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
   };

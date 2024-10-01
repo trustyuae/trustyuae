@@ -35,7 +35,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RiMessage2Line } from "react-icons/ri";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 import { DatePicker } from "@mui/x-date-pickers-pro";
 import PendingItemsDataModal from "./PendingItemsDataModal";
 
@@ -69,7 +69,7 @@ function GRNManagement_OrderIds() {
   const factoryData = useSelector((state) => state?.factory?.factories);
   const currentPage =
     useSelector(
-      (state) => state.pagination.currentPage["GRNManagementOnOrder"]
+      (state) => state.pagination.currentPage["GrnManagementOnOrderBasis"]
     ) || 1;
 
   // const grnListData = useSelector(
@@ -88,8 +88,8 @@ function GRNManagement_OrderIds() {
   }, [factoryData]);
 
   useEffect(() => {
-    console.log(grnListData, "grnListData");
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'GrnManagementOnOrderBasis' }));
       setPage(currentPage);
     }
     if (grnListData) {
@@ -279,7 +279,7 @@ function GRNManagement_OrderIds() {
 
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
-    dispatch(setCurrentPage({ tableId: "GRNManagementOnOrder", page: value }));
+    dispatch(setCurrentPage({ tableId: "GrnManagementOnOrderBasis", page: value }));
   };
 
   const handlePageSizeChange = (e) => {

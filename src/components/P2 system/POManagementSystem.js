@@ -26,6 +26,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import axiosInstance from "../../utils/AxiosInstance";
 import { PomSystemProductsDetails } from "../../Redux2/slices/P2SystemSlice";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function POManagementSystem() {
   const inputRef = useRef(null);
@@ -60,6 +61,8 @@ function POManagementSystem() {
     (state) => state?.p2System?.isLoading
   );
 
+  const currentPage = useSelector((state) => state.pagination.currentPage['POManagementSystem']) || 1;
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -70,6 +73,13 @@ function POManagementSystem() {
       setFactories(factData);
     }
   }, [factoryData]);
+
+  useEffect(()=>{
+    if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'POManagementSystem' }));
+      setPage(currentPage);
+    }
+  },[currentPage])
 
   const POM_system_products = async () => {
     try {
@@ -271,7 +281,8 @@ function POManagementSystem() {
   };
 
   const handleChange = (event, value) => {
-    setPage(value);
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'POManagementSystem', page: value }));
   };
 
   const handleLanguageChange = async (language) => {

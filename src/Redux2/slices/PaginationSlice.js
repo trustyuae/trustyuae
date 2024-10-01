@@ -10,7 +10,8 @@ const initialState = {
 const tableIds = [
   "ERManagement", "AllFactory", "MissingOrderSystem", "CompletedOrderSystem", "OnHoldOrdersSystem",
   "OrderSystem", "CompletedOrderSystemInChina", "OnHoldOrdersSystemInChina", "OrderSystemInChina",
-  "OrderTrackingNumberPending", "ReserveOrderSystemInChina", "GRNManagement"
+  "OrderTrackingNumberPending", "ReserveOrderSystemInChina", "GRNManagement","OrderManagementSystem","POManagementSystem","OrderNotAvailable",
+  "GrnManagementOnOrderBasis"
 ]
 
 const paginationSlice = createSlice({
