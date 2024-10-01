@@ -237,18 +237,27 @@ const OrderDetailsPrintModal = ({
   const handleExportPNG = async () => {
     setIsDownloadPng(true);
     const element = orderDetailsRef.current;
+  
     if (element) {
       try {
-        const canvas = await html2canvas(element);
-        const imgData = canvas.toDataURL("image/png");
+        const scale = 3; 
+        const canvas = await html2canvas(element, {
+          scale: scale,
+          useCORS: true, 
+          allowTaint: true, 
+          logging: true,
+        });
+  
+        const imgData = canvas.toDataURL("image/png", 1.0); 
         const link = document.createElement("a");
         link.href = imgData;
-        link.download = `PoDetails-invoice.png`;
+        link.download = "PoDetails-invoice-hd.png";
         link.click();
       } catch (error) {
         console.error("Error exporting PNG:", error);
       }
     }
+  
     setIsDownloadPng(false);
   };
 
