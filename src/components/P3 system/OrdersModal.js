@@ -32,6 +32,8 @@ const OrdersModal = ({
       product_id: Number(productIDD),
       variation_id:
         Array.isArray(variationID) && variationID.length > 0
+          ? Number(variationID[0])
+          : variationID && !Array.isArray(variationID) && variationID !== ""
           ? Number(variationID)
           : 0,
       po_id: poId ? poId : "",
@@ -85,7 +87,7 @@ const OrdersModal = ({
           null,
           2000
         );
-      }else{
+      } else {
         ShowAlert(
           "",
           "assign order process failed",
