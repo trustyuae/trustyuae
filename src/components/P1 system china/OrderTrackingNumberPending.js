@@ -40,7 +40,7 @@ import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import * as XLSX from "xlsx";
 import { FaEye } from "react-icons/fa";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -89,10 +89,12 @@ function OrderTrackingNumberPending() {
     (state) => state?.orderSystemChina?.ordersTracking?.orders?.items
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['OrderTrackingNumberPending']) || 1;
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderTrackingNumberPending' }));
       setPage(currentPage);
     }
     if (ordersData) {
@@ -552,7 +554,8 @@ function OrderTrackingNumberPending() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OrderTrackingNumberPending', page: value }));
   };
   
   const radios = [

@@ -1,11 +1,17 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoading: false,
   SyncLoading: false,
-  currentPage: 1,
+  currentPage: {},
   error: null,
 };
+
+const tableIds = [
+  "ERManagement", "AllFactory", "MissingOrderSystem", "CompletedOrderSystem", "OnHoldOrdersSystem",
+  "OrderSystem", "CompletedOrderSystemInChina", "OnHoldOrdersSystemInChina", "OrderSystemInChina",
+  "OrderTrackingNumberPending", "ReserveOrderSystemInChina", "GRNManagement"
+]
 
 const paginationSlice = createSlice({
   name: "pagination",
@@ -17,20 +23,42 @@ const paginationSlice = createSlice({
     stopSyncLoading: (state) => {
       state.SyncLoading = false;
     },
-    clearstoredata: (state) => {
+    clearStoreData: (state, action) => {
+      const { tableId } = action.payload;
+      if (typeof state.currentPage !== 'object') {
+        state.currentPage = {};
+      }
       state.isLoading = false;
       state.SyncLoading = false;
-      state.currentPage = 1;
+      tableIds.forEach(id => {
+        if (id !== tableId)
+          delete state.currentPage[id];
+      })
       state.error = null;
     },
     setCurrentPage: (state, action) => {
-      state.currentPage = action.payload;
+      const { tableId, page } = action.payload;
+
+      if (typeof state.currentPage !== 'object') {
+        state.currentPage = {};
+      }
+
+      tableIds.forEach(id => {
+        if (id !== tableId)
+          delete state.currentPage[id];
+      })
+    
+      if (!state.currentPage[tableId]) {
+        state.currentPage[tableId] = 1; 
+      }
+    
+      state.currentPage[tableId] = page;
     },
   },
 });
 
 export const {
-  clearstoredata,
+  clearStoreData,
   startSyncLoading,
   stopSyncLoading,
   setCurrentPage,

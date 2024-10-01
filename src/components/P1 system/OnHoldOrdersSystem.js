@@ -19,7 +19,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { OnHoldOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OnHoldOrdersSystem() {
   const inputRef = useRef(null);
@@ -46,10 +46,12 @@ function OnHoldOrdersSystem() {
   const OnholdOrdersData = useSelector(
     (state) => state?.orderSystem?.onHoldOrders
   );
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['OnHoldOrdersSystem']) || 1;
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OnHoldOrdersSystem' }));
       setPage(currentPage);
     }
     if (OnholdOrdersData) {
@@ -152,7 +154,8 @@ function OnHoldOrdersSystem() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OnHoldOrdersSystem', page: value }));
   };
 
   const handleDateChange = async (newDateRange) => {

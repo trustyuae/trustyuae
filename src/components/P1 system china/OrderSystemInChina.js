@@ -41,7 +41,7 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderSystemInChina() {
   const dispatch = useDispatch();
@@ -80,10 +80,12 @@ function OrderSystemInChina() {
   const orderDetails = useSelector(
     (state) => state?.orderSystemChina?.orderDetails
   );
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['OrderSystemInChina']) || 1;
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderSystemInChina' }));
       setPage(currentPage);
     }
     if (ordersData) {
@@ -280,7 +282,8 @@ function OrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OrderSystemInChina', page: value }));
   };
 
   const radios = [

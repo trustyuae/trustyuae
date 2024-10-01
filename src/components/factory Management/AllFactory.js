@@ -13,7 +13,7 @@ import {
   factoryEdit,
   fetchFactoriesByFilterParam,
 } from "../../Redux2/slices/FactoriesSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function AllFactory() {
   const dispatch = useDispatch();
@@ -33,7 +33,8 @@ function AllFactory() {
 
   const loading = useSelector((state) => state?.factory?.isLoading);
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['AllFactory']) || 1;
 
   const factoryData = useSelector(
     (state) => state?.factory?.factoriesWithParams
@@ -49,6 +50,7 @@ function AllFactory() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'AllFactory' }));
       setPage(currentPage);
     }
   }, [currentPage]);
@@ -155,7 +157,8 @@ function AllFactory() {
   };
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'AllFactory', page: value }));
   };
 
   return (

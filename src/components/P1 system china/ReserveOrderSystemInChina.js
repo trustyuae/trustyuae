@@ -21,7 +21,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { ReserveOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function ReserveOrderSystemInChina() {
   const inputRef = useRef(null);
@@ -50,10 +50,12 @@ function ReserveOrderSystemInChina() {
     (state) => state?.orderSystemChina?.reserveOrders
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['ReserveOrderSystemInChina']) || 1;
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'ReserveOrderSystemInChina' }));
       setPage(currentPage);
     }
     if (reserveOrdersData) {
@@ -157,7 +159,8 @@ function ReserveOrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'ReserveOrderSystemInChina', page: value }));
   };
 
   const radios = [

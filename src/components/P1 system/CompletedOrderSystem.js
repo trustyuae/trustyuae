@@ -19,7 +19,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function CompletedOrderSystem() {
@@ -48,10 +48,12 @@ function CompletedOrderSystem() {
     (state) => state?.orderSystem?.completedOrders
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['CompletedOrderSystem']) || 1;
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'CompletedOrderSystem' }));
       setPage(currentPage);
     }
     if (completedOrdersData) {
@@ -188,7 +190,8 @@ function CompletedOrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'CompletedOrderSystem', page: value }));
   };
 
   const handleDateChange = async (newDateRange) => {

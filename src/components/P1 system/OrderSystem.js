@@ -25,7 +25,7 @@ import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import PrintModal from "./PrintModal";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderSystem() {
   const dispatch = useDispatch();
@@ -53,10 +53,12 @@ function OrderSystem() {
   const ordersData = useSelector((state) => state?.orderSystem?.orders?.orders);
   const otherData = useSelector((state) => state?.orderSystem?.orders);
   const orderDetails = useSelector((state) => state?.orderSystem?.orderDetailsData);
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['OrderSystem']) || 1;
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderSystem' }));
       setPage(currentPage);
     }
     if (ordersData) {
@@ -216,7 +218,8 @@ function OrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'OrderSystem', page: value }));
   };
 
   const handleDateChange = async (newDateRange) => {

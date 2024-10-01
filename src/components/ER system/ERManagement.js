@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import { GetErManagementData } from "../../Redux2/slices/ErManagementSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function ERManagement() {
   const dispatch = useDispatch();
@@ -39,7 +39,8 @@ function ERManagement() {
 
   const factoryData = useSelector((state) => state?.factory?.factories);
 
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  const currentPage = useSelector((state) => state.pagination.currentPage['ERManagement']) || 1;
 
   const radios = [
     { name: "English", value: "En" },
@@ -59,6 +60,7 @@ function ERManagement() {
 
   useEffect(()=>{
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'ERManagement' }));
       setPage(currentPage);
     }
   },[currentPage])
@@ -156,7 +158,8 @@ function ERManagement() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'ERManagement', page: value }));
   };
 
   const handleDateChange = async (newDateRange) => {

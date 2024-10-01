@@ -23,7 +23,7 @@ import ShowAlert from "../../utils/ShowAlert";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RiMessage2Line } from "react-icons/ri";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function GRNManagement() {
   const dispatch = useDispatch();
@@ -47,8 +47,9 @@ function GRNManagement() {
   const [factories, setFactories] = useState([]);
 
   const factoryData = useSelector((state) => state?.factory?.factories);
-  const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
   const grnListData = useSelector((state) => state?.p3System?.grnList);
+  const currentPage = useSelector((state) => state.pagination.currentPage['GRNManagement']) || 1;
 
   useEffect(() => {
     if (factoryData) {
@@ -59,6 +60,7 @@ function GRNManagement() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'GRNManagement' }));
       setPage(currentPage);
     }
     if (grnListData) {
@@ -217,7 +219,8 @@ function GRNManagement() {
   };
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'GRNManagement', page: value }));
   };
 
   const handlePageSizeChange = (e) => {
