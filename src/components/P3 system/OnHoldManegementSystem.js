@@ -809,11 +809,11 @@ function OnHoldManegementSystem() {
 
     const payload = {
       po_id: poId || "",
-      order_id: filteredData.flatMap((item) =>
-        Array.isArray(item.order_ids)
-          ? item.order_ids.map((id) => id.toString())
-          : [item.order_ids.toString()]
-      ),
+      // order_id: filteredData.flatMap((item) =>
+      //   Array.isArray(item.order_ids)
+      //     ? item.order_ids.map((id) => id.toString())
+      //     : [item.order_ids.toString()]
+      // ),
       product_id: filteredData.map((item) => item.product_id),
       variation_id: filteredData.map((item) => item.variation_id),
       received_qty: filteredData.map((item) => item.received_quantity),
