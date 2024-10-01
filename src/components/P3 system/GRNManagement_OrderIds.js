@@ -62,8 +62,6 @@ function GRNManagement_OrderIds() {
   const [factories, setFactories] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
 
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [selectedItemIds, setSelectedItemIds] = useState([]);
   const [pendingItemsDataModal, setPendingItemsDataModal] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [pendingItemType, setPendingItemType] = useState("all");
@@ -143,41 +141,7 @@ function GRNManagement_OrderIds() {
     }
   };
 
-  const handleItemSelection = (rowData) => {
-    const selectedIndex = selectedItemIds.indexOf(rowData.id);
-    const newSelected =
-      selectedIndex !== -1
-        ? selectedItemIds.filter((id) => id !== rowData.id)
-        : [...selectedItemIds, rowData.id];
-
-    if (selectedIndex === -1) {
-      setSelectedItems([...selectedItems, rowData]);
-    } else {
-      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
-    }
-    setSelectedItemIds(newSelected);
-  };
-
   const columns = [
-    {
-      field: "select",
-      headerName: "Select",
-      flex: 0.5,
-      renderCell: (params) => (
-        <FormGroup>
-          <FormControlLabel
-            className="mx-auto"
-            control={
-              <Checkbox
-                checked={selectedItemIds.includes(params.row.id)}
-                onChange={() => handleItemSelection(params.row)}
-              />
-            }
-            style={{ justifyContent: "center" }}
-          />
-        </FormGroup>
-      ),
-    },
     { field: "order_id", headerName: "Order Ids", flex: 1 },
     { field: "order_created_date", headerName: "Order Created Date", flex: 1 },
     {
