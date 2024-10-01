@@ -52,7 +52,7 @@ function OrderSystem() {
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
   const ordersData = useSelector((state) => state?.orderSystem?.orders?.orders);
   const otherData = useSelector((state) => state?.orderSystem?.orders);
-  const orderDetails = useSelector((state) => state?.orderSystem?.orderDetails);
+  const orderDetails = useSelector((state) => state?.orderSystem?.orderDetailsData);
   const currentPage = useSelector((state) => state.pagination.currentPage);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ function OrderSystem() {
     }
   }, [ordersData, otherData, currentPage]);
 
-  console.log(orders, "orders");
+
   useEffect(() => {
     if (orderDetails) {
       const oDetails = orderDetails?.orders?.map((v, i) => ({ ...v, id: i }));
@@ -113,7 +113,7 @@ function OrderSystem() {
 
   const handlePrint = async (orderId) => {
     try {
-      dispatch(OrderDetailsGet({ id: orderId }));
+      dispatch(OrderDetailsGet(orderId));
       setShowModal(true);
     } catch (error) {
       console.error(error);
@@ -156,7 +156,7 @@ function OrderSystem() {
       className: "order-system",
       type: "html",
       renderCell: (value, row) => {
-        const orderId = value && value.row && value.row.order_id;
+        const orderId = value?.row?.order_id;
         return (
           <Button
             type="button"
