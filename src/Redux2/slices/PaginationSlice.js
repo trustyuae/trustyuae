@@ -8,20 +8,10 @@ const initialState = {
 };
 
 const tableIds = [
-  "ERManagement",
-  "AllFactory",
-  "MissingOrderSystem",
-  "CompletedOrderSystem",
-  "OnHoldOrdersSystem",
-  "OrderSystem",
-  "CompletedOrderSystemInChina",
-  "OnHoldOrdersSystemInChina",
-  "OrderSystemInChina",
-  "OrderTrackingNumberPending",
-  "ReserveOrderSystemInChina",
-  "GRNManagement",
-  "GRNManagementOnOrder",
-];
+  "ERManagement", "AllFactory", "MissingOrderSystem", "CompletedOrderSystem", "OnHoldOrdersSystem",
+  "OrderSystem", "CompletedOrderSystemInChina", "OnHoldOrdersSystemInChina", "OrderSystemInChina",
+  "OrderTrackingNumberPending", "ReserveOrderSystemInChina", "GRNManagement"
+]
 
 const paginationSlice = createSlice({
   name: "pagination",
@@ -35,34 +25,33 @@ const paginationSlice = createSlice({
     },
     clearStoreData: (state, action) => {
       const { tableId } = action.payload;
-      if (typeof state.currentPage !== "object") {
+      if (typeof state.currentPage !== 'object') {
         state.currentPage = {};
       }
-
-      tableIds.forEach((id) => {
-        if (id !== tableId) {
+      state.isLoading = false;
+      state.SyncLoading = false;
+      tableIds.forEach(id => {
+        if (id !== tableId)
           delete state.currentPage[id];
-          state.isLoading = false;
-          state.SyncLoading = false;
-        }
-      });
+      })
       state.error = null;
     },
     setCurrentPage: (state, action) => {
       const { tableId, page } = action.payload;
 
-      if (typeof state.currentPage !== "object") {
+      if (typeof state.currentPage !== 'object') {
         state.currentPage = {};
       }
 
-      tableIds.forEach((id) => {
-        if (id !== tableId) delete state.currentPage[id];
-      });
-
+      tableIds.forEach(id => {
+        if (id !== tableId)
+          delete state.currentPage[id];
+      })
+    
       if (!state.currentPage[tableId]) {
-        state.currentPage[tableId] = 1;
+        state.currentPage[tableId] = 1; 
       }
-
+    
       state.currentPage[tableId] = page;
     },
   },

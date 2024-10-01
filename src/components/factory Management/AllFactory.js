@@ -14,7 +14,7 @@ import {
   FactoryStatus,
   fetchFactoriesByFilterParam,
 } from "../../Redux2/slices/FactoriesSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 import Swal from "sweetalert2";
 import ShowAlert from "../../utils/ShowAlert";
 
@@ -54,6 +54,7 @@ function AllFactory() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'AllFactory' }));
       setPage(currentPage);
     }
   }, [currentPage]);

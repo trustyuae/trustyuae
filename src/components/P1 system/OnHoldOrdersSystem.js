@@ -19,7 +19,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { OnHoldOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OnHoldOrdersSystem() {
   const inputRef = useRef(null);
@@ -51,6 +51,7 @@ function OnHoldOrdersSystem() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OnHoldOrdersSystem' }));
       setPage(currentPage);
     }
     if (OnholdOrdersData) {

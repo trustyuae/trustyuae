@@ -19,7 +19,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function CompletedOrderSystem() {
@@ -53,6 +53,7 @@ function CompletedOrderSystem() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'CompletedOrderSystem' }));
       setPage(currentPage);
     }
     if (completedOrdersData) {

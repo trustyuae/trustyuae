@@ -22,7 +22,7 @@ import { OnHoldOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaS
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OnHoldOrdersSystemInChina() {
   const inputRef = useRef(null);
@@ -57,6 +57,7 @@ function OnHoldOrdersSystemInChina() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OnHoldOrdersSystemInChina' }));
       setPage(currentPage);
     }
     if (OnholdOrdersData) {

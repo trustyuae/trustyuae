@@ -21,7 +21,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, Card, Modal, Table, ToggleButton } from "react-bootstrap";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function CompletedOrderSystemInChina() {
   const inputRef = useRef(null);
@@ -57,6 +57,7 @@ function CompletedOrderSystemInChina() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'CompletedOrderSystemInChina' }));
       setPage(currentPage);
     }
     if (completedOrdersData) {

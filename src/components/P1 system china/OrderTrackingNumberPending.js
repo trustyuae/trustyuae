@@ -40,7 +40,7 @@ import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import * as XLSX from "xlsx";
 import { FaEye } from "react-icons/fa";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -94,6 +94,7 @@ function OrderTrackingNumberPending() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderTrackingNumberPending' }));
       setPage(currentPage);
     }
     if (ordersData) {

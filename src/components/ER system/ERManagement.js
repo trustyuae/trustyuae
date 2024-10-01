@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import { GetErManagementData } from "../../Redux2/slices/ErManagementSlice";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function ERManagement() {
   const dispatch = useDispatch();
@@ -60,6 +60,7 @@ function ERManagement() {
 
   useEffect(()=>{
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'ERManagement' }));
       setPage(currentPage);
     }
   },[currentPage])

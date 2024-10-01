@@ -41,7 +41,7 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderSystemInChina() {
   const dispatch = useDispatch();
@@ -85,6 +85,7 @@ function OrderSystemInChina() {
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderSystemInChina' }));
       setPage(currentPage);
     }
     if (ordersData) {
