@@ -24,6 +24,8 @@ import {
   GetProductOrderDetails,
 } from "../../Redux2/slices/P3SystemSlice";
 import Swal from "sweetalert2";
+import { CheckCircle, Cancel } from "@mui/icons-material";
+import { green, red, grey } from "@mui/material/colors";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -38,6 +40,7 @@ function OnHoldManagement() {
   const [productOverallData, setProductOverallData] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
   const loader = useSelector((state) => state?.p3System?.isLoading);
+  const [isChecked, setIsChecked] = useState(false);
 
   const productDetailsDataa = useSelector(
     (state) => state?.p3System?.productDetails
@@ -258,6 +261,16 @@ function OnHoldManagement() {
     fetchProductDetails();
   };
 
+  const handleToggle = () => {
+    setIsChecked(!isChecked); // Toggle the state between checked/unchecked
+    handleCheckboxClick(); // Call your custom function
+  };
+
+  const handleCheckboxClick = () => {
+    // Custom function to be called on checkbox click
+    console.log("Checkbox clicked!");
+  };
+
   const columns = [
     {
       field: "order_id",
@@ -281,7 +294,7 @@ function OnHoldManagement() {
     {
       field: "select",
       headerName: "Select",
-      flex: 1,
+      flex: 0.5,
       renderCell: (params) => {
         return (
           <FormGroup>
@@ -293,6 +306,31 @@ function OnHoldManagement() {
               onChange={(event) => handleCheckboxChange(event, params.row)}
             />
           </FormGroup>
+        );
+      },
+    },
+    {
+      field: "stock_status",
+      headerName: "Stock Status",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <div
+            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            onClick={handleToggle} // Attach click handler
+          >
+            {isChecked ? (
+              <>
+                <CheckCircle style={{ color: blue[500] }} />
+                <span style={{ marginLeft: 8 }}>In Stock</span>
+              </>
+            ) : (
+              <>
+                <Cancel style={{ color: red[500] }} />
+                <span style={{ marginLeft: 8 }}>Out of Stock</span>
+              </>
+            )}
+          </div>
         );
       },
     },

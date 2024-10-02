@@ -303,7 +303,7 @@ const OrderDetailsPrintModal = ({
       flex: 1,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
-          return 2;
+          return 3;
         }
         return undefined;
       },
@@ -315,7 +315,7 @@ const OrderDetailsPrintModal = ({
           <img
             src={params.value || defaultImage}
             alt="Product"
-            style={{ width: 100, height: 95 }}
+            style={{ width: 150, height: 140 }}
           />
         );
       },
@@ -326,6 +326,17 @@ const OrderDetailsPrintModal = ({
       flex: 1.5,
       renderCell: (params) => {
         return <div className="wrap-text">{params.value}</div>;
+      },
+    },
+    {
+      field: "order_ids",
+      headerName: "Order ID",
+      flex: 1,
+      renderCell: (params) => {
+        if (params.row.content) {
+          return <strong>{params.value}</strong>;
+        }
+        return params.value;
       },
     },
     {
@@ -398,7 +409,7 @@ const OrderDetailsPrintModal = ({
               <strong>Factory Name:</strong> {factoryName}
             </Box>
             <Box className="mt-2 po-details-table">
-              <DataTable columns={columns} rows={rows} rowHeight={100} />
+              <DataTable columns={columns} rows={rows} rowHeight={150} />
             </Box>
           </Box>
         </Modal.Body>
