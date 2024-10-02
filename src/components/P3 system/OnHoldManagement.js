@@ -115,7 +115,15 @@ function OnHoldManagement() {
 
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
-    const quantity = selectedOrders.map((order) => order.qty_fullfilled);
+    // const quantity = selectedOrders.map((order) => order.qty_fullfilled);
+    const grnNo = selectedOrders.map((order) => order.grn_no);
+    const productIdd = selectedOrders.map((order) =>
+      parseInt(order.product_id, 10)
+    );
+    const variationIdd = selectedOrders.map((order) =>
+      parseInt(order.variation_id, 10)
+    );
+    const poIdd = [productOverallData.po_id];
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
@@ -166,12 +174,12 @@ function OnHoldManagement() {
 
     if (confirmation.isConfirmed) {
       const requestedDataP = {
-        product_id: params.id,
-        po_id: productOverallData.po_id,
+        product_id: productIdd,
+        po_id: poIdd,
         order_id: orderId,
-        quantity: quantity,
-        grn_no: params.grn_no,
-        variation_id: params.variation_id,
+        // quantity: quantity,
+        grn_no: grnNo,
+        variation_id: variationIdd,
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
 
@@ -181,28 +189,26 @@ function OnHoldManagement() {
             console.log(payload, "payload from AddProductOrderForPre");
             if (payload?.status_code === 200) {
               ShowAlert(
-                payload?.Message,
+                "order sending for prep successfully!",
                 "",
                 "success",
                 false,
                 false,
                 "",
                 "",
-                "",
-                1500
+                2000
               );
               fetchProductOrderDetails();
             } else {
               ShowAlert(
-                payload.Message,
+                "error while sending order for prep!",
                 "",
                 "error",
                 false,
                 false,
                 "",
                 "",
-                "",
-                1500
+                2000
               );
             }
           }

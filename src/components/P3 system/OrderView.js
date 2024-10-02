@@ -5,12 +5,25 @@ import Container from "react-bootstrap/Container";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Badge, Card, Form } from "react-bootstrap";
 import DataTable from "../DataTable";
-import { Alert, Box, Checkbox, FormControlLabel, FormGroup, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Typography,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
-import { GetGRNListOnBasisOrderId } from "../../Redux2/slices/P3SystemSlice";
+import {
+  AddProductOrderForPre,
+  GetGRNListOnBasisOrderId,
+} from "../../Redux2/slices/P3SystemSlice";
+import ShowAlert from "../../utils/ShowAlert";
+import ShowAlert2 from "../../utils/ShowAlert2";
+import Swal from "sweetalert2";
 
 const OrderView = () => {
   const { id } = useParams();
@@ -64,6 +77,117 @@ const OrderView = () => {
     setSelectedItemIds(newSelected);
   };
 
+  const handleOrderPerp = async () => {
+    console.log(selectedItems, "selectedItems");
+    const orderId = selectedItems.map((item) => item.order_id);
+    // const quantity = selectedOrders.map((order) => order.qty_fullfilled);
+    const grnNo = selectedItems.map((item) => item.grn_no);
+    const productIdd = selectedItems.map((item) =>
+      parseInt(item.product_id, 10)
+    );
+    const variationIdd = selectedItems.map((item) =>
+      parseInt(item.variation_id, 10)
+    );
+    const poIdd = selectedItems.map((item) => item.po_id);
+
+    if (selectedItems.length === 0) {
+      await ShowAlert(
+        "Please select products for fulfilling orders",
+        "",
+        "error",
+        false,
+        false,
+        "",
+        "",
+        "",
+        0
+      );
+      return;
+    }
+
+    const systemSelection = await ShowAlert2(
+      "Please select the system to send data",
+      "",
+      "info",
+      true,
+      false,
+      "P1 System UAE",
+      "P1 System China",
+      "Cancel",
+      0,
+      1,
+      2,
+      {
+        allowOutsideClick: false, // Disable clicking outside
+        allowEscapeKey: false, // Disable closing on Escape key
+      }
+    );
+
+    if (systemSelection === "Cancel") {
+      return;
+    }
+
+    const confirmation = await Swal.fire({
+      title: `Are you sure you want to send the data to ${systemSelection}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      allowOutsideClick: false, // Disable clicking outside
+      allowEscapeKey: false, // Disable escape key
+    });
+
+    if (confirmation.isConfirmed) {
+      const requestedDataP = {
+        product_id: productIdd,
+        po_id: poIdd,
+        order_id: orderId,
+        // quantity: quantity,
+        grn_no: grnNo,
+        variation_id: variationIdd,
+        warehouse: systemSelection === "P1 System UAE" ? "" : "China",
+      };
+
+      try {
+        await dispatch(AddProductOrderForPre({ requestedDataP })).then(
+          ({ payload }) => {
+            console.log(payload, "payload from AddProductOrderForPre");
+            if (payload?.status_code === 200) {
+              ShowAlert(
+                "Items sent for prep successfully!",
+                "",
+                "success", 
+                false, 
+                false,
+                "",
+                "",
+                2000
+              );
+              setSelectedItems([]);
+              fetchItems();
+            } else {
+              ShowAlert(
+                "error while sending items for prep!",
+                "",
+                "error", 
+                false, 
+                false,
+                "",
+                "",
+                2000
+              );
+            }
+          }
+        );
+        // setSelectedItems([]);
+      } catch (error) {
+        console.error("Error occurred:", error);
+      }
+    } else if (confirmation.isDismissed) {
+      return;
+    }
+  };
+
   useEffect(() => {
     fetchItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,7 +197,7 @@ const OrderView = () => {
     {
       field: "select",
       headerName: "Select",
-      flex: 0.5,
+      flex: 1,
       renderCell: (params) => (
         <FormGroup>
           <FormControlLabel
@@ -126,26 +250,6 @@ const OrderView = () => {
     },
     { field: "qty_received", headerName: "Qty Received", flex: 2 },
     { field: "qty_remain", headerName: "Qty Remain", flex: 2 },
-    {
-      field: "",
-      headerName: "Action",
-      flex: 1,
-      type: "html",
-      renderCell: (value, row) => {
-        return (
-          <Link
-            to={`/On_Hold_Management/${value.row.grn_no}/${value.row.product_id}/${value.row.variation_id}`}
-          >
-            <Button
-              type="button"
-              className="w-auto bg-transparent border-0 text-secondary fs-5"
-            >
-              <FaEye className="mb-1" />
-            </Button>
-          </Link>
-        );
-      },
-    },
   ];
 
   const handalBackButton = () => {
@@ -279,7 +383,9 @@ const OrderView = () => {
               Send For InStock
             </Button>
           ) : ( */}
-            <Button variant="success">Send for Preparation</Button>
+            <Button variant="success" onClick={handleOrderPerp}>
+              Send for Preparation
+            </Button>
             {/* )} */}
           </MDBCol>
         </MDBRow>
