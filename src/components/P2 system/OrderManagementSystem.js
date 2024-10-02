@@ -130,7 +130,10 @@ function OrderManagementSystem() {
   useEffect(() => {
     if (factoryData) {
       const factData = factoryData?.factories?.map((item) => ({ ...item }));
-      setFactories(factData);
+
+      const filteredData = factData?.filter((item) => item.inactive === "0");
+
+      setFactories(filteredData);
     }
   }, [factoryData]);
 
