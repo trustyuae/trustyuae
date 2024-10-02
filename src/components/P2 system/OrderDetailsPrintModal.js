@@ -367,13 +367,8 @@ const OrderDetailsPrintModal = ({
             <Box sx={{ marginBottom: "10px" }}>
               <strong>Factory Name:</strong> {factoryName}
             </Box>
-            <Box className="mt-2">
-              <DataTable
-                columns={columns}
-                rows={rows}
-                className="custom-data-table"
-                rowHeight={100}
-              />
+            <Box className="mt-2 po-details-table">
+              <DataTable columns={columns}  rows={rows} rowHeight={100} />
             </Box>
           </Box>
         </Modal.Body>

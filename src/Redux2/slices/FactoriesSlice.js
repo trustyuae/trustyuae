@@ -9,6 +9,7 @@ const initialState = {
   factoriesWithParams: [],
   editFactory: [],
   addFactory: [],
+  factoryStatus: [],
   error: null,
 };
 
@@ -84,6 +85,22 @@ export const FactoryAdd = createAsyncThunk(
   }
 );
 
+
+export const FactoryStatus = createAsyncThunk(
+  "factory/FactoryStatus",
+  async (id,{ rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-factory-active/v1/active-factory/${id}`,
+      );
+      return response;
+    } catch (error) {
+      console.error("Error changing factory Status:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const factorySlice = createSlice({
   name: "factory",
   initialState,
@@ -101,6 +118,7 @@ const factorySlice = createSlice({
       state.factoriesWithParams = [];
       state.editFactory = [];
       state.addFactory = [];
+      state.factoryStatus = [];
       state.error = null;
     },
   },
@@ -147,6 +165,17 @@ const factorySlice = createSlice({
         state.addFactory = action.payload;
       })
       .addCase(FactoryAdd.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(FactoryStatus.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(FactoryStatus.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.factoryStatus = action.payload;
+      })
+      .addCase(FactoryStatus.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
