@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -63,6 +69,8 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { CheckCircle, Cancel } from "@mui/icons-material";
+import { green, red, grey, blue } from "@mui/material/colors";
 
 function OrderTrackingNumberPendingDetails() {
   const { id } = useParams();
@@ -95,6 +103,7 @@ function OrderTrackingNumberPendingDetails() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
@@ -467,7 +476,43 @@ function OrderTrackingNumberPendingDetails() {
       className: "order-details",
       type: "string",
     },
+    {
+      field: "stock_status",
+      headerName: "Stock Status",
+      flex: 1,
+      renderCell: (params) => {
+        const storeValue = params.row.instore
+        return (
+          <div
+            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            onClick={handleToggle} // Attach click handler
+          >
+            {storeValue && storeValue === "1" ? (
+              <>
+                <Cancel style={{ color: blue[500] }} />
+                <span style={{ marginLeft: 8 }}>In Store</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle style={{ color: red[500] }} />
+                <span style={{ marginLeft: 8 }}>Out of Store</span>
+              </>
+            )}
+          </div>
+        );
+      },
+    },
   ];
+
+  const handleToggle = () => {
+    setIsChecked(!isChecked); // Toggle the state between checked/unchecked
+    handleCheckboxClick(); // Call your custom function
+  };
+
+  const handleCheckboxClick = () => {
+    // Custom function to be called on checkbox click
+    console.log("Checkbox clicked!");
+  };
 
   const handleCopy = (text) => {
     navigator.clipboard
@@ -844,9 +889,24 @@ function OrderTrackingNumberPendingDetails() {
           ) : null}
         </Row>
         <Card className="p-3 mb-3">
-          <Typography variant="h6" className="fw-bold mb-3">
-            {t("P1ChinaSystem.OrderDetails")}
-          </Typography>
+          <Box className="d-flex justify-content-between">
+            <Typography variant="h6" className="fw-bold mb-3">
+              {t("P1ChinaSystem.OrderDetails")}
+            </Typography>
+            <Box
+              style={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={handleToggle} // Attach click handler
+            >
+              <CheckCircle
+                style={{ color: blue[500], transition: "transform 0.15s ease" }}
+              />
+              <span style={{ marginLeft: 8 }}>In Store</span>
+            </Box>
+          </Box>
           {loader ? (
             <Loader />
           ) : (

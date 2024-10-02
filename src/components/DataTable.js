@@ -32,7 +32,7 @@ export default function DataTable({
         height: "100%",
       }}
     >
-       {!hidePagination && (paginationPosition === "top") && (
+       {!hidePagination && (paginationPosition === "top" || paginationPosition === "both") && (
         <Box
           sx={{
             marginTop: "auto",
@@ -177,7 +177,7 @@ export default function DataTable({
           processRowUpdate={processRowUpdate}
         />
       </Box>
-      {!hidePagination && (paginationPosition !== "top") && (
+      {!hidePagination && (paginationPosition !== "top" || paginationPosition === "both") && (
         <Box
           sx={{
             marginTop: "auto",

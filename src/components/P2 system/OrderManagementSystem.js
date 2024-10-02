@@ -1403,7 +1403,7 @@ function OrderManagementSystem() {
                       pageSize={pageSize}
                       totalPages={totalPages}
                       handleChange={handleChange}
-                      paginationPosition="top"
+                      paginationPosition="both"
                     />
                   ) : (
                     <Alert

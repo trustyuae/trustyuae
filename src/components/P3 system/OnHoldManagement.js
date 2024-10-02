@@ -25,7 +25,7 @@ import {
 } from "../../Redux2/slices/P3SystemSlice";
 import Swal from "sweetalert2";
 import { CheckCircle, Cancel } from "@mui/icons-material";
-import { green, red, grey,blue } from "@mui/material/colors";
+import { green, red, grey } from "@mui/material/colors";
 
 function OnHoldManagement() {
   const params = useParams();
@@ -317,19 +317,12 @@ function OnHoldManagement() {
         return (
           <div
             style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-            onClick={handleToggle} // Attach click handler
+            onClick={handleToggle} 
           >
-            {isChecked ? (
-              <>
-                <CheckCircle style={{ color: blue[500] }} />
-                <span style={{ marginLeft: 8 }}>In Stock</span>
-              </>
-            ) : (
-              <>
-                <Cancel style={{ color: red[500] }} />
-                <span style={{ marginLeft: 8 }}>Out of Stock</span>
-              </>
-            )}
+            <CheckCircle
+              style={{ color: isChecked ? red[500] : grey[500] }}
+            />
+            <span style={{ marginLeft: 8 }}>In Stock</span>
           </div>
         );
       },
