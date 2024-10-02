@@ -303,7 +303,7 @@ const OrderDetailsPrintModal = ({
       flex: 1.5,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
-          return 2;
+          return 3;
         }
         return undefined;
       },
@@ -326,6 +326,17 @@ const OrderDetailsPrintModal = ({
       flex: 1.5,
       renderCell: (params) => {
         return <div className="wrap-text">{params.value}</div>;
+      },
+    },
+    {
+      field: "order_ids",
+      headerName: "Order ID",
+      flex: 1,
+      renderCell: (params) => {
+        if (params.row.content) {
+          return <strong>{params.value}</strong>;
+        }
+        return params.value;
       },
     },
     {
