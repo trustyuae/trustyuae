@@ -237,18 +237,18 @@ const OrderDetailsPrintModal = ({
   const handleExportPNG = async () => {
     setIsDownloadPng(true);
     const element = orderDetailsRef.current;
-  
+
     if (element) {
       try {
-        const scale = 3; 
+        const scale = 3;
         const canvas = await html2canvas(element, {
           scale: scale,
-          useCORS: true, 
-          allowTaint: true, 
+          useCORS: true,
+          allowTaint: true,
           logging: true,
         });
-  
-        const imgData = canvas.toDataURL("image/png", 1.0); 
+
+        const imgData = canvas.toDataURL("image/png", 1.0);
         const link = document.createElement("a");
         link.href = imgData;
         link.download = "PoDetails-invoice-hd.png";
@@ -257,7 +257,7 @@ const OrderDetailsPrintModal = ({
         console.error("Error exporting PNG:", error);
       }
     }
-  
+
     setIsDownloadPng(false);
   };
 
@@ -397,13 +397,8 @@ const OrderDetailsPrintModal = ({
             <Box sx={{ marginBottom: "10px" }}>
               <strong>Factory Name:</strong> {factoryName}
             </Box>
-            <Box className="mt-2">
-              <DataTable
-                columns={columns}
-                rows={rows}
-                className="custom-data-table"
-                rowHeight={100}
-              />
+            <Box className="mt-2 po-details-table">
+              <DataTable columns={columns} rows={rows} rowHeight={100} />
             </Box>
           </Box>
         </Modal.Body>
