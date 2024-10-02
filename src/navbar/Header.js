@@ -24,14 +24,14 @@ const Header = ({ onToggleSidebar }) => {
         ).then((result) => {
           if (result.isConfirmed) {
             ShowAlert(
-              "Success",
               "you have logged out successfully",
+              "",
               "success",
               false,
               false,
-              "OK",
               "",
-              1000
+              "",
+              1500
             );
             navigate("/");
           }
