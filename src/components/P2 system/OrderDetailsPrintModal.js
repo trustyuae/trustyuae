@@ -300,7 +300,7 @@ const OrderDetailsPrintModal = ({
     {
       field: "factory_image",
       headerName: "Factory Image",
-      flex: 1,
+      flex: 1.5,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
           return 2;
@@ -315,7 +315,7 @@ const OrderDetailsPrintModal = ({
           <img
             src={params.value || defaultImage}
             alt="Product"
-            style={{ width: 100, height: 95 }}
+            style={{ width: 190, height: 190 }}
           />
         );
       },
@@ -398,7 +398,7 @@ const OrderDetailsPrintModal = ({
               <strong>Factory Name:</strong> {factoryName}
             </Box>
             <Box className="mt-2 po-details-table">
-              <DataTable columns={columns} rows={rows} rowHeight={100} />
+              <DataTable columns={columns} rows={rows} rowHeight={200} />
             </Box>
           </Box>
         </Modal.Body>
