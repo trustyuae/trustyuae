@@ -15,7 +15,7 @@ const OrderDetailsPrintModal = ({
   PO_OrderList,
   factoryName,
   poId,
-  poRaiseDate
+  poRaiseDate,
 }) => {
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
@@ -62,7 +62,7 @@ const OrderDetailsPrintModal = ({
             );
           } catch (error) {
             console.error("Error loading image:", error);
-            imgData = defaultImage; 
+            imgData = defaultImage;
           }
         }
 
@@ -317,7 +317,7 @@ const OrderDetailsPrintModal = ({
     {
       field: "factory_image",
       headerName: "Factory Image",
-      flex: 1.5,
+      flex: 1,
       colSpan: (value, row) => {
         if (row.id === "TAX") {
           return 3;
@@ -344,7 +344,7 @@ const OrderDetailsPrintModal = ({
     {
       field: "product_name",
       headerName: "Product Name",
-      flex: 1.5,
+      flex: 1,
       renderCell: (params) => {
         return (
           <div className="wrap-text" style={{ fontSize: "1rem" }}>
@@ -359,9 +359,14 @@ const OrderDetailsPrintModal = ({
       flex: 1,
       renderCell: (params) => {
         console.log(params, "params from order_ids");
+
         if (params.row.content) {
           return null;
         }
+        const orderIds = params?.row?.order_ids.split(",");
+        const numRows = 5;
+        const numColumns = Math.ceil(orderIds.length / numRows);
+
         return (
           <div
             style={{
@@ -377,12 +382,27 @@ const OrderDetailsPrintModal = ({
               lineHeight: "1.5",
               padding: "5px 0",
               height: "100%",
-              overflowY: "auto",
+              overflowX: "auto",
+              overflowY: "hidden",
+              width: "100%",
             }}
           >
-            {params?.row?.order_ids.split(",").map((id, index) => (
-              <div key={index}>{id}</div>
-            ))}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${numColumns}, auto)`,
+                gridAutoRows: "auto",
+                gap: "10px",
+                width: "fit-content",
+                padding: "5px",
+              }}
+            >
+              {orderIds.map((id, index) => (
+                <div key={index} style={{ padding: "5px" }}>
+                  {id}
+                </div>
+              ))}
+            </div>
           </div>
         );
       },
@@ -442,9 +462,11 @@ const OrderDetailsPrintModal = ({
 
   return (
     <>
-      <Modal show={show} onHide={handleClosePrintModal} centered size="lg">
+      <Modal show={show} onHide={handleClosePrintModal} centered size="xl">
         <Modal.Header closeButton>
-          <Modal.Title>Invoice</Modal.Title>
+          <Modal.Title className="d-flex justify-content-center w-100" style={{fontWeight:'bolder',fontSize:'1.8rem'}}>
+            Invoice
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Box
@@ -460,14 +482,31 @@ const OrderDetailsPrintModal = ({
               lineHeight: "1.5",
             }}
           >
-            <Box sx={{ marginBottom: "10px" }}>
-              <strong>POId:</strong> {poId}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "10px",
+                fontSize: "1.4rem",
+              }}
+            >
+              <strong>POId:</strong>{" "}
+              <div style={{ fontWeight: "initial", marginLeft: "5px" }}>
+                {poId}
+              </div>
             </Box>
-            <Box sx={{ marginBottom: "10px" }}>
-              <strong>PO Generated Date:</strong> {poRaiseDate}
-            </Box>
-            <Box sx={{ marginBottom: "10px" }}>
-              <strong>Factory Name:</strong> {factoryName}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "10px",
+                fontSize: "1.4rem",
+              }}
+            >
+              <strong>PO Generated Date:</strong>{" "}
+              <div style={{ fontWeight: "initial", marginLeft: "5px" }}>
+                {poRaiseDate}
+              </div>
             </Box>
             <Box className="mt-2 po-details-table">
               <DataTable columns={columns} rows={rows} rowHeight={200} />
