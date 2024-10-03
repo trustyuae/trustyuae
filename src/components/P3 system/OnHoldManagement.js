@@ -311,18 +311,15 @@ function OnHoldManagement() {
     },
     {
       field: "stock_status",
-      headerName: "Stock Status",
+      headerName: "In Store",
       flex: 1,
       renderCell: (params) => {
         return (
           <div
             style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-            onClick={handleToggle} 
+            onClick={handleToggle}
           >
-            <CheckCircle
-              style={{ color: isChecked ? red[500] : grey[500] }}
-            />
-            <span style={{ marginLeft: 8 }}>In Stock</span>
+            <CheckCircle style={{ color: isChecked ? red[500] : grey[500] }} />
           </div>
         );
       },
