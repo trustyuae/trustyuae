@@ -15,6 +15,7 @@ const OrderDetailsPrintModal = ({
   PO_OrderList,
   factoryName,
   poId,
+  poRaiseDate
 }) => {
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
@@ -61,11 +62,10 @@ const OrderDetailsPrintModal = ({
             );
           } catch (error) {
             console.error("Error loading image:", error);
-            imgData = defaultImage; // Fallback to default image on error
+            imgData = defaultImage; 
           }
         }
 
-        // Parse variation_value if present
         let productName = "";
         if (item?.variation_value) {
           try {
@@ -78,7 +78,6 @@ const OrderDetailsPrintModal = ({
           }
         }
 
-        // Add row data
         tableRows.push([
           item.product_id || "N/A",
           { image: imgData, width: 48 },
@@ -251,31 +250,46 @@ const OrderDetailsPrintModal = ({
         const imgData = canvas.toDataURL("image/png", 1.0);
         const link = document.createElement("a");
         link.href = imgData;
-        link.download = "PoDetails-invoice-hd.png";
+        link.download = `${factoryName}-${poId}-${poRaiseDate}.png`;
         link.click();
       } catch (error) {
         console.error("Error exporting PNG:", error);
       }
     }
-
     setIsDownloadPng(false);
   };
 
   const handleExportExcel = (e) => {
     const wb = XLSX.utils.book_new();
-    const data = PO_OrderList.map((item) => {
-      if (item?.id !== "TAX") {
-        return {
-          "Product ID": item?.product_id || "N/A",
-          "variation ID": item?.variation_id || "N/A",
-          "Product Name": item?.product_name || "N/A",
-          "Quantity Ordered": item?.quantity || 0,
-          "Image URL": item?.image || "N/A",
-          "order ids":
-            item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
-        };
-      }
-    }).filter((item) => item !== undefined);
+    let data = [];
+    const CHUNK_SIZE = 1000;
+    const processChunk = (startIndex, endIndex) => {
+      const chunkData = PO_OrderList.slice(startIndex, endIndex)
+        .map((item) => {
+          if (item?.id !== "TAX") {
+            return {
+              "Product ID": item?.product_id || "N/A",
+              "variation ID": item?.variation_id || "N/A",
+              "Product Name": item?.product_name || "N/A",
+              "Quantity Ordered": item?.quantity || 0,
+              "Image URL": item?.image || "N/A",
+              "Order IDs": Array.isArray(item.order_ids)
+                ? item.order_ids.join(", ")
+                : typeof item.order_ids === "string"
+                ? item.order_ids
+                : "N/A",
+            };
+          }
+        })
+        .filter((item) => item !== undefined);
+
+      data = data.concat(chunkData);
+    };
+
+    for (let i = 0; i < PO_OrderList.length; i += CHUNK_SIZE) {
+      const end = Math.min(i + CHUNK_SIZE, PO_OrderList.length);
+      processChunk(i, end);
+    }
 
     const totalItem = PO_OrderList.find((item) => item?.id === "TAX");
     if (totalItem) {
@@ -286,8 +300,11 @@ const OrderDetailsPrintModal = ({
     }
 
     const ws = XLSX.utils.json_to_sheet(data);
+
     XLSX.utils.book_append_sheet(wb, ws, "PO Orders");
+
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, `PoDetails-invoice.xlsx`);
   };
@@ -309,7 +326,11 @@ const OrderDetailsPrintModal = ({
       },
       renderCell: (params) => {
         if (params.row.content) {
-          return <strong>{params.row.content}</strong>;
+          return (
+            <strong style={{ fontWeight: "bold", fontSize: "1.4rem" }}>
+              {params.row.content}
+            </strong>
+          );
         }
         return (
           <img
@@ -325,7 +346,11 @@ const OrderDetailsPrintModal = ({
       headerName: "Product Name",
       flex: 1.5,
       renderCell: (params) => {
-        return <div className="wrap-text">{params.value}</div>;
+        return (
+          <div className="wrap-text" style={{ fontSize: "1rem" }}>
+            {params.value}
+          </div>
+        );
       },
     },
     {
@@ -333,10 +358,33 @@ const OrderDetailsPrintModal = ({
       headerName: "Order ID",
       flex: 1,
       renderCell: (params) => {
+        console.log(params, "params from order_ids");
         if (params.row.content) {
-          return <strong>{params.value}</strong>;
+          return null;
         }
-        return params.value;
+        return (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              fontWeight: "bold",
+              fontSize: "1rem",
+              textAlign: "center",
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              lineHeight: "1.5",
+              padding: "5px 0",
+              height: "100%",
+              overflowY: "auto",
+            }}
+          >
+            {params?.row?.order_ids.split(",").map((id, index) => (
+              <div key={index}>{id}</div>
+            ))}
+          </div>
+        );
       },
     },
     {
@@ -345,9 +393,17 @@ const OrderDetailsPrintModal = ({
       flex: 0.5,
       renderCell: (params) => {
         if (params.row.content) {
-          return <strong>{params.value}</strong>;
+          return (
+            <strong style={{ fontWeight: "bold", fontSize: "1.4rem" }}>
+              {params.value}
+            </strong>
+          );
         }
-        return params.value;
+        return (
+          <strong style={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+            {params.value}
+          </strong>
+        );
       },
     },
   ];
@@ -367,6 +423,8 @@ const OrderDetailsPrintModal = ({
         quantity: item.quantity || 0,
         order_ids: Array.isArray(item.order_ids)
           ? item.order_ids.join(", ")
+          : typeof item.order_ids === "string"
+          ? item.order_ids
           : "N/A",
         colspan: 2,
         factory_image: item.factory_image
@@ -404,6 +462,9 @@ const OrderDetailsPrintModal = ({
           >
             <Box sx={{ marginBottom: "10px" }}>
               <strong>POId:</strong> {poId}
+            </Box>
+            <Box sx={{ marginBottom: "10px" }}>
+              <strong>PO Generated Date:</strong> {poRaiseDate}
             </Box>
             <Box sx={{ marginBottom: "10px" }}>
               <strong>Factory Name:</strong> {factoryName}
