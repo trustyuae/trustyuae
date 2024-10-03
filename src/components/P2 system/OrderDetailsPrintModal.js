@@ -61,11 +61,10 @@ const OrderDetailsPrintModal = ({
             );
           } catch (error) {
             console.error("Error loading image:", error);
-            imgData = defaultImage; // Fallback to default image on error
+            imgData = defaultImage; 
           }
         }
 
-        // Parse variation_value if present
         let productName = "";
         if (item?.variation_value) {
           try {
@@ -78,7 +77,6 @@ const OrderDetailsPrintModal = ({
           }
         }
 
-        // Add row data
         tableRows.push([
           item.product_id || "N/A",
           { image: imgData, width: 48 },
@@ -263,19 +261,35 @@ const OrderDetailsPrintModal = ({
 
   const handleExportExcel = (e) => {
     const wb = XLSX.utils.book_new();
-    const data = PO_OrderList.map((item) => {
-      if (item?.id !== "TAX") {
-        return {
-          "Product ID": item?.product_id || "N/A",
-          "variation ID": item?.variation_id || "N/A",
-          "Product Name": item?.product_name || "N/A",
-          "Quantity Ordered": item?.quantity || 0,
-          "Image URL": item?.image || "N/A",
-          "order ids":
-            item?.order_ids?.map((item2) => item2).join(", ") || "N/A",
-        };
-      }
-    }).filter((item) => item !== undefined);
+    let data = [];
+    const CHUNK_SIZE = 1000;
+    const processChunk = (startIndex, endIndex) => {
+      const chunkData = PO_OrderList.slice(startIndex, endIndex)
+        .map((item) => {
+          if (item?.id !== "TAX") {
+            return {
+              "Product ID": item?.product_id || "N/A",
+              "variation ID": item?.variation_id || "N/A",
+              "Product Name": item?.product_name || "N/A",
+              "Quantity Ordered": item?.quantity || 0,
+              "Image URL": item?.image || "N/A",
+              "Order IDs": Array.isArray(item.order_ids)
+                ? item.order_ids.join(", ")
+                : typeof item.order_ids === "string"
+                ? item.order_ids
+                : "N/A",
+            };
+          }
+        })
+        .filter((item) => item !== undefined);
+
+      data = data.concat(chunkData);
+    };
+
+    for (let i = 0; i < PO_OrderList.length; i += CHUNK_SIZE) {
+      const end = Math.min(i + CHUNK_SIZE, PO_OrderList.length);
+      processChunk(i, end);
+    }
 
     const totalItem = PO_OrderList.find((item) => item?.id === "TAX");
     if (totalItem) {
@@ -286,8 +300,11 @@ const OrderDetailsPrintModal = ({
     }
 
     const ws = XLSX.utils.json_to_sheet(data);
+
     XLSX.utils.book_append_sheet(wb, ws, "PO Orders");
+
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, `PoDetails-invoice.xlsx`);
   };
