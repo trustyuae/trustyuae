@@ -78,6 +78,7 @@ const PoDetails = () => {
   const [imageURL, setImageURL] = useState("");
   const [imageId, setImageId] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
+  const [poRaiseDate, setPoRaiseDate] = useState(null);
 
   const navigate = useNavigate();
 
@@ -146,6 +147,7 @@ const PoDetails = () => {
             total_cost: payload?.total_cost || 0,
           },
         ];
+        setPoRaiseDate(payload.po_date)
         setPO_OrderList(row);
         setERId(payload.er_no);
         setFactorieName(payload.factory_id);
@@ -358,18 +360,25 @@ const PoDetails = () => {
 
   const variant2 = (params) => {
     const variationValue = params.row.variation_value;
-
+  
     let variationArray = [];
     try {
       if (variationValue) {
-        const parsedValue = JSON.parse(variationValue);
-
-        if (typeof parsedValue === "object" && parsedValue !== null) {
-          variationArray = Object.entries(parsedValue).map(([key, value]) => ({
+        if (typeof variationValue === "string") {
+          const parsedValue = JSON.parse(variationValue);
+          if (typeof parsedValue === "object" && parsedValue !== null) {
+            variationArray = Object.entries(parsedValue).map(([key, value]) => ({
+              [key]: value,
+            }));
+          } else {
+            console.error("Parsed value is not an object:", parsedValue);
+          }
+        } else if (typeof variationValue === "object") {
+          variationArray = Object.entries(variationValue).map(([key, value]) => ({
             [key]: value,
           }));
         } else {
-          console.error("Parsed value is not an object:", parsedValue);
+          console.error("Variation value is not a valid format:", variationValue);
         }
       } else {
         console.error("Variation value is empty or not defined.");
@@ -377,7 +386,7 @@ const PoDetails = () => {
     } catch (error) {
       console.error("Error parsing JSON:", error);
     }
-
+  
     return (
       <div className="container mt-4 mb-4">
         {variationArray.length === 0 ? (
@@ -399,7 +408,7 @@ const PoDetails = () => {
       </div>
     );
   };
-
+  
   const columns = [
     {
       field: "product_name",
@@ -1012,6 +1021,7 @@ const PoDetails = () => {
       <OrderDetailsPrintModal
         show={printModal}
         poId={id}
+        poRaiseDate={poRaiseDate}
         factoryName={
           factories.find((factory) => factory.id == factorieName)?.factory_name
         }

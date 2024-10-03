@@ -15,6 +15,7 @@ const OrderDetailsPrintModal = ({
   PO_OrderList,
   factoryName,
   poId,
+  poRaiseDate
 }) => {
   const orderDetailsRef = useRef(null);
   const [isDownloadPdf, setIsDownloadPdf] = useState(false);
@@ -249,13 +250,12 @@ const OrderDetailsPrintModal = ({
         const imgData = canvas.toDataURL("image/png", 1.0);
         const link = document.createElement("a");
         link.href = imgData;
-        link.download = "PoDetails-invoice-hd.png";
+        link.download = `${factoryName}-${poId}-${poRaiseDate}.png`;
         link.click();
       } catch (error) {
         console.error("Error exporting PNG:", error);
       }
     }
-
     setIsDownloadPng(false);
   };
 
@@ -353,39 +353,6 @@ const OrderDetailsPrintModal = ({
         );
       },
     },
-    // {
-    //   field: "order_ids",
-    //   headerName: "Order ID",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     console.log(params, "params from order_ids");
-    //     if (params.row.content) {
-    //       return null;
-    //     }
-    //     return (
-    //       <div
-    //         style={{
-    //           display: "flex",
-    //           flexDirection: "column",
-    //           justifyContent: "center",
-    //           alignItems: "center",
-    //           fontWeight: "bold",
-    //           fontSize: "1rem",
-    //           textAlign: "center",
-    //           whiteSpace: "normal",
-    //           wordWrap: "break-word",
-    //           lineHeight: "1.5",
-    //           padding: "5px 0",
-    //           height: "100%",
-    //         }}
-    //       >
-    //         {params?.row?.order_ids.split(",").map((id, index) => (
-    //           <div key={index}>{id}</div>
-    //         ))}
-    //       </div>
-    //     );
-    //   },
-    // },
     {
       field: "order_ids",
       headerName: "Order ID",
@@ -395,26 +362,25 @@ const OrderDetailsPrintModal = ({
         if (params.row.content) {
           return null;
         }
-
-        const orderIds = params?.row?.order_ids.split(","); // Split the IDs by commas
-
         return (
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(auto-fit, minmax(100px, 1fr))`, // Create responsive columns
-              gap: "5px", // Small gap between columns and rows
-              justifyItems: "center", // Center each order ID horizontally
-              alignItems: "center", // Center items vertically in the grid
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
               fontWeight: "bold",
               fontSize: "1rem",
-              textAlign: "center", // Center text inside each cell
-              whiteSpace: "normal", // Allow text to wrap if necessary
-              padding: "5px 0", // Add some padding
-              height: "100%", // Take up full cell height
+              textAlign: "center",
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              lineHeight: "1.5",
+              padding: "5px 0",
+              height: "100%",
+              overflowY: "auto",
             }}
           >
-            {orderIds.map((id, index) => (
+            {params?.row?.order_ids.split(",").map((id, index) => (
               <div key={index}>{id}</div>
             ))}
           </div>
@@ -496,6 +462,9 @@ const OrderDetailsPrintModal = ({
           >
             <Box sx={{ marginBottom: "10px" }}>
               <strong>POId:</strong> {poId}
+            </Box>
+            <Box sx={{ marginBottom: "10px" }}>
+              <strong>PO Generated Date:</strong> {poRaiseDate}
             </Box>
             <Box sx={{ marginBottom: "10px" }}>
               <strong>Factory Name:</strong> {factoryName}
