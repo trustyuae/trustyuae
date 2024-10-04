@@ -38,6 +38,8 @@ const OrderView = () => {
   const [grnList, setGrnList] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
+  const [selectedItemsforinstore, setSelectedItemsforinstore] = useState([]);
+  const [selectedItemIdsforinstore, setSelectedItemIdsforinstore] = useState([]);
 
   const grnListData = useSelector(
     (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
@@ -75,6 +77,24 @@ const OrderView = () => {
       setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
     }
     setSelectedItemIds(newSelected);
+  };
+
+  const handleItemSelectionforinstore = (rowData) => {
+    const selectedIndex = selectedItemIdsforinstore.indexOf(rowData.id);
+    const newSelected =
+      selectedIndex !== -1
+        ? selectedItemIdsforinstore.filter((id) => id !== rowData.id)
+        : [...selectedItemIdsforinstore, rowData.id];
+  
+    const updatedRowData = { ...rowData, instore: selectedIndex === -1 ? 1 : 0 };
+  
+    if (selectedIndex === -1) {
+      setSelectedItemsforinstore([...selectedItemsforinstore, updatedRowData]);
+    } else {
+      setSelectedItemsforinstore(selectedItemsforinstore.filter((item) => item.id !== rowData.id));
+    }
+  
+    setSelectedItemIdsforinstore(newSelected);
   };
 
   const handleOrderPerp = async () => {
@@ -250,6 +270,25 @@ const OrderView = () => {
     },
     { field: "qty_received", headerName: "Qty Received", flex: 2 },
     { field: "qty_remain", headerName: "Qty Remain", flex: 2 },
+    {
+      field: "select_for_store",
+      headerName: "In Store",
+      flex: 0.5,
+      renderCell: (params) => (
+        <FormGroup>
+          <FormControlLabel
+            className="mx-auto"
+            control={
+              <Checkbox
+                checked={selectedItemIdsforinstore.includes(params.row.id)}
+                onChange={() => handleItemSelectionforinstore(params.row)}
+              />
+            }
+            style={{ justifyContent: "center" }}
+          />
+        </FormGroup>
+      ),
+    },
   ];
 
   const handalBackButton = () => {

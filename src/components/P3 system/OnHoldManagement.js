@@ -42,6 +42,8 @@ function OnHoldManagement() {
   const loader = useSelector((state) => state?.p3System?.isLoading);
   const [isChecked, setIsChecked] = useState(false);
 
+  const [selectedItems, setSelectedItems] = useState([]);
+
   const productDetailsDataa = useSelector(
     (state) => state?.p3System?.productDetails
   );
@@ -118,7 +120,6 @@ function OnHoldManagement() {
 
   const handleOrderPerp = async () => {
     const orderId = selectedOrders.map((order) => order.order_id);
-    // const quantity = selectedOrders.map((order) => order.qty_fullfilled);
     const grnNo = selectedOrders.map((order) => order.grn_no);
     const productIdd = selectedOrders.map((order) =>
       parseInt(order.product_id, 10)
@@ -127,6 +128,10 @@ function OnHoldManagement() {
       parseInt(order.variation_id, 10)
     );
     const poIdd = [productOverallData.po_id];
+
+    const instoreValues = productData.map((order) =>
+      order.instore ? order.instore : 0
+    );
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
@@ -156,8 +161,8 @@ function OnHoldManagement() {
       1,
       2,
       {
-        allowOutsideClick: false, // Disable clicking outside
-        allowEscapeKey: false, // Disable closing on Escape key
+        allowOutsideClick: false,
+        allowEscapeKey: false,
       }
     );
 
@@ -171,8 +176,8 @@ function OnHoldManagement() {
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
-      allowOutsideClick: false, // Disable clicking outside
-      allowEscapeKey: false, // Disable escape key
+      allowOutsideClick: false,
+      allowEscapeKey: false,
     });
 
     if (confirmation.isConfirmed) {
@@ -180,9 +185,9 @@ function OnHoldManagement() {
         product_id: productIdd,
         po_id: poIdd,
         order_id: orderId,
-        // quantity: quantity,
         grn_no: grnNo,
         variation_id: variationIdd,
+        instore: instoreValues,
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
 
@@ -192,7 +197,7 @@ function OnHoldManagement() {
             console.log(payload, "payload from AddProductOrderForPre");
             if (payload?.status_code === 200) {
               ShowAlert(
-                "order sending for prep successfully!",
+                "Order sending for prep successfully!",
                 "",
                 "success",
                 false,
@@ -204,7 +209,7 @@ function OnHoldManagement() {
               fetchProductOrderDetails();
             } else {
               ShowAlert(
-                "error while sending order for prep!",
+                "Error while sending order for prep!",
                 "",
                 "error",
                 false,
@@ -261,14 +266,18 @@ function OnHoldManagement() {
     fetchProductDetails();
   };
 
-  const handleToggle = () => {
-    setIsChecked(!isChecked); // Toggle the state between checked/unchecked
-    handleCheckboxClick(); // Call your custom function
-  };
+  const handleItemSelection = (rowData) => {
+    const selectedIndex1 = productData.indexOf(rowData.id);
+    const updatedRowData = {
+      ...rowData,
+      instore: selectedIndex1 === -1 ? 1 : 0,
+    };
 
-  const handleCheckboxClick = () => {
-    // Custom function to be called on checkbox click
-    console.log("Checkbox clicked!");
+    const updatedProductData = productData.map((product) =>
+      product.id === rowData.id ? updatedRowData : product
+    );
+
+    setProductData(updatedProductData);
   };
 
   const columns = [
@@ -310,17 +319,26 @@ function OnHoldManagement() {
       },
     },
     {
-      field: "stock_status",
+      field: "selectin store",
       headerName: "In Store",
-      flex: 1,
+      flex: 0.5,
       renderCell: (params) => {
+        let productInstore = productData?.find(
+          (prod) => prod.id === params.row.id
+        );
         return (
-          <div
-            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-            onClick={handleToggle}
-          >
-            <CheckCircle style={{ color: isChecked ? red[500] : grey[500] }} />
-          </div>
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={
+                <Checkbox
+                  checked={productInstore.instore == 1 ? true : false}
+                  onChange={() => handleItemSelection(params.row)}
+                />
+              }
+              style={{ justifyContent: "center" }}
+            />
+          </FormGroup>
         );
       },
     },

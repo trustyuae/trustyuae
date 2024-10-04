@@ -729,6 +729,7 @@ function OnHoldManegementSystem() {
   };
 
   const handleFactoryChange = (e) => {
+    setSelectedPOId(null);
     setSelectedFactory(e.target.value);
   };
 
@@ -871,8 +872,8 @@ function OnHoldManegementSystem() {
   };
 
   const handleReset = () => {
-    setSelectedPOId(null)
-    setSelectedFactory("")
+    setSelectedPOId(null);
+    setSelectedFactory("");
   };
 
   useEffect(() => {
@@ -941,7 +942,11 @@ function OnHoldManegementSystem() {
             <Form.Label className="fw-semibold">Select PO ID</Form.Label>
             <Select
               options={allPoIds}
-              value={allPoIds.find((option) => option.value === selectedPOId)}
+              value={
+                selectedPOId
+                  ? allPoIds.find((option) => option.value === selectedPOId)
+                  : null
+              }
               onChange={handleChangePoID}
               isClearable
               placeholder="Select PO ID"
