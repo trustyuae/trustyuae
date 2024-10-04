@@ -43,7 +43,10 @@ import {
   PoDetailsData,
 } from "../../Redux2/slices/P2SystemSlice";
 import Swal from "sweetalert2";
-import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import {
+  clearStoreData,
+  setCurrentPage,
+} from "../../Redux2/slices/PaginationSlice";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
@@ -124,7 +127,10 @@ function OrderManagementSystem() {
     (state) => state?.p2System?.addedManualPoData
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage['OrderManagementSystem']) || 1;
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["OrderManagementSystem"]
+    ) || 1;
 
   useEffect(() => {
     dispatch(fetchAllFactories());
@@ -140,13 +146,12 @@ function OrderManagementSystem() {
     }
   }, [factoryData]);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (currentPage) {
-      dispatch(clearStoreData({ tableId: 'OrderManagementSystem' }));
+      dispatch(clearStoreData({ tableId: "OrderManagementSystem" }));
       setPage(currentPage);
     }
-  },[currentPage])
-
+  }, [currentPage]);
 
   function handleAttributeChange(event, rowIndex, attributeName) {
     const newValue = event.target.value;
@@ -268,6 +273,9 @@ function OrderManagementSystem() {
   };
 
   const handleUpdateForMultiProd = () => {
+    setSelectedFactoryName(null);
+    console.log(selectedOrderIds, "selectedOrderIds");
+    console.log(selectedAgainstOrderDetails, "selectedAgainstOrderDetails");
     const ProductIds = selectedAgainstOrderDetails.map((order) =>
       parseInt(order.item_id, 10)
     );
@@ -276,6 +284,7 @@ function OrderManagementSystem() {
       factory_id: selectedFactoryName,
     };
     dispatch(AssignFactoryToMultiProduct({ payload })).then(({ payload }) => {
+      setSelectedAgainstOrderDetails([]);
       setSelectedOrderIds([]);
       setSelectedFactoryName("");
       if (payload) {
@@ -1140,7 +1149,7 @@ function OrderManagementSystem() {
 
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
-    dispatch(setCurrentPage({ tableId: 'OrderManagementSystem', page: value }));
+    dispatch(setCurrentPage({ tableId: "OrderManagementSystem", page: value }));
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
   };
@@ -1367,9 +1376,13 @@ function OrderManagementSystem() {
                       label: factory.factory_name,
                       value: factory.id,
                     }))}
-                    value={factories?.find(
-                      (option) => option.value === selectedFactoryName
-                    )}
+                    value={
+                      selectedFactoryName
+                        ? factories?.find(
+                            (option) => option.value === selectedFactoryName
+                          )
+                        : null
+                    }
                     onChange={handleChangeFactoryForMul}
                     isClearable
                     placeholder="Select Factory"
