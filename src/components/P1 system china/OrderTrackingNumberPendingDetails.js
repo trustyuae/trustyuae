@@ -63,6 +63,7 @@ import {
   CustomOrderOHChina,
   InsertOrderPickupCancelChina,
   InsertOrderPickupChina,
+  InstoreStatusUpdate,
   OrderDetailsChinaGet,
   OrderTrackingDetailsChinaGet,
   OverAllAttachmentFileUploadChina,
@@ -246,6 +247,54 @@ function OrderTrackingNumberPendingDetails() {
     setSelectedItemIds(newSelected);
   };
 
+  const handleInstoreStatus = (instoreValue) => {
+    if (!selectedItems || selectedItems.length === 0) {
+      console.error("No items selected!");
+      ShowAlert(
+        "Error: No items selected for updating!",
+        "",
+        "error",
+        false,
+        false,
+        "",
+        "",
+        2000
+      );
+      return;
+    }
+
+    const productIDD = selectedItems.map((item) => item.item_id);
+    const variationIDD = selectedItems.map((item) => item.variation_id);
+    const payload = {
+      order_id: parseInt(orderDetails.order_id, 10),
+      product_id: productIDD,
+      variation_id: variationIDD,
+      instore: instoreValue,
+    };
+
+    console.log(payload, "payload");
+    dispatch(InstoreStatusUpdate({ payload }))
+      .unwrap() // Use `.unwrap()` to handle the resolved promise or errors.
+      .then((response) => {
+        console.log("Success:", response);
+        ShowAlert(
+          "Items instored successfully!",
+          "",
+          "success",
+          false,
+          false,
+          "",
+          "",
+          2000
+        );
+        setSelectedItems([]);
+        fetchOrder();
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+      });
+  };
+
   const submitOH = async () => {
     try {
       const result = {
@@ -395,6 +444,25 @@ function OrderTrackingNumberPendingDetails() {
 
   const columns = [
     {
+      field: "select",
+      headerName: t("POManagement.Select"),
+      flex: 0.5,
+      renderCell: (params) => (
+        <FormGroup>
+          <FormControlLabel
+            className="mx-auto"
+            control={
+              <Checkbox
+                checked={selectedItemIds.includes(params.row.id)}
+                onChange={() => handleItemSelection(params.row)}
+              />
+            }
+            style={{ justifyContent: "center" }}
+          />
+        </FormGroup>
+      ),
+    },
+    {
       field: "item_id",
       headerName: t("P1ChinaSystem.ItemId"),
       className: "order-details",
@@ -481,24 +549,11 @@ function OrderTrackingNumberPendingDetails() {
       headerName: "Stock Status",
       flex: 1,
       renderCell: (params) => {
-        const storeValue = params.row.instore
-        return (
-          <div
-            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-            onClick={handleToggle} // Attach click handler
-          >
-            {storeValue && storeValue === "1" ? (
-              <>
-                <Cancel style={{ color: blue[500] }} />
-                <span style={{ marginLeft: 8 }}>In Store</span>
-              </>
-            ) : (
-              <>
-                <CheckCircle style={{ color: red[500] }} />
-                <span style={{ marginLeft: 8 }}>Out of Store</span>
-              </>
-            )}
-          </div>
+        const storeValue = params.row.instore;
+        return storeValue === "1" ? (
+          <span style={{ marginLeft: 8 }}>In Store</span>
+        ) : (
+          <span style={{ marginLeft: 8 }}>Out of Store</span>
         );
       },
     },
@@ -524,6 +579,8 @@ function OrderTrackingNumberPendingDetails() {
         console.error("Failed to copy text: ", err);
       });
   };
+
+  console.log(userData, "userData");
 
   return (
     <>
@@ -893,19 +950,47 @@ function OrderTrackingNumberPendingDetails() {
             <Typography variant="h6" className="fw-bold mb-3">
               {t("P1ChinaSystem.OrderDetails")}
             </Typography>
-            <Box
-              style={{
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-              onClick={handleToggle} // Attach click handler
-            >
-              <CheckCircle
-                style={{ color: blue[500], transition: "transform 0.15s ease" }}
-              />
-              <span style={{ marginLeft: 8 }}>In Store</span>
-            </Box>
+            {userData && userData.user_role === "administrator" && (
+              <Box className="d-flex">
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <CheckCircle
+                    style={{
+                      color: blue[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(1)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginLeft: 20,
+                  }}
+                >
+                  <Cancel
+                    style={{
+                      color: red[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(0)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
+              </Box>
+            )}
           </Box>
           {loader ? (
             <Loader />
