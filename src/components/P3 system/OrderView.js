@@ -38,8 +38,7 @@ const OrderView = () => {
   const [grnList, setGrnList] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
-  const [selectedItemsforinstore, setSelectedItemsforinstore] = useState([]);
-  const [selectedItemIdsforinstore, setSelectedItemIdsforinstore] = useState([]);
+  const [selectedInstores, setSelectedInstores] = useState([]);
 
   const grnListData = useSelector(
     (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
@@ -52,6 +51,8 @@ const OrderView = () => {
       setTotalPages(grnListData?.total_pages);
     }
   }, [grnListData]);
+
+  console.log(grnList, "grnList");
 
   const fetchItems = async () => {
     try {
@@ -79,28 +80,58 @@ const OrderView = () => {
     setSelectedItemIds(newSelected);
   };
 
+  // const handleItemSelectionforinstore = (rowData) => {
+  //   console.log(rowData, "rowData");
+  //   const selectedIndex1 = grnList.indexOf(rowData.id);
+  //   const updatedRowData = {
+  //     ...rowData,
+  //     instore: selectedIndex1 === -1 ? 1 : 0,
+  //   };
+
+  //   const updatedProductData = grnList.map((grn) =>
+  //     grn.id === rowData.id ? updatedRowData : grn
+  //   );
+  //   console.log(updatedProductData,"updatedProductData")
+
+  //   setGrnList(updatedProductData);
+  // };
+
   const handleItemSelectionforinstore = (rowData) => {
-    const selectedIndex = selectedItemIdsforinstore.indexOf(rowData.id);
-    const newSelected =
-      selectedIndex !== -1
-        ? selectedItemIdsforinstore.filter((id) => id !== rowData.id)
-        : [...selectedItemIdsforinstore, rowData.id];
-  
-    const updatedRowData = { ...rowData, instore: selectedIndex === -1 ? 1 : 0 };
-  
-    if (selectedIndex === -1) {
-      setSelectedItemsforinstore([...selectedItemsforinstore, updatedRowData]);
-    } else {
-      setSelectedItemsforinstore(selectedItemsforinstore.filter((item) => item.id !== rowData.id));
-    }
-  
-    setSelectedItemIdsforinstore(newSelected);
+    const selectedIndex1 = grnList.indexOf(rowData.id);
+    rowData.instore = 1;
+    setSelectedInstores((prevSelectedOrders) => [
+      ...prevSelectedOrders,
+      rowData,
+    ]);
+
+    const updatedRowData = {
+      ...rowData,
+      instore: selectedIndex1 === -1 ? 1 : 0,
+    };
+
+    const updatedProductData = grnList.map((grn) =>
+      grn.id === rowData.id ? updatedRowData : grn
+    );
+
+    setGrnList(updatedProductData);
   };
 
+  const handleUpdatedValues = async () => {
+    setSelectedItems([]);
+    setSelectedInstores([]);
+    fetchItems();
+  };
+
+  useEffect(() => {
+    handleUpdatedValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   const handleOrderPerp = async () => {
+    console.log(grnList, "selectedItems");
     console.log(selectedItems, "selectedItems");
-    const orderId = selectedItems.map((item) => item.order_id);
-    // const quantity = selectedOrders.map((order) => order.qty_fullfilled);
+    const orderId = [grnListData.order_id];
     const grnNo = selectedItems.map((item) => item.grn_no);
     const productIdd = selectedItems.map((item) =>
       parseInt(item.product_id, 10)
@@ -109,6 +140,9 @@ const OrderView = () => {
       parseInt(item.variation_id, 10)
     );
     const poIdd = selectedItems.map((item) => item.po_id);
+    const instoreValues = selectedInstores.map((order) =>
+      order.instore
+    );
 
     if (selectedItems.length === 0) {
       await ShowAlert(
@@ -162,13 +196,15 @@ const OrderView = () => {
         product_id: productIdd,
         po_id: poIdd,
         order_id: orderId,
-        // quantity: quantity,
         grn_no: grnNo,
         variation_id: variationIdd,
+        instore: instoreValues,
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
 
+
       try {
+        console.log(requestedDataP,"requestedDataP")
         await dispatch(AddProductOrderForPre({ requestedDataP })).then(
           ({ payload }) => {
             console.log(payload, "payload from AddProductOrderForPre");
@@ -176,8 +212,8 @@ const OrderView = () => {
               ShowAlert(
                 "Items sent for prep successfully!",
                 "",
-                "success", 
-                false, 
+                "success",
+                false,
                 false,
                 "",
                 "",
@@ -189,8 +225,8 @@ const OrderView = () => {
               ShowAlert(
                 "error while sending items for prep!",
                 "",
-                "error", 
-                false, 
+                "error",
+                false,
                 false,
                 "",
                 "",
@@ -274,20 +310,25 @@ const OrderView = () => {
       field: "select_for_store",
       headerName: "In Store",
       flex: 0.5,
-      renderCell: (params) => (
-        <FormGroup>
-          <FormControlLabel
-            className="mx-auto"
-            control={
-              <Checkbox
-                checked={selectedItemIdsforinstore.includes(params.row.id)}
-                onChange={() => handleItemSelectionforinstore(params.row)}
-              />
-            }
-            style={{ justifyContent: "center" }}
-          />
-        </FormGroup>
-      ),
+      renderCell: (params) => {
+        let productInstore = grnList?.find(
+          (grn) => grn.id === params.row.id
+        );
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={
+                <Checkbox
+                  checked={productInstore.instore == 1 ? true : false}
+                  onChange={() => handleItemSelectionforinstore(params.row)}
+                />
+              }
+              style={{ justifyContent: "center" }}
+            />
+          </FormGroup>
+        );
+      },
     },
   ];
 

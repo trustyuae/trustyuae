@@ -35,14 +35,13 @@ function OnHoldManagement() {
   const [totalPages, setTotalPages] = useState(1);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [selectedInstores, setSelectedInstores] = useState([]);
   const [productData, setProductData] = useState([]);
   const [productDetailsData, setProductDetailsData] = useState([]);
   const [productOverallData, setProductOverallData] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
   const loader = useSelector((state) => state?.p3System?.isLoading);
   const [isChecked, setIsChecked] = useState(false);
-
-  const [selectedItems, setSelectedItems] = useState([]);
 
   const productDetailsDataa = useSelector(
     (state) => state?.p3System?.productDetails
@@ -108,6 +107,32 @@ function OnHoldManagement() {
     }
   };
 
+  const handleItemSelection = (rowData) => {
+    const selectedIndex1 = productData.indexOf(rowData.id);
+    rowData.instore = 1;
+    setSelectedInstores((prevSelectedOrders) => [
+      ...prevSelectedOrders,
+      rowData,
+    ]);
+
+    const updatedRowData = {
+      ...rowData,
+      instore: selectedIndex1 === -1 ? 1 : 0,
+    };
+
+    const updatedProductData = productData.map((product) =>
+      product.id === rowData.id ? updatedRowData : product
+    );
+
+    setProductData(updatedProductData);
+  };
+
+  const handleUpdatedValues = async () => {
+    setSelectedOrders([]);
+    setSelectedInstores([]);
+    fetchProductDetails();
+  };
+
   useEffect(() => {
     handleUpdatedValues();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,19 +144,14 @@ function OnHoldManagement() {
   }, [params.id, params.grn_no, params.variation_id]);
 
   const handleOrderPerp = async () => {
+    console.log(selectedOrders, "selectedOrders");
+    console.log(selectedInstores, "selectedInstores");
     const orderId = selectedOrders.map((order) => order.order_id);
-    const grnNo = selectedOrders.map((order) => order.grn_no);
-    const productIdd = selectedOrders.map((order) =>
-      parseInt(order.product_id, 10)
-    );
-    const variationIdd = selectedOrders.map((order) =>
-      parseInt(order.variation_id, 10)
-    );
+    const grnNo = [productOverallData.grn_no];
+    const productIdd = [productOverallData.product_id];
+    const variationIdd = [productOverallData.variation_id];
     const poIdd = [productOverallData.po_id];
-
-    const instoreValues = productData.map((order) =>
-      order.instore ? order.instore : 0
-    );
+    const instoreValues = selectedInstores.map((order) => order.instore);
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
@@ -190,6 +210,7 @@ function OnHoldManagement() {
         instore: instoreValues,
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
+      console.log(requestedDataP, "requestedDataP");
 
       try {
         await dispatch(AddProductOrderForPre({ requestedDataP })).then(
@@ -259,25 +280,6 @@ function OnHoldManagement() {
       .catch((error) => {
         console.error(error);
       });
-  };
-
-  const handleUpdatedValues = async () => {
-    setSelectedOrders([]);
-    fetchProductDetails();
-  };
-
-  const handleItemSelection = (rowData) => {
-    const selectedIndex1 = productData.indexOf(rowData.id);
-    const updatedRowData = {
-      ...rowData,
-      instore: selectedIndex1 === -1 ? 1 : 0,
-    };
-
-    const updatedProductData = productData.map((product) =>
-      product.id === rowData.id ? updatedRowData : product
-    );
-
-    setProductData(updatedProductData);
   };
 
   const columns = [
