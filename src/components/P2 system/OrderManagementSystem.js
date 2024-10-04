@@ -257,6 +257,7 @@ function OrderManagementSystem() {
   };
 
   const handleUpdateForMultiProd = () => {
+    setSelectedFactoryName(null);
     const ProductIds = selectedAgainstOrderDetails.map((order) =>
       parseInt(order.item_id, 10)
     );
@@ -265,6 +266,7 @@ function OrderManagementSystem() {
       factory_id: selectedFactoryName,
     };
     dispatch(AssignFactoryToMultiProduct({ payload })).then(({ payload }) => {
+      setSelectedAgainstOrderDetails([]);
       setSelectedOrderIds([]);
       setSelectedFactoryName("");
       if (payload) {
@@ -277,6 +279,7 @@ function OrderManagementSystem() {
       }
     });
   };
+
 
   const handleUpdate = (rowData) => {
     const id = rowData.item_id;
@@ -1349,9 +1352,13 @@ function OrderManagementSystem() {
                       label: factory.factory_name,
                       value: factory.id,
                     }))}
-                    value={factories.find(
-                      (option) => option.value === selectedFactoryName
-                    )}
+                    value={
+                      selectedFactoryName
+                        ? factories?.find(
+                            (option) => option.value === selectedFactoryName
+                          )
+                        : null
+                    }
                     onChange={handleChangeFactoryForMul}
                     isClearable
                     placeholder="Select Factory"
