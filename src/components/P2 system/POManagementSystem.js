@@ -74,13 +74,6 @@ function POManagementSystem() {
     }
   }, [factoryData]);
 
-  useEffect(()=>{
-    if (currentPage) {
-      dispatch(clearStoreData({ tableId: 'POManagementSystem' }));
-      setPage(currentPage);
-    }
-  },[currentPage])
-
   const POM_system_products = async () => {
     try {
       let apiUrl;
@@ -124,6 +117,10 @@ function POManagementSystem() {
   }, []);
 
   useEffect(() => {
+    if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'POManagementSystem' }));
+      setPage(currentPage);
+    }
     POM_system_products();
   }, [
     page,
@@ -134,6 +131,7 @@ function POManagementSystem() {
     PoStatus,
     searchPoID,
     poType,
+    currentPage
   ]);
 
   const handleDateChange = (newDateRange) => {

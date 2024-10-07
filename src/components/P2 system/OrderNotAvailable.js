@@ -67,14 +67,11 @@ function OrderNotAvailable() {
     }
   }, [factoryData]);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (currentPage) {
       dispatch(clearStoreData({ tableId: 'OrderNotAvailable' }));
       setPage(currentPage);
     }
-  },[currentPage])
-
-  useEffect(() => {
     if (ordersNotAvailableOverAllData) {
       const orderNotAvailable = ordersNotAvailableOverAllData?.orders?.map(
         (v, i) => ({
@@ -96,7 +93,7 @@ function OrderNotAvailable() {
       setOrdersNotAvailableData(orderNotAvailable);
       setTotalPages(orderNotAvailable?.total_pages);
     }
-  }, [ordersNotAvailableOverAllData]);
+  }, [ordersNotAvailableOverAllData,currentPage]);
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
