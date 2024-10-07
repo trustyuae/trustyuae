@@ -19,23 +19,26 @@ const InnerContainer = styled(Box)(({ theme }) => ({
   backgroundColor: "#FCFCFC",
   display: "flex",
   flex: 1,
-  flexdirection: "row",
+  flexDirection: "row",
   overflow: "hidden",
   height: "100%",
 }));
 
-const StyledMain = styled("main")(({ theme }) => ({
+const StyledMain = styled("main")(({ theme, isSidebarVisible }) => ({
   height: "100%",
   flex: 1,
   overflow: "auto",
   width: "100%",
   paddingTop: "65px",
   paddingBottom: "6rem",
-  backgroundColor: 'rgb(241, 239, 241)'
+  backgroundColor: 'rgb(241, 239, 241)',
+  marginLeft: isSidebarVisible ? "300px" : "0px", // Conditional margin-left based on sidebar visibility
+  transition: "margin-left 0.3s ease", // Add smooth transition for better UX
 }));
 
 export const Layout = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+
   useEffect(() => {
     function handleResize() {
       setIsSidebarVisible(window.innerWidth > 1024);
@@ -48,14 +51,14 @@ export const Layout = () => {
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
+
   return (
     <OuterContainer>
       <InnerContainer>
-        {/* <Header /> */}
         <Header onToggleSidebar={toggleSidebar} />
-        {/* <SideBar /> */}
         {isSidebarVisible && <SideBar />}
-        <StyledMain id="main" className="overflow-visible">
+        {/* Pass isSidebarVisible as a prop to StyledMain */}
+        <StyledMain id="main" isSidebarVisible={isSidebarVisible} className="overflow-visible">
           <Card className="border-0 p-2 overflow-visible">
             <Outlet />
           </Card>
