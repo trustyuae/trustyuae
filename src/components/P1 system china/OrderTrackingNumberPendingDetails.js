@@ -263,8 +263,10 @@ function OrderTrackingNumberPendingDetails() {
       return;
     }
 
-    const productIDD = selectedItems.map((item) => item.item_id);
-    const variationIDD = selectedItems.map((item) => item.variation_id);
+    const productIDD = selectedItems.map((item) => parseInt(item.item_id, 10));
+    const variationIDD = selectedItems.map((item) =>
+      parseInt(item.variation_id, 10)
+    );
     const payload = {
       order_id: parseInt(orderDetails.order_id, 10),
       product_id: productIDD,
@@ -274,7 +276,7 @@ function OrderTrackingNumberPendingDetails() {
 
     console.log(payload, "payload");
     dispatch(InstoreStatusUpdate({ payload }))
-      .unwrap() // Use `.unwrap()` to handle the resolved promise or errors.
+      .unwrap()
       .then((response) => {
         console.log("Success:", response);
         ShowAlert(
@@ -288,6 +290,7 @@ function OrderTrackingNumberPendingDetails() {
           2000
         );
         setSelectedItems([]);
+        setSelectedItemIds([]);
         fetchOrder();
       })
       .catch((error) => {

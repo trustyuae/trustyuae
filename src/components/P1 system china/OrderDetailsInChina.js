@@ -316,8 +316,10 @@ function OrderDetailsInChina() {
       return;
     }
 
-    const productIDD = selectedItems.map((item) => item.item_id);
-    const variationIDD = selectedItems.map((item) => item.variation_id);
+    const productIDD = selectedItems.map((item) => parseInt(item.item_id, 10));
+    const variationIDD = selectedItems.map((item) =>
+      parseInt(item.variation_id, 10)
+    );
     const payload = {
       order_id: parseInt(orderDetails.order_id, 10),
       product_id: productIDD,
@@ -341,6 +343,7 @@ function OrderDetailsInChina() {
           2000
         );
         setSelectedItems([]);
+        setSelectedItemIds([]);
         fetchOrder();
       })
       .catch((error) => {
@@ -1506,44 +1509,44 @@ function OrderDetailsInChina() {
               {t("P1ChinaSystem.OrderDetails")}
             </Typography>
             <Box className="d-flex">
-                <Box
+              <Box
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <CheckCircle
                   style={{
+                    color: blue[500],
+                    transition: "transform 0.15s ease",
                     display: "flex",
                     alignItems: "center",
+                    cursor: "pointer",
                   }}
-                >
-                  <CheckCircle
-                    style={{
-                      color: blue[500],
-                      transition: "transform 0.15s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleInstoreStatus(1)}
-                  />
-                  <span style={{ marginLeft: 8 }}>In Store</span>
-                </Box>
-                <Box
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginLeft: 20,
-                  }}
-                >
-                  <Cancel
-                    style={{
-                      color: red[500],
-                      transition: "transform 0.15s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleInstoreStatus(0)}
-                  />
-                  <span style={{ marginLeft: 8 }}>In Store</span>
-                </Box>
+                  onClick={() => handleInstoreStatus(1)}
+                />
+                <span style={{ marginLeft: 8 }}>In Store</span>
               </Box>
+              <Box
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginLeft: 20,
+                }}
+              >
+                <Cancel
+                  style={{
+                    color: red[500],
+                    transition: "transform 0.15s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleInstoreStatus(0)}
+                />
+                <span style={{ marginLeft: 8 }}>In Store</span>
+              </Box>
+            </Box>
           </Box>
           {loader ? (
             <Loader />
