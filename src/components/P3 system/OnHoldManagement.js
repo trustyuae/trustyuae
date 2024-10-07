@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Alert,
   Box,
@@ -26,9 +26,11 @@ import {
 import Swal from "sweetalert2";
 import { CheckCircle, Cancel } from "@mui/icons-material";
 import { green, red, grey } from "@mui/material/colors";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function OnHoldManagement() {
   const params = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
@@ -355,10 +357,27 @@ function OnHoldManagement() {
     setPage(e.target.value);
   };
 
-  console.log(productData, "productData from onhold management system");
+  const handalBackButton = () => {
+    navigate(`/GRN_View/${params.grn_no}`);
+  };
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
+      <MDBRow className="my-3">
+        <MDBCol
+          md="5"
+          className="d-flex justify-content-start align-items-center"
+        >
+          <Button
+            variant="outline-secondary"
+            className="p-1 me-2 bg-transparent text-secondary"
+            onClick={handalBackButton}
+          >
+            <ArrowBackIcon className="me-1" />
+          </Button>
+          <Box></Box>
+        </MDBCol>
+      </MDBRow>
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
           On-hold Management

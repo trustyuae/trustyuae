@@ -220,6 +220,7 @@ const OrderView = () => {
                 2000
               );
               setSelectedItems([]);
+              setSelectedItemIds([])
               fetchItems();
             } else {
               ShowAlert(
