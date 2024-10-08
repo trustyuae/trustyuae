@@ -32,26 +32,27 @@ export default function DataTable({
         height: "100%",
       }}
     >
-       {!hidePagination && (paginationPosition === "top" || paginationPosition === "both") && (
-        <Box
-          sx={{
-            marginTop: "auto",
-            display: "flex",
-            justifyContent: "flex-end",
-            padding: "8px 0",
-          }}
-        >
-          <Pagination
+      {!hidePagination &&
+        (paginationPosition === "top" || paginationPosition === "both") && (
+          <Box
             sx={{
-              marginBottom: 0,
+              marginTop: "auto",
+              display: "flex",
+              justifyContent: "flex-end",
+              padding: "8px 0",
             }}
-            count={totalPages}
-            page={page}
-            variant="outlined"
-            onChange={handleChange}
-          />
-        </Box>
-      )}
+          >
+            <Pagination
+              sx={{
+                marginBottom: 0,
+              }}
+              count={totalPages}
+              page={page}
+              variant="outlined"
+              onChange={handleChange}
+            />
+          </Box>
+        )}
       <Box
         sx={{
           flex: 1,
@@ -163,7 +164,6 @@ export default function DataTable({
               }
             }
             if (params.colDef.className == "factory-status") {
-              console.log(params.row.inactive,"params.row.inactive")
               if (!params.row.inactive) {
                 return "";
               }
@@ -187,32 +187,49 @@ export default function DataTable({
                 return "bg-yellow";
               }
             }
+            if (params.colDef.className == "order-details-in-china") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === "1") {
+                return "bg-yellow";
+              }
+            }
+            if (params.colDef.className == "onhold-management-p3") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === 1) {
+                return "bg-yellow";
+              }
+            }
           }}
           checkboxSelection={checkboxSelection}
           onCellEditStart={onCellEditStart}
           processRowUpdate={processRowUpdate}
         />
       </Box>
-      {!hidePagination && (paginationPosition !== "top" || paginationPosition === "both") && (
-        <Box
-          sx={{
-            marginTop: "auto",
-            display: "flex",
-            justifyContent: "flex-end",
-            padding: "8px 0",
-          }}
-        >
-          <Pagination
+      {!hidePagination &&
+        (paginationPosition !== "top" || paginationPosition === "both") && (
+          <Box
             sx={{
-              marginBottom: 0,
+              marginTop: "auto",
+              display: "flex",
+              justifyContent: "flex-end",
+              padding: "8px 0",
             }}
-            count={totalPages}
-            page={page}
-            variant="outlined"
-            onChange={handleChange}
-          />
-        </Box>
-      )}
+          >
+            <Pagination
+              sx={{
+                marginBottom: 0,
+              }}
+              count={totalPages}
+              page={page}
+              variant="outlined"
+              onChange={handleChange}
+            />
+          </Box>
+        )}
     </Box>
   );
 }

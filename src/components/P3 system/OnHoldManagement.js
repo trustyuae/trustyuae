@@ -110,21 +110,22 @@ function OnHoldManagement() {
   };
 
   const handleItemSelection = (rowData) => {
-    const selectedIndex1 = productData.indexOf(rowData.id);
-    rowData.instore = 1;
-    setSelectedInstores((prevSelectedOrders) => [
-      ...prevSelectedOrders,
-      rowData,
-    ]);
-
     const updatedRowData = {
       ...rowData,
-      instore: selectedIndex1 === -1 ? 1 : 0,
+      instore: rowData.instore === 1 ? 0 : 1,
     };
 
     const updatedProductData = productData.map((product) =>
       product.id === rowData.id ? updatedRowData : product
     );
+
+    setSelectedInstores((prevSelectedOrders) => {
+      if (updatedRowData.instore === 1) {
+        return [...prevSelectedOrders, updatedRowData];
+      } else {
+        return prevSelectedOrders.filter((item) => item.id !== rowData.id);
+      }
+    });
 
     setProductData(updatedProductData);
   };
@@ -146,14 +147,20 @@ function OnHoldManagement() {
   }, [params.id, params.grn_no, params.variation_id]);
 
   const handleOrderPerp = async () => {
-    console.log(selectedOrders, "selectedOrders");
-    console.log(selectedInstores, "selectedInstores");
+    let data = [];
+    productData.forEach((product) => {
+      selectedOrders.forEach((order) => {
+        if (product.order_id == order.order_id) {
+          data.push(product);
+        }
+      });
+    });
     const orderId = selectedOrders.map((order) => order.order_id);
     const grnNo = [productOverallData.grn_no];
     const productIdd = [productOverallData.product_id];
     const variationIdd = [productOverallData.variation_id];
     const poIdd = [productOverallData.po_id];
-    const instoreValues = selectedInstores.map((order) => order.instore);
+    const instoreValues = data.map((order) => order.instore);
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
@@ -212,7 +219,6 @@ function OnHoldManagement() {
         instore: instoreValues,
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
-      console.log(requestedDataP, "requestedDataP");
 
       try {
         await dispatch(AddProductOrderForPre({ requestedDataP })).then(
@@ -289,17 +295,19 @@ function OnHoldManagement() {
       field: "order_id",
       headerName: "Order ID",
       flex: 1,
+      className:'onhold-management-p3',
       renderCell: (params) => {
         const orderId =
           params.row.order_id !== "0" ? params.row.order_id : "No Order ID Avl";
         return <div>{orderId}</div>;
       },
     },
-    { field: "shipping_country", headerName: "Shipping Country", flex: 1 },
+    { field: "shipping_country", headerName: "Shipping Country", flex: 1, className:'onhold-management-p3'},
     {
       field: "item_received",
       headerName: "Item Received",
       flex: 1,
+      className:'onhold-management-p3',
       valueGetter: (value, row) => {
         return `${row.qty_fullfilled} / ${row.qty_received}`;
       },
@@ -308,6 +316,7 @@ function OnHoldManagement() {
       field: "select",
       headerName: "Select",
       flex: 0.5,
+      className:'onhold-management-p3',
       renderCell: (params) => {
         return (
           <FormGroup>
@@ -326,17 +335,19 @@ function OnHoldManagement() {
       field: "selectin store",
       headerName: "In Store",
       flex: 0.5,
+      className:'onhold-management-p3',
       renderCell: (params) => {
-        let productInstore = productData?.find(
+        let productInstore = productData.find(
           (prod) => prod.id === params.row.id
         );
+
         return (
           <FormGroup>
             <FormControlLabel
               className="mx-auto"
               control={
                 <Checkbox
-                  checked={productInstore.instore == 1 ? true : false}
+                  checked={productInstore?.instore === 1}
                   onChange={() => handleItemSelection(params.row)}
                 />
               }
