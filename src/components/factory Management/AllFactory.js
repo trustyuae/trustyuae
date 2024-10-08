@@ -59,9 +59,12 @@ function AllFactory() {
     }
   }, [currentPage]);
 
+  console.log(factoryType,"factoryType")
+
   async function fetchFactories() {
     try {
       let apiUrl = `wp-json/custom-factory/v1/fetch-factories/?page=${page}&per_page=${pageSize}`;
+      if (factoryType) apiUrl += `&inactive=${factoryType}`;
       const params = {
         factory_name: factoryName,
         address: address,
@@ -87,6 +90,7 @@ function AllFactory() {
     contactPerson,
     contactNumber,
     email,
+    factoryType
   ]);
 
   const handleEdit = (factoryId) => {
@@ -327,8 +331,8 @@ function AllFactory() {
               onChange={(e) => searchFactoryTypeFilter(e.target.value)}
             >
               <option value="">Select Factory Type</option>
-              <option value="all">Active</option>
-              <option value="dispatch">InActive</option>
+              <option value="0">Active</option>
+              <option value="1">InActive</option>
             </Form.Select>
           </Form.Group>
         </MDBCol>
