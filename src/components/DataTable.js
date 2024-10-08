@@ -171,6 +171,22 @@ export default function DataTable({
                 return "bg-grey";
               }
             }
+            if (params.colDef.className == "order-details-tracking-pending") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === "1") {
+                return "bg-yellow";
+              }
+            }
+            if (params.colDef.className == "order-details-in-china") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === "1") {
+                return "bg-yellow";
+              }
+            }
           }}
           checkboxSelection={checkboxSelection}
           onCellEditStart={onCellEditStart}
