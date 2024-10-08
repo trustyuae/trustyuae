@@ -72,10 +72,6 @@ function GRNManagement_OrderIds() {
       (state) => state.pagination.currentPage["GrnManagementOnOrderBasis"]
     ) || 1;
 
-  // const grnListData = useSelector(
-  //   (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
-  // );
-
   const grnListData = useSelector(
     (state) => state?.p3System?.grnListOnOrderIds
   );
@@ -93,10 +89,8 @@ function GRNManagement_OrderIds() {
       setPage(currentPage);
     }
     if (grnListData) {
-      // const grnData = grnListData?.items?.map((v, i) => ({ ...v, id: i }));
       const grnData = grnListData?.orders?.map((v, i) => ({ ...v, id: i }));
       setGrnListOverAllData(grnData);
-      // setGrnList(grnData);
       setTotalPages(grnListData?.total_pages);
     }
   }, [grnListData, currentPage]);
@@ -174,32 +168,6 @@ function GRNManagement_OrderIds() {
         return <Box>{dayDifference} days</Box>;
       },
     },
-    // {
-    //   field: "status",
-    //   headerName: "Status",
-    //   flex: 1,
-    //   type: "string",
-    // },
-    // {
-    //   field: "po_id",
-    //   headerName: "Po Ref No.",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     const poId = params.row.po_id;
-    //     return <div>{poId ? poId : "No PO ref"}</div>;
-    //   },
-    // },
-    // {
-    //   field: "factory_id",
-    //   headerName: "Factory Name",
-    //   flex: 1,
-    //   renderCell: (params) => {
-    //     const factory = factories.find(
-    //       (factory) => factory.id == params.row.factory_id
-    //     );
-    //     return <Box>{factory?.factory_name}</Box>;
-    //   },
-    // },
     {
       field: "grn_note",
       headerName: "Remark",

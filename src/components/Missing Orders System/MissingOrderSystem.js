@@ -41,7 +41,6 @@ function MissingOrderSystem() {
     total_reserve_orders: 0,
   });
   const loader = useSelector((state) => state?.orderSystemData?.isOrders);
-  // const currentPage = useSelector((state) => state.pagination.currentPage);
   const currentPage = useSelector((state) => state.pagination.currentPage['MissingOrderSystem']) || 1;
 
   useEffect(() => {
@@ -148,7 +147,6 @@ function MissingOrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'MissingOrderSystem', page: value }));
   };
 

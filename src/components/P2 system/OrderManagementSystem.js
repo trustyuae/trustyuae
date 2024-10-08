@@ -78,11 +78,7 @@ function OrderManagementSystem() {
   const [endDate, setEndDate] = useState("");
   const [selectedDateRange, setSelectedDateRange] = useState([null, null]);
   const [factories, setFactories] = useState([]);
-
-  //selected  factory filter
   const [selectedFactory, setSelectedFactory] = useState("");
-
-  //selected Product filter
   const [manualProductF, setManualProductF] = useState("");
 
   const [manualNote, setManualNote] = useState("");
@@ -495,9 +491,6 @@ function OrderManagementSystem() {
       field: "variation_values",
       headerName: "Variation values",
       flex: 1,
-      // renderCell: (params) => {
-      //   return variant2(params.row.variation_values);
-      // },
       renderCell: renderVariationValues,
     },
     {
@@ -580,9 +573,6 @@ function OrderManagementSystem() {
       field: "variation_values",
       headerName: "Variation values",
       flex: 1,
-      // renderCell: (params) => {
-      //   return variant2(params.row.variation_values);
-      // },
       renderCell: renderVariationValues,
     },
     {
@@ -1141,14 +1131,7 @@ function OrderManagementSystem() {
     return details.join(", ");
   };
 
-  // const handleChange = (event, value) => {
-  //   setPage(value);
-  //   let currIndex = value * pageSize - pageSize + 1;
-  //   setCurrentStartIndex(currIndex, "currIndex");
-  // };
-
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: "OrderManagementSystem", page: value }));
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
@@ -1356,21 +1339,6 @@ function OrderManagementSystem() {
               </Row>
               <Row className="mt-3">
                 <Box className="d-flex justify-content-end">
-                  {/* <Form.Group className="fw-semibold mb-0">
-                    <Form.Select
-                      as="select"
-                      className="mr-sm-2"
-                      value={selectedFactoryName} // Keep track of the selected factory
-                      onChange={(e) => setSelectedFactoryName(e.target.value)}
-                    >
-                      <option value="">{"Please Assign factory"}</option>
-                      {factories?.map((factory) => (
-                        <option key={factory.id} value={factory.id}>
-                          {factory.factory_name}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group> */}
                   <Select
                     options={factories?.map((factory) => ({
                       label: factory.factory_name,

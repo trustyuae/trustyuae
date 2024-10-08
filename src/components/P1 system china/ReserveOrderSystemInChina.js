@@ -50,7 +50,6 @@ function ReserveOrderSystemInChina() {
     (state) => state?.orderSystemChina?.reserveOrders
   );
 
-  // const currentPage = useSelector((state) => state.pagination.currentPage);
   const currentPage = useSelector((state) => state.pagination.currentPage['ReserveOrderSystemInChina']) || 1;
 
   useEffect(() => {

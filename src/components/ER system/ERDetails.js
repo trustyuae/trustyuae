@@ -265,12 +265,6 @@ const ERDetails = () => {
               received_status: "Partially received",
             };
           }
-
-          //else if(event.order_qty>=index.target.value){
-          //     return { ...item, returned_qty: index.target.value,received_status:'Partially received' }
-          // }else if(index.target.value===0){
-          //     return { ...item, returned_qty: index.target.value,received_status:'Not Received' }
-          // }
           return { ...item, returned_qty: index.target.value };
         }
         return item;

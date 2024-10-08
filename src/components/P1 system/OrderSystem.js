@@ -218,7 +218,6 @@ function OrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'OrderSystem', page: value }));
   };
 
@@ -258,8 +257,6 @@ function OrderSystem() {
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
 

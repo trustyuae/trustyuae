@@ -20,7 +20,6 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     const cardX = (pageWidth - cardWidth) / 2;
     const cardY = (pageHeight - cardHeight) / 2;
 
-    // Draw outer border of the card
     doc.setLineWidth(borderWidth);
     doc.setDrawColor(0); // Black border color
     doc.rect(cardX, cardY, cardWidth, cardHeight);
@@ -53,9 +52,6 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
 
     doc.setFontSize(12); // Reduce font size for details// Reset font style
     // doc.setFontStyle("normal");
-
-    // Draw horizontal line above address
-    // doc.line(cardX, addressY - 5, cardX + cardWidth, addressY - 5);
 
     // Print customer details
     doc.text(`Order Id : ${customerData.order_id}`, cardContentX, titleY + 10);

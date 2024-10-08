@@ -47,7 +47,6 @@ function GRNManagement() {
   const [factories, setFactories] = useState([]);
 
   const factoryData = useSelector((state) => state?.factory?.factories);
-  // const currentPage = useSelector((state) => state.pagination.currentPage);
   const grnListData = useSelector((state) => state?.p3System?.grnList);
   const currentPage = useSelector((state) => state.pagination.currentPage['GRNManagement']) || 1;
 
@@ -219,7 +218,6 @@ function GRNManagement() {
   };
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'GRNManagement', page: value }));
   };
 

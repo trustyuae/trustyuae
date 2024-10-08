@@ -80,7 +80,7 @@ function OrderSystemInChina() {
   const orderDetails = useSelector(
     (state) => state?.orderSystemChina?.orderDetails
   );
-  // const currentPage = useSelector((state) => state.pagination.currentPage);
+
   const currentPage = useSelector((state) => state.pagination.currentPage['OrderSystemInChina']) || 1;
 
   useEffect(() => {
@@ -282,7 +282,6 @@ function OrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'OrderSystemInChina', page: value }));
   };
 
@@ -337,8 +336,6 @@ function OrderSystemInChina() {
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
 

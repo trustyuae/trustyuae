@@ -173,12 +173,10 @@ const PoDetails = () => {
 
   useEffect(() => {
     fetchPO();
-    // getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, page]);
 
   useEffect(() => {
-    // fetchPO();
     getMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setMessages]);
@@ -263,7 +261,7 @@ const PoDetails = () => {
       ),
       received_quantity: updatelist.map((item) => item.received_quantity),
     };
-    // Check if availability_status is not empty
+
     const availabilityStatuses = updatelist.map((item) =>
       item.availability_status
         ? item.availability_status
@@ -273,7 +271,6 @@ const PoDetails = () => {
     );
     const flattenedStatuses = availabilityStatuses.flat();
 
-    // Validate only if availability_status is not empty
     if (flattenedStatuses.length > 0) {
       const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
 
@@ -283,14 +280,11 @@ const PoDetails = () => {
           title: validationMessage,
           showConfirmButton: true,
         });
-        return; // Stop execution if validation fails
+        return; 
       }
-
-      // Include availability_status in updatedData
       updatedData.availability_status = availabilityStatuses;
     }
 
-    // Proceed with dispatch update action
     let apiUrl = `wp-json/custom-available-status/v1/estimated-status/${id}`;
     await dispatch(UpdatePODetails({ apiUrl, payload: updatedData })).then(
       ({ payload }) => {
@@ -845,14 +839,6 @@ const PoDetails = () => {
                     >
                       <List>
                         {messages?.map(({ id, po_note, note_time }, i) => (
-                          // <ListItem key={i} className="d-flex justify-content-start">
-                          //   <ListItemText
-                          //     primary={po_note}
-                          //     secondary={note_time}
-                          //     className="rounded p-2"
-                          //     style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
-                          //   />
-                          // </ListItem>
                           <ListItem
                             key={i}
                             className="d-flex justify-content-start"

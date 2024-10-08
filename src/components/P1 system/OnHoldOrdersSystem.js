@@ -204,8 +204,6 @@ function OnHoldOrdersSystem() {
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
   const clearDateRange = () => {

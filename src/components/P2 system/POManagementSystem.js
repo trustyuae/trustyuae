@@ -85,7 +85,6 @@ function POManagementSystem() {
         apiUrl = `wp-json/custom-so-management/v1/generated-so-order/?&per_page=${pageSize}&page=${page}`;
       }
 
-      // Build query parameters based on selected filters
       const params = {};
       if (searchPoID) params.po_id = searchPoID;
       if (startDate && endDate) {
@@ -95,7 +94,6 @@ function POManagementSystem() {
       if (selectedFactory) params.factory_id = selectedFactory;
       if (PoStatus) params.status = PoStatus;
 
-      // Construct the final API URL with query parameters
       dispatch(
         PomSystemProductsDetails({
           apiUrl: `${apiUrl}&${new URLSearchParams(params).toString()}`,
@@ -279,7 +277,6 @@ function POManagementSystem() {
   };
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'POManagementSystem', page: value }));
   };
 

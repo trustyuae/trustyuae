@@ -39,7 +39,6 @@ function ERManagement() {
 
   const factoryData = useSelector((state) => state?.factory?.factories);
 
-  // const currentPage = useSelector((state) => state.pagination.currentPage);
   const currentPage = useSelector((state) => state.pagination.currentPage['ERManagement']) || 1;
 
   const radios = [
@@ -158,7 +157,6 @@ function ERManagement() {
   ];
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'ERManagement', page: value }));
   };
 

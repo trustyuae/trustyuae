@@ -190,7 +190,6 @@ function CompletedOrderSystem() {
   ];
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'CompletedOrderSystem', page: value }));
   };
 
@@ -250,7 +249,6 @@ function CompletedOrderSystem() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
   }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
 
   return (

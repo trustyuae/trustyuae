@@ -80,22 +80,6 @@ const OrderView = () => {
     setSelectedItemIds(newSelected);
   };
 
-  // const handleItemSelectionforinstore = (rowData) => {
-  //   console.log(rowData, "rowData");
-  //   const selectedIndex1 = grnList.indexOf(rowData.id);
-  //   const updatedRowData = {
-  //     ...rowData,
-  //     instore: selectedIndex1 === -1 ? 1 : 0,
-  //   };
-
-  //   const updatedProductData = grnList.map((grn) =>
-  //     grn.id === rowData.id ? updatedRowData : grn
-  //   );
-  //   console.log(updatedProductData,"updatedProductData")
-
-  //   setGrnList(updatedProductData);
-  // };
-
   const handleItemSelectionforinstore = (rowData) => {
     const selectedIndex1 = grnList.indexOf(rowData.id);
     rowData.instore = 1;
@@ -459,15 +443,9 @@ const OrderView = () => {
         </MDBRow>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end mt-3">
-            {/* {productData?.length === 0 ? (
-            <Button variant="success" disabled onClick={handleOrderStock}>
-              Send For InStock
-            </Button>
-          ) : ( */}
             <Button variant="success" onClick={handleOrderPerp}>
               Send for Preparation
             </Button>
-            {/* )} */}
           </MDBCol>
         </MDBRow>
       </Card>

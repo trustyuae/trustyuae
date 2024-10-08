@@ -20,12 +20,10 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     const cardX = (pageWidth - cardWidth) / 2;
     const cardY = (pageHeight - cardHeight) / 2;
 
-    // Draw outer border of the card
     doc.setLineWidth(borderWidth);
     doc.setDrawColor(0); // Black border color
     doc.rect(cardX, cardY, cardWidth, cardHeight);
 
-    // Fill background with light gray
     doc.setFillColor(255, 255, 255);
     doc.rect(
       cardX + borderWidth,
@@ -39,25 +37,17 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     const cardContentY = cardY + 10;
 
     const titleX = cardX + cardWidth / 2;
-    const titleY = cardY + 10; // Adjust for vertical centering
+    const titleY = cardY + 10; 
     doc.setFontSize(16);
-    doc.setTextColor(0); // Black text color
+    doc.setTextColor(0);
 
-    // Print "Shipping Label" with bold font weight
-    // doc.setFontStyle("bold");
     doc.text("Shipping Label", titleX, titleY, { align: "center" });
 
-    // Draw horizontal line below "Shipping Label"
-    doc.setLineWidth(0.3); // Set line width for the separator
+    doc.setLineWidth(0.3);
     doc.line(cardX + 2, titleY + 5, cardX + cardWidth - 2, titleY + 5);
 
-    doc.setFontSize(12); // Reduce font size for details// Reset font style
-    // doc.setFontStyle("normal");
+    doc.setFontSize(12);
 
-    // Draw horizontal line above address
-    // doc.line(cardX, addressY - 5, cardX + cardWidth, addressY - 5);
-
-    // Print customer details
     doc.text(`Order Id : ${customerData.order_id}`, cardContentX, titleY + 10);
     doc.text(
       `Customer Name :${customerData.customer_name} ${customerData?.last_name}`,
@@ -78,8 +68,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     let titleVe = titleY + 42;
 
     function getTextHeight(text) {
-      // Assuming a font size of 12 for demonstration purposes
-      return 12; // Adjust this value based on your actual font size and line height
+      return 12; 
     }
 
     let addressText = `Address : ${customerData?.customer_shipping_address
@@ -89,21 +78,16 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
 
     let text1Height = getTextHeight(addressText);
 
-    // Update titleY for Text 2
-    titleVe += text1Height + 6; // Adjust 8 based on your desired vertical spacing
-
-    // Text 2: Shipping Method
-    // let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
-    // doc.text(shippingMethodText, cardContentX, titleVe);
+    titleVe += text1Height + 6; 
+   
     let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
     let textLines = doc.splitTextToSize(shippingMethodText, cardWidth - 10);
     let shippingTextHeight = textLines.length *6; 
     doc.text(textLines, cardContentX, titleY + 42 + shippingTextHeight);
 
-    doc.setLineWidth(0.3); // Set line width for the separator
+    doc.setLineWidth(0.3); 
     doc.line(cardX + 2, titleVe + 2, cardX + cardWidth - 2, titleVe + 2);
 
-    // Save the PDF with the name "invoice.pdf"
     doc.save("invoice.pdf");
   };
 

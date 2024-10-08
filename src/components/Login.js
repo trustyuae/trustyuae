@@ -105,11 +105,6 @@ const Login = () => {
               <Row className="justify-content-center align-items-center">
                 <Col md={6}>
                   <Box sx={{ height: "350px", width: "100%" }}>
-                    {/* <img
-                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-                      className="h-100 w-100"
-                      alt="Phone"
-                    /> */}
                     <img
                       src={require("../assets/access-control-system.webp")}
                       className="h-100 w-100"

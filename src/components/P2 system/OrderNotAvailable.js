@@ -418,7 +418,6 @@ function OrderNotAvailable() {
   ];
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'OrderNotAvailable', page: value }));
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
@@ -426,10 +425,10 @@ function OrderNotAvailable() {
 
   const handleUpdatedValues = () => {
     const updatedOrders = ordersNotAvailableData.map((order) => {
-      return { ...order, isSelected: false }; // Set isSelected to false for each order
+      return { ...order, isSelected: false };
     });
     setOrdersNotAvailableData(updatedOrders);
-    setSelectedOrderNotAvailable([]); // Clear the selected orders array
+    setSelectedOrderNotAvailable([]);
     setSelectedStatus({ id: 0, status: "" }); //
   };
 
