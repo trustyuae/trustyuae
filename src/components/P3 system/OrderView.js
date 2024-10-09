@@ -65,38 +65,56 @@ const OrderView = () => {
     }
   };
 
-  const handleItemSelection = (rowData) => {
-    const selectedIndex = selectedItemIds.indexOf(rowData.id);
-    const newSelected =
-      selectedIndex !== -1
-        ? selectedItemIds.filter((id) => id !== rowData.id)
-        : [...selectedItemIds, rowData.id];
+  // const handleItemSelection = (rowData) => {
+  //   const selectedIndex = selectedItemIds.indexOf(rowData.id);
+  //   const newSelected =
+  //     selectedIndex !== -1
+  //       ? selectedItemIds.filter((id) => id !== rowData.id)
+  //       : [...selectedItemIds, rowData.id];
 
-    if (selectedIndex === -1) {
-      setSelectedItems([...selectedItems, rowData]);
-    } else {
-      setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+  //   if (selectedIndex === -1) {
+  //     setSelectedItems([...selectedItems, rowData]);
+  //   } else {
+  //     setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
+  //   }
+  //   setSelectedItemIds(newSelected);
+  // };
+
+  const handleCheckboxChange = (e, rowData) => {
+    rowData.isSelected = true;
+    const index = selectedItems?.findIndex((order) => order?.id == rowData.id);
+    if (index === -1 && e.target.checked) {
+      rowData.isSelected = true;
+      setSelectedItems((prevSelectedOrders) => [
+        ...prevSelectedOrders,
+        rowData,
+      ]);
+    } else if (index !== -1 && !e.target.checked) {
+      rowData.isSelected = false;
+      const updatedSelectedOrders = [...selectedItems];
+      updatedSelectedOrders.splice(index, 1);
+      setSelectedItems(updatedSelectedOrders);
     }
-    setSelectedItemIds(newSelected);
   };
 
   const handleItemSelectionforinstore = (rowData) => {
-    const selectedIndex1 = grnList.indexOf(rowData.id);
-    rowData.instore = 1;
-    setSelectedInstores((prevSelectedOrders) => [
-      ...prevSelectedOrders,
-      rowData,
-    ]);
-
+    console.log(rowData,'rowData')
     const updatedRowData = {
       ...rowData,
-      instore: selectedIndex1 === -1 ? 1 : 0,
+      instore: rowData.instore == "1" ? "0" : "1",
     };
 
-    const updatedProductData = grnList.map((grn) =>
-      grn.id === rowData.id ? updatedRowData : grn
+    const updatedProductData = grnList.map((grnList) =>
+      grnList.id === rowData.id ? updatedRowData : grnList
     );
 
+    setSelectedInstores((prevSelectedOrders) => {
+      if (updatedRowData.instore == "1") {
+        return [...prevSelectedOrders, updatedRowData];
+      } else {
+        return prevSelectedOrders.filter((item) => item.id !== rowData.id);
+      }
+    });
     setGrnList(updatedProductData);
   };
 
@@ -111,10 +129,18 @@ const OrderView = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   const handleOrderPerp = async () => {
     console.log(grnList, "selectedItems");
     console.log(selectedItems, "selectedItems");
+    let data = [];
+    grnList.forEach((grn) => {
+      selectedItems.forEach((order) => {
+        if (grn.grn_no == order.grn_no) {
+          data.push(grn);
+        }
+      });
+    });
+    console.log(data,'data')
     const orderId = [grnListData.order_id];
     const grnNo = selectedItems.map((item) => item.grn_no);
     const productIdd = selectedItems.map((item) =>
@@ -124,9 +150,7 @@ const OrderView = () => {
       parseInt(item.variation_id, 10)
     );
     const poIdd = selectedItems.map((item) => item.po_id);
-    const instoreValues = selectedInstores.map((order) =>
-      order.instore
-    );
+    const instoreValues = data.map((order) => parseInt(order.instore,10));
 
     if (selectedItems.length === 0) {
       await ShowAlert(
@@ -186,9 +210,8 @@ const OrderView = () => {
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
 
-
       try {
-        console.log(requestedDataP,"requestedDataP")
+        console.log(requestedDataP, "requestedDataP");
         await dispatch(AddProductOrderForPre({ requestedDataP })).then(
           ({ payload }) => {
             console.log(payload, "payload from AddProductOrderForPre");
@@ -204,7 +227,7 @@ const OrderView = () => {
                 2000
               );
               setSelectedItems([]);
-              setSelectedItemIds([])
+              setSelectedItemIds([]);
               fetchItems();
             } else {
               ShowAlert(
@@ -238,32 +261,34 @@ const OrderView = () => {
     {
       field: "select",
       headerName: "Select",
-      flex: 1,
-      renderCell: (params) => (
-        <FormGroup>
-          <FormControlLabel
-            className="mx-auto"
-            control={
-              <Checkbox
-                checked={selectedItemIds.includes(params.row.id)}
-                onChange={() => handleItemSelection(params.row)}
-              />
-            }
-            style={{ justifyContent: "center" }}
-          />
-        </FormGroup>
-      ),
+      flex: 0.5,
+      className: "onhold-management-p3",
+      renderCell: (params) => {
+        return (
+          <FormGroup>
+            <FormControlLabel
+              checked={params.row.isSelected}
+              className="mx-auto"
+              control={<Checkbox />}
+              style={{ justifyContent: "center" }}
+              onChange={(event) => handleCheckboxChange(event, params.row)}
+            />
+          </FormGroup>
+        );
+      },
     },
     {
       field: "product_name",
       headerName: "Product Name",
       flex: 2,
+      className: "onhold-management-p3",
     },
     {
       field: "product_image",
       headerName: "Product images",
       flex: 2,
       type: "html",
+      className: "onhold-management-p3",
       renderCell: (value, row) => {
         return (
           <>
@@ -281,6 +306,7 @@ const OrderView = () => {
       field: "variation_value",
       headerName: "Variation",
       flex: 2,
+      className: "onhold-management-p3",
       renderCell: (params) => {
         if (params?.row?.variations != "") {
           return formatVariations(params.row.variations);
@@ -289,23 +315,21 @@ const OrderView = () => {
         }
       },
     },
-    { field: "qty_received", headerName: "Qty Received", flex: 2 },
-    { field: "qty_remain", headerName: "Qty Remain", flex: 2 },
+    { field: "qty_remain", headerName: "Qty Fullfilled", flex: 1, className: "onhold-management-p3", },
     {
       field: "select_for_store",
       headerName: "In Store",
-      flex: 0.5,
+      flex: 1,
+      className: "onhold-management-p3",
       renderCell: (params) => {
-        let productInstore = grnList?.find(
-          (grn) => grn.id === params.row.id
-        );
+        let productInstore = grnList?.find((grn) => grn.id === params.row.id);
         return (
           <FormGroup>
             <FormControlLabel
               className="mx-auto"
               control={
                 <Checkbox
-                  checked={productInstore.instore == 1 ? true : false}
+                  checked={productInstore.instore === "1"}
                   onChange={() => handleItemSelectionforinstore(params.row)}
                 />
               }
