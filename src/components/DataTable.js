@@ -199,7 +199,7 @@ export default function DataTable({
               if (!params.row.instore) {
                 return "";
               }
-              if (params.row.instore === 1) {
+              if (params.row.instore === 1 || params.row.instore === "1") {
                 return "bg-yellow";
               }
             }
