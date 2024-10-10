@@ -48,7 +48,7 @@ export const OrderDetailsGet = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-orders-new/v1/orders/?orderid=${id}`
+        `wp-json/custom-orders-new/v1/orders/?warehouse=""&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -76,7 +76,7 @@ export const CompletedOrderDetailsGet = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-orders-completed/v1/completed-orders/?orderid=${id}`
+        `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=""&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -104,7 +104,7 @@ export const OnHoldOrderDetailsGet = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-onhold-orders/v1/onhold-orders/?orderid=${id}`
+        `wp-json/custom-onhold-orders/v1/onhold-orders/?warehouse=""&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -132,7 +132,7 @@ export const ReserveOrderDetailsGet = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-reserved-orders/v1/reserved-orders/?orderid=${id}`
+        `wp-json/custom-reserved-orders/v1/reserved-orders/?warehouse=""&orderid=${id}`
       );
       return response.data;
     } catch (error) {
@@ -162,7 +162,7 @@ export const MissingOrderDetailsGet = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-missing-orders/v1/missing-orders/?orderid=${id}`
+        `wp-json/custom-missing-orders/v1/missing-orders/?warehouse=""&orderid=${id}`
       );
       return response.data;
     } catch (error) {
