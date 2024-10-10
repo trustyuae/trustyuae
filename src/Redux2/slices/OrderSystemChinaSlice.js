@@ -107,7 +107,7 @@ export const CompletedOrderDetailsChinaGet = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-orders-completed/v1/completed-orders/?&orderid=${id}`
+        `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&orderid=${id}`
       );
       return response.data;
     } catch (error) {
