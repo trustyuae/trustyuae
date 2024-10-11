@@ -282,9 +282,9 @@ const OnHoldProductDetailsPrintModal = ({
     saveAs(blob, `PoDetails-invoice.xlsx`);
   };
 
-  //   const printModalContent = () => {
-  //     window.print();
-  //   };
+    const printModalContent = () => {
+      window.print();
+    };
 
   const columns = [
     {
@@ -441,9 +441,9 @@ const OnHoldProductDetailsPrintModal = ({
           <Button variant="secondary" onClick={handleClosePrintModal}>
             Close
           </Button>
-          {/* <Button variant="primary" onClick={printModalContent}>
+          <Button variant="primary" onClick={printModalContent}>
             Print
-          </Button> */}
+          </Button>
           <Button variant="primary" onClick={handleExport}>
             {isDownloadPdf ? "Downloading..." : "Download PDF"}
           </Button>
