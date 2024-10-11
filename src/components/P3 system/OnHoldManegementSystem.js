@@ -31,6 +31,8 @@ import {
 } from "../../Redux2/slices/P3SystemSlice";
 import { getUserData } from "../../utils/StorageUtils";
 import OrderModal from "./OrdersModal";
+import OnHoldProductDetailsPrintModal from "./OnHoldProductDetailsPrintModal";
+import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -79,6 +81,8 @@ function OnHoldManegementSystem() {
   const [showOrdersModalOpen, setShowOrdersModalOpen] = useState(false);
   const [productIDD, setProductIDD] = useState(null);
   const [variationID, setVariationID] = useState(null);
+
+  const [printModal, setPrintModal] = useState(false);
 
   const allProducts = useSelector(
     (state) => state?.p3System?.allProducts?.products
@@ -876,6 +880,10 @@ function OnHoldManegementSystem() {
     setSelectedFactory("");
   };
 
+  const handlePrint = () => {
+    setPrintModal(true);
+  };
+
   useEffect(() => {
     selectPOId();
   }, [selectedFactory]);
@@ -1125,22 +1133,43 @@ function OnHoldManegementSystem() {
                   Create GRN
                 </Button>
               ) : (
-                <Button
-                  variant="primary"
-                  disabled={
-                    !isValid && poTableData.length == 0 && tableData.length == 0
-                  }
-                  style={{ width: "130px" }}
-                  // onClick={handleCreateGrn}
-                  onClick={handleCreateGrn}
-                >
-                  Create GRN
-                </Button>
+                <Box className="d-flex justify-content-end px-3 py-2">
+                  <Button
+                    variant="outline-primary"
+                    className="p-1 me-3 bg-transparent text-primary"
+                    onClick={handlePrint}
+                  >
+                    <LocalPrintshopOutlinedIcon className="me-1" />
+                  </Button>
+                  <Button
+                    variant="primary"
+                    disabled={
+                      !isValid &&
+                      poTableData.length == 0 &&
+                      tableData.length == 0
+                    }
+                    style={{ width: "130px" }}
+                    // onClick={handleCreateGrn}
+                    onClick={handleCreateGrn}
+                  >
+                    Create GRN
+                  </Button>
+                </Box>
               )}
             </MDBRow>
           </>
         </Card>
       </MDBRow>
+      <OnHoldProductDetailsPrintModal
+        show={printModal}
+        poId={selectedPOId}
+        // poRaiseDate={poRaiseDate}
+        factoryName={
+          factories.find((factory) => factory.id == selectedFactory)?.factory_name
+        }
+        poTableData={poTableData}
+        handleClosePrintModal={() => setPrintModal(false)}
+      />
       {showOrdersModalOpen && (
         <OrderModal
           show={showOrdersModalOpen}
