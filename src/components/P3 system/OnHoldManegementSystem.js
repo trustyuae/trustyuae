@@ -1000,7 +1000,7 @@ function OnHoldManegementSystem() {
           </Row>
         )}
       </Form>
-      {selectedFactory?.length <= 0 && selectedPOId?.length <= 0 && (
+      {selectedFactory?.length <= 0 && (selectedPOId?.length <= 0 || !selectedPOId) && (
         <MDBRow className="px-3">
           <Card className="py-3">
             <Row className=" justify-content-start">
@@ -1095,7 +1095,7 @@ function OnHoldManegementSystem() {
             )}
           <>
             <div className="mt-2">
-              {poTableData && poTableData.length != 0 && selectedPOId ? (
+              {poTableData && poTableData.length != 0 && (selectedPOId.length != 0 || selectedPOId) ? (
                 <>
                   <DataTable
                     columns={poColumns}
