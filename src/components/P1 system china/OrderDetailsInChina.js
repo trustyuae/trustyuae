@@ -73,7 +73,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useDropzone } from "react-dropzone";
 import { CheckCircle, Cancel } from "@mui/icons-material";
 import { green, red, grey, blue } from "@mui/material/colors";
-import HomeTwoToneIcon from '@mui/icons-material/HomeTwoTone';
+import HomeTwoToneIcon from "@mui/icons-material/HomeTwoTone";
 
 function OrderDetailsInChina() {
   const { id } = useParams();
@@ -609,7 +609,7 @@ function OrderDetailsInChina() {
       field: "select",
       headerName: "Select",
       flex: 0.5,
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       renderCell: (params) => {
         return (
           <FormGroup>
@@ -627,19 +627,19 @@ function OrderDetailsInChina() {
     {
       field: "item_id",
       headerName: t("P1ChinaSystem.ItemId"),
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       flex: 0.5,
     },
     {
       field: "product_name",
       headerName: t("P1ChinaSystem.Name"),
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       flex: 1.5,
     },
     {
       field: "variant_details",
       headerName: t("P1ChinaSystem.VariantDetails"),
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       flex: 1.5,
       renderCell: (params) => {
         if (
@@ -661,7 +661,7 @@ function OrderDetailsInChina() {
       field: "product_image",
       headerName: t("POManagement.Image"),
       flex: 1,
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       renderCell: (params) => (
         <Box
           className="h-100 w-100 d-flex align-items-center"
@@ -692,26 +692,26 @@ function OrderDetailsInChina() {
       field: "quantity",
       headerName: t("P1ChinaSystem.QTY"),
       flex: 0.5,
-      className:'order-details-in-china',
+      className: "order-details-in-china",
     },
     {
       field: "avl_quantity",
       headerName: t("P1ChinaSystem.AvlQTY"),
       flex: 0.5,
-      className:'order-details-in-china',
+      className: "order-details-in-china",
     },
     {
       field: "dispatch_type",
       headerName: t("POManagement.Status"),
       flex: 0.5,
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       type: "string",
     },
     {
       field: "dispatch_image",
       headerName: "Attachment",
       flex: 1.5,
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
@@ -986,11 +986,13 @@ function OrderDetailsInChina() {
       field: "stock_status",
       headerName: "Stock Status",
       flex: 1,
-      className:'order-details-in-china',
+      className: "order-details-in-china",
       renderCell: (params) => {
         const storeValue = params.row.instore;
         return storeValue === "1" ? (
-          <span style={{ marginLeft: 8 }}><HomeTwoToneIcon style={{ color: "red",fontSize:'40px' }} /></span>
+          <span style={{ marginLeft: 8 }}>
+            <HomeTwoToneIcon style={{ color: "red", fontSize: "40px" }} />
+          </span>
         ) : (
           <span style={{ marginLeft: 8 }}></span>
         );
@@ -1512,45 +1514,47 @@ function OrderDetailsInChina() {
             <Typography variant="h6" className="fw-bold mb-3">
               {t("P1ChinaSystem.OrderDetails")}
             </Typography>
-            <Box className="d-flex">
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <CheckCircle
+            {userData && userData.user_role === "administrator" && (
+              <Box className="d-flex">
+                <Box
                   style={{
-                    color: blue[500],
-                    transition: "transform 0.15s ease",
                     display: "flex",
                     alignItems: "center",
-                    cursor: "pointer",
                   }}
-                  onClick={() => handleInstoreStatus(1)}
-                />
-                <span style={{ marginLeft: 8 }}>In Store</span>
-              </Box>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginLeft: 20,
-                }}
-              >
-                <Cancel
+                >
+                  <CheckCircle
+                    style={{
+                      color: blue[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(1)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
+                <Box
                   style={{
-                    color: red[500],
-                    transition: "transform 0.15s ease",
                     display: "flex",
                     alignItems: "center",
-                    cursor: "pointer",
+                    marginLeft: 20,
                   }}
-                  onClick={() => handleInstoreStatus(0)}
-                />
-                <span style={{ marginLeft: 8 }}>In Store</span>
+                >
+                  <Cancel
+                    style={{
+                      color: red[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(0)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
               </Box>
-            </Box>
+            )}
           </Box>
           {loader ? (
             <Loader />
