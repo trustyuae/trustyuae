@@ -984,7 +984,7 @@ function OrderDetailsInChina() {
     },
     {
       field: "stock_status",
-      headerName: "Stock Status",
+      headerName: "Store Status",
       flex: 1,
       className: "order-details-in-china",
       renderCell: (params) => {

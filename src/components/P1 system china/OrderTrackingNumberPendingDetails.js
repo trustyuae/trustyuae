@@ -552,7 +552,7 @@ function OrderTrackingNumberPendingDetails() {
     },
     {
       field: "stock_status",
-      headerName: "Stock Status",
+      headerName: "Store Status",
       flex: 1,
       className:'order-details-tracking-pending',
       renderCell: (params) => {
