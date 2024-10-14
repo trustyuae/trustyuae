@@ -28,7 +28,8 @@ const initialState = {
   assignTrackID: [],
   pushTrackOrder: [],
   trackIDFileUploadData: [],
-  updateTrackingID:[],
+  updateTrackingID: [],
+  updateInStoreStatus: [],
   error: null,
 };
 
@@ -408,9 +409,28 @@ export const TrackIDFileUpload = createAsyncThunk(
 
 export const TrackingIDUpdate = createAsyncThunk(
   "orderSystem/TrackingIDUpdate",
-  async ({id,payload}, { rejectWithValue }) => {
+  async ({ id, payload }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post(`wp-json/custom-add-trackid/v1/add-trackid-order/${id}/?warehouse=China`,payload)
+      const response = await axiosInstance.post(
+        `wp-json/custom-add-trackid/v1/add-trackid-order/${id}/?warehouse=China`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error uploading file:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const InstoreStatusUpdate = createAsyncThunk(
+  "orderSystem/InstoreStatusUpdate",
+  async ({ payload }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/instore-value-api/v1/change-instore-value/`,
+        payload
+      );
       return response.data;
     } catch (error) {
       console.error("Error uploading file:", error.message);
@@ -456,6 +476,7 @@ const orderSystemChinaSlice = createSlice({
       state.pushTrackOrder = [];
       state.trackIDFileUploadData = [];
       state.updateTrackingID = [];
+      state.updateInStoreStatus = [];
       state.error = null;
     },
   },
@@ -722,6 +743,17 @@ const orderSystemChinaSlice = createSlice({
         state.updateTrackingID = action.payload;
       })
       .addCase(TrackingIDUpdate.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(InstoreStatusUpdate.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(InstoreStatusUpdate.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.updateInStoreStatus = action.payload;
+      })
+      .addCase(InstoreStatusUpdate.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

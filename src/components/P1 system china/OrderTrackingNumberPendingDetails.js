@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -57,12 +63,16 @@ import {
   CustomOrderOHChina,
   InsertOrderPickupCancelChina,
   InsertOrderPickupChina,
+  InstoreStatusUpdate,
   OrderDetailsChinaGet,
   OrderTrackingDetailsChinaGet,
   OverAllAttachmentFileUploadChina,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { CheckCircle, Cancel } from "@mui/icons-material";
+import { green, red, grey, blue } from "@mui/material/colors";
+import HomeTwoToneIcon from '@mui/icons-material/HomeTwoTone';
 
 function OrderTrackingNumberPendingDetails() {
   const { id } = useParams();
@@ -95,6 +105,7 @@ function OrderTrackingNumberPendingDetails() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
@@ -235,6 +246,57 @@ function OrderTrackingNumberPendingDetails() {
       setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
     }
     setSelectedItemIds(newSelected);
+  };
+
+  const handleInstoreStatus = (instoreValue) => {
+    if (!selectedItems || selectedItems.length === 0) {
+      console.error("No items selected!");
+      ShowAlert(
+        "Error: No items selected for updating!",
+        "",
+        "error",
+        false,
+        false,
+        "",
+        "",
+        2000
+      );
+      return;
+    }
+
+    const productIDD = selectedItems.map((item) => parseInt(item.item_id, 10));
+    const variationIDD = selectedItems.map((item) =>
+      parseInt(item.variation_id, 10)
+    );
+    const payload = {
+      order_id: parseInt(orderDetails.order_id, 10),
+      product_id: productIDD,
+      variation_id: variationIDD,
+      instore: instoreValue,
+    };
+
+    console.log(payload, "payload");
+    dispatch(InstoreStatusUpdate({ payload }))
+      .unwrap()
+      .then((response) => {
+        console.log("Success:", response);
+        ShowAlert(
+          "Items instored successfully!",
+          "",
+          "success",
+          false,
+          false,
+          "",
+          "",
+          2000
+        );
+        setSelectedItems([]);
+        setSelectedItemIds([]);
+        fetchOrder();
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+      });
   };
 
   const submitOH = async () => {
@@ -386,21 +448,41 @@ function OrderTrackingNumberPendingDetails() {
 
   const columns = [
     {
+      field: "select",
+      headerName: t("POManagement.Select"),
+      flex: 0.5,
+      className:'order-details-tracking-pending',
+      renderCell: (params) => (
+        <FormGroup>
+          <FormControlLabel
+            className="mx-auto"
+            control={
+              <Checkbox
+                checked={selectedItemIds.includes(params.row.id)}
+                onChange={() => handleItemSelection(params.row)}
+              />
+            }
+            style={{ justifyContent: "center" }}
+          />
+        </FormGroup>
+      ),
+    },
+    {
       field: "item_id",
       headerName: t("P1ChinaSystem.ItemId"),
-      className: "order-details",
+      className:'order-details-tracking-pending',
       flex: 0.5,
     },
     {
       field: "product_name",
       headerName: t("P1ChinaSystem.Name"),
-      className: "order-details",
+      className:'order-details-tracking-pending',
       flex: 1.5,
     },
     {
       field: "variant_details",
       headerName: t("P1ChinaSystem.VariantDetails"),
-      className: "order-details",
+      className:'order-details-tracking-pending',
       flex: 1.5,
       renderCell: (params) => {
         if (
@@ -422,7 +504,7 @@ function OrderTrackingNumberPendingDetails() {
       field: "product_image",
       headerName: t("POManagement.Image"),
       flex: 1,
-      className: "order-details",
+      className:'order-details-tracking-pending',
       renderCell: (params) => (
         <Box
           className="h-100 w-100 d-flex align-items-center"
@@ -453,21 +535,46 @@ function OrderTrackingNumberPendingDetails() {
       field: "quantity",
       headerName: t("P1ChinaSystem.QTY"),
       flex: 0.5,
-      className: "order-details",
+      className:'order-details-tracking-pending',
     },
     {
       field: "avl_quantity",
       headerName: t("P1ChinaSystem.AvlQTY"),
       flex: 0.5,
+      className:'order-details-tracking-pending',
     },
     {
       field: "dispatch_type",
       headerName: t("POManagement.Status"),
       flex: 0.5,
-      className: "order-details",
+      className:'order-details-tracking-pending',
       type: "string",
     },
+    {
+      field: "stock_status",
+      headerName: "Store Status",
+      flex: 1,
+      className:'order-details-tracking-pending',
+      renderCell: (params) => {
+        const storeValue = params.row.instore;
+        return storeValue === "1" ? (
+          <span style={{ marginLeft: 8 }}><HomeTwoToneIcon style={{ color: "red",fontSize:'40px' }} /></span>
+        ) : (
+          <span style={{ marginLeft: 8 }}></span>
+        );
+      },
+    },
   ];
+
+  const handleToggle = () => {
+    setIsChecked(!isChecked); // Toggle the state between checked/unchecked
+    handleCheckboxClick(); // Call your custom function
+  };
+
+  const handleCheckboxClick = () => {
+    // Custom function to be called on checkbox click
+    console.log("Checkbox clicked!");
+  };
 
   const handleCopy = (text) => {
     navigator.clipboard
@@ -479,6 +586,8 @@ function OrderTrackingNumberPendingDetails() {
         console.error("Failed to copy text: ", err);
       });
   };
+
+  console.log(userData, "userData");
 
   return (
     <>
@@ -844,9 +953,52 @@ function OrderTrackingNumberPendingDetails() {
           ) : null}
         </Row>
         <Card className="p-3 mb-3">
-          <Typography variant="h6" className="fw-bold mb-3">
-            {t("P1ChinaSystem.OrderDetails")}
-          </Typography>
+          <Box className="d-flex justify-content-between">
+            <Typography variant="h6" className="fw-bold mb-3">
+              {t("P1ChinaSystem.OrderDetails")}
+            </Typography>
+            {userData && userData.user_role === "administrator" && (
+              <Box className="d-flex">
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <CheckCircle
+                    style={{
+                      color: blue[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(1)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginLeft: 20,
+                  }}
+                >
+                  <Cancel
+                    style={{
+                      color: red[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(0)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
+              </Box>
+            )}
+          </Box>
           {loader ? (
             <Loader />
           ) : (

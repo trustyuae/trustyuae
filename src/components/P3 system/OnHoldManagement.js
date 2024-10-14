@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Alert,
   Box,
@@ -24,20 +24,26 @@ import {
   GetProductOrderDetails,
 } from "../../Redux2/slices/P3SystemSlice";
 import Swal from "sweetalert2";
+import { CheckCircle, Cancel } from "@mui/icons-material";
+import { green, red, grey } from "@mui/material/colors";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function OnHoldManagement() {
   const params = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [pageSize, setPageSize] = useState(5);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [selectedInstores, setSelectedInstores] = useState([]);
   const [productData, setProductData] = useState([]);
   const [productDetailsData, setProductDetailsData] = useState([]);
   const [productOverallData, setProductOverallData] = useState([]);
   const [showImageModal, setShowImageModal] = useState(false);
   const loader = useSelector((state) => state?.p3System?.isLoading);
+  const [isChecked, setIsChecked] = useState(false);
 
   const productDetailsDataa = useSelector(
     (state) => state?.p3System?.productDetails
@@ -103,6 +109,33 @@ function OnHoldManagement() {
     }
   };
 
+  const handleItemSelection = (rowData) => {
+    const updatedRowData = {
+      ...rowData,
+      instore: rowData.instore === 1 ? 0 : 1,
+    };
+
+    const updatedProductData = productData.map((product) =>
+      product.id === rowData.id ? updatedRowData : product
+    );
+
+    setSelectedInstores((prevSelectedOrders) => {
+      if (updatedRowData.instore === 1) {
+        return [...prevSelectedOrders, updatedRowData];
+      } else {
+        return prevSelectedOrders.filter((item) => item.id !== rowData.id);
+      }
+    });
+
+    setProductData(updatedProductData);
+  };
+
+  const handleUpdatedValues = async () => {
+    setSelectedOrders([]);
+    setSelectedInstores([]);
+    fetchProductDetails();
+  };
+
   useEffect(() => {
     handleUpdatedValues();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,8 +147,20 @@ function OnHoldManagement() {
   }, [params.id, params.grn_no, params.variation_id]);
 
   const handleOrderPerp = async () => {
+    let data = [];
+    productData.forEach((product) => {
+      selectedOrders.forEach((order) => {
+        if (product.order_id == order.order_id) {
+          data.push(product);
+        }
+      });
+    });
     const orderId = selectedOrders.map((order) => order.order_id);
-    const quantity = selectedOrders.map((order) => order.qty_fullfilled);
+    const grnNo = [productOverallData.grn_no];
+    const productIdd = [productOverallData.product_id];
+    const variationIdd = [productOverallData.variation_id];
+    const poIdd = [productOverallData.po_id];
+    const instoreValues = data.map((order) => order.instore);
 
     if (selectedOrders.length === 0) {
       await ShowAlert(
@@ -145,8 +190,8 @@ function OnHoldManagement() {
       1,
       2,
       {
-        allowOutsideClick: false, // Disable clicking outside
-        allowEscapeKey: false, // Disable closing on Escape key
+        allowOutsideClick: false,
+        allowEscapeKey: false,
       }
     );
 
@@ -160,18 +205,18 @@ function OnHoldManagement() {
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "Cancel",
-      allowOutsideClick: false, // Disable clicking outside
-      allowEscapeKey: false, // Disable escape key
+      allowOutsideClick: false,
+      allowEscapeKey: false,
     });
 
     if (confirmation.isConfirmed) {
       const requestedDataP = {
-        product_id: params.id,
-        po_id: productOverallData.po_id,
+        product_id: productIdd,
+        po_id: poIdd,
         order_id: orderId,
-        quantity: quantity,
-        grn_no: params.grn_no,
-        variation_id: params.variation_id,
+        grn_no: grnNo,
+        variation_id: variationIdd,
+        instore: instoreValues,
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
 
@@ -181,28 +226,26 @@ function OnHoldManagement() {
             console.log(payload, "payload from AddProductOrderForPre");
             if (payload?.status_code === 200) {
               ShowAlert(
-                payload?.Message,
+                "Order sending for prep successfully!",
                 "",
                 "success",
                 false,
                 false,
                 "",
                 "",
-                "",
-                1500
+                2000
               );
               fetchProductOrderDetails();
             } else {
               ShowAlert(
-                payload.Message,
+                "Error while sending order for prep!",
                 "",
                 "error",
                 false,
                 false,
                 "",
                 "",
-                "",
-                1500
+                2000
               );
             }
           }
@@ -247,27 +290,24 @@ function OnHoldManagement() {
       });
   };
 
-  const handleUpdatedValues = async () => {
-    setSelectedOrders([]);
-    fetchProductDetails();
-  };
-
   const columns = [
     {
       field: "order_id",
       headerName: "Order ID",
       flex: 1,
+      className:'onhold-management-p3',
       renderCell: (params) => {
         const orderId =
           params.row.order_id !== "0" ? params.row.order_id : "No Order ID Avl";
         return <div>{orderId}</div>;
       },
     },
-    { field: "shipping_country", headerName: "Shipping Country", flex: 1 },
+    { field: "shipping_country", headerName: "Shipping Country", flex: 1, className:'onhold-management-p3'},
     {
       field: "item_received",
       headerName: "Item Received",
       flex: 1,
+      className:'onhold-management-p3',
       valueGetter: (value, row) => {
         return `${row.qty_fullfilled} / ${row.qty_received}`;
       },
@@ -275,7 +315,8 @@ function OnHoldManagement() {
     {
       field: "select",
       headerName: "Select",
-      flex: 1,
+      flex: 0.5,
+      className:'onhold-management-p3',
       renderCell: (params) => {
         return (
           <FormGroup>
@@ -285,6 +326,32 @@ function OnHoldManagement() {
               control={<Checkbox />}
               style={{ justifyContent: "center" }}
               onChange={(event) => handleCheckboxChange(event, params.row)}
+            />
+          </FormGroup>
+        );
+      },
+    },
+    {
+      field: "selectin store",
+      headerName: "In Store",
+      flex: 0.5,
+      className:'onhold-management-p3',
+      renderCell: (params) => {
+        let productInstore = productData.find(
+          (prod) => prod.id === params.row.id
+        );
+
+        return (
+          <FormGroup>
+            <FormControlLabel
+              className="mx-auto"
+              control={
+                <Checkbox
+                  checked={productInstore?.instore === 1}
+                  onChange={() => handleItemSelection(params.row)}
+                />
+              }
+              style={{ justifyContent: "center" }}
             />
           </FormGroup>
         );
@@ -301,10 +368,27 @@ function OnHoldManagement() {
     setPage(e.target.value);
   };
 
-  console.log(productData, "productData from onhold management system");
+  const handalBackButton = () => {
+    navigate(`/GRN_View/${params.grn_no}`);
+  };
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
+      <MDBRow className="my-3">
+        <MDBCol
+          md="5"
+          className="d-flex justify-content-start align-items-center"
+        >
+          <Button
+            variant="outline-secondary"
+            className="p-1 me-2 bg-transparent text-secondary"
+            onClick={handalBackButton}
+          >
+            <ArrowBackIcon className="me-1" />
+          </Button>
+          <Box></Box>
+        </MDBCol>
+      </MDBRow>
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
           On-hold Management
