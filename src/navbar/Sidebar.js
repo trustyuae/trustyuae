@@ -16,6 +16,7 @@ const Sidebar = () => {
     PO_MANAGEMENT: "/PO_ManagementSystem",
     ORDER_NOT_AVAILABLE: "/order_not_available",
     ON_HOLD_MANAGEMENT: "/On_Hold_Manegement_System",
+    GRN_ORDER_PENDING: "/GRN_Order_Pending",
     GRN_MANAGEMENT: "/GRN_Management",
     GRN_MANAGEMENT_ON_ORDER_IDS: "/GRN_Management_On_OrderIds",
     EXCHANGE_AND_RETURN: "/Exchange_And_Return",
@@ -172,6 +173,7 @@ const Sidebar = () => {
                 routes.ON_HOLD_MANAGEMENT,
                 "On Hold Management System"
               )}
+              {renderMenuItem(routes.GRN_ORDER_PENDING, "GRN Order Pending")}
               {renderMenuItem(routes.GRN_MANAGEMENT, "GRN Management")}
               {renderMenuItem(
                 routes.GRN_MANAGEMENT_ON_ORDER_IDS,

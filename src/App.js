@@ -42,6 +42,7 @@ import OrderTrackingNumberPending from "./components/P1 system china/OrderTracki
 import OrderTrackingNumberPendingDetails from "./components/P1 system china/OrderTrackingNumberPendingDetails";
 import GRNManagement_OrderIds from "./components/P3 system/GRNManagement_OrderIds";
 import OrderView from "./components/P3 system/OrderView";
+import GRNOrderPending from "./components/P3 system/GRNOrderPending";
 
 function App() {
   return (
@@ -92,6 +93,11 @@ function App() {
               exact
               path="/On_Hold_Manegement_System"
               element={<OnHoldManegementSystem />}
+            />
+            <Route
+              exact
+              path="/GRN_Order_Pending"
+              element={<GRNOrderPending />}
             />
             <Route
               exact
