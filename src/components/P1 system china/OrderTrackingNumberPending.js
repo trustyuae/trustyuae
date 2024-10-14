@@ -187,13 +187,16 @@ function OrderTrackingNumberPending() {
   };
 
   const handleTrackIdAssign = (row, event) => {
-    const { value } = event.target;
-
+    let { value } = event.target;
+  
+    // Remove special characters and keep only numbers and letters
+    value = value.replace(/[^a-zA-Z0-9]/g, "");
+  
     setTempTrackIds((prev) => ({
       ...prev,
       [row.id]: value, // Temporarily store tracking ID for this row
     }));
-
+  
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
         order.id === row.id
@@ -208,6 +211,7 @@ function OrderTrackingNumberPending() {
       )
     );
   };
+  
 
   const handleUpdate = (rowData) => {
     const orderId = rowData.order_id;
