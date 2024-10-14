@@ -40,7 +40,10 @@ import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import * as XLSX from "xlsx";
 import { FaEye } from "react-icons/fa";
-import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import {
+  clearStoreData,
+  setCurrentPage,
+} from "../../Redux2/slices/PaginationSlice";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -90,11 +93,14 @@ function OrderTrackingNumberPending() {
   );
 
   // const currentPage = useSelector((state) => state.pagination.currentPage);
-  const currentPage = useSelector((state) => state.pagination.currentPage['OrderTrackingNumberPending']) || 1;
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["OrderTrackingNumberPending"]
+    ) || 1;
 
   useEffect(() => {
     if (currentPage) {
-      dispatch(clearStoreData({ tableId: 'OrderTrackingNumberPending' }));
+      dispatch(clearStoreData({ tableId: "OrderTrackingNumberPending" }));
       setPage(currentPage);
     }
     if (ordersData) {
@@ -109,7 +115,7 @@ function OrderTrackingNumberPending() {
       });
       setTotalPages(otherData?.total_pages);
     }
-  }, [ordersData, otherData,currentPage]);
+  }, [ordersData, otherData, currentPage]);
 
   useEffect(() => {
     if (orderDetails) {
@@ -187,7 +193,10 @@ function OrderTrackingNumberPending() {
   };
 
   const handleTrackIdAssign = (row, event) => {
-    const { value } = event.target;
+    let { value } = event.target;
+
+    // Remove special characters and keep only numbers and letters
+    value = value.replace(/[^a-zA-Z0-9]/g, "");
 
     setTempTrackIds((prev) => ({
       ...prev,
@@ -555,9 +564,11 @@ function OrderTrackingNumberPending() {
 
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
-    dispatch(setCurrentPage({ tableId: 'OrderTrackingNumberPending', page: value }));
+    dispatch(
+      setCurrentPage({ tableId: "OrderTrackingNumberPending", page: value })
+    );
   };
-  
+
   const radios = [
     { name: "English", value: "En" },
     { name: "中國人", value: "Zn" },
