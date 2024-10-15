@@ -96,7 +96,7 @@ function App() {
             />
             <Route
               exact
-              path="/GRN_Order_Pending"
+              path="/GRN_Products_Pending_System"
               element={<GRNOrderPending />}
             />
             <Route
