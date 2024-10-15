@@ -282,12 +282,15 @@ export const FetchPoIds = createAsyncThunk(
 
 export const FetchPoIdsWithPendingProductData = createAsyncThunk(
   "P3System/FetchPoIdsWithPendingProductData",
-  async ({ selectedFactory, selectedPOId }, { rejectWithValue }) => {
-    console.log(selectedFactory,"selectedFactory")
-    console.log(selectedPOId,"selectedPOId")
+  async (
+    { selectedFactory, selectedPOId, pageSize, page },
+    { rejectWithValue }
+  ) => {
+    console.log(selectedFactory, "selectedFactory");
+    console.log(selectedPOId, "selectedPOId");
     try {
       const response = await axiosInstance.get(
-        `wp-json/custom-get-products/v1/get-pending-grn-list/`,
+        `wp-json/custom-get-products/v1/get-pending-grn-list/?per_page=${pageSize}&page=${page}`,
         {
           params: {
             factory_id: selectedFactory,
@@ -297,7 +300,10 @@ export const FetchPoIdsWithPendingProductData = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      console.error("Error while gettting poids with product data:", error.message);
+      console.error(
+        "Error while gettting poids with product data:",
+        error.message
+      );
       return rejectWithValue(error.message);
     }
   }

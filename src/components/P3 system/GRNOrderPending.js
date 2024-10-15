@@ -211,7 +211,12 @@ function GRNOrderPending() {
   const selectPOId = async () => {
     try {
       dispatch(
-        FetchPoIdsWithPendingProductData({ selectedFactory, selectedPOId })
+        FetchPoIdsWithPendingProductData({
+          selectedFactory,
+          selectedPOId,
+          pageSize,
+          page,
+        })
       ).then(({ payload }) => {
         const formattedPoIds = payload?.po_ids?.map((poId) => ({
           value: poId,
@@ -340,9 +345,29 @@ function GRNOrderPending() {
                 ))}
               </Form.Control>
             </Form.Group>
-            <Button type="button" className="mt-4 ms-5" onClick={handleReset}>
-              Reset filter
-            </Button>
+            <Box
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                size="small"
+                variant="primary"
+                color="danger"
+                onClick={handleReset}
+                style={{
+                  marginLeft: 8, 
+                  padding: "4px 8px", 
+                  fontSize: "0.875rem",
+                  height: "36px",
+                }}
+                className="buttonStyle"
+              >
+                Reset filter
+              </Button>
+            </Box>
           </Col>
         </Row>
       </Form>
@@ -384,9 +409,7 @@ function GRNOrderPending() {
                   variant="outline-primary"
                   className="p-1 me-3 bg-transparent text-primary"
                   onClick={handlePrint}
-                  disabled={
-                    poTableData?.length == 0
-                  }
+                  disabled={poTableData?.length == 0}
                 >
                   <LocalPrintshopOutlinedIcon className="me-1" />
                 </Button>
