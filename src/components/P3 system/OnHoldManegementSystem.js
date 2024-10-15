@@ -25,6 +25,7 @@ import Swal from "sweetalert2";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import {
   AddGrn,
+  FetchPoIds,
   FetchPoProductData,
   GetAllProducts,
   GetProductManual,
@@ -744,20 +745,15 @@ function OnHoldManegementSystem() {
 
   const selectPOId = async () => {
     try {
-      const response = await axiosInstance.get(
-        `wp-json/get-po-ids/v1/show-po-id/`,
-        {
-          params: {
-            factory_id: selectedFactory,
-            po_id: selectedPOId,
-          },
+      dispatch(FetchPoIds({ selectedFactory, selectedPOId })).then(
+        ({ payload }) => {
+          const formattedPoIds = payload.map((poId) => ({
+            value: poId,
+            label: poId,
+          }));
+          setAllPoIds(formattedPoIds);
         }
       );
-      const formattedPoIds = response.data.map((poId) => ({
-        value: poId,
-        label: poId,
-      }));
-      setAllPoIds(formattedPoIds);
     } catch (error) {
       console.error("Error fetching PO IDs:", error);
     }
@@ -1000,32 +996,33 @@ function OnHoldManegementSystem() {
           </Row>
         )}
       </Form>
-      {selectedFactory?.length <= 0 && (selectedPOId?.length <= 0 || !selectedPOId) && (
-        <MDBRow className="px-3">
-          <Card className="py-3">
-            <Row className=" justify-content-start">
-              <Col xs="auto" lg="4">
-                <Form.Group className="fw-semibold mb-0">
-                  <Form.Label>Product Name:</Form.Label>
-                  <Select
-                    value={selectedOption}
-                    onChange={(option) => setSelectedOption(option)}
-                    options={optionsArray}
-                  />
-                </Form.Group>
-              </Col>
-              <Col xs="auto" lg="4">
-                <Form.Group className="fw-semibold mb-0">
-                  <Form.Label>Product ID:</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Product ID"
-                    ref={inputRef}
-                    onKeyDown={(e) => handalonChangeProductId(e)}
-                  />
-                </Form.Group>
-              </Col>
-              {/* <Col xs="auto" lg="4">
+      {selectedFactory?.length <= 0 &&
+        (selectedPOId?.length <= 0 || !selectedPOId) && (
+          <MDBRow className="px-3">
+            <Card className="py-3">
+              <Row className=" justify-content-start">
+                <Col xs="auto" lg="4">
+                  <Form.Group className="fw-semibold mb-0">
+                    <Form.Label>Product Name:</Form.Label>
+                    <Select
+                      value={selectedOption}
+                      onChange={(option) => setSelectedOption(option)}
+                      options={optionsArray}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs="auto" lg="4">
+                  <Form.Group className="fw-semibold mb-0">
+                    <Form.Label>Product ID:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter Product ID"
+                      ref={inputRef}
+                      onKeyDown={(e) => handalonChangeProductId(e)}
+                    />
+                  </Form.Group>
+                </Col>
+                {/* <Col xs="auto" lg="4">
                 <Form.Group className="fw-semibold mb-0">
                   <Form.Label>PageSize</Form.Label>
                   <Form.Control
@@ -1042,10 +1039,10 @@ function OnHoldManegementSystem() {
                   </Form.Control>
                 </Form.Group>
               </Col> */}
-            </Row>
-          </Card>
-        </MDBRow>
-      )}
+              </Row>
+            </Card>
+          </MDBRow>
+        )}
       <MDBRow className="px-3">
         <Card className="py-3">
           {tableData.length > 0 &&
@@ -1095,7 +1092,9 @@ function OnHoldManegementSystem() {
             )}
           <>
             <div className="mt-2">
-              {poTableData && poTableData.length != 0 && (selectedPOId.length != 0 || selectedPOId) ? (
+              {poTableData &&
+              poTableData.length != 0 &&
+              (selectedPOId.length != 0 || selectedPOId) ? (
                 <>
                   <DataTable
                     columns={poColumns}
@@ -1165,7 +1164,8 @@ function OnHoldManegementSystem() {
         poId={selectedPOId}
         // poRaiseDate={poRaiseDate}
         factoryName={
-          factories.find((factory) => factory.id == selectedFactory)?.factory_name
+          factories.find((factory) => factory.id == selectedFactory)
+            ?.factory_name
         }
         poTableData={poTableData}
         handleClosePrintModal={() => setPrintModal(false)}

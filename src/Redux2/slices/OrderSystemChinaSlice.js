@@ -34,7 +34,7 @@ const initialState = {
 };
 
 export const OrderTrackingSystemChinaGet = createAsyncThunk(
-  "orderSystem/OrderTrackingSystemChinaGet",
+  "orderSystemChinaSlice/OrderTrackingSystemChinaGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -47,7 +47,7 @@ export const OrderTrackingSystemChinaGet = createAsyncThunk(
 );
 
 export const OrderTrackingDetailsChinaGet = createAsyncThunk(
-  "orderSystem/OrderTrackingDetailsChinaGet",
+  "orderSystemChinaSlice/OrderTrackingDetailsChinaGet",
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -62,7 +62,7 @@ export const OrderTrackingDetailsChinaGet = createAsyncThunk(
 );
 
 export const OrderSystemChinaGet = createAsyncThunk(
-  "orderSystem/OrderSystemGet",
+  "orderSystemChinaSlice/OrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -75,7 +75,7 @@ export const OrderSystemChinaGet = createAsyncThunk(
 );
 
 export const OrderDetailsChinaGet = createAsyncThunk(
-  "orderSystem/OrderDetailsGet",
+  "orderSystemChinaSlice/OrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -90,7 +90,7 @@ export const OrderDetailsChinaGet = createAsyncThunk(
 );
 
 export const CompletedOrderSystemChinaGet = createAsyncThunk(
-  "orderSystem/CompletedOrderSystemGet",
+  "orderSystemChinaSlice/CompletedOrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -103,7 +103,7 @@ export const CompletedOrderSystemChinaGet = createAsyncThunk(
 );
 
 export const CompletedOrderDetailsChinaGet = createAsyncThunk(
-  "orderSystem/CompletedOrderDetailsGet",
+  "orderSystemChinaSlice/CompletedOrderDetailsGet",
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -118,7 +118,7 @@ export const CompletedOrderDetailsChinaGet = createAsyncThunk(
 );
 
 export const OnHoldOrderSystemChinaGet = createAsyncThunk(
-  "orderSystem/OnHoldOrderSystemGet",
+  "orderSystemChinaSlice/OnHoldOrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -131,7 +131,7 @@ export const OnHoldOrderSystemChinaGet = createAsyncThunk(
 );
 
 export const OnHoldOrderDetailsChinaGet = createAsyncThunk(
-  "orderSystem/OnHoldOrderDetailsGet",
+  "orderSystemChinaSlice/OnHoldOrderDetailsGet",
   async ({ id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -146,7 +146,7 @@ export const OnHoldOrderDetailsChinaGet = createAsyncThunk(
 );
 
 export const ReserveOrderSystemChinaGet = createAsyncThunk(
-  "orderSystem/ReserveOrderSystemGet",
+  "orderSystemChinaSlice/ReserveOrderSystemGet",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -159,7 +159,7 @@ export const ReserveOrderSystemChinaGet = createAsyncThunk(
 );
 
 export const ReserveOrderDetailsChinaGet = createAsyncThunk(
-  "orderSystem/ReserveOrderDetailsGet",
+  "orderSystemChinaSlice/ReserveOrderDetailsGet",
   async (id, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -174,7 +174,7 @@ export const ReserveOrderDetailsChinaGet = createAsyncThunk(
 );
 
 export const AttachmentFileUploadChina = createAsyncThunk(
-  "orderSystem/AttachmentFileUpload",
+  "orderSystemChinaSlice/AttachmentFileUpload",
   async (
     { user_id, order_id, item_id, variation_id, selectedFile },
     { rejectWithValue }
@@ -200,7 +200,7 @@ export const AttachmentFileUploadChina = createAsyncThunk(
 );
 
 export const OverAllAttachmentFileUploadChina = createAsyncThunk(
-  "orderSystem/OverAllAttachmentFileUpload",
+  "orderSystemChinaSlice/OverAllAttachmentFileUpload",
   async ({ order_id, order_dispatch_image }, { rejectWithValue }) => {
     try {
       const requestData = new FormData();
@@ -223,7 +223,7 @@ export const OverAllAttachmentFileUploadChina = createAsyncThunk(
 );
 
 export const AddMessageChina = createAsyncThunk(
-  "orderSystem/AddMessage",
+  "orderSystemChinaSlice/AddMessage",
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -239,7 +239,7 @@ export const AddMessageChina = createAsyncThunk(
 );
 
 export const InsertOrderPickupChina = createAsyncThunk(
-  "orderSystem/InsertOrderPickup",
+  "orderSystemChinaSlice/InsertOrderPickup",
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -255,7 +255,7 @@ export const InsertOrderPickupChina = createAsyncThunk(
 );
 
 export const InsertOrderPickupCancelChina = createAsyncThunk(
-  "orderSystem/InsertOrderPickupCancel",
+  "orderSystemChinaSlice/InsertOrderPickupCancel",
   async (requestData, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -271,7 +271,7 @@ export const InsertOrderPickupCancelChina = createAsyncThunk(
 );
 
 export const CustomOrderFinishChina = createAsyncThunk(
-  "orderSystem/CustomOrderFinish",
+  "orderSystemChinaSlice/CustomOrderFinish",
   async ({ user_id, id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -286,7 +286,7 @@ export const CustomOrderFinishChina = createAsyncThunk(
 );
 
 export const CustomOrderOHChina = createAsyncThunk(
-  "orderSystem/CustomOrderOH",
+  "orderSystemChinaSlice/CustomOrderOH",
   async (result, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -302,7 +302,7 @@ export const CustomOrderOHChina = createAsyncThunk(
 );
 
 export const CustomOrderFinishOHChina = createAsyncThunk(
-  "orderSystem/CustomOrderFinishOH",
+  "orderSystemChinaSlice/CustomOrderFinishOH",
   async ({ user_id, id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -317,7 +317,7 @@ export const CustomOrderFinishOHChina = createAsyncThunk(
 );
 
 export const CustomItemSendToUAE = createAsyncThunk(
-  "orderSystem/CustomItemSendToUAE",
+  "orderSystemChinaSlice/CustomItemSendToUAE",
   async ({ id, payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -333,7 +333,7 @@ export const CustomItemSendToUAE = createAsyncThunk(
 );
 
 export const CustomItemSendToP2 = createAsyncThunk(
-  "orderSystem/CustomItemSendToP2",
+  "orderSystemChinaSlice/CustomItemSendToP2",
   async ({ id, payload }, { rejectWithValue }) => {
     console.log(payload, "payload from CustomItemSendToP2");
     try {
@@ -350,7 +350,7 @@ export const CustomItemSendToP2 = createAsyncThunk(
 );
 
 export const AssignTrackID = createAsyncThunk(
-  "orderSystem/AssignTrackID",
+  "orderSystemChinaSlice/AssignTrackID",
   async ({ orderId, payload }, { rejectWithValue }) => {
     console.log(payload, "payload from CustomItemSendToP2");
     try {
@@ -367,7 +367,7 @@ export const AssignTrackID = createAsyncThunk(
 );
 
 export const PushTrackOrder = createAsyncThunk(
-  "orderSystem/PushTrackOrder",
+  "orderSystemChinaSlice/PushTrackOrder",
   async ({ payload }, { rejectWithValue }) => {
     console.log(payload, "payload from CustomItemSendToP2");
     try {
@@ -385,7 +385,7 @@ export const PushTrackOrder = createAsyncThunk(
 );
 
 export const TrackIDFileUpload = createAsyncThunk(
-  "orderSystem/TrackIDFileUpload",
+  "orderSystemChinaSlice/TrackIDFileUpload",
   async (formData, { rejectWithValue }) => {
     console.log(formData, "FormData");
     try {
@@ -408,7 +408,7 @@ export const TrackIDFileUpload = createAsyncThunk(
 );
 
 export const TrackingIDUpdate = createAsyncThunk(
-  "orderSystem/TrackingIDUpdate",
+  "orderSystemChinaSlice/TrackingIDUpdate",
   async ({ id, payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -424,7 +424,7 @@ export const TrackingIDUpdate = createAsyncThunk(
 );
 
 export const InstoreStatusUpdate = createAsyncThunk(
-  "orderSystem/InstoreStatusUpdate",
+  "orderSystemChinaSlice/InstoreStatusUpdate",
   async ({ payload }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -440,7 +440,7 @@ export const InstoreStatusUpdate = createAsyncThunk(
 );
 
 const orderSystemChinaSlice = createSlice({
-  name: "orderSystem",
+  name: "orderSystemChinaSlice",
   initialState,
   reducers: {
     startSyncLoading: (state) => {

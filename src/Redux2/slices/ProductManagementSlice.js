@@ -10,7 +10,7 @@ const initialState = {
 };
 
 export const GetAllProductsList = createAsyncThunk(
-  "factory/GetAllProductsList",
+  "product/GetAllProductsList",
   async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -23,7 +23,7 @@ export const GetAllProductsList = createAsyncThunk(
 );
 
 export const EditProductsList = createAsyncThunk(
-  "factory/EditProductsList",
+  "product/EditProductsList",
   async ({ formData, id }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -44,7 +44,7 @@ export const EditProductsList = createAsyncThunk(
 );
 
 const ProductManagementSlice = createSlice({
-  name: "ProductManagement",
+  name: "product",
   initialState,
   reducers: {
     startSyncLoading: (state) => {

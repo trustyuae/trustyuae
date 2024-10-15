@@ -22,7 +22,7 @@ export const GetErManagementData = createAsyncThunk(
 );
 
 const erManagementSlice = createSlice({
-  name: "erManagement",
+  name: "ErManagement",
   initialState,
   reducers: {
     startSyncLoading: (state) => {

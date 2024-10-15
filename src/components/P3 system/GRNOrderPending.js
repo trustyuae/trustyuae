@@ -16,7 +16,10 @@ import axiosInstance from "../../utils/AxiosInstance";
 
 import Select from "react-select";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
-import { FetchPoProductData } from "../../Redux2/slices/P3SystemSlice";
+import {
+  FetchPoIdsWithPendingProductData,
+  FetchPoProductData,
+} from "../../Redux2/slices/P3SystemSlice";
 import OrderModal from "./OrdersModal";
 import OnHoldProductDetailsPrintModal from "./OnHoldProductDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
@@ -121,6 +124,12 @@ function GRNOrderPending() {
 
   const poColumns = [
     {
+      field: "date",
+      headerName: "Date Created",
+      flex: 1,
+      className: " d-flex justify-content-center align-items-center",
+    },
+    {
       field: "product_id",
       headerName: "product id",
       flex: 0.5,
@@ -129,7 +138,7 @@ function GRNOrderPending() {
     {
       field: "image",
       headerName: "product image",
-      flex: 1,
+      flex: 0.5,
       className: " d-flex justify-content-center align-items-center",
       renderCell: (params) => (
         <Box
@@ -179,30 +188,8 @@ function GRNOrderPending() {
     {
       field: "po_id",
       headerName: "PO ID",
-      flex: 1,
+      flex: 0.5,
       className: " d-flex justify-content-center align-items-center",
-    },
-    {
-      field: "date_created",
-      headerName: "Date Created",
-      flex: 1,
-      renderCell: (params) => {
-        console.log(params,'params')
-        return (
-          null
-        );
-      },
-    },
-    {
-      field: "factory",
-      headerName: "Factory Name",
-      flex: 1,
-      renderCell: (params) => {
-        console.log(params,'params')
-        return (
-          null
-        );
-      },
     },
   ];
 
@@ -223,20 +210,21 @@ function GRNOrderPending() {
 
   const selectPOId = async () => {
     try {
-      const response = await axiosInstance.get(
-        `wp-json/get-po-ids/v1/show-po-id/`,
-        {
-          params: {
-            factory_id: selectedFactory,
-            po_id: selectedPOId,
-          },
-        }
-      );
-      const formattedPoIds = response.data.map((poId) => ({
-        value: poId,
-        label: poId,
-      }));
-      setAllPoIds(formattedPoIds);
+      dispatch(
+        FetchPoIdsWithPendingProductData({ selectedFactory, selectedPOId })
+      ).then(({ payload }) => {
+        const formattedPoIds = payload?.po_ids?.map((poId) => ({
+          value: poId,
+          label: poId,
+        }));
+        setAllPoIds(formattedPoIds);
+        const data = payload?.details?.map((item, i) => ({
+          ...item,
+          id: i + currentStartIndex,
+        }));
+        setPoTableData(data);
+        setTotalPages(payload.total_pages);
+      });
     } catch (error) {
       console.error("Error fetching PO IDs:", error);
     }
@@ -296,7 +284,7 @@ function GRNOrderPending() {
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
-         Grn Order Pending System
+          GRN Products Pending System
         </Typography>
       </Box>
       <Form inline className="mb-4">
@@ -352,11 +340,7 @@ function GRNOrderPending() {
                 ))}
               </Form.Control>
             </Form.Group>
-            <Button
-              type="button"
-              className="mt-4 ms-5"
-              onClick={handleReset}
-            >
+            <Button type="button" className="mt-4 ms-5" onClick={handleReset}>
               Reset filter
             </Button>
           </Col>
@@ -400,6 +384,9 @@ function GRNOrderPending() {
                   variant="outline-primary"
                   className="p-1 me-3 bg-transparent text-primary"
                   onClick={handlePrint}
+                  disabled={
+                    poTableData?.length == 0
+                  }
                 >
                   <LocalPrintshopOutlinedIcon className="me-1" />
                 </Button>
@@ -408,17 +395,19 @@ function GRNOrderPending() {
           </>
         </Card>
       </MDBRow>
-      <OnHoldProductDetailsPrintModal
-        show={printModal}
-        poId={selectedPOId}
-        // poRaiseDate={poRaiseDate}
-        factoryName={
-          factories.find((factory) => factory.id == selectedFactory)
-            ?.factory_name
-        }
-        poTableData={poTableData}
-        handleClosePrintModal={() => setPrintModal(false)}
-      />
+      {printModal && (
+        <OnHoldProductDetailsPrintModal
+          show={printModal}
+          poId={selectedPOId}
+          // poRaiseDate={poRaiseDate}
+          factoryName={
+            factories.find((factory) => factory.id == selectedFactory)
+              ?.factory_name
+          }
+          poTableData={poTableData}
+          handleClosePrintModal={() => setPrintModal(false)}
+        />
+      )}
       {showOrdersModalOpen && (
         <OrderModal
           show={showOrdersModalOpen}
