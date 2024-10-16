@@ -40,7 +40,10 @@ import OrderTrackingFileUpload from "./OrderTrackingFileUpload";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import * as XLSX from "xlsx";
 import { FaEye } from "react-icons/fa";
-import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import {
+  clearStoreData,
+  setCurrentPage,
+} from "../../Redux2/slices/PaginationSlice";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -90,11 +93,14 @@ function OrderTrackingNumberPending() {
   );
 
   // const currentPage = useSelector((state) => state.pagination.currentPage);
-  const currentPage = useSelector((state) => state.pagination.currentPage['OrderTrackingNumberPending']) || 1;
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["OrderTrackingNumberPending"]
+    ) || 1;
 
   useEffect(() => {
     if (currentPage) {
-      dispatch(clearStoreData({ tableId: 'OrderTrackingNumberPending' }));
+      dispatch(clearStoreData({ tableId: "OrderTrackingNumberPending" }));
       setPage(currentPage);
     }
     if (ordersData) {
@@ -109,7 +115,7 @@ function OrderTrackingNumberPending() {
       });
       setTotalPages(otherData?.total_pages);
     }
-  }, [ordersData, otherData,currentPage]);
+  }, [ordersData, otherData, currentPage]);
 
   useEffect(() => {
     if (orderDetails) {
@@ -312,14 +318,18 @@ function OrderTrackingNumberPending() {
   const downloadExcel = async () => {
     console.log(orders, "orders from downloadexcel");
     console.log(selectedItems, "selectedItems from downloadexcel");
-    const filteredOrderData = orders.map((order) => {
-      return {
-        "Order Id": order.order_id,
-        "Product Name": order.items.map((item) => item.product_name).join(", "),
-        "Shipping Country": order.shipping_country,
-        "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
-      };
-    });
+    const filteredOrderData = orders
+      .filter((order) => order.exist_item === "0")
+      .map((order) => {
+        return {
+          "Order Id": order.order_id,
+          "Product Name": order.items
+            .map((item) => item.product_name)
+            .join(", "),
+          "Shipping Country": order.shipping_country,
+          "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
+        };
+      });
 
     const workbook = XLSX.utils.book_new();
 
@@ -555,9 +565,11 @@ function OrderTrackingNumberPending() {
 
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
-    dispatch(setCurrentPage({ tableId: 'OrderTrackingNumberPending', page: value }));
+    dispatch(
+      setCurrentPage({ tableId: "OrderTrackingNumberPending", page: value })
+    );
   };
-  
+
   const radios = [
     { name: "English", value: "En" },
     { name: "中國人", value: "Zn" },
