@@ -321,14 +321,18 @@ function OrderTrackingNumberPending() {
   const downloadExcel = async () => {
     console.log(orders, "orders from downloadexcel");
     console.log(selectedItems, "selectedItems from downloadexcel");
-    const filteredOrderData = orders.map((order) => {
-      return {
-        "Order Id": order.order_id,
-        "Product Name": order.items.map((item) => item.product_name).join(", "),
-        "Shipping Country": order.shipping_country,
-        "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
-      };
-    });
+    const filteredOrderData = orders
+      .filter((order) => order.exist_item === "0")
+      .map((order) => {
+        return {
+          "Order Id": order.order_id,
+          "Product Name": order.items
+            .map((item) => item.product_name)
+            .join(", "),
+          "Shipping Country": order.shipping_country,
+          "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
+        };
+      });
 
     const workbook = XLSX.utils.book_new();
 
