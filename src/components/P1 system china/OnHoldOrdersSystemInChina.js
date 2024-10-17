@@ -22,7 +22,10 @@ import { OnHoldOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChinaS
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, ToggleButton } from "react-bootstrap";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import {
+  clearStoreData,
+  setCurrentPage,
+} from "../../Redux2/slices/PaginationSlice";
 
 function OnHoldOrdersSystemInChina() {
   const inputRef = useRef(null);
@@ -53,11 +56,14 @@ function OnHoldOrdersSystemInChina() {
     (state) => state?.orderSystemChina?.onHoldOrders
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage['OnHoldOrdersSystemInChina']) || 1;
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["OnHoldOrdersSystemInChina"]
+    ) || 1;
 
   useEffect(() => {
     if (currentPage) {
-      dispatch(clearStoreData({ tableId: 'OnHoldOrdersSystemInChina' }));
+      dispatch(clearStoreData({ tableId: "OnHoldOrdersSystemInChina" }));
       setPage(currentPage);
     }
     if (OnholdOrdersData) {
@@ -150,7 +156,11 @@ function OnHoldOrdersSystemInChina() {
         const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
         return (
           <Box className="d-flex align-items-center justify-content-center">
-            <Typography>{trackingID}</Typography>
+            <Typography>
+              {trackingID === "0" || trackingID === ""
+                ? "No Tracking Id"
+                : trackingID}
+            </Typography>
             {trackingID !== "0" && (
               <IconButton onClick={() => handleCopy(trackingID)}>
                 <ContentCopyIcon />
@@ -186,7 +196,9 @@ function OnHoldOrdersSystemInChina() {
 
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
-    dispatch(setCurrentPage({ tableId: 'OnHoldOrdersSystemInChina', page: value }));
+    dispatch(
+      setCurrentPage({ tableId: "OnHoldOrdersSystemInChina", page: value })
+    );
   };
 
   const radios = [

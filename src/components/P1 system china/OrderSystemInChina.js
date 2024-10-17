@@ -41,7 +41,10 @@ import {
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import {
+  clearStoreData,
+  setCurrentPage,
+} from "../../Redux2/slices/PaginationSlice";
 
 function OrderSystemInChina() {
   const dispatch = useDispatch();
@@ -81,11 +84,14 @@ function OrderSystemInChina() {
     (state) => state?.orderSystemChina?.orderDetails
   );
 
-  const currentPage = useSelector((state) => state.pagination.currentPage['OrderSystemInChina']) || 1;
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["OrderSystemInChina"]
+    ) || 1;
 
   useEffect(() => {
     if (currentPage) {
-      dispatch(clearStoreData({ tableId: 'OrderSystemInChina' }));
+      dispatch(clearStoreData({ tableId: "OrderSystemInChina" }));
       setPage(currentPage);
     }
     if (ordersData) {
@@ -152,7 +158,7 @@ function OrderSystemInChina() {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        setSnackbarOpen(true); 
+        setSnackbarOpen(true);
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
@@ -209,9 +215,14 @@ function OrderSystemInChina() {
       renderCell: (params) => {
         const items = params?.row?.items || [];
         const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
+        console.log(trackingID, "trackingID");
         return (
           <Box className="d-flex align-items-center justify-content-center">
-            <Typography>{trackingID}</Typography>
+            <Typography>
+              {trackingID === "0" || trackingID === ""
+                ? "Please Enter trackID"
+                : trackingID}
+            </Typography>
             {trackingID !== "0" && (
               <IconButton onClick={() => handleCopy(trackingID)}>
                 <ContentCopyIcon />
@@ -282,7 +293,7 @@ function OrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage({ tableId: 'OrderSystemInChina', page: value }));
+    dispatch(setCurrentPage({ tableId: "OrderSystemInChina", page: value }));
   };
 
   const radios = [
