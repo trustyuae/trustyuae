@@ -21,7 +21,7 @@ import {
   FetchPoProductData,
 } from "../../Redux2/slices/P3SystemSlice";
 import OrderModal from "./OrdersModal";
-// import OnHoldProductDetailsPrintModal from "./OnHoldProductDetailsPrintModal";
+import OnHoldProductDetailsPrintModal from "./OnHoldProductDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
 import { getUserData } from "../../utils/StorageUtils";
 
