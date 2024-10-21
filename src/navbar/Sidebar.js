@@ -215,6 +215,20 @@ const Sidebar = () => {
                 </li>
                 <li>
                   <Link
+                    to="/GRN_Products_Pending_System"
+                    className={
+                      "nav-link underline" +
+                      (activeMenuItem === "/GRN_Products_Pending_System"
+                        ? " active"
+                        : "")
+                    }
+                  >
+                    <i className="bi bi-circle"></i>
+                    <span>GRN Products Pending System</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     to="/GRN_Management"
                     className={
                       "nav-link underline" +

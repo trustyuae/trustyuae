@@ -19,11 +19,15 @@ const initialState = {
   poProductData: [],
   ordersData: [],
   assignOrderData: [],
+  pendingItemsData: [],
+  pendingItemsData: [],
+  poidsData: [],
+  poidwithPendingProducts: [],
   error: null,
 };
 
 export const GetProductManual = createAsyncThunk(
-  "factory/GetProductManual",
+  "P3System/GetProductManual",
   async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -37,7 +41,7 @@ export const GetProductManual = createAsyncThunk(
 );
 
 export const AddGrn = createAsyncThunk(
-  "factory/AddGrn",
+  "P3System/AddGrn",
   async (payload, { rejectWithValue }) => {
     try {
       console.log(payload, "payload");
@@ -59,7 +63,7 @@ export const AddGrn = createAsyncThunk(
 );
 
 export const GetGRNList = createAsyncThunk(
-  "factory/GetGRNList",
+  "P3System/GetGRNList",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -72,7 +76,7 @@ export const GetGRNList = createAsyncThunk(
 );
 
 export const GetGRNListOnBasisOrderId = createAsyncThunk(
-  "factory/GetGRNListOnBasisOrderId",
+  "P3System/GetGRNListOnBasisOrderId",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -85,7 +89,7 @@ export const GetGRNListOnBasisOrderId = createAsyncThunk(
 );
 
 export const GetGRNView = createAsyncThunk(
-  "factory/GetGRNView",
+  "P3System/GetGRNView",
   async (apiUrl, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -98,7 +102,7 @@ export const GetGRNView = createAsyncThunk(
 );
 
 export const GetProductDetails = createAsyncThunk(
-  "factory/GetProductDetails",
+  "P3System/GetProductDetails",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -111,7 +115,7 @@ export const GetProductDetails = createAsyncThunk(
 );
 
 export const GetProductOrderDetails = createAsyncThunk(
-  "factory/GetProductOrderDetails",
+  "P3System/GetProductOrderDetails",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -124,7 +128,7 @@ export const GetProductOrderDetails = createAsyncThunk(
 );
 
 export const AddProductOrderForPre = createAsyncThunk(
-  "factory/AddProductOrderForPre",
+  "P3System/AddProductOrderForPre",
   async ({ requestedDataP }, { rejectWithValue }) => {
     console.log(requestedDataP, "requestedDataP");
     try {
@@ -142,7 +146,7 @@ export const AddProductOrderForPre = createAsyncThunk(
 );
 
 export const AddProductOrderForStock = createAsyncThunk(
-  "factory/AddProductOrderForStock",
+  "P3System/AddProductOrderForStock",
   async ({ requestedData }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -158,7 +162,7 @@ export const AddProductOrderForStock = createAsyncThunk(
 );
 
 export const AddRemark = createAsyncThunk(
-  "orderSystem/AddRemark",
+  "P3System/AddRemark",
   async ({ selectedGrnNo, requestedMessage }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
@@ -174,7 +178,7 @@ export const AddRemark = createAsyncThunk(
 );
 
 export const GetAllProducts = createAsyncThunk(
-  "orderSystem/GetAllProducts",
+  "P3System/GetAllProducts",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
@@ -189,7 +193,7 @@ export const GetAllProducts = createAsyncThunk(
 );
 
 export const FetchPoProductData = createAsyncThunk(
-  "orderSystem/FetchPoProductData",
+  "P3System/FetchPoProductData",
   async ({ apiUrl }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl);
@@ -202,10 +206,8 @@ export const FetchPoProductData = createAsyncThunk(
 );
 
 export const GetOrderIdsData = createAsyncThunk(
-  "orderSystem/GetOrderIdsData",
+  "P3System/GetOrderIdsData",
   async ({ payload }, { rejectWithValue }) => {
-    console.log(payload, "payload");
-    console.log("GetOrderIdsData");
     try {
       const response = await axiosInstance.post(
         `wp-json/custom-get-order/v1/get-order-id/`,
@@ -217,7 +219,7 @@ export const GetOrderIdsData = createAsyncThunk(
         }
       );
       console.log(response, "response");
-      return response.data; // Return the actual data from the response
+      return response.data;
     } catch (error) {
       console.error("Error while getting OrderIds:", error.message);
       return rejectWithValue(error.message);
@@ -226,16 +228,82 @@ export const GetOrderIdsData = createAsyncThunk(
 );
 
 export const AssignOrders = createAsyncThunk(
-  "orderSystem/AssignOrders",
+  "P3System/AssignOrders",
   async ({ payload }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axiosInstance.post(
         `wp-json/custom-assign-order/v1/assign-item-order/`,
         payload
+      );
+      console.log(response, "response");
+      return response;
+    } catch (error) {
+      console.error("Error while gettting AllProducts:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const FetchPendingItemsData = createAsyncThunk(
+  "P3System/FetchPendingItemsData",
+  async ({ orderId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-not-grn/v1/grn-missing-orders/${orderId}`
       );
       return response.data;
     } catch (error) {
       console.error("Error while gettting AllProducts:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const FetchPoIds = createAsyncThunk(
+  "P3System/FetchPoIds",
+  async ({ selectedFactory, selectedPOId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/get-po-ids/v1/show-po-id/`,
+        {
+          params: {
+            factory_id: selectedFactory,
+            po_id: selectedPOId,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error while gettting Poids:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const FetchPoIdsWithPendingProductData = createAsyncThunk(
+  "P3System/FetchPoIdsWithPendingProductData",
+  async (
+    { selectedFactory, selectedPOId, pageSize, page },
+    { rejectWithValue }
+  ) => {
+    console.log(selectedFactory, "selectedFactory");
+    console.log(selectedPOId, "selectedPOId");
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-get-products/v1/get-pending-grn-list/?per_page=${pageSize}&page=${page}`,
+        {
+          params: {
+            factory_id: selectedFactory,
+            po_id: selectedPOId,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error while gettting poids with product data:",
+        error.message
+      );
       return rejectWithValue(error.message);
     }
   }
@@ -268,6 +336,9 @@ const P3SystemSlice = createSlice({
       state.poProductData = [];
       state.ordersData = [];
       state.assignOrderData = [];
+      state.pendingItemsData = [];
+      state.poidsData = [];
+      state.poidwithPendingProducts = [];
       state.error = null;
     },
   },
@@ -424,6 +495,39 @@ const P3SystemSlice = createSlice({
         state.assignOrderData = action.payload;
       })
       .addCase(AssignOrders.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(FetchPendingItemsData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(FetchPendingItemsData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.pendingItemsData = action.payload;
+      })
+      .addCase(FetchPendingItemsData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(FetchPoIds.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(FetchPoIds.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.poidsData = action.payload;
+      })
+      .addCase(FetchPoIds.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(FetchPoIdsWithPendingProductData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(FetchPoIdsWithPendingProductData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.poidwithPendingProducts = action.payload;
+      })
+      .addCase(FetchPoIdsWithPendingProductData.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
