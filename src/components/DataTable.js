@@ -203,6 +203,14 @@ export default function DataTable({
                 return "bg-yellow";
               }
             }
+            if (params.colDef.className == "po-details") {
+              if (!params.row.item_hide) {
+                return "";
+              }
+              if (params.row.item_hide === "1") {
+                return "bg-danger";
+              }
+            }
           }}
           checkboxSelection={checkboxSelection}
           onCellEditStart={onCellEditStart}

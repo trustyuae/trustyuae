@@ -408,6 +408,7 @@ const PoDetails = () => {
       field: "product_name",
       headerName: t("POManagement.ProductName"),
       flex: 4,
+      className: "po-details",
       colSpan: (value, row) => {
         if (row.id === "TAX") {
           return 3;
@@ -425,6 +426,7 @@ const PoDetails = () => {
       field: "variation_value",
       headerName: t("POManagement.Variation"),
       flex: 4,
+      className: "po-details",
       renderCell: variant2,
     },
     {
@@ -432,6 +434,7 @@ const PoDetails = () => {
       headerName: t("POManagement.Image"),
       flex: 4,
       type: "html",
+      className: "po-details",
       renderCell: (value, row) => {
         return (
           <Box
@@ -455,11 +458,11 @@ const PoDetails = () => {
         );
       },
     },
-
     {
       field: "quantity",
       headerName: t("POManagement.QtyOrdered"),
       flex: 2.5,
+      className: "po-details",
       renderCell: (params) => {
         const handleClick = () => {
           handlePoModal(params.row.product_id, params.row.variation_id);
@@ -480,6 +483,7 @@ const PoDetails = () => {
       field: "received_quantity",
       headerName: t("POManagement.ReceivedQty"),
       flex: 2.5,
+      className: "po-details",
       colSpan: (value, row) => {
         if (row?.id == "TAX") {
           return 4;
@@ -487,6 +491,7 @@ const PoDetails = () => {
         return undefined;
       },
       renderCell: (params) => {
+        console.log(params.row.item_hide,'params')
         if (params?.row?.id == "TAX") {
           return null;
         }
@@ -498,6 +503,7 @@ const PoDetails = () => {
               value={params.row.received_quantity}
               placeholder="0"
               onChange={(e) => handleRecievedQtyChange(e, params.row)}
+              disabled={params.row.item_hide === "1"} 
             />
           </Form.Group>
         );
@@ -507,6 +513,7 @@ const PoDetails = () => {
       field: "available_quantity",
       headerName: t("POManagement.AvlQty"),
       flex: 2.5,
+      className: "po-details",
       renderCell: (params) => {
         if (params.row.id === "TAX") {
           return null;
@@ -519,6 +526,7 @@ const PoDetails = () => {
               value={params.row.available_quantity}
               placeholder="0"
               onChange={(e) => handleAvailableQtyChange(e, params.row)}
+              disabled={params.row.item_hide === "1"} 
             />
           </Form.Group>
         );
@@ -528,6 +536,7 @@ const PoDetails = () => {
       field: "availability_status",
       headerName: t("POManagement.AvlStatus"),
       flex: 8,
+      className: "po-details",
       renderCell: (params) => {
         const rowId = params.row.id;
         const selectedDate = params.row.availability_date || ""; // Use state date or fallback to availability_date
@@ -556,6 +565,7 @@ const PoDetails = () => {
             <Form.Select
               labelId={`customer-status-${rowId}-label`}
               id={`customer-status-${rowId}`}
+              disabled={params.row.item_hide === "1"} 
               value={
                 params.row.availability_status !== "" &&
                 params.row.availability_status !== "0"
@@ -584,6 +594,7 @@ const PoDetails = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 format="YYYY-MM-DD"
+                disabled={params.row.item_hide === "1"} 
                 value={dateValue} // Use determined value for DatePicker
                 onChange={(date) => handleDateChange(rowId, date)}
                 sx={{
@@ -606,6 +617,7 @@ const PoDetails = () => {
       field: "dispatch_type",
       headerName: t("POManagement.DispatchStatus"),
       flex: 3,
+      className: "po-details",
       renderCell: (params) => {
         if (params?.row?.id == "TAX") {
           return null;
@@ -617,6 +629,7 @@ const PoDetails = () => {
             onChange={(e) =>
               handleDispatchStatusChange(e.target.value, params.row)
             }
+            disabled={params.row.item_hide === "1"} 
           >
             <option disabled selected value="">
               {t("POManagement.Select")}...
@@ -633,6 +646,7 @@ const PoDetails = () => {
       field: "rmb_price",
       headerName: t("POManagement.RMBPrice"),
       flex: 3,
+      className: "po-details",
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
           return row.taxTotal;
@@ -644,6 +658,7 @@ const PoDetails = () => {
       field: "total_price",
       headerName: t("POManagement.AEDPrice"),
       flex: 3,
+      className: "po-details",
       colSpan: (value, row) => {
         if (row.id === "TAX") {
           return 1;
