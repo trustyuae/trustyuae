@@ -93,7 +93,8 @@ function OnHoldManegementSystem() {
   useEffect(() => {
     if (factoryData) {
       const factData = factoryData?.factories?.map((item) => ({ ...item }));
-      setFactories(factData);
+      const filteredData = factData?.filter((item) => item.inactive === "0");
+      setFactories(filteredData);
     }
   }, [factoryData]);
 
@@ -878,7 +879,7 @@ function OnHoldManegementSystem() {
     if (selectedPOId) {
       fetchPoProductData();
     }
-  }, [selectedPOId, selectedFactory,pageSize, page]);
+  }, [selectedPOId, selectedFactory, pageSize, page]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -935,14 +936,14 @@ function OnHoldManegementSystem() {
           <Col xs="auto" lg="3">
             <Form.Label className="fw-semibold">Select PO ID</Form.Label>
             <Select
-              options={allPoIds} 
-              value={allPoIds.find((option) => option.value === selectedPOId)} 
-              onChange={handleChangePoID} 
+              options={allPoIds}
+              value={allPoIds.find((option) => option.value === selectedPOId)}
+              onChange={handleChangePoID}
               isClearable
-              placeholder="Select PO ID" 
-              noOptionsMessage={() => "No PO IDs found"} 
-              getOptionLabel={(option) => option.label} 
-              getOptionValue={(option) => option.value} 
+              placeholder="Select PO ID"
+              noOptionsMessage={() => "No PO IDs found"}
+              getOptionLabel={(option) => option.label}
+              getOptionValue={(option) => option.value}
               closeMenuOnSelect={false}
             />
           </Col>
