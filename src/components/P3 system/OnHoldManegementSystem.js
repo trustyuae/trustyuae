@@ -1020,105 +1020,102 @@ function OnHoldManegementSystem() {
       )}
       <MDBRow className="px-3">
         <Card className="py-3">
-          {tableData.length > 0 &&
-            selectedFactory.length <= 0 &&
-            selectedPOId.length <= 0 && (
-              <>
-                <div className="mt-2">
-                  <DataTable
-                    columns={columns}
-                    rows={tableData}
-                    // rowHeight={'auto'}
-                    // page={page}
-                    // pageSize={pageSize}
-                    // totalPages={totalPages}
-                    // handleChange={handleChange}
-                    showAllRows={true}
-                    // rowHeight="auto"
-                    hidePagination={true}
-                  />
-                </div>
-                <MDBRow className="justify-content-end px-3 py-2">
-                  {loading ? (
-                    <Button
-                      variant="primary"
-                      disabled
-                      style={{ width: "130px" }}
-                      onClick={handleSubmit}
-                    >
-                      submit
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      disabled={
-                        !isValid &&
-                        poTableData.length == 0 &&
-                        tableData.length == 0
-                      }
-                      style={{ width: "130px" }}
-                      onClick={handleSubmit}
-                    >
-                      submit
-                    </Button>
-                  )}
-                </MDBRow>
-              </>
-            )}
-          <>
+          {tableData?.length > 0 && !selectedFactory && !selectedPOId ? (
+            <>
+              <div className="mt-2">
+                <DataTable
+                  columns={columns}
+                  rows={tableData}
+                  showAllRows={true} // Display all rows
+                  hidePagination={true} // Hide pagination for this instance
+                />
+              </div>
+              <MDBRow className="justify-content-end px-3 py-2">
+                {loading ? (
+                  <Button
+                    variant="primary"
+                    disabled
+                    style={{ width: "130px" }} // Button size
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    disabled={
+                      (!isValid || poTableData.length === 0) &&
+                      tableData.length === 0
+                    }
+                    style={{ width: "130px" }} // Button size
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+                )}
+              </MDBRow>
+            </>
+          ) : (
             <div className="mt-2">
-              {poTableData && poTableData.length != 0 ? (
+              {poTableData?.length !== 0 &&
+              (selectedPOId?.length !== 0 || selectedPOId) ? (
                 <>
                   <DataTable
                     columns={poColumns}
                     rows={poTableData}
-                    page={page}
+                    page={page} // Pagination props
                     pageSize={pageSize}
                     totalPages={totalPages}
-                    handleChange={handleChange}
-                    rowHeight="auto"
-                    // showAllRows={true}
-                    // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
-                    // hidePagination={true}
+                    handleChange={handleChange} // Pagination handler
+                    rowHeight="auto" // Auto-adjust row height
                   />
+                  <MDBRow className="justify-content-end px-3 py-2">
+                    {loading ? (
+                      <Button
+                        variant="primary"
+                        disabled
+                        style={{ width: "130px" }}
+                        // onClick={handleCreateGrn}
+                        onClick={handleCreateGrn}
+                      >
+                        Create GRN
+                      </Button>
+                    ) : (
+                      <Box className="d-flex justify-content-end  mt-3">
+                        {/* <Button
+                          variant="outline-primary"
+                          className="p-1 me-3 bg-transparent text-primary"
+                          onClick={handlePrint}
+                        >
+                          <LocalPrintshopOutlinedIcon className="me-1" />
+                        </Button> */}
+                        <Button
+                          variant="primary"
+                          disabled={
+                            !isValid &&
+                            poTableData.length == 0 &&
+                            tableData.length == 0
+                          }
+                          style={{ width: "130px" }}
+                          // onClick={handleCreateGrn}
+                          onClick={handleCreateGrn}
+                        >
+                          Create GRN
+                        </Button>
+                      </Box>
+                    )}
+                  </MDBRow>
                 </>
               ) : (
-                <>
-                  <Alert
-                    severity="warning"
-                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                  >
-                    Records is not Available for above filter
-                  </Alert>
-                </>
+                <Alert
+                  severity="warning"
+                  sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                >
+                  Records are not available for the selected filter
+                </Alert>
               )}
             </div>
-            <MDBRow className="justify-content-end px-3 py-2">
-              {loading ? (
-                <Button
-                  variant="primary"
-                  disabled
-                  style={{ width: "130px" }}
-                  // onClick={handleCreateGrn}
-                  onClick={handleCreateGrn}
-                >
-                  Create GRN
-                </Button>
-              ) : (
-                <Button
-                  variant="primary"
-                  disabled={
-                    !isValid && poTableData.length == 0 && tableData.length == 0
-                  }
-                  style={{ width: "130px" }}
-                  // onClick={handleCreateGrn}
-                  onClick={handleCreateGrn}
-                >
-                  Create GRN
-                </Button>
-              )}
-            </MDBRow>
-          </>
+          )}
         </Card>
       </MDBRow>
       {showOrdersModalOpen && (
