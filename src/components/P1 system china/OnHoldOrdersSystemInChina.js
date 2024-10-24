@@ -35,7 +35,7 @@ function OnHoldOrdersSystemInChina() {
   const [endDate, setEndDate] = useState("");
   const [completedStartDate, setCompletedStartDate] = useState("");
   const [completedEndDate, setCompletedEndDate] = useState("");
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [dispatchType, setDispatchType] = useState("all");
