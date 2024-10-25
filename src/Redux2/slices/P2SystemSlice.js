@@ -99,7 +99,7 @@ export const RefundPoDetailsForModalInView = createAsyncThunk(
   async ({poId }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${poId}`
+        `wp-json/custom-porefund-details/v1/po-refund-details/${poId}`
       );
       return response.data;
     } catch (error) {

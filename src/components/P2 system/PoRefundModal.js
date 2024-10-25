@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Alert, Button, Modal, Table } from "react-bootstrap";
+import { Alert, Button, Card, Modal, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../utils/Loader";
-import { QuantityPoDetailsForModalInView } from "../../Redux2/slices/P2SystemSlice";
+import {
+  QuantityPoDetailsForModalInView,
+  RefundPoDetailsForModalInView,
+} from "../../Redux2/slices/P2SystemSlice";
 import DataTable from "../DataTable";
 import { t } from "i18next";
-import { Avatar, Box } from "@mui/material";
+import { Avatar, Box} from "@mui/material";
 
 const PoRefundModal = ({
   show,
@@ -26,9 +29,9 @@ const PoRefundModal = ({
 
   useEffect(() => {
     const fetchData = () => {
-      dispatch(QuantityPoDetailsForModalInView({ poId }))
+      dispatch(RefundPoDetailsForModalInView({ poId }))
         .then(({ payload }) => {
-          const data = payload?.orders.map((v, id) => ({
+          const data = payload?.map((v, id) => ({
             ...v,
             id,
           }));
@@ -78,8 +81,8 @@ const PoRefundModal = ({
   };
 
   const ImageModule = (rowData) => {
-    setImageURL(rowData.product_image);
-    setImageId(rowData.item_id);
+    setImageURL(rowData?.image);
+    setImageId(rowData?.product_id);
     setShowEditModal(true);
   };
 
@@ -116,30 +119,32 @@ const PoRefundModal = ({
       headerName: t("POManagement.Image"),
       flex: 1,
       className: "order-details-in-china",
-      renderCell: (params) => (
-        <Box
-          className="h-100 w-100 d-flex align-items-center"
-          onClick={() => {
-            ImageModule(params?.value);
-          }}
-        >
-          <Avatar
-            src={params.value || require("../../assets/default.png")}
-            alt="Product Image"
-            sx={{
-              height: "45px",
-              width: "45px",
-              borderRadius: "2px",
-              margin: "0 auto",
-              "& .MuiAvatar-img": {
-                height: "100%",
-                width: "100%",
-                borderRadius: "2px",
-              },
+      renderCell: (params) => {
+        return (
+          <Box
+            className="h-100 w-100 d-flex align-items-center"
+            onClick={() => {
+              ImageModule(params?.row);
             }}
-          />
-        </Box>
-      ),
+          >
+            <Avatar
+              src={params?.row?.image || require("../../assets/default.png")}
+              alt="Product Image"
+              sx={{
+                height: "45px",
+                width: "45px",
+                borderRadius: "2px",
+                margin: "0 auto",
+                "& .MuiAvatar-img": {
+                  height: "100%",
+                  width: "100%",
+                  borderRadius: "2px",
+                },
+              }}
+            />
+          </Box>
+        );
+      },
     },
     {
       field: "quantity",
@@ -148,7 +153,7 @@ const PoRefundModal = ({
       className: "order-details-in-china",
     },
     {
-      field: "item_id",
+      field: "order_id",
       headerName: t("P1ChinaSystem.OrderId"),
       className: "order-details-in-china",
       flex: 0.5,
@@ -178,6 +183,21 @@ const PoRefundModal = ({
             Close
           </Button>
         </Modal.Footer>
+      </Modal>
+      <Modal
+        show={showEditModal}
+        // onHide={handleCloseEditModal}
+        onHide={() => setShowEditModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Product ID - {imageId}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Card className="factory-card">
+            <img src={imageURL} alt="Product" />
+          </Card>
+        </Modal.Body>
       </Modal>
     </>
   );

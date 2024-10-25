@@ -81,6 +81,7 @@ const PoDetails = () => {
   const [imageId, setImageId] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [poRaiseDate, setPoRaiseDate] = useState(null);
+  const [showRefundModal, setShowRefundModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -139,6 +140,10 @@ const PoDetails = () => {
       await dispatch(PerticularPoDetails({ apiUrl })).then(({ payload }) => {
         let data = payload.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
+        const hasHiddenItems = data.some((item) => item.item_hide === "1");
+        if (hasHiddenItems) {
+          setShowRefundModal(true);
+        }
         const row = [
           ...data,
           {
@@ -822,17 +827,14 @@ const PoDetails = () => {
                   )}
                 </Box>
                 <Box>
-                  {erId ? (
-                    <div>
-                      <Typography className="fw-bold"># {erId}</Typography>
-                      <Typography sx={{ fontSize: 14 }}>
-                        <Badge bg="success">Exchange & Return ID</Badge>
-                      </Typography>
-                    </div>
-                  ) : (
+                  {showRefundModal && (
                     <Alert
                       severity="warning"
-                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                      sx={{
+                        fontFamily: "monospace",
+                        fontSize: "18px",
+                        backgroundColor: "#f0e68c",
+                      }}
                     >
                       <Typography component="span">
                         {t("POManagement.RF")}{" "}
