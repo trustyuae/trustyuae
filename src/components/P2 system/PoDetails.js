@@ -50,6 +50,7 @@ import {
   UpdatePODetails,
 } from "../../Redux2/slices/P2SystemSlice";
 import ShowAlert from "../../utils/ShowAlert";
+import PoRefundModal from "./PoRefundModal";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -63,6 +64,7 @@ const PoDetails = () => {
   const [factorieName, setFactorieName] = useState("");
   const [printModal, setPrintModal] = useState(false);
   const [poDetailsModal, setPoDetailsModal] = useState(false);
+  const [poRefundModal, setPoRefundModal] = useState(false);
   const [productId, setProductId] = useState(null);
   const [variationId, setVariationId] = useState(null);
   const [erId, setERId] = useState(null);
@@ -147,7 +149,7 @@ const PoDetails = () => {
             total_cost: payload?.total_cost || 0,
           },
         ];
-        setPoRaiseDate(payload.po_date)
+        setPoRaiseDate(payload.po_date);
         setPO_OrderList(row);
         setERId(payload.er_no);
         setFactorieName(payload.factory_id);
@@ -280,7 +282,7 @@ const PoDetails = () => {
           title: validationMessage,
           showConfirmButton: true,
         });
-        return; 
+        return;
       }
       updatedData.availability_status = availabilityStatuses;
     }
@@ -354,25 +356,32 @@ const PoDetails = () => {
 
   const variant2 = (params) => {
     const variationValue = params.row.variation_value;
-  
+
     let variationArray = [];
     try {
       if (variationValue) {
         if (typeof variationValue === "string") {
           const parsedValue = JSON.parse(variationValue);
           if (typeof parsedValue === "object" && parsedValue !== null) {
-            variationArray = Object.entries(parsedValue).map(([key, value]) => ({
-              [key]: value,
-            }));
+            variationArray = Object.entries(parsedValue).map(
+              ([key, value]) => ({
+                [key]: value,
+              })
+            );
           } else {
             console.error("Parsed value is not an object:", parsedValue);
           }
         } else if (typeof variationValue === "object") {
-          variationArray = Object.entries(variationValue).map(([key, value]) => ({
-            [key]: value,
-          }));
+          variationArray = Object.entries(variationValue).map(
+            ([key, value]) => ({
+              [key]: value,
+            })
+          );
         } else {
-          console.error("Variation value is not a valid format:", variationValue);
+          console.error(
+            "Variation value is not a valid format:",
+            variationValue
+          );
         }
       } else {
         console.error("Variation value is empty or not defined.");
@@ -380,7 +389,7 @@ const PoDetails = () => {
     } catch (error) {
       console.error("Error parsing JSON:", error);
     }
-  
+
     return (
       <div className="container mt-4 mb-4">
         {variationArray.length === 0 ? (
@@ -402,7 +411,7 @@ const PoDetails = () => {
       </div>
     );
   };
-  
+
   const columns = [
     {
       field: "product_name",
@@ -491,7 +500,7 @@ const PoDetails = () => {
         return undefined;
       },
       renderCell: (params) => {
-        console.log(params.row.item_hide,'params')
+        console.log(params.row.item_hide, "params");
         if (params?.row?.id == "TAX") {
           return null;
         }
@@ -503,7 +512,7 @@ const PoDetails = () => {
               value={params.row.received_quantity}
               placeholder="0"
               onChange={(e) => handleRecievedQtyChange(e, params.row)}
-              disabled={params.row.item_hide === "1"} 
+              disabled={params.row.item_hide === "1"}
             />
           </Form.Group>
         );
@@ -526,7 +535,7 @@ const PoDetails = () => {
               value={params.row.available_quantity}
               placeholder="0"
               onChange={(e) => handleAvailableQtyChange(e, params.row)}
-              disabled={params.row.item_hide === "1"} 
+              disabled={params.row.item_hide === "1"}
             />
           </Form.Group>
         );
@@ -565,7 +574,7 @@ const PoDetails = () => {
             <Form.Select
               labelId={`customer-status-${rowId}-label`}
               id={`customer-status-${rowId}`}
-              disabled={params.row.item_hide === "1"} 
+              disabled={params.row.item_hide === "1"}
               value={
                 params.row.availability_status !== "" &&
                 params.row.availability_status !== "0"
@@ -594,7 +603,7 @@ const PoDetails = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 format="YYYY-MM-DD"
-                disabled={params.row.item_hide === "1"} 
+                disabled={params.row.item_hide === "1"}
                 value={dateValue} // Use determined value for DatePicker
                 onChange={(date) => handleDateChange(rowId, date)}
                 sx={{
@@ -629,7 +638,7 @@ const PoDetails = () => {
             onChange={(e) =>
               handleDispatchStatusChange(e.target.value, params.row)
             }
-            disabled={params.row.item_hide === "1"} 
+            disabled={params.row.item_hide === "1"}
           >
             <option disabled selected value="">
               {t("POManagement.Select")}...
@@ -769,9 +778,17 @@ const PoDetails = () => {
       <Card className="p-3 mb-3">
         <Box className="d-flex align-items-center justify-content-between">
           <Box>
-            <Typography variant="h6" className="fw-bold mb-3">
-              {t("POManagement.PODetails")}
-            </Typography>
+            <Box className="d-flex justify-content-between">
+              <Typography variant="h6" className="fw-bold mb-3">
+                {t("POManagement.PODetails")}
+              </Typography>
+              <Typography variant="h6" className="fw-bold mb-3">
+                {
+                  factories.find((factory) => factory.id == factorieName)
+                    ?.factory_name
+                }
+              </Typography>
+            </Box>
             <Box className="d-flex justify-content-between">
               <Box>
                 <Box>
@@ -786,17 +803,12 @@ const PoDetails = () => {
                   <Badge bg="success">{POTypes(id)}</Badge>
                 </Typography>
               </Box>
-              <Box style={{ marginLeft: "20px" }}>
+              <Box sx={{ display: "flex", gap: 2, ml: 2 }}>
                 <Box>
                   {erId ? (
                     <div>
                       <Typography className="fw-bold"># {erId}</Typography>
-                      <Typography
-                        className=""
-                        sx={{
-                          fontSize: 14,
-                        }}
-                      >
+                      <Typography sx={{ fontSize: 14 }}>
                         <Badge bg="success">Exchange & Return ID</Badge>
                       </Typography>
                     </div>
@@ -809,16 +821,38 @@ const PoDetails = () => {
                     </Alert>
                   )}
                 </Box>
+                <Box>
+                  {erId ? (
+                    <div>
+                      <Typography className="fw-bold"># {erId}</Typography>
+                      <Typography sx={{ fontSize: 14 }}>
+                        <Badge bg="success">Exchange & Return ID</Badge>
+                      </Typography>
+                    </div>
+                  ) : (
+                    <Alert
+                      severity="warning"
+                      sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                    >
+                      <Typography component="span">
+                        {t("POManagement.RF")}{" "}
+                        <Typography
+                          component="span"
+                          onClick={() => setPoRefundModal(true)}
+                          sx={{
+                            cursor: "pointer",
+                            color: "blue",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          Click to view details.
+                        </Typography>
+                      </Typography>
+                    </Alert>
+                  )}
+                </Box>
               </Box>
             </Box>
-          </Box>
-          <Box>
-            <Typography variant="h6" className="fw-bold mb-3">
-              {
-                factories.find((factory) => factory.id == factorieName)
-                  ?.factory_name
-              }
-            </Typography>
           </Box>
         </Box>
       </Card>
@@ -1037,6 +1071,14 @@ const PoDetails = () => {
           productId={productId}
           variationId={variationId}
           handleClosePoDetailsModal={() => setPoDetailsModal(false)}
+          poId={id}
+        />
+      )}
+      {poRefundModal && (
+        <PoRefundModal
+          show={poRefundModal}
+          poDetailsModal={poRefundModal}
+          handleClosePoDetailsModal={() => setPoRefundModal(false)}
           poId={id}
         />
       )}

@@ -63,6 +63,7 @@ i18n.use(initReactI18next).init({
           PODetails: "採購訂單詳情",
           Variation: "變化",
           ER: "此 PO 不支援換貨或退貨!",
+          RF: "此寶已退款！",
           AvlQty: "平均數量",
           AvlStatus: "平均狀態",
           DispatchStatus: "出貨狀態",
@@ -140,7 +141,7 @@ i18n.use(initReactI18next).init({
           Push: "推",
           Update: "更新",
           Upload: "上傳",
-          ExcellSheet:'Excel工作表'
+          ExcellSheet: "Excel工作表",
         },
       },
     },
@@ -200,6 +201,7 @@ i18n.use(initReactI18next).init({
           ProductImage: "Product Image",
           Variation: "Variation",
           ER: "There are no exchanges or returns for this PO!",
+          RF: "This Po Has Refund Genarated!",
           AvlQty: "Avl Qty",
           AvlStatus: "Avl Status",
           DispatchStatus: "Dispatch Status",
@@ -278,7 +280,7 @@ i18n.use(initReactI18next).init({
           Push: "Push",
           Update: "Update",
           Upload: "Upload",
-          ExcellSheet:'ExcellSheet'
+          ExcellSheet: "ExcellSheet",
         },
       },
     },

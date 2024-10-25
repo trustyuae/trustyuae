@@ -747,10 +747,12 @@ function OnHoldManegementSystem() {
     try {
       dispatch(FetchPoIds({ selectedFactory, selectedPOId })).then(
         ({ payload }) => {
-          const formattedPoIds = payload.map((poId) => ({
-            value: poId,
-            label: poId,
-          }));
+          const formattedPoIds = Array.isArray(payload)
+            ? payload.map((poId) => ({
+                value: poId,
+                label: poId,
+              }))
+            : [];
           setAllPoIds(formattedPoIds);
         }
       );
