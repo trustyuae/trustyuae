@@ -34,6 +34,7 @@ import { getUserData } from "../../utils/StorageUtils";
 import OrderModal from "./OrdersModal";
 import OnHoldProductDetailsPrintModal from "./OnHoldProductDetailsPrintModal";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import PoRefundModal from "./PoRefundModal";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -84,6 +85,9 @@ function OnHoldManegementSystem() {
   const [variationID, setVariationID] = useState(null);
 
   const [printModal, setPrintModal] = useState(false);
+
+  const [poRefundModal, setPoRefundModal] = useState(false);
+  const [showRefundModal, setShowRefundModal] = useState(false);
 
   const allProducts = useSelector(
     (state) => state?.p3System?.allProducts?.products
@@ -769,6 +773,9 @@ function OnHoldManegementSystem() {
           ...item,
           id: i + currentStartIndex,
         }));
+        if (data.length != payload.total_items) {
+          setShowRefundModal(true);
+        }
         setPoTableData(data);
         setTotalPages(payload.total_pages);
         setPoId(payload.po_id);
@@ -1053,8 +1060,8 @@ function OnHoldManegementSystem() {
                 <DataTable
                   columns={columns}
                   rows={tableData}
-                  showAllRows={true} // Display all rows
-                  hidePagination={true} // Hide pagination for this instance
+                  showAllRows={true}
+                  hidePagination={true}
                 />
               </div>
               <MDBRow className="justify-content-end px-3 py-2">
@@ -1083,65 +1090,94 @@ function OnHoldManegementSystem() {
               </MDBRow>
             </>
           ) : (
-            <div className="mt-2">
-              {poTableData?.length !== 0 &&
-              (selectedPOId?.length !== 0 || selectedPOId) ? (
-                <>
-                  <DataTable
-                    columns={poColumns}
-                    rows={poTableData}
-                    page={page} // Pagination props
-                    pageSize={pageSize}
-                    totalPages={totalPages}
-                    handleChange={handleChange} // Pagination handler
-                    rowHeight="auto" // Auto-adjust row height
-                  />
-                  <MDBRow className="justify-content-end px-3 py-2">
-                    {loading ? (
-                      <Button
-                        variant="primary"
-                        disabled
-                        style={{ width: "130px" }}
-                        // onClick={handleCreateGrn}
-                        onClick={handleCreateGrn}
-                      >
-                        Create GRN
-                      </Button>
-                    ) : (
-                      <Box className="d-flex justify-content-end px-3 py-2">
-                        <Button
-                          variant="outline-primary"
-                          className="p-1 me-3 bg-transparent text-primary"
-                          onClick={handlePrint}
-                        >
-                          <LocalPrintshopOutlinedIcon className="me-1" />
-                        </Button>
+            <>
+              {showRefundModal && selectedPOId && (
+                <Alert
+                  severity="warning"
+                  sx={{
+                    fontFamily: "monospace",
+                    fontSize: "18px",
+                    backgroundColor: "#f0e68c",
+                  }}
+                >
+                  <Typography component="span">
+                    This Po Has Refund Genarated!
+                    <Typography
+                      component="span"
+                      onClick={() => setPoRefundModal(true)}
+                      sx={{
+                        cursor: "pointer",
+                        color: "blue",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Click to view details.
+                    </Typography>
+                  </Typography>
+                </Alert>
+              )}
+              <div className="mt-2">
+                {poTableData?.length !== 0 &&
+                (selectedPOId?.length !== 0 || selectedPOId) ? (
+                  <>
+                    <div className="mt-2">
+                      <DataTable
+                        columns={poColumns}
+                        rows={poTableData}
+                        page={page} // Pagination props
+                        pageSize={pageSize}
+                        totalPages={totalPages}
+                        handleChange={handleChange} // Pagination handler
+                        rowHeight="auto" // Auto-adjust row height
+                      />
+                    </div>
+                    <MDBRow className="justify-content-end px-3 py-2">
+                      {loading ? (
                         <Button
                           variant="primary"
-                          disabled={
-                            !isValid &&
-                            poTableData.length == 0 &&
-                            tableData.length == 0
-                          }
+                          disabled
                           style={{ width: "130px" }}
                           // onClick={handleCreateGrn}
                           onClick={handleCreateGrn}
                         >
                           Create GRN
                         </Button>
-                      </Box>
-                    )}
-                  </MDBRow>
-                </>
-              ) : (
-                <Alert
-                  severity="warning"
-                  sx={{ fontFamily: "monospace", fontSize: "18px" }}
-                >
-                  Records are not available for the selected filter
-                </Alert>
-              )}
-            </div>
+                      ) : (
+                        <Box className="d-flex justify-content-end px-3 py-2">
+                          <Button
+                            variant="outline-primary"
+                            className="p-1 me-3 bg-transparent text-primary"
+                            onClick={handlePrint}
+                          >
+                            <LocalPrintshopOutlinedIcon className="me-1" />
+                          </Button>
+                          <Button
+                            variant="primary"
+                            disabled={
+                              !isValid &&
+                              poTableData.length == 0 &&
+                              tableData.length == 0
+                            }
+                            style={{ width: "130px" }}
+                            // onClick={handleCreateGrn}
+                            onClick={handleCreateGrn}
+                          >
+                            Create GRN
+                          </Button>
+                        </Box>
+                      )}
+                    </MDBRow>
+                  </>
+                ) : (
+                  <Alert
+                    severity="warning"
+                    sx={{ fontFamily: "monospace", fontSize: "18px" }}
+                  >
+                    Records are not available for the selected filter
+                  </Alert>
+                )}
+              </div>
+            </>
           )}
         </Card>
       </MDBRow>
@@ -1167,6 +1203,14 @@ function OnHoldManegementSystem() {
           // variationId={variationId}
           handleClosePoDetailsModal={() => setShowOrdersModalOpen(false)}
           // poId={id}
+        />
+      )}
+      {poRefundModal && (
+        <PoRefundModal
+          show={poRefundModal}
+          poDetailsModal={poRefundModal}
+          handleClosePoDetailsModal={() => setPoRefundModal(false)}
+          poId={selectedPOId}
         />
       )}
       <Modal

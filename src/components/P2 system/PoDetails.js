@@ -310,7 +310,10 @@ const PoDetails = () => {
   };
 
   const handleRecievedQtyChange = (index, event) => {
-    if (index.target.value >= 0 && index.target.value <= event.quantity) {
+    if (
+      index.target.value >= 0 &&
+      index.target.value <= event.item_unhide_count
+    ) {
       const updatedRecivedQtyData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {
@@ -324,7 +327,7 @@ const PoDetails = () => {
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    if (index.target.value >= 0 && index.target.value <= event.quantity) {
+    if (index.target.value >= 0 && index.target.value <= event.item_unhide_count) {
       const updatedData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {
