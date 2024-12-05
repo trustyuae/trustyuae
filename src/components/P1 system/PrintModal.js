@@ -11,22 +11,24 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
 
   const downloadPDF = () => {
     const doc = new jsPDF();
+
+    // Page and card dimensions
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const cardWidth = 85;
-    const cardHeight = 85;
-    const borderWidth = 0.7; // Border width
+    const cardHeight = 100;
+    const borderWidth = 0.7;
 
     const cardX = (pageWidth - cardWidth) / 2;
     const cardY = (pageHeight - cardHeight) / 2;
 
-    // Draw outer border of the card
+    // Draw card border
     doc.setLineWidth(borderWidth);
     doc.setDrawColor(0); // Black border color
     doc.rect(cardX, cardY, cardWidth, cardHeight);
 
-    // Fill background with light gray
-    doc.setFillColor(255, 255, 255);
+    // Fill card background
+    doc.setFillColor(255, 255, 255); // White background
     doc.rect(
       cardX + borderWidth,
       cardY + borderWidth,
@@ -35,76 +37,82 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
       "F"
     );
 
-    const cardContentX = cardX + 5;
-    const cardContentY = cardY + 10;
-
+    // Title: "Shipping Label"
     const titleX = cardX + cardWidth / 2;
-    const titleY = cardY + 10; // Adjust for vertical centering
+    const titleY = cardY + 10;
     doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
     doc.setTextColor(0); // Black text color
-
-    // Print "Shipping Label" with bold font weight
-    // doc.setFontStyle("bold");
     doc.text("Shipping Label", titleX, titleY, { align: "center" });
 
-    // Draw horizontal line below "Shipping Label"
-    doc.setLineWidth(0.3); // Set line width for the separator
-    doc.line(cardX + 2, titleY + 5, cardX + cardWidth - 2, titleY + 5);
+    // Horizontal separator below title
+    doc.setLineWidth(0.3);
+    doc.line(cardX + 5, titleY + 5, cardX + cardWidth - 5, titleY + 5);
 
-    doc.setFontSize(12); // Reduce font size for details// Reset font style
-    // doc.setFontStyle("normal");
+    // Content starting position
+    let contentX = cardX + 5;
+    let contentY = titleY + 10; // Start below the title and separator
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
 
-    // Draw horizontal line above address
-    // doc.line(cardX, addressY - 5, cardX + cardWidth, addressY - 5);
+    // Utility function to add text line-by-line for comma-separated values
+    const addMultiLineText = (label, value) => {
+      // Draw the label
+      doc.text(`${label}:`, contentX, contentY);
+
+      // Calculate the starting position of the value text
+      const valueX = contentX + doc.getTextWidth(`${label}: `);
+
+      // Define maximum width for wrapping text
+      const maxWidth = cardX + cardWidth - valueX - 5; // Ensure it fits within the card
+
+      // Split the value by commas and wrap each part if necessary
+      const lines = value.split(",").flatMap((part) => {
+        return doc.splitTextToSize(part.trim(), maxWidth); // Wrap text if it's too long
+      });
+
+      // Render each line, aligning it properly
+      lines.forEach((line, index) => {
+        const lineY = contentY + index * 6; // Adjust vertical spacing for each line
+        doc.text(line, valueX, lineY);
+      });
+
+      // Update contentY for the next section
+      contentY += lines.length * 6 + 2; // Add extra spacing after the multi-line section
+    };
+
+    // Utility function to add simple text
+    const addText = (label, value) => {
+      doc.text(`${label}: ${value}`, contentX, contentY);
+      contentY += 6; // Move down after each line
+    };
 
     // Print customer details
-    doc.text(`Order Id : ${customerData.order_id}`, cardContentX, titleY + 10);
-    doc.text(
-      `Customer Name :${customerData.customer_name} ${customerData?.last_name}`,
-      cardContentX,
-      titleY + 18
+    addText("Order ID", customerData.order_id || "N/A");
+    addText(
+      "Customer Name",
+      `${customerData.customer_name || "N/A"} ${customerData.last_name || ""}`
     );
-    doc.text(
-      `Contact Number : ${customerData.contact_no}`,
-      cardContentX,
-      titleY + 26
+    addText("Contact Number", customerData.contact_no || "N/A");
+    addText("Country", getCountryName(customerData.shipping_country) || "N/A");
+
+    // Add multi-line fields
+    addMultiLineText("Emirates Address", customerData.emirates_add || "N/A");
+    addMultiLineText(
+      "Address",
+      customerData.customer_shipping_address || "N/A"
     );
-    doc.text(
-      `Country : ${getCountryName(customerData.shipping_country)}`,
-      cardContentX,
-      titleY + 34
-    );
+    addMultiLineText("Shipping Method", customerData.shipping_method || "N/A");
 
-    let titleVe = titleY + 42;
+    // Add Order Total
+    addText("Order Collection", customerData.order_total || "N/A");
 
-    function getTextHeight(text) {
-      // Assuming a font size of 12 for demonstration purposes
-      return 12; // Adjust this value based on your actual font size and line height
-    }
+    // Draw bottom separator
+    doc.setLineWidth(0.3);
+    doc.line(cardX + 5, contentY, cardX + cardWidth - 5, contentY);
 
-    let addressText = `Address : ${customerData?.customer_shipping_address
-      .split(",")
-      .join(" ,\n                ")}`;
-    doc.text(addressText, cardContentX, titleVe);
-
-    let text1Height = getTextHeight(addressText);
-
-    // Update titleY for Text 2
-    titleVe += text1Height + 6; // Adjust 8 based on your desired vertical spacing
-
-    // Text 2: Shipping Method
-    // let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
-    // doc.text(shippingMethodText, cardContentX, titleVe);
-    let shippingMethodText = `Shipping Method : ${customerData.shipping_method}`;
-    let textLines = doc.splitTextToSize(shippingMethodText, cardWidth - 10);
-    let shippingTextHeight = textLines.length *6; 
-    doc.text(textLines, cardContentX, titleY + 42 + shippingTextHeight);
-
-    doc.setLineWidth(0.3); // Set line width for the separator
-    doc.line(cardX + 2, titleVe + 2, cardX + cardWidth - 2, titleVe + 2);
-
-    // Save the PDF with the name "invoice.pdf"
-    doc.save("invoice.pdf");
+    // Save the PDF
+    doc.save("shipping_label.pdf");
   };
 
   const printModalContent = () => {
@@ -217,6 +225,107 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                   {getCountryName(customerData.shipping_country)}
                 </Typography>
               </Box>
+              {/* <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Emirates Adress:{" "}
+                  <span
+                    style={{
+                      color: "#7d6c71",
+                      fontSize: "20px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {customerData?.emirates_add
+                      ?.split(",")
+                      ?.slice(1)
+                      ?.map((line, index) => (
+                        <span
+                          key={index}
+                          style={{
+                            display: "block",
+                            marginLeft: "102px",
+                          }}
+                        >
+                          {line.trim()}
+                        </span>
+                      ))}
+                  </span>
+                </Typography>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
+                  {customerData.customer_shipping_address
+                    .split(",")
+                    .slice(1)
+                    .map((line, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          display: "block",
+                          marginLeft: "102px",
+                        }}
+                      >
+                        {line.trim()}
+                      </span>
+                    ))}
+                </Typography>
+              </Box> */}
+              <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Emirates Adress:{" "}
+                  <span
+                    style={{
+                      color: "#7d6c71",
+                      fontSize: "20px",
+                      fontWeight: "500",
+                    }}
+                  >
+                    {customerData?.emirates_add?.split(",")[0]}
+                  </span>
+                </Typography>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
+                  {customerData.emirates_add
+                    ?.split(",")
+                    ?.slice(1)
+                    ?.map((line, index) => (
+                      <span
+                        key={index}
+                        style={{
+                          display: "block",
+                          marginLeft: "102px",
+                        }}
+                      >
+                        {line.trim()}
+                      </span>
+                    ))}
+                </Typography>
+              </Box>
               <Box>
                 <Typography
                   variant="label"
@@ -281,6 +390,28 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                   }}
                 >
                   {customerData.shipping_method}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#000000",
+                    fontSize: "22px",
+                    fontWeight: "700",
+                  }}
+                >
+                  Order Collection :{" "}
+                </Typography>
+                <Typography
+                  variant="label"
+                  style={{
+                    color: "#7d6c71",
+                    fontSize: "20px",
+                    fontWeight: "500",
+                  }}
+                >
+                  {customerData.order_total}
                 </Typography>
               </Box>
             </>
