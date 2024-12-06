@@ -105,7 +105,10 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     addMultiLineText("Shipping Method", customerData.shipping_method || "N/A");
 
     // Add Order Total
-    addText("Order Collection", customerData.order_total || "N/A");
+    addText(
+      "Order Collection",
+      customerData.order_total ? `${customerData.order_total} AED` : "N/A"
+    );
 
     // Draw bottom separator
     doc.setLineWidth(0.3);
@@ -411,7 +414,9 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                     fontWeight: "500",
                   }}
                 >
-                  {customerData.order_total}
+                  {customerData.order_total
+                    ? `${customerData.order_total} AED`
+                    : "N/A"}
                 </Typography>
               </Box>
             </>
