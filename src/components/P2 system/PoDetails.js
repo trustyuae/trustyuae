@@ -71,7 +71,7 @@ const PoDetails = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [addMessageD, setAddMessageD] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

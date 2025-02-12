@@ -30,7 +30,7 @@ function AllFactory() {
   const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const [totalPages, setTotalPages] = useState(1);
   const [factoryType, setFactoryType] = useState("");
 

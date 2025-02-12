@@ -28,7 +28,7 @@ function AllProductList() {
   const [searchId, setSearchId] = useState("");
   const [searchName, setSearchName] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(100);
   const [totalPages, setTotalPages] = useState(1);
   const [imageURL, setImageURL] = useState("");
   const loader = useSelector((state) => state?.productManagement?.isLoading);

@@ -97,7 +97,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     addText("Country", getCountryName(customerData.shipping_country) || "N/A");
 
     // Add multi-line fields
-    addMultiLineText("Emirates Address", customerData.emirates_add || "N/A");
+    // addMultiLineText("Emirates Address", customerData.emirates_add || "N/A");
     addMultiLineText(
       "Address",
       customerData.customer_shipping_address || "N/A"
@@ -107,7 +107,9 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
     // Add Order Total
     addText(
       "Order Collection",
-      customerData.order_total ? `${customerData.order_total} AED` : "N/A"
+      customerData.payment_method === "Cash on delivery"
+        ? `${customerData.order_total} AED`
+        : "Paid"
     );
 
     // Draw bottom separator
@@ -285,7 +287,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                     ))}
                 </Typography>
               </Box> */}
-              <Box>
+              {/* <Box>
                 <Typography
                   variant="label"
                   style={{
@@ -328,7 +330,7 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                       </span>
                     ))}
                 </Typography>
-              </Box>
+              </Box> */}
               <Box>
                 <Typography
                   variant="label"
@@ -414,9 +416,9 @@ const PrintModal = ({ show, handleClosePrintModal, orderData }) => {
                     fontWeight: "500",
                   }}
                 >
-                  {customerData.order_total
+                  {customerData.payment_method === "Cash on delivery"
                     ? `${customerData.order_total} AED`
-                    : "N/A"}
+                    : "Paid"}
                 </Typography>
               </Box>
             </>

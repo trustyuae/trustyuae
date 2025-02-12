@@ -29,7 +29,7 @@ function OrderNotAvailable() {
   const dispatch = useDispatch();
   const [ordersNotAvailableData, setOrdersNotAvailableData] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const pageSizeOptions = [5, 10, 20, 50, 100];

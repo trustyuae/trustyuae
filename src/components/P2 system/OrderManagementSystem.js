@@ -67,7 +67,7 @@ function OrderManagementSystem() {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(100);
   const pageSizeOptions = [5, 10, 20, 50, 100];
 
   const [startDate, setStartDate] = useState("");

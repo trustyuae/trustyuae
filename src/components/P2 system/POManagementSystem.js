@@ -49,7 +49,7 @@ function POManagementSystem() {
   const [poType, setPOType] = useState("po");
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(100);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [totalPages, setTotalPages] = useState(1);
   const [lang, setLang] = useState("En");
