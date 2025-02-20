@@ -59,6 +59,7 @@ function OrderSystem() {
   useEffect(() => {
     if (currentPage) {
       dispatch(clearStoreData({ tableId: 'OrderSystem' }));
+      dispatch(clearStoreData({ tableId: 'OrderSystem' }));
       setPage(currentPage);
     }
     if (ordersData) {
@@ -116,6 +117,7 @@ function OrderSystem() {
   const handlePrint = async (orderId) => {
     try {
       dispatch(OrderDetailsGet(orderId));
+      dispatch(OrderDetailsGet(orderId));
       setShowModal(true);
     } catch (error) {
       console.error(error);
@@ -159,6 +161,7 @@ function OrderSystem() {
       type: "html",
       renderCell: (value, row) => {
         const orderId = value?.row?.order_id;
+     
         return (
           <Button
             type="button"
@@ -258,8 +261,6 @@ function OrderSystem() {
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
 

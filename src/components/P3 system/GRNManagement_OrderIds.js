@@ -35,8 +35,9 @@ import ShowAlert from "../../utils/ShowAlert";
 import { AddMessage } from "../../Redux2/slices/OrderSystemSlice";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { RiMessage2Line } from "react-icons/ri";
-import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 import { DatePicker } from "@mui/x-date-pickers-pro";
+import PendingItemsDataModal from "./PendingItemsDataModal";
 
 function GRNManagement_OrderIds() {
   const dispatch = useDispatch();
@@ -50,6 +51,7 @@ function GRNManagement_OrderIds() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [grnList, setGrnList] = useState([]);
+  const [grnListOverAllData, setGrnListOverAllData] = useState([]);
   const [userData, setUserData] = useState(null);
   const loader = useSelector((state) => state?.p3System?.isLoading);
   const [message, setMessage] = useState("");
@@ -60,13 +62,19 @@ function GRNManagement_OrderIds() {
   const [factories, setFactories] = useState([]);
   const [searchOrderID, setSearchOrderID] = useState("");
 
-  const factoryData = useSelector((state) => state?.factory?.factories);
-  const currentPage = useSelector((state) => state.pagination.currentPage);
-  const grnListData = useSelector(
-    (state) => state?.p3System?.grnListOnOrderIds?.orders[0]
-  );
+  const [pendingItemsDataModal, setPendingItemsDataModal] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [pendingItemType, setPendingItemType] = useState("all");
 
-  console.log(grnList, "grnList");
+  const factoryData = useSelector((state) => state?.factory?.factories);
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["GrnManagementOnOrderBasis"]
+    ) || 1;
+
+  const grnListData = useSelector(
+    (state) => state?.p3System?.grnListOnOrderIds
+  );
 
   useEffect(() => {
     if (factoryData) {
@@ -76,14 +84,13 @@ function GRNManagement_OrderIds() {
   }, [factoryData]);
 
   useEffect(() => {
-    console.log(grnListData,'grnListData')
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'GrnManagementOnOrderBasis' }));
       setPage(currentPage);
     }
     if (grnListData) {
-      const grnData = grnListData?.items?.map((v, i) => ({ ...v, id: i }));
-      console.log(grnData, "grnData");
-      setGrnList(grnData);
+      const grnData = grnListData?.orders?.map((v, i) => ({ ...v, id: i }));
+      setGrnListOverAllData(grnData);
       setTotalPages(grnListData?.total_pages);
     }
   }, [grnListData, currentPage]);
@@ -105,12 +112,6 @@ function GRNManagement_OrderIds() {
   const handleStatusChange = (e) => {
     setStatusFilter(e.target.value);
   };
-
-  const availabilityStatus = [
-    "All Processed",
-    "Partially Processed",
-    "Pending for Process",
-  ];
 
   const handleDateChangeForOrder = async (newDateRange) => {
     if (newDateRange?.$d) {
@@ -135,56 +136,36 @@ function GRNManagement_OrderIds() {
   };
 
   const columns = [
-    {
-      field: "select",
-      headerName: "Select",
-      flex: 0.5,
-      renderCell: (params) => (
-        <FormGroup>
-          <FormControlLabel
-            className="mx-auto"
-            control={
-              <Checkbox
-              // checked={selectedItemIds.includes(params.row.id)}
-              // onChange={() => handleItemSelection(params.row)}
-              />
-            }
-            style={{ justifyContent: "center" }}
-          />
-        </FormGroup>
-      ),
-    },
     { field: "order_id", headerName: "Order Ids", flex: 1 },
     { field: "order_created_date", headerName: "Order Created Date", flex: 1 },
     {
-      field: "total_qty",
-      headerName: "Total Items",
-      flex: 1,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      type: "string",
-    },
-    {
-      field: "po_id",
-      headerName: "Po Ref No.",
+      field: "pending_items",
+      headerName: "Pending Items",
       flex: 1,
       renderCell: (params) => {
-        const poId = params.row.po_id;
-        return <div>{poId ? poId : "No PO ref"}</div>;
+        console.log(params, "params");
+        return (
+          <Box onClick={() => handlePoModal(params.row)}>
+            {params.row.pending_items}
+          </Box>
+        );
       },
     },
     {
-      field: "factory_id",
-      headerName: "Factory Name",
+      field: "aging_days",
+      headerName: "Aging Days",
       flex: 1,
       renderCell: (params) => {
-        const factory = factories.find(
-          (factory) => factory.id == params.row.factory_id
-        );
-        return <Box>{factory?.factory_name}</Box>;
+        const orderCreatedOn = new Date(params.row.order_created_date);
+        const todaysDate = new Date();
+        // Calculate the difference in time between the two dates (in milliseconds)
+        const timeDifference = Math.abs(todaysDate - orderCreatedOn);
+
+        // Convert the difference from milliseconds to days (1 day = 24*60*60*1000 ms)
+        const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+        // Return the difference in days as a React component
+        return <Box>{dayDifference} days</Box>;
       },
     },
     {
@@ -219,13 +200,14 @@ function GRNManagement_OrderIds() {
       flex: 1,
       type: "html",
       renderCell: (value, row) => {
+        console.log(value.row,'value.row')
         const handleShowMessageModal = () => {
           setSelectedGrnNo(value?.row?.grn_no);
           setshowMessageModal(true);
         };
         return (
           <Box>
-            <Link to={`/GRN_View/${value?.row?.grn_no}`}>
+            <Link to={`/Order_View/${value.row.order_id}`}>
               <Button
                 type="button"
                 className="w-auto bg-transparent border-0 text-secondary fs-5"
@@ -251,18 +233,21 @@ function GRNManagement_OrderIds() {
       let apiUrl;
       apiUrl = `wp-json/custom-grn-order/v1/order-by-grn/?per_page=${pageSize}&page=${page}`;
       if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
-      if (selectedOrderDate) apiUrl += `&order_created_date=${selectedOrderDate}`;
+      if (selectedOrderDate)
+        apiUrl += `&order_created_date=${selectedOrderDate}`;
       if (selectedGrnDate) apiUrl += `&grn_date=${selectedGrnDate}`;
       if (statusFilter) apiUrl += `&status=${statusFilter}`;
       dispatch(GetGRNListOnBasisOrderId({ apiUrl }));
     } catch (error) {
       console.error(error);
-      setGrnList([]);
+      // setGrnList([]);
+      grnListOverAllData([]);
     }
   };
 
   const handleChange = (event, value) => {
-    dispatch(setCurrentPage(value));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: "GrnManagementOnOrderBasis", page: value }));
   };
 
   const handlePageSizeChange = (e) => {
@@ -293,10 +278,28 @@ function GRNManagement_OrderIds() {
     }
   };
 
+  const handlePoModal = (itemData) => {
+    console.log(itemData, "itemData");
+    setOrderId(itemData.order_id);
+    setPendingItemsDataModal(true);
+  };
+
+  const searchPendingItemTypeFilter = (e) => {
+    setPendingItemType(e);
+    setPage(1);
+  };
+
   useEffect(() => {
     handlGetGRNList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchOrderID,statusFilter, page, pageSize,selectedGrnDate,selectedOrderDate]);
+  }, [
+    searchOrderID,
+    statusFilter,
+    page,
+    pageSize,
+    selectedGrnDate,
+    selectedOrderDate,
+  ]);
 
   return (
     <Container fluid className="py-3" style={{ maxHeight: "100%" }}>
@@ -385,20 +388,14 @@ function GRNManagement_OrderIds() {
             </Col>
             <Col xs="auto" lg="3">
               <Form.Group>
-                <Form.Label className="fw-semibold">
-                  Filter by Status:
-                </Form.Label>
+                <Form.Label className="fw-semibold">Pending Item type:</Form.Label>
                 <Form.Select
                   className="mr-sm-2 py-2"
-                  onChange={handleStatusChange}
-                  value={statusFilter}
+                  onChange={(e) => searchPendingItemTypeFilter(e.target.value)}
                 >
-                  <option value="">Select Status</option>
-                  {availabilityStatus.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
+                  <option value="all">All</option>
+                  <option value="zero">Zero</option>
+                  {/* <option value="reserve">Reserve</option> */}
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -430,11 +427,11 @@ function GRNManagement_OrderIds() {
             <Loader />
           ) : (
             <>
-              {grnListData && grnListData.length !== 0 && grnList && grnList.length !== 0 ? (
+              {grnListOverAllData && grnListOverAllData.length !== 0 ? (
                 <div className="mt-2">
                   <DataTable
                     columns={columns}
-                    rows={grnList}
+                    rows={grnListOverAllData}
                     page={page}
                     pageSize={pageSize}
                     totalPages={totalPages}
@@ -503,6 +500,14 @@ function GRNManagement_OrderIds() {
           </Box>
         </Modal.Body>
       </Modal>
+      {pendingItemsDataModal && (
+        <PendingItemsDataModal
+          show={pendingItemsDataModal}
+          pendingItemsDataModal={pendingItemsDataModal}
+          orderId={orderId}
+          handleClosePoDetailsModal={() => setPendingItemsDataModal(false)}
+        />
+      )}
     </Container>
   );
 }

@@ -376,7 +376,7 @@ function ExchangeAndReturn() {
                   onChange={handleFactoryChange}
                 >
                   <option value="">All Factory</option>
-                  {factories.map((factory) => (
+                  {factories?.map((factory) => (
                     <option key={factory.id} value={factory.id}>
                       {factory.factory_name}
                     </option>

@@ -19,43 +19,51 @@ const InnerContainer = styled(Box)(({ theme }) => ({
   backgroundColor: "#FCFCFC",
   display: "flex",
   flex: 1,
-  flexdirection: "row",
+  flexDirection: "row",
   overflow: "hidden",
   height: "100%",
 }));
 
-const StyledMain = styled("main")(({ theme }) => ({
+const StyledMain = styled("main")(({ theme, issidebarvisible }) => ({
   height: "100%",
   flex: 1,
   overflow: "auto",
-  width: "100%",
   paddingTop: "65px",
   paddingBottom: "6rem",
-  backgroundColor: 'rgb(241, 239, 241)'
+  backgroundColor: "rgb(241, 239, 241)",
+  // Use calc for width to handle sidebar visibility
+  width: issidebarvisible ? "calc(100% - 300px)" : "100%",
+  marginLeft: issidebarvisible ? "300px" : "0px",
+  transition: "margin-left 0.3s ease, width 0.3s ease", // Add width transition for smooth adjustment
 }));
 
 export const Layout = () => {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [issidebarvisible, setIssidebarvisible] = useState(true);
+
   useEffect(() => {
     function handleResize() {
-      setIsSidebarVisible(window.innerWidth > 1024);
+      setIssidebarvisible(window.innerWidth > 1024);
     }
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize(); // Call the function once to set initial state
-    return () => window.removeEventListener('resize', handleResize); // Clean up event listener
+    return () => window.removeEventListener("resize", handleResize); // Clean up event listener
   }, []);
 
   const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
+    setIssidebarvisible(!issidebarvisible);
   };
+
   return (
     <OuterContainer>
       <InnerContainer>
-        {/* <Header /> */}
         <Header onToggleSidebar={toggleSidebar} />
-        {/* <SideBar /> */}
-        {isSidebarVisible && <SideBar />}
-        <StyledMain id="main" className="overflow-visible">
+        {issidebarvisible && <SideBar />}
+        {/* Pass isSidebarVisible as a prop to StyledMain */}
+        <StyledMain
+          id="main"
+          issidebarvisible={issidebarvisible}
+          className="overflow-visible"
+        >
           <Card className="border-0 p-2 overflow-visible">
             <Outlet />
           </Card>

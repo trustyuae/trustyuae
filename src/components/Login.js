@@ -53,29 +53,29 @@ const Login = () => {
         dispatch(loginUser({ username, password })).then(({ payload }) => {
           if (payload && payload?.token) {
             ShowAlert(
-              "Success",
               payload.message,
+              "",
               "success",
-              true,
               false,
-              "OK"
+              false,
+              "",
+              "",
+              1500
             ).then((result) => {
-              if (result.isConfirmed) {
-                switch (payload?.user_data?.user_role) {
-                  case "administrator":
-                  case "packing_assistant":
-                  case "operation_assistant":
-                    navigate("/ordersystem");
-                    break;
-                  case "factory_coordinator":
-                    navigate("/ordersystem_in_china");
-                    break;
-                  case "customer_support":
-                    navigate("/order_not_available");
-                    break;
-                  default:
-                    console.log("Unknown role");
-                }
+              switch (payload?.user_data?.user_role) {
+                case "administrator":
+                case "packing_assistant":
+                case "operation_assistant":
+                  navigate("/ordersystem");
+                  break;
+                case "factory_coordinator":
+                  navigate("/ordersystem_in_china");
+                  break;
+                case "customer_support":
+                  navigate("/order_not_available");
+                  break;
+                default:
+                  console.log("Unknown role");
               }
             });
           } else {
@@ -105,11 +105,6 @@ const Login = () => {
               <Row className="justify-content-center align-items-center">
                 <Col md={6}>
                   <Box sx={{ height: "350px", width: "100%" }}>
-                    {/* <img
-                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"
-                      className="h-100 w-100"
-                      alt="Phone"
-                    /> */}
                     <img
                       src={require("../assets/access-control-system.webp")}
                       className="h-100 w-100"

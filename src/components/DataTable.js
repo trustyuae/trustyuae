@@ -162,6 +162,54 @@ export default function DataTable({
                 return "";
               }
             }
+            if (params.colDef.className == "factory-status") {
+              if (!params.row.inactive) {
+                return "";
+              }
+              if (params.row.inactive === "1") {
+                return "bg-grey";
+              }
+            }
+            if (params.colDef.className == "order-details-tracking-pending") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === "1") {
+                return "bg-yellow";
+              }
+            }
+            if (params.colDef.className == "order-details-in-china") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === "1") {
+                return "bg-yellow";
+              }
+            }
+            if (params.colDef.className == "order-details-in-china") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === "1") {
+                return "bg-yellow";
+              }
+            }
+            if (params.colDef.className == "onhold-management-p3") {
+              if (!params.row.instore) {
+                return "";
+              }
+              if (params.row.instore === 1 || params.row.instore === "1") {
+                return "bg-yellow";
+              }
+            }
+            if (params.colDef.className == "po-details") {
+              if (!params.row.item_hide) {
+                return "";
+              }
+              if (params.row.item_hide === "1") {
+                return "bg-danger";
+              }
+            }
           }}
           checkboxSelection={checkboxSelection}
           onCellEditStart={onCellEditStart}

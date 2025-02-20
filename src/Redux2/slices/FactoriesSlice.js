@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/AxiosInstance";
-import ShowAlert from "../../utils/ShowAlert";
 
 const initialState = {
   isLoading: false,
@@ -33,10 +32,10 @@ export const fetchFactoriesByFilterParam = createAsyncThunk(
   async ({ apiUrl, params }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(apiUrl, { params });
-      return response.data; // Ensure response.data has the expected structure
+      return response.data; 
     } catch (error) {
       console.error("Error fetching factories:", error.message);
-      return rejectWithValue(error.response?.data || error.message); // Provide more detailed error information if available
+      return rejectWithValue(error.response?.data || error.message); 
     }
   }
 );

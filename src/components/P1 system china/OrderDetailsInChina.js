@@ -63,6 +63,7 @@ import {
   CustomOrderOHChina,
   InsertOrderPickupCancelChina,
   InsertOrderPickupChina,
+  InstoreStatusUpdate,
   OrderDetailsChinaGet,
   OverAllAttachmentFileUploadChina,
   TrackingIDUpdate,
@@ -70,6 +71,9 @@ import {
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useDropzone } from "react-dropzone";
+import { CheckCircle, Cancel } from "@mui/icons-material";
+import { green, red, grey, blue } from "@mui/material/colors";
+import HomeTwoToneIcon from "@mui/icons-material/HomeTwoTone";
 
 function OrderDetailsInChina() {
   const { id } = useParams();
@@ -104,6 +108,7 @@ function OrderDetailsInChina() {
   const [selectedItemIds, setSelectedItemIds] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [uploadImageModalOpen, setUploadImageModalOpen] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
   if (!fileInputRef.current) {
@@ -294,6 +299,57 @@ function OrderDetailsInChina() {
       setSelectedItems(selectedItems.filter((item) => item.id !== rowData.id));
     }
     setSelectedItemIds(newSelected);
+  };
+
+  const handleInstoreStatus = (instoreValue) => {
+    if (!selectedItems || selectedItems.length === 0) {
+      console.error("No items selected!");
+      ShowAlert(
+        "Error: No items selected for updating!",
+        "",
+        "error",
+        false,
+        false,
+        "",
+        "",
+        2000
+      );
+      return;
+    }
+
+    const productIDD = selectedItems.map((item) => parseInt(item.item_id, 10));
+    const variationIDD = selectedItems.map((item) =>
+      parseInt(item.variation_id, 10)
+    );
+    const payload = {
+      order_id: parseInt(orderDetails.order_id, 10),
+      product_id: productIDD,
+      variation_id: variationIDD,
+      instore: instoreValue,
+    };
+
+    console.log(payload, "payload");
+    dispatch(InstoreStatusUpdate({ payload }))
+      .unwrap() // Use `.unwrap()` to handle the resolved promise or errors.
+      .then((response) => {
+        console.log("Success:", response);
+        ShowAlert(
+          "Items instored successfully!",
+          "",
+          "success",
+          false,
+          false,
+          "",
+          "",
+          2000
+        );
+        setSelectedItems([]);
+        setSelectedItemIds([]);
+        fetchOrder();
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+      });
   };
 
   const handleSendToUAESystem = async () => {
@@ -553,6 +609,7 @@ function OrderDetailsInChina() {
       field: "select",
       headerName: "Select",
       flex: 0.5,
+      className: "order-details-in-china",
       renderCell: (params) => {
         return (
           <FormGroup>
@@ -570,19 +627,19 @@ function OrderDetailsInChina() {
     {
       field: "item_id",
       headerName: t("P1ChinaSystem.ItemId"),
-      className: "order-details",
+      className: "order-details-in-china",
       flex: 0.5,
     },
     {
       field: "product_name",
       headerName: t("P1ChinaSystem.Name"),
-      className: "order-details",
+      className: "order-details-in-china",
       flex: 1.5,
     },
     {
       field: "variant_details",
       headerName: t("P1ChinaSystem.VariantDetails"),
-      className: "order-details",
+      className: "order-details-in-china",
       flex: 1.5,
       renderCell: (params) => {
         if (
@@ -604,7 +661,7 @@ function OrderDetailsInChina() {
       field: "product_image",
       headerName: t("POManagement.Image"),
       flex: 1,
-      className: "order-details",
+      className: "order-details-in-china",
       renderCell: (params) => (
         <Box
           className="h-100 w-100 d-flex align-items-center"
@@ -635,25 +692,26 @@ function OrderDetailsInChina() {
       field: "quantity",
       headerName: t("P1ChinaSystem.QTY"),
       flex: 0.5,
-      className: "order-details",
+      className: "order-details-in-china",
     },
     {
       field: "avl_quantity",
       headerName: t("P1ChinaSystem.AvlQTY"),
       flex: 0.5,
+      className: "order-details-in-china",
     },
     {
       field: "dispatch_type",
       headerName: t("POManagement.Status"),
       flex: 0.5,
-      className: "order-details",
+      className: "order-details-in-china",
       type: "string",
     },
     {
       field: "dispatch_image",
       headerName: "Attachment",
       flex: 1.5,
-      className: "order-details",
+      className: "order-details-in-china",
       type: "html",
       renderCell: (value, row) => {
         const itemId = value && value.row.item_id ? value.row.item_id : null;
@@ -924,7 +982,33 @@ function OrderDetailsInChina() {
         }
       },
     },
+    {
+      field: "stock_status",
+      headerName: "Store Status",
+      flex: 1,
+      className: "order-details-in-china",
+      renderCell: (params) => {
+        const storeValue = params.row.instore;
+        return storeValue === "1" ? (
+          <span style={{ marginLeft: 8 }}>
+            <HomeTwoToneIcon style={{ color: "red", fontSize: "40px" }} />
+          </span>
+        ) : (
+          <span style={{ marginLeft: 8 }}></span>
+        );
+      },
+    },
   ];
+
+  const handleToggle = () => {
+    setIsChecked(!isChecked); // Toggle the state between checked/unchecked
+    handleCheckboxClick(); // Call your custom function
+  };
+
+  const handleCheckboxClick = () => {
+    // Custom function to be called on checkbox click
+    console.log("Checkbox clicked!");
+  };
 
   const handleCopy = (text) => {
     navigator.clipboard
@@ -1426,9 +1510,52 @@ function OrderDetailsInChina() {
           ) : null}
         </Row>
         <Card className="p-3 mb-3">
-          <Typography variant="h6" className="fw-bold mb-3">
-            {t("P1ChinaSystem.OrderDetails")}
-          </Typography>
+          <Box className="d-flex justify-content-between">
+            <Typography variant="h6" className="fw-bold mb-3">
+              {t("P1ChinaSystem.OrderDetails")}
+            </Typography>
+            {userData && userData.user_role === "administrator" && (
+              <Box className="d-flex">
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <CheckCircle
+                    style={{
+                      color: blue[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(1)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
+                <Box
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginLeft: 20,
+                  }}
+                >
+                  <Cancel
+                    style={{
+                      color: red[500],
+                      transition: "transform 0.15s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleInstoreStatus(0)}
+                  />
+                  <span style={{ marginLeft: 8 }}>In Store</span>
+                </Box>
+              </Box>
+            )}
+          </Box>
           {loader ? (
             <Loader />
           ) : (

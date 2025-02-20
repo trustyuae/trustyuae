@@ -25,12 +25,16 @@ import Swal from "sweetalert2";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
 import {
   AddGrn,
+  FetchPoIds,
   FetchPoProductData,
   GetAllProducts,
   GetProductManual,
 } from "../../Redux2/slices/P3SystemSlice";
 import { getUserData } from "../../utils/StorageUtils";
 import OrderModal from "./OrdersModal";
+import OnHoldProductDetailsPrintModal from "./OnHoldProductDetailsPrintModal";
+import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
+import PoRefundModal from "./PoRefundModal";
 
 function OnHoldManegementSystem() {
   const inputRef = useRef(null);
@@ -58,7 +62,7 @@ function OnHoldManegementSystem() {
   const [optionsArray, setoptionsArray] = useState([]);
 
   const [selectedFactory, setSelectedFactory] = useState("");
-  const [selectedPOId, setSelectedPOId] = useState("");
+  const [selectedPOId, setSelectedPOId] = useState(null);
   const [factories, setFactories] = useState([]);
 
   const [allPoIds, setAllPoIds] = useState([]);
@@ -79,6 +83,11 @@ function OnHoldManegementSystem() {
   const [showOrdersModalOpen, setShowOrdersModalOpen] = useState(false);
   const [productIDD, setProductIDD] = useState(null);
   const [variationID, setVariationID] = useState(null);
+
+  const [printModal, setPrintModal] = useState(false);
+
+  const [poRefundModal, setPoRefundModal] = useState(false);
+  const [showRefundModal, setShowRefundModal] = useState(false);
 
   const allProducts = useSelector(
     (state) => state?.p3System?.allProducts?.products
@@ -730,6 +739,7 @@ function OnHoldManegementSystem() {
   };
 
   const handleFactoryChange = (e) => {
+    setSelectedPOId(null);
     setSelectedFactory(e.target.value);
   };
 
@@ -740,20 +750,17 @@ function OnHoldManegementSystem() {
 
   const selectPOId = async () => {
     try {
-      const response = await axiosInstance.get(
-        `wp-json/get-po-ids/v1/show-po-id/`,
-        {
-          params: {
-            factory_id: selectedFactory,
-            po_id: selectedPOId,
-          },
+      dispatch(FetchPoIds({ selectedFactory, selectedPOId })).then(
+        ({ payload }) => {
+          const formattedPoIds = Array.isArray(payload)
+            ? payload.map((poId) => ({
+                value: poId,
+                label: poId,
+              }))
+            : [];
+          setAllPoIds(formattedPoIds);
         }
       );
-      const formattedPoIds = response.data.map((poId) => ({
-        value: poId,
-        label: poId,
-      }));
-      setAllPoIds(formattedPoIds);
     } catch (error) {
       console.error("Error fetching PO IDs:", error);
     }
@@ -767,6 +774,9 @@ function OnHoldManegementSystem() {
           ...item,
           id: i + currentStartIndex,
         }));
+        if (data.length != payload.total_items) {
+          setShowRefundModal(true);
+        }
         setPoTableData(data);
         setTotalPages(payload.total_pages);
         setPoId(payload.po_id);
@@ -810,11 +820,11 @@ function OnHoldManegementSystem() {
 
     const payload = {
       po_id: poId || "",
-      order_id: filteredData.flatMap((item) =>
-        Array.isArray(item.order_ids)
-          ? item.order_ids.map((id) => id.toString())
-          : [item.order_ids.toString()]
-      ),
+      // order_id: filteredData.flatMap((item) =>
+      //   Array.isArray(item.order_ids)
+      //     ? item.order_ids.map((id) => id.toString())
+      //     : [item.order_ids.toString()]
+      // ),
       product_id: filteredData.map((item) => item.product_id),
       variation_id: filteredData.map((item) => item.variation_id),
       received_qty: filteredData.map((item) => item.received_quantity),
@@ -869,6 +879,15 @@ function OnHoldManegementSystem() {
     } else {
       setSelectedPOId(null);
     }
+  };
+
+  const handleReset = () => {
+    setSelectedPOId(null);
+    setSelectedFactory("");
+  };
+
+  const handlePrint = () => {
+    setPrintModal(true);
   };
 
   useEffect(() => {
@@ -948,6 +967,17 @@ function OnHoldManegementSystem() {
             />
           </Col>
         </Row>
+        <Row className="d-flex justify-content-end mt-2">
+          <Col className="col-auto">
+            <Button
+              type="button"
+              className="mr-2 mx-1 w-auto"
+              onClick={handleReset}
+            >
+              Reset filter
+            </Button>
+          </Col>
+        </Row>
         {selectedFactory.length > 0 && (
           <Row className="align-items-center py-3">
             <Box className="d-flex justify-content-end">
@@ -972,32 +1002,33 @@ function OnHoldManegementSystem() {
           </Row>
         )}
       </Form>
-      {selectedFactory?.length <= 0 && selectedPOId?.length <= 0 && (
-        <MDBRow className="px-3">
-          <Card className="py-3">
-            <Row className=" justify-content-start">
-              <Col xs="auto" lg="4">
-                <Form.Group className="fw-semibold mb-0">
-                  <Form.Label>Product Name:</Form.Label>
-                  <Select
-                    value={selectedOption}
-                    onChange={(option) => setSelectedOption(option)}
-                    options={optionsArray}
-                  />
-                </Form.Group>
-              </Col>
-              <Col xs="auto" lg="4">
-                <Form.Group className="fw-semibold mb-0">
-                  <Form.Label>Product ID:</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter Product ID"
-                    ref={inputRef}
-                    onKeyDown={(e) => handalonChangeProductId(e)}
-                  />
-                </Form.Group>
-              </Col>
-              {/* <Col xs="auto" lg="4">
+      {selectedFactory?.length <= 0 &&
+        (selectedPOId?.length <= 0 || !selectedPOId) && (
+          <MDBRow className="px-3">
+            <Card className="py-3">
+              <Row className=" justify-content-start">
+                <Col xs="auto" lg="4">
+                  <Form.Group className="fw-semibold mb-0">
+                    <Form.Label>Product Name:</Form.Label>
+                    <Select
+                      value={selectedOption}
+                      onChange={(option) => setSelectedOption(option)}
+                      options={optionsArray}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs="auto" lg="4">
+                  <Form.Group className="fw-semibold mb-0">
+                    <Form.Label>Product ID:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter Product ID"
+                      ref={inputRef}
+                      onKeyDown={(e) => handalonChangeProductId(e)}
+                    />
+                  </Form.Group>
+                </Col>
+                {/* <Col xs="auto" lg="4">
                 <Form.Group className="fw-semibold mb-0">
                   <Form.Label>PageSize</Form.Label>
                   <Form.Control
@@ -1014,10 +1045,10 @@ function OnHoldManegementSystem() {
                   </Form.Control>
                 </Form.Group>
               </Col> */}
-            </Row>
-          </Card>
-        </MDBRow>
-      )}
+              </Row>
+            </Card>
+          </MDBRow>
+        )}
       <MDBRow className="px-3">
         <Card className="py-3">
           {tableData?.length > 0 && !selectedFactory && !selectedPOId ? (
@@ -1118,6 +1149,17 @@ function OnHoldManegementSystem() {
           )}
         </Card>
       </MDBRow>
+      <OnHoldProductDetailsPrintModal
+        show={printModal}
+        poId={selectedPOId}
+        // poRaiseDate={poRaiseDate}
+        factoryName={
+          factories.find((factory) => factory.id == selectedFactory)
+            ?.factory_name
+        }
+        poTableData={poTableData}
+        handleClosePrintModal={() => setPrintModal(false)}
+      />
       {showOrdersModalOpen && (
         <OrderModal
           show={showOrdersModalOpen}
@@ -1129,6 +1171,14 @@ function OnHoldManegementSystem() {
           // variationId={variationId}
           handleClosePoDetailsModal={() => setShowOrdersModalOpen(false)}
           // poId={id}
+        />
+      )}
+      {poRefundModal && (
+        <PoRefundModal
+          show={poRefundModal}
+          poDetailsModal={poRefundModal}
+          handleClosePoDetailsModal={() => setPoRefundModal(false)}
+          poId={selectedPOId}
         />
       )}
       <Modal

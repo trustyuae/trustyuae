@@ -61,6 +61,7 @@ function ERManagement() {
   useEffect(()=>{
     if (currentPage) {
       dispatch(clearStoreData({ tableId: 'ERManagement' }));
+      dispatch(clearStoreData({ tableId: 'ERManagement' }));
       setPage(currentPage);
     }
   },[currentPage])
@@ -261,7 +262,7 @@ function ERManagement() {
                   <option disabled selected value="">
                     All Factory
                   </option>
-                  {factories.map((factory) => (
+                  {factories?.map((factory) => (
                     <option key={factory.id} value={factory.id}>
                       {factory.factory_name}
                     </option>

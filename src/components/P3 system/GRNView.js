@@ -23,6 +23,7 @@ const GRNView = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [verifiedName, setVerifiedName] = useState("");
+
   const fetchOrder = () => {
     const apiUrl = `wp-json/custom-view-grn-api/v1/view-grn-details/${id}/?per_page=${pageSize}&page=${page}`;
 

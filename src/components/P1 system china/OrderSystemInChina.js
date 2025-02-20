@@ -152,7 +152,7 @@ function OrderSystemInChina() {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        setSnackbarOpen(true); 
+        setSnackbarOpen(true);
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
@@ -209,9 +209,14 @@ function OrderSystemInChina() {
       renderCell: (params) => {
         const items = params?.row?.items || [];
         const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
+        console.log(trackingID, "trackingID");
         return (
           <Box className="d-flex align-items-center justify-content-center">
-            <Typography>{trackingID}</Typography>
+            <Typography>
+              {trackingID === "0" || trackingID === ""
+                ? "Please Enter trackID"
+                : trackingID}
+            </Typography>
             {trackingID !== "0" && (
               <IconButton onClick={() => handleCopy(trackingID)}>
                 <ContentCopyIcon />
@@ -337,8 +342,6 @@ function OrderSystemInChina() {
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);
-      // setProductName("");
-      // fetchOrders();
     }
   };
 

@@ -189,7 +189,6 @@ function OnHoldOrdersDetails() {
         await fetchOrder();
       })
       .catch((error) => {
-        // Handle error if needed
         console.error("Error adding message:", error);
       });
   };

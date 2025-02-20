@@ -161,6 +161,8 @@ function ReserveOrderSystemInChina() {
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'ReserveOrderSystemInChina', page: value }));
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'ReserveOrderSystemInChina', page: value }));
   };
 
   const radios = [

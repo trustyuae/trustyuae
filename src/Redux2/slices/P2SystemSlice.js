@@ -10,6 +10,7 @@ const initialState = {
   perticularPoDetailsData: [],
   quantityDetailsData: [],
   quantityDetailsDataOnPoDetails: [],
+  refundDetailsDataOnPoDetails: [],
   addedPoData: [],
   addedManualPoData: [],
   addedSchedulePoData: [],
@@ -84,6 +85,21 @@ export const QuantityPoDetailsForModalInView = createAsyncThunk(
     try {
       const response = await axiosInstance.get(
         `wp-json/preorder-product-po/v1/pre-order-product-detail-single-po/${productId}/${poId}/${variationId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const RefundPoDetailsForModalInView = createAsyncThunk(
+  "P2System/RefundPoDetailsForModalInView",
+  async ({poId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `wp-json/custom-porefund-details/v1/po-refund-details/${poId}`
       );
       return response.data;
     } catch (error) {
@@ -276,6 +292,7 @@ const P2SystemSlice = createSlice({
       state.perticularPoDetailsData = [];
       state.quantityDetailsData = [];
       state.quantityDetailsDataOnPoDetails = [];
+      state.refundDetailsDataOnPoDetails = [];
       state.addedPoData = [];
       state.addedManualPoData = [];
       state.addedSchedulePoData = [];
@@ -343,6 +360,17 @@ const P2SystemSlice = createSlice({
         state.quantityDetailsDataOnPoDetails = action.payload;
       })
       .addCase(QuantityPoDetailsForModalInView.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(RefundPoDetailsForModalInView.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(RefundPoDetailsForModalInView.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.refundDetailsDataOnPoDetails = action.payload;
+      })
+      .addCase(RefundPoDetailsForModalInView.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

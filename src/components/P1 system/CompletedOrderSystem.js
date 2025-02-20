@@ -49,10 +49,12 @@ function CompletedOrderSystem() {
   );
 
   // const currentPage = useSelector((state) => state.pagination.currentPage);
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
   const currentPage = useSelector((state) => state.pagination.currentPage['CompletedOrderSystem']) || 1;
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'CompletedOrderSystem' }));
       dispatch(clearStoreData({ tableId: 'CompletedOrderSystem' }));
       setPage(currentPage);
     }
@@ -250,7 +252,6 @@ function CompletedOrderSystem() {
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
   }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
 
   return (

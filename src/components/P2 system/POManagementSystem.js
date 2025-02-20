@@ -26,6 +26,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import axiosInstance from "../../utils/AxiosInstance";
 import { PomSystemProductsDetails } from "../../Redux2/slices/P2SystemSlice";
 import { fetchAllFactories } from "../../Redux2/slices/FactoriesSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function POManagementSystem() {
   const inputRef = useRef(null);
@@ -60,6 +61,8 @@ function POManagementSystem() {
     (state) => state?.p2System?.isLoading
   );
 
+  const currentPage = useSelector((state) => state.pagination.currentPage['POManagementSystem']) || 1;
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -82,7 +85,6 @@ function POManagementSystem() {
         apiUrl = `wp-json/custom-so-management/v1/generated-so-order/?&per_page=${pageSize}&page=${page}`;
       }
 
-      // Build query parameters based on selected filters
       const params = {};
       if (searchPoID) params.po_id = searchPoID;
       if (startDate && endDate) {
@@ -92,7 +94,6 @@ function POManagementSystem() {
       if (selectedFactory) params.factory_id = selectedFactory;
       if (PoStatus) params.status = PoStatus;
 
-      // Construct the final API URL with query parameters
       dispatch(
         PomSystemProductsDetails({
           apiUrl: `${apiUrl}&${new URLSearchParams(params).toString()}`,
@@ -114,6 +115,10 @@ function POManagementSystem() {
   }, []);
 
   useEffect(() => {
+    if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'POManagementSystem' }));
+      setPage(currentPage);
+    }
     POM_system_products();
   }, [
     page,
@@ -124,6 +129,7 @@ function POManagementSystem() {
     PoStatus,
     searchPoID,
     poType,
+    currentPage
   ]);
 
   const handleDateChange = (newDateRange) => {
@@ -271,7 +277,7 @@ function POManagementSystem() {
   };
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage({ tableId: 'POManagementSystem', page: value }));
   };
 
   const handleLanguageChange = async (language) => {
@@ -364,7 +370,7 @@ function POManagementSystem() {
                   onChange={handleFactoryChange}
                 >
                   <option value="">All Factory</option>
-                  {factories.map((factory) => (
+                  {factories?.map((factory) => (
                     <option key={factory.id} value={factory.id}>
                       {factory.factory_name}
                     </option>

@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+// import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoading: false,
   SyncLoading: false,
+  currentPage: {},
   currentPage: {},
   error: null,
 };

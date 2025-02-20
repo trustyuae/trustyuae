@@ -47,6 +47,7 @@ function MissingOrderSystem() {
   useEffect(() => {
     if (currentPage) {
       dispatch(clearStoreData({ tableId: 'MissingOrderSystem' }));
+      dispatch(clearStoreData({ tableId: 'MissingOrderSystem' }));
       setPage(currentPage);
     }
   }, [currentPage]);

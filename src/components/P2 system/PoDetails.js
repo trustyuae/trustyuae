@@ -50,6 +50,7 @@ import {
   UpdatePODetails,
 } from "../../Redux2/slices/P2SystemSlice";
 import ShowAlert from "../../utils/ShowAlert";
+import PoRefundModal from "./PoRefundModal";
 
 const PoDetails = () => {
   const { id } = useParams();
@@ -63,6 +64,7 @@ const PoDetails = () => {
   const [factorieName, setFactorieName] = useState("");
   const [printModal, setPrintModal] = useState(false);
   const [poDetailsModal, setPoDetailsModal] = useState(false);
+  const [poRefundModal, setPoRefundModal] = useState(false);
   const [productId, setProductId] = useState(null);
   const [variationId, setVariationId] = useState(null);
   const [erId, setERId] = useState(null);
@@ -89,6 +91,9 @@ const PoDetails = () => {
   const perticularOrderDetailsLoader = useSelector(
     (state) => state?.p2System?.isLoading
   );
+
+    const [showRefundModal, setShowRefundModal] = useState(false);
+  
 
   useEffect(() => {
     dispatch(fetchAllFactories());
@@ -137,6 +142,10 @@ const PoDetails = () => {
       await dispatch(PerticularPoDetails({ apiUrl })).then(({ payload }) => {
         let data = payload.line_items.map((v, i) => ({ ...v, id: i }));
         data = data.map((v, i) => ({ ...v, dispatch_status: "" }));
+        const hasHiddenItems = data.some((item) => item.item_hide === "1");
+        if (hasHiddenItems) {
+          setShowRefundModal(true);
+        }
         const row = [
           ...data,
           {
@@ -173,12 +182,10 @@ const PoDetails = () => {
 
   useEffect(() => {
     fetchPO();
-    // getMessages()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, page]);
 
   useEffect(() => {
-    // fetchPO();
     getMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setMessages]);
@@ -263,7 +270,7 @@ const PoDetails = () => {
       ),
       received_quantity: updatelist.map((item) => item.received_quantity),
     };
-    // Check if availability_status is not empty
+
     const availabilityStatuses = updatelist.map((item) =>
       item.availability_status
         ? item.availability_status
@@ -273,7 +280,6 @@ const PoDetails = () => {
     );
     const flattenedStatuses = availabilityStatuses.flat();
 
-    // Validate only if availability_status is not empty
     if (flattenedStatuses.length > 0) {
       const validationMessage = validateAvailabilityStatuses(flattenedStatuses);
 
@@ -283,14 +289,11 @@ const PoDetails = () => {
           title: validationMessage,
           showConfirmButton: true,
         });
-        return; // Stop execution if validation fails
+        return;
       }
-
-      // Include availability_status in updatedData
       updatedData.availability_status = availabilityStatuses;
     }
 
-    // Proceed with dispatch update action
     let apiUrl = `wp-json/custom-available-status/v1/estimated-status/${id}`;
     await dispatch(UpdatePODetails({ apiUrl, payload: updatedData })).then(
       ({ payload }) => {
@@ -309,7 +312,10 @@ const PoDetails = () => {
   };
 
   const handleRecievedQtyChange = (index, event) => {
-    if (index.target.value >= 0 && index.target.value <= event.quantity) {
+    if (
+      index.target.value >= 0 &&
+      index.target.value <= event.item_unhide_count
+    ) {
       const updatedRecivedQtyData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {
@@ -323,7 +329,7 @@ const PoDetails = () => {
   };
 
   const handleAvailableQtyChange = (index, event) => {
-    if (index.target.value >= 0 && index.target.value <= event.quantity) {
+    if (index.target.value >= 0 && index.target.value <= event.item_unhide_count) {
       const updatedData = PO_OrderList.map((item) => {
         if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {
@@ -414,6 +420,7 @@ const PoDetails = () => {
       field: "product_name",
       headerName: t("POManagement.ProductName"),
       flex: 4,
+      className: "po-details",
       colSpan: (value, row) => {
         if (row.id === "TAX") {
           return 3;
@@ -431,6 +438,7 @@ const PoDetails = () => {
       field: "variation_value",
       headerName: t("POManagement.Variation"),
       flex: 4,
+      className: "po-details",
       renderCell: variant2,
     },
     {
@@ -438,6 +446,7 @@ const PoDetails = () => {
       headerName: t("POManagement.Image"),
       flex: 4,
       type: "html",
+      className: "po-details",
       renderCell: (value, row) => {
         return (
           <Box
@@ -461,11 +470,11 @@ const PoDetails = () => {
         );
       },
     },
-
     {
       field: "quantity",
       headerName: t("POManagement.QtyOrdered"),
       flex: 2.5,
+      className: "po-details",
       renderCell: (params) => {
         const handleClick = () => {
           handlePoModal(params.row.product_id, params.row.variation_id);
@@ -486,6 +495,7 @@ const PoDetails = () => {
       field: "received_quantity",
       headerName: t("POManagement.ReceivedQty"),
       flex: 2.5,
+      className: "po-details",
       colSpan: (value, row) => {
         if (row?.id == "TAX") {
           return 4;
@@ -493,6 +503,7 @@ const PoDetails = () => {
         return undefined;
       },
       renderCell: (params) => {
+        console.log(params.row.item_hide, "params");
         if (params?.row?.id == "TAX") {
           return null;
         }
@@ -504,6 +515,7 @@ const PoDetails = () => {
               value={params.row.received_quantity}
               placeholder="0"
               onChange={(e) => handleRecievedQtyChange(e, params.row)}
+              disabled={params.row.item_hide === "1"}
             />
           </Form.Group>
         );
@@ -513,6 +525,7 @@ const PoDetails = () => {
       field: "available_quantity",
       headerName: t("POManagement.AvlQty"),
       flex: 2.5,
+      className: "po-details",
       renderCell: (params) => {
         if (params.row.id === "TAX") {
           return null;
@@ -525,6 +538,7 @@ const PoDetails = () => {
               value={params.row.available_quantity}
               placeholder="0"
               onChange={(e) => handleAvailableQtyChange(e, params.row)}
+              disabled={params.row.item_hide === "1"}
             />
           </Form.Group>
         );
@@ -534,6 +548,7 @@ const PoDetails = () => {
       field: "availability_status",
       headerName: t("POManagement.AvlStatus"),
       flex: 8,
+      className: "po-details",
       renderCell: (params) => {
         const rowId = params.row.id;
         const selectedDate = params.row.availability_date || ""; // Use state date or fallback to availability_date
@@ -562,6 +577,7 @@ const PoDetails = () => {
             <Form.Select
               labelId={`customer-status-${rowId}-label`}
               id={`customer-status-${rowId}`}
+              disabled={params.row.item_hide === "1"}
               value={
                 params.row.availability_status !== "" &&
                 params.row.availability_status !== "0"
@@ -590,6 +606,7 @@ const PoDetails = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 format="YYYY-MM-DD"
+                disabled={params.row.item_hide === "1"}
                 value={dateValue} // Use determined value for DatePicker
                 onChange={(date) => handleDateChange(rowId, date)}
                 sx={{
@@ -612,6 +629,7 @@ const PoDetails = () => {
       field: "dispatch_type",
       headerName: t("POManagement.DispatchStatus"),
       flex: 3,
+      className: "po-details",
       renderCell: (params) => {
         if (params?.row?.id == "TAX") {
           return null;
@@ -623,6 +641,7 @@ const PoDetails = () => {
             onChange={(e) =>
               handleDispatchStatusChange(e.target.value, params.row)
             }
+            disabled={params.row.item_hide === "1"}
           >
             <option disabled selected value="">
               {t("POManagement.Select")}...
@@ -639,6 +658,7 @@ const PoDetails = () => {
       field: "rmb_price",
       headerName: t("POManagement.RMBPrice"),
       flex: 3,
+      className: "po-details",
       valueGetter: (value, row) => {
         if (row.id === "TAX") {
           return row.taxTotal;
@@ -650,6 +670,7 @@ const PoDetails = () => {
       field: "total_price",
       headerName: t("POManagement.AEDPrice"),
       flex: 3,
+      className: "po-details",
       colSpan: (value, row) => {
         if (row.id === "TAX") {
           return 1;
@@ -760,9 +781,17 @@ const PoDetails = () => {
       <Card className="p-3 mb-3">
         <Box className="d-flex align-items-center justify-content-between">
           <Box>
-            <Typography variant="h6" className="fw-bold mb-3">
-              {t("POManagement.PODetails")}
-            </Typography>
+            <Box className="d-flex justify-content-between">
+              <Typography variant="h6" className="fw-bold mb-3">
+                {t("POManagement.PODetails")}
+              </Typography>
+              <Typography variant="h6" className="fw-bold mb-3">
+                {
+                  factories.find((factory) => factory.id == factorieName)
+                    ?.factory_name
+                }
+              </Typography>
+            </Box>
             <Box className="d-flex justify-content-between">
               <Box>
                 <Box>
@@ -777,17 +806,12 @@ const PoDetails = () => {
                   <Badge bg="success">{POTypes(id)}</Badge>
                 </Typography>
               </Box>
-              <Box style={{ marginLeft: "20px" }}>
+              <Box sx={{ display: "flex", gap: 2, ml: 2 }}>
                 <Box>
                   {erId ? (
                     <div>
                       <Typography className="fw-bold"># {erId}</Typography>
-                      <Typography
-                        className=""
-                        sx={{
-                          fontSize: 14,
-                        }}
-                      >
+                      <Typography sx={{ fontSize: 14 }}>
                         <Badge bg="success">Exchange & Return ID</Badge>
                       </Typography>
                     </div>
@@ -800,16 +824,35 @@ const PoDetails = () => {
                     </Alert>
                   )}
                 </Box>
+                <Box>
+                  {showRefundModal && (
+                    <Alert
+                      severity="warning"
+                      sx={{
+                        fontFamily: "monospace",
+                        fontSize: "18px",
+                        backgroundColor: "#f0e68c",
+                      }}
+                    >
+                      <Typography component="span">
+                        {t("POManagement.RF")}{" "}
+                        <Typography
+                          component="span"
+                          onClick={() => setPoRefundModal(true)}
+                          sx={{
+                            cursor: "pointer",
+                            color: "blue",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          Click to view details.
+                        </Typography>
+                      </Typography>
+                    </Alert>
+                  )}
+                </Box>
               </Box>
             </Box>
-          </Box>
-          <Box>
-            <Typography variant="h6" className="fw-bold mb-3">
-              {
-                factories.find((factory) => factory.id == factorieName)
-                  ?.factory_name
-              }
-            </Typography>
           </Box>
         </Box>
       </Card>
@@ -845,14 +888,6 @@ const PoDetails = () => {
                     >
                       <List>
                         {messages?.map(({ id, po_note, note_time }, i) => (
-                          // <ListItem key={i} className="d-flex justify-content-start">
-                          //   <ListItemText
-                          //     primary={po_note}
-                          //     secondary={note_time}
-                          //     className="rounded p-2"
-                          //     style={{ maxWidth: '70%', minWidth: '50px', backgroundColor: "#bfdffb" }}
-                          //   />
-                          // </ListItem>
                           <ListItem
                             key={i}
                             className="d-flex justify-content-start"
@@ -1036,6 +1071,14 @@ const PoDetails = () => {
           productId={productId}
           variationId={variationId}
           handleClosePoDetailsModal={() => setPoDetailsModal(false)}
+          poId={id}
+        />
+      )}
+      {poRefundModal && (
+        <PoRefundModal
+          show={poRefundModal}
+          poDetailsModal={poRefundModal}
+          handleClosePoDetailsModal={() => setPoRefundModal(false)}
           poId={id}
         />
       )}

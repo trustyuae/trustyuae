@@ -45,6 +45,7 @@ import {
   setCurrentPage,
 } from "../../Redux2/slices/PaginationSlice";
 
+
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -97,9 +98,12 @@ function OrderTrackingNumberPending() {
     useSelector(
       (state) => state.pagination.currentPage["OrderTrackingNumberPending"]
     ) || 1;
+  // const currentPage = useSelector((state) => state.pagination.currentPage);
+  
 
   useEffect(() => {
     if (currentPage) {
+      dispatch(clearStoreData({ tableId: "OrderTrackingNumberPending" }));
       dispatch(clearStoreData({ tableId: "OrderTrackingNumberPending" }));
       setPage(currentPage);
     }
@@ -116,6 +120,7 @@ function OrderTrackingNumberPending() {
       setTotalPages(otherData?.total_pages);
     }
   }, [ordersData, otherData, currentPage]);
+
 
   useEffect(() => {
     if (orderDetails) {
@@ -193,7 +198,10 @@ function OrderTrackingNumberPending() {
   };
 
   const handleTrackIdAssign = (row, event) => {
-    const { value } = event.target;
+    let { value } = event.target;
+
+    // Remove special characters and keep only numbers and letters
+    value = value.replace(/[^a-zA-Z0-9]/g, "");
 
     setTempTrackIds((prev) => ({
       ...prev,
@@ -568,7 +576,12 @@ function OrderTrackingNumberPending() {
     dispatch(
       setCurrentPage({ tableId: "OrderTrackingNumberPending", page: value })
     );
+    // dispatch(setCurrentPage(value));
+    dispatch(
+      setCurrentPage({ tableId: "OrderTrackingNumberPending", page: value })
+    );
   };
+
 
   const radios = [
     { name: "English", value: "En" },

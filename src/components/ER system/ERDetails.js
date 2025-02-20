@@ -265,12 +265,6 @@ const ERDetails = () => {
               received_status: "Partially received",
             };
           }
-
-          //else if(event.order_qty>=index.target.value){
-          //     return { ...item, returned_qty: index.target.value,received_status:'Partially received' }
-          // }else if(index.target.value===0){
-          //     return { ...item, returned_qty: index.target.value,received_status:'Not Received' }
-          // }
           return { ...item, returned_qty: index.target.value };
         }
         return item;
@@ -406,7 +400,7 @@ const ERDetails = () => {
           <Box>
             <Typography variant="h6" className="fw-bold mb-3">
               {
-                factories.find((factory) => factory.id == factoryName)
+                factories?.find((factory) => factory.id == factoryName)
                   ?.factory_name
               }
             </Typography>

@@ -151,7 +151,11 @@ function OnHoldOrdersSystemInChina() {
         const trackingID = items.length > 0 ? items[0]?.tracking_id : "";
         return (
           <Box className="d-flex align-items-center justify-content-center">
-            <Typography>{trackingID}</Typography>
+            <Typography>
+              {trackingID === "0" || trackingID === ""
+                ? "No Tracking Id"
+                : trackingID}
+            </Typography>
             {trackingID !== "0" && (
               <IconButton onClick={() => handleCopy(trackingID)}>
                 <ContentCopyIcon />

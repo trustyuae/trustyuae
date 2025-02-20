@@ -59,6 +59,7 @@ function CompletedOrderSystemInChina() {
   useEffect(() => {
     if (currentPage) {
       dispatch(clearStoreData({ tableId: 'CompletedOrderSystemInChina' }));
+      dispatch(clearStoreData({ tableId: 'CompletedOrderSystemInChina' }));
       setPage(currentPage);
     }
     if (completedOrdersData) {
@@ -209,6 +210,8 @@ function CompletedOrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
+    // dispatch(setCurrentPage(value));
+    dispatch(setCurrentPage({ tableId: 'CompletedOrderSystemInChina', page: value }));
     // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'CompletedOrderSystemInChina', page: value }));
   };

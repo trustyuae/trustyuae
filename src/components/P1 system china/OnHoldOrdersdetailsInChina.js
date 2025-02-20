@@ -1062,7 +1062,6 @@ function OnHoldOrdersdetailsInChina() {
           )}
         <Alert variant={"success"}>
           <label>On Hold Meesage :-</label> {orderDetails?.onhold_note}
-          {/* <Box>{orderDetails?.onhold_note}</Box> */}
         </Alert>
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">

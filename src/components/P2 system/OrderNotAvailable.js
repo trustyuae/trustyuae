@@ -24,6 +24,7 @@ import {
   OrderNotAvailableData,
   OrderNotAvailableDataStatus,
 } from "../../Redux2/slices/P2SystemSlice";
+import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 
 function OrderNotAvailable() {
   const dispatch = useDispatch();
@@ -53,6 +54,8 @@ function OrderNotAvailable() {
     (state) => state?.p2System?.ordersNotAvailable
   );
 
+  const currentPage = useSelector((state) => state.pagination.currentPage['OrderNotAvailable']) || 1;
+
   useEffect(() => {
     dispatch(fetchAllFactories());
   }, [dispatch]);
@@ -65,6 +68,10 @@ function OrderNotAvailable() {
   }, [factoryData]);
 
   useEffect(() => {
+    if (currentPage) {
+      dispatch(clearStoreData({ tableId: 'OrderNotAvailable' }));
+      setPage(currentPage);
+    }
     if (ordersNotAvailableOverAllData) {
       const orderNotAvailable = ordersNotAvailableOverAllData?.orders?.map(
         (v, i) => ({
@@ -86,7 +93,7 @@ function OrderNotAvailable() {
       setOrdersNotAvailableData(orderNotAvailable);
       setTotalPages(orderNotAvailable?.total_pages);
     }
-  }, [ordersNotAvailableOverAllData]);
+  }, [ordersNotAvailableOverAllData,currentPage]);
 
   const handleStatusChange = (event, itemData) => {
     const { value } = event.target;
@@ -411,17 +418,17 @@ function OrderNotAvailable() {
   ];
 
   const handleChange = (event, value) => {
-    setPage(value);
+    dispatch(setCurrentPage({ tableId: 'OrderNotAvailable', page: value }));
     let currIndex = value * pageSize - pageSize + 1;
     setCurrentStartIndex(currIndex, "currIndex");
   };
 
   const handleUpdatedValues = () => {
     const updatedOrders = ordersNotAvailableData.map((order) => {
-      return { ...order, isSelected: false }; // Set isSelected to false for each order
+      return { ...order, isSelected: false };
     });
     setOrdersNotAvailableData(updatedOrders);
-    setSelectedOrderNotAvailable([]); // Clear the selected orders array
+    setSelectedOrderNotAvailable([]);
     setSelectedStatus({ id: 0, status: "" }); //
   };
 
