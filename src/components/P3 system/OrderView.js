@@ -30,7 +30,7 @@ const OrderView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const loader = useSelector((state) => state?.p3System?.isLoading);
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(100);
   const pageSizeOptions = [5, 10, 20, 50, 100];
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

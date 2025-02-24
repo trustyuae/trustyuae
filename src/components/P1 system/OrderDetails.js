@@ -383,29 +383,46 @@ function OrderDetails() {
   const handleSendToChinaSystem = async () => {
     const selectedProductIds = selectedItems.map((item) => item.item_id);
     const selectedVariationIds = selectedItems.map((item) => item.variation_id);
-
+  
+    console.log("Order ID:", id);
+    console.log("Selected Product IDs:", selectedProductIds);
+    console.log("Selected Variation IDs:", selectedVariationIds);
+  
+    if (!id || selectedProductIds.length === 0 || selectedVariationIds.length === 0) {
+      Swal.fire({
+        title: "Missing Data",
+        text: "Please select the product.",
+        icon: "error",
+        showConfirmButton: true,
+      });
+      return;
+    }
+  
     const payload = {
       product_id: selectedProductIds,
       variation_id: selectedVariationIds,
       warehouse: "China",
     };
-
+  
     try {
-      dispatch(CustomItemSendToChina({ id, payload })).then(({ payload }) => {
-        Swal.fire({
-          title: payload,
-          icon: payload ? "success" : "error",
-          showConfirmButton: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/ordersystem_in_china");
-          }
-        });
+      const { payload: responsePayload } = await dispatch(
+        CustomItemSendToChina({ id, payload })
+      );
+  
+      Swal.fire({
+        title: responsePayload,
+        icon: responsePayload ? "success" : "error",
+        showConfirmButton: true,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/order_tracking_number_Pending");
+        }
       });
     } catch (error) {
-      console.log(error);
+      console.log("Error in handleSendToChinaSystem:", error);
     }
   };
+  
 
   const handleFinishButtonClick = async () => {
     try {

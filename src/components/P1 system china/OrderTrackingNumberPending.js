@@ -250,11 +250,7 @@ function OrderTrackingNumberPending() {
           : order
       )
     );
-
-    // Dispatch the update action
     dispatch(AssignTrackID({ orderId, payload }));
-
-    // Optionally: Clear the temporary tracking ID after the update
     setTempTrackIds((prev) => {
       const newState = { ...prev };
       delete newState[rowData.id];
@@ -263,12 +259,16 @@ function OrderTrackingNumberPending() {
   };
 
   const handlePush = (rowData) => {
+    const trackingId = rowData.items[0]?.tracking_id || tempTrackIds[rowData.id];
+    if (!trackingId || trackingId === "0" || trackingId === "") {
+      ShowAlert("Error", "Tracking ID is required to push the order.", "error", false, false, null, "", 2000);
+      return; 
+    }
+  
     const payload = {
-      order_id: [parseInt(rowData.order_id, 10)], // Parse and wrap in an array in one step
+      order_id: [parseInt(rowData.order_id, 10)], 
       product_id: rowData.items.map((item) => parseInt(item.item_id, 10)),
-      variation_id: rowData.items.map((item) =>
-        parseInt(item.variation_id, 10)
-      ),
+      variation_id: rowData.items.map((item) => parseInt(item.variation_id, 10)),
     };
     dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
       ShowAlert("Success", payload, "success", false, false, null, "", 1000);
