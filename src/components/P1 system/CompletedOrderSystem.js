@@ -228,12 +228,22 @@ function CompletedOrderSystem() {
     }
   };
 
+  // const handleSearchFilter = (e) => {
+  //   e.preventDefault();
+  //   setSearchOrderID(inputRef.current.value);
+  //   setPage(1);
+  //   fetchOrders();
+  // };
+
   const handleSearchFilter = (e) => {
     e.preventDefault();
-    setSearchOrderID(inputRef.current.value);
+    const orderId = inputRef.current.value.trim(); // ✅ Trim to avoid extra spaces
+    setSearchOrderID(orderId);
     setPage(1);
-    fetchOrders();
+    fetchOrders(orderId); // ✅ Pass orderId directly
   };
+
+
   const orderId = (e) => {
     if (e.key === "Enter") {
       setSearchOrderID(e.target.value);

@@ -208,7 +208,7 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link
+                  {/* <Link
                     to="/GRN_Management_On_OrderIds"
                     className={
                       "nav-link underline" +
@@ -217,7 +217,7 @@ const Sidebar = () => {
                   >
                     <i className="bi bi-circle"></i>
                     <span>GRN Management On OrderIds</span>
-                  </Link>
+                  </Link> */}
                 </li>
               </ul>
             </li>
