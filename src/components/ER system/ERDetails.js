@@ -62,11 +62,11 @@ const ERDetails = () => {
       setStatus(perticularPoDetailsDataa.er_status);
       setFactoryName(perticularPoDetailsDataa.factory_id);
       setNote(perticularPoDetailsDataa.er_note);
-      let data = perticularPoDetailsDataa.line_items.map((v, i) => ({
+      let data = perticularPoDetailsDataa.line_items?.map((v, i) => ({
         ...v,
         id: i,
       }));
-      data = data.map((d) => {
+      data = data?.map((d) => {
         if (d.returned_qty == d.received_qty) {
           return {
             ...d,
@@ -242,7 +242,7 @@ const ERDetails = () => {
 
   const handleAvailableQtyChange = (index, event) => {
     if (index.target.value >= 0 && event.returned_qty >= index.target.value) {
-      const updatedData = ERviewList.map((item) => {
+      const updatedData = ERviewList?.map((item) => {
         if (item.id === event.id) {
           if (event.returned_qty == index.target.value) {
             return {
@@ -280,7 +280,7 @@ const ERDetails = () => {
   };
 
   const handleStatusChange = (index, event) => {
-    const updatedData = ERviewList.map((item) => {
+    const updatedData = ERviewList?.map((item) => {
       if (item.id === event.id) {
         return { ...item, received_status: index.target.value };
       }
@@ -290,7 +290,7 @@ const ERDetails = () => {
   };
 
   const handleDateChange = (index, event) => {
-    const updatedData = ERviewList.map((item) => {
+    const updatedData = ERviewList?.map((item) => {
       if (item.id === event.id) {
         return { ...item, expected_delivery_date: index.target.value };
       }
@@ -319,11 +319,11 @@ const ERDetails = () => {
       er_no: params.er_no,
       er_note: addNote,
       er_status: status,
-      product_id: ERviewList.map((d) => Number(d.product_id)),
-      received_qty: ERviewList.map((d) => Number(d.received_qty)),
-      received_status: ERviewList.map((d) => d.received_status),
-      expected_date: ERviewList.map((d) => d.expected_delivery_date),
-      variation_id: ERviewList.map((d) => d.variation_id),
+      product_id: ERviewList?.map((d) => Number(d.product_id)),
+      received_qty: ERviewList?.map((d) => Number(d.received_qty)),
+      received_status: ERviewList?.map((d) => d.received_status),
+      expected_date: ERviewList?.map((d) => d.expected_delivery_date),
+      variation_id: ERviewList?.map((d) => d.variation_id),
     };
     try {
       const response = await axiosInstance.post(
@@ -370,7 +370,7 @@ const ERDetails = () => {
             <ArrowBackIcon className="me-1" />
           </Button>
           <ButtonGroup>
-            {radios.map((radio, idx) => (
+            {radios?.map((radio, idx) => (
               <ToggleButton
                 key={idx}
                 id={`radio-${idx}`}

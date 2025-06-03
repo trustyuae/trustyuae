@@ -73,7 +73,7 @@ function ERManagement() {
     await dispatch(GetErManagementData(apiUrl))
       .then(({payload}) => {
         console.log(payload,'payload from Er management system')
-        let data = payload.er_details.map((v, i) => ({ ...v, id: i }));
+        let data = payload.er_details?.map((v, i) => ({ ...v, id: i }));
         setOrders(data);
         setTotalPages(payload.total_pages);
       })
@@ -205,7 +205,7 @@ function ERManagement() {
           {t("POManagement.ERManagement")}
         </Typography>
         <ButtonGroup>
-          {radios.map((radio, idx) => (
+          {radios?.map((radio, idx) => (
             <ToggleButton
               key={idx}
               id={`radio-${idx}`}
@@ -261,7 +261,7 @@ function ERManagement() {
                   <option disabled selected value="">
                     All Factory
                   </option>
-                  {factories.map((factory) => (
+                  {factories?.map((factory) => (
                     <option key={factory.id} value={factory.id}>
                       {factory.factory_name}
                     </option>
@@ -299,7 +299,7 @@ function ERManagement() {
                 value={pageSize}
                 onChange={handlePageSizeChange}
               >
-                {pageSizeOptions.map((size) => (
+                {pageSizeOptions?.map((size) => (
                   <option key={size} value={size}>
                     {size}
                   </option>

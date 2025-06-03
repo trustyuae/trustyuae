@@ -19,7 +19,10 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { CompletedOrderSystemGet } from "../../Redux2/slices/OrderSystemSlice";
-import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import {
+  clearStoreData,
+  setCurrentPage,
+} from "../../Redux2/slices/PaginationSlice";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 function CompletedOrderSystem() {
@@ -49,11 +52,14 @@ function CompletedOrderSystem() {
   );
 
   // const currentPage = useSelector((state) => state.pagination.currentPage);
-  const currentPage = useSelector((state) => state.pagination.currentPage['CompletedOrderSystem']) || 1;
+  const currentPage =
+    useSelector(
+      (state) => state.pagination.currentPage["CompletedOrderSystem"]
+    ) || 1;
 
   useEffect(() => {
     if (currentPage) {
-      dispatch(clearStoreData({ tableId: 'CompletedOrderSystem' }));
+      dispatch(clearStoreData({ tableId: "CompletedOrderSystem" }));
       setPage(currentPage);
     }
     if (completedOrdersData) {
@@ -64,7 +70,7 @@ function CompletedOrderSystem() {
       setOrders(completedData);
       setTotalPages(completedOrdersData.total_pages);
     }
-  }, [completedOrdersData,currentPage]);
+  }, [completedOrdersData, currentPage]);
 
   async function fetchOrders() {
     let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=&page=${page}&per_page=${pageSize}`;
@@ -105,7 +111,7 @@ function CompletedOrderSystem() {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        setSnackbarOpen(true); 
+        setSnackbarOpen(true);
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
@@ -191,7 +197,7 @@ function CompletedOrderSystem() {
 
   const handleChange = (event, value) => {
     // dispatch(setCurrentPage(value));
-    dispatch(setCurrentPage({ tableId: 'CompletedOrderSystem', page: value }));
+    dispatch(setCurrentPage({ tableId: "CompletedOrderSystem", page: value }));
   };
 
   const handleDateChange = async (newDateRange) => {
@@ -415,7 +421,6 @@ function CompletedOrderSystem() {
           horizontal: "center",
         }}
       />
-
     </Container>
   );
 }

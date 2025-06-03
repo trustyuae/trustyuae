@@ -90,7 +90,7 @@ function AllFactory() {
   ]);
 
   const handleEdit = (factoryId) => {
-    const factory = factories.find((f) => f.id === factoryId);
+    const factory = factories?.find((f) => f.id === factoryId);
     setSelectedFactory(factory);
     setShowEditModal(true);
   };
@@ -111,7 +111,7 @@ function AllFactory() {
     try {
       await dispatch(factoryEdit(selectedFactory, data));
       setFactories((prevFactories) => {
-        return prevFactories.map((factory) => {
+        return prevFactories?.map((factory) => {
           if (factory.id === selectedFactory.id) {
             return { ...factory, ...data };
           }

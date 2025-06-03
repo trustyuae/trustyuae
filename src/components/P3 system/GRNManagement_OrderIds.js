@@ -181,7 +181,7 @@ function GRNManagement_OrderIds() {
       headerName: "Factory Name",
       flex: 1,
       renderCell: (params) => {
-        const factory = factories.find(
+        const factory = factories?.find(
           (factory) => factory.id == params.row.factory_id
         );
         return <Box>{factory?.factory_name}</Box>;

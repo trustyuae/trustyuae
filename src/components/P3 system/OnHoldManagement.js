@@ -43,6 +43,10 @@ function OnHoldManagement() {
     (state) => state?.p3System?.productDetails
   );
 
+  useEffect(()=>{
+    console.log(params,'params');
+    
+  },[params])
   useEffect(() => {
     if (productDetailsDataa) {
       setProductDetailsData(productDetailsDataa);
@@ -59,6 +63,7 @@ function OnHoldManagement() {
   }
 
   async function fetchProductOrderDetails() {
+    // let apiUrl = `wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/`;
     let apiUrl = `wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
     dispatch(
       GetProductOrderDetails({
@@ -114,6 +119,7 @@ function OnHoldManagement() {
   }, [params.id, params.grn_no, params.variation_id]);
 
   const handleOrderPerp = async () => {
+    // debugger
     const orderId = selectedOrders.map((order) => order.order_id);
     const quantity = selectedOrders.map((order) => order.qty_fullfilled);
 
@@ -166,15 +172,17 @@ function OnHoldManagement() {
 
     if (confirmation.isConfirmed) {
       const requestedDataP = {
-        product_id: params.id,
+        product_id: Number(params.id),
         po_id: productOverallData.po_id,
         order_id: orderId,
         quantity: quantity,
         grn_no: params.grn_no,
-        variation_id: params.variation_id,
+        variation_id: params.variation_id==0?"": params.variation_id,
         warehouse: systemSelection === "P1 System UAE" ? "" : "China",
       };
 
+      console.log(requestedDataP,'requestedDataP');
+      
       try {
         await dispatch(AddProductOrderForPre({ requestedDataP })).then(
           ({ payload }) => {

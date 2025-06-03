@@ -172,7 +172,7 @@
       }
       return i;
     };
-    const findUrlEnd = (characters, startIndex) => {
+    const findEnd = (characters, startIndex) => {
       const endIndex = findWordEnd(characters, startIndex + 1);
       const peakedWord = characters.slice(startIndex + 1, endIndex).join(EMPTY_STRING);
       return peakedWord.substr(0, 3) === '://' ? endIndex : startIndex;
@@ -190,10 +190,10 @@
             const endOfWord = i + 1;
             const str = sChars.slice(startOfWord, endOfWord).join(EMPTY_STRING);
             if (isProtocol(str)) {
-              const endOfUrl = findUrlEnd(sChars, i);
-              const url = chars.slice(endOfWord, endOfUrl);
-              Array.prototype.push.apply(word, url);
-              i = endOfUrl;
+              const endOf = findEnd(sChars, i);
+              const  = chars.slice(endOfWord, endOf);
+              Array.prototype.push.apply(word, );
+              i = endOf;
             }
             words.push(word);
             indices.push({

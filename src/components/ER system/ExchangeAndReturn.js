@@ -152,7 +152,7 @@ function ExchangeAndReturn() {
             fullWidth
             style={{ height: "70%", width: "100%" }}
           >
-            {ReturnType.map((status) => (
+            {ReturnType?.map((status) => (
               <MenuItem key={status} value={status}>
                 {status}
               </MenuItem>
@@ -213,7 +213,7 @@ function ExchangeAndReturn() {
   };
 
   const handleDateChange = (index, event) => {
-    const updatedData = orders.map((item) => {
+    const updatedData = orders?.map((item) => {
       if (item.id === event.id) {
         return { ...item, expected_delivery_date: index.target.value };
       }
@@ -223,7 +223,7 @@ function ExchangeAndReturn() {
   };
   const handleAvailableQtyChange = (event, rowData) => {
     if (event.target.value >= 0 && event.target.value <= rowData.quantity) {
-      const updatedData = orders.map((item) => {
+      const updatedData = orders?.map((item) => {
         if (item.id === rowData.id) {
           return { ...item, return_qty: event.target.value };
         }
@@ -234,7 +234,7 @@ function ExchangeAndReturn() {
   };
 
   const handleStatusChange = (index, event) => {
-    const updatedData = orders.map((item) => {
+    const updatedData = orders?.map((item) => {
       if (item.id === event.id) {
         return { ...item, return_type: index.target.value };
       }
@@ -282,7 +282,7 @@ function ExchangeAndReturn() {
         ...response.data.items_with_variations,
         ...response.data.items_without_variations,
       ];
-      let data = data2.map((v, i) => ({ ...v, id: i }));
+      let data = data2?.map((v, i) => ({ ...v, id: i }));
       setOrders(data);
     } catch (error) {
       console.error(error);
@@ -296,16 +296,16 @@ function ExchangeAndReturn() {
     const payload = {
       factory_id: Number(selectedFactory),
       po_id: selectPOId,
-      product_id: selectedOrders.map((d) => d.product_id),
-      return_qty: selectedOrders.map((d) => d.return_qty),
-      return_type: selectedOrders.map((d) => d.return_type),
-      expected_date: selectedOrders.map((d) => d.expected_delivery_date),
-      variation_id: selectedOrders.map((d) => d.variation_id),
+      product_id: selectedOrders?.map((d) => d.product_id),
+      return_qty: selectedOrders?.map((d) => d.return_qty),
+      return_type: selectedOrders?.map((d) => d.return_type),
+      expected_date: selectedOrders?.map((d) => d.expected_delivery_date),
+      variation_id: selectedOrders?.map((d) => d.variation_id),
     };
 
     try {
       const response = await axiosInstance.post(
-        `wp-json/custom-er-generate/v1/create-er/`,
+        `custom-er-generate/v1/create-er/`,
         payload
       );
 
@@ -348,7 +348,7 @@ function ExchangeAndReturn() {
           {t("POManagement.ExchangeAndReturn")}
         </Typography>
         <ButtonGroup>
-          {radios.map((radio, idx) => (
+          {radios?.map((radio, idx) => (
             <ToggleButton
               key={idx}
               id={`radio-${idx}`}
@@ -376,7 +376,7 @@ function ExchangeAndReturn() {
                   onChange={handleFactoryChange}
                 >
                   <option value="">All Factory</option>
-                  {factories.map((factory) => (
+                  {factories?.map((factory) => (
                     <option key={factory.id} value={factory.id}>
                       {factory.factory_name}
                     </option>
@@ -441,7 +441,7 @@ function ExchangeAndReturn() {
                     value={pageSize}
                     onChange={handlePageSizeChange}
                   >
-                    {pageSizeOptions.map((size) => (
+                    {pageSizeOptions?.map((size) => (
                       <option key={size} value={size}>
                         {size}
                       </option>

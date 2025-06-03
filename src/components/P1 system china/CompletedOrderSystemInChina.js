@@ -22,6 +22,7 @@ import { CompletedOrderSystemChinaGet } from "../../Redux2/slices/OrderSystemChi
 import { useTranslation } from "react-i18next";
 import { ButtonGroup, Card, Modal, Table, ToggleButton } from "react-bootstrap";
 import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import * as XLSX from 'xlsx';
 
 function CompletedOrderSystemInChina() {
   const inputRef = useRef(null);
@@ -53,7 +54,6 @@ function CompletedOrderSystemInChina() {
     (state) => state?.orderSystemChina?.completedOrders
   );
 
-  // const currentPage = useSelector((state) => state.pagination.currentPage);
   const currentPage = useSelector((state) => state.pagination.currentPage['CompletedOrderSystemInChina']) || 1;
 
   useEffect(() => {
@@ -209,7 +209,6 @@ function CompletedOrderSystemInChina() {
   ];
 
   const handleChange = (event, value) => {
-    // dispatch(setCurrentPage(value));
     dispatch(setCurrentPage({ tableId: 'CompletedOrderSystemInChina', page: value }));
   };
 
@@ -224,7 +223,6 @@ function CompletedOrderSystemInChina() {
   };
 
   useEffect(() => {
-    // Set the initial language to 'En' when component mounts
     i18n.changeLanguage(lang);
   }, []);
 
@@ -287,8 +285,43 @@ function CompletedOrderSystemInChina() {
 
   useEffect(() => {
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
+
+  const exportToExcel = () => {
+    // Create an array to hold all items from all orders
+    const excelData = orders.flatMap(order => {
+      // Map each item in the order to a row
+      return order.items.map(item => ({
+        'Date': order.start_date,
+        'Product ID': item.item_id,
+        'Product Name': item.product_name,
+        'Tracking ID': item.tracking_id || 'No Tracking ID',
+        'Order ID': order.order_id,
+        'Image URL': item.product_image || 'No Image'
+      }));
+    });
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    
+    // Set column widths
+    const wscols = [
+      {wch: 12}, // Date
+      {wch: 10}, // Product ID
+      {wch: 30}, // Product Name
+      {wch: 15}, // Tracking ID
+      {wch: 10}, // Order ID
+      {wch: 50}  // Image URL
+    ];
+    ws['!cols'] = wscols;
+    
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Completed Orders");
+    
+    // Generate Excel file
+    XLSX.writeFile(wb, `Completed_Orders_Page_${page}.xlsx`);
+  };
 
   return (
     <Container fluid className="py-3">
@@ -326,7 +359,6 @@ function CompletedOrderSystemInChina() {
                   type="text"
                   placeholder={t("P1ChinaSystem.EnterOrderId")}
                   ref={inputRef}
-                  // value={searchOrderID}
                   onKeyDown={(e) => orderId(e)}
                   className="mr-sm-2 py-2"
                 />
@@ -450,6 +482,16 @@ function CompletedOrderSystemInChina() {
                 totalPages={totalPages}
                 handleChange={handleChange}
               />
+              <Box className="d-flex justify-content-end mt-3">
+                <Button 
+                  variant="success" 
+                  onClick={exportToExcel}
+                  className="d-flex align-items-center gap-2"
+                >
+                  <i className="fas fa-file-excel"></i>
+                  {t("Export to Excel")}
+                </Button>
+              </Box>
             </div>
           ) : (
             <Alert

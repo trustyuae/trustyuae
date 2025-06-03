@@ -379,7 +379,7 @@ function OrderManagementSystem() {
       flex: 1,
       renderCell: (params) => {
         console.log(params, "params......");
-        const factory = factories.find(
+        const factory = factories?.find(
           (factory) => factory.id === params.row.factory_id
         );
         return (

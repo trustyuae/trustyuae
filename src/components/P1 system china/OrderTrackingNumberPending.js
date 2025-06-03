@@ -193,7 +193,10 @@ function OrderTrackingNumberPending() {
   };
 
   const handleTrackIdAssign = (row, event) => {
-    const { value } = event.target;
+    let { value } = event.target;
+
+    // Remove special characters and keep only numbers and letters
+    value = value.replace(/[^a-zA-Z0-9]/g, "");
 
     setTempTrackIds((prev) => ({
       ...prev,
@@ -255,12 +258,16 @@ function OrderTrackingNumberPending() {
   };
 
   const handlePush = (rowData) => {
+    const trackingId = rowData.items[0]?.tracking_id || tempTrackIds[rowData.id];
+    if (!trackingId || trackingId === "0" || trackingId === "") {
+      ShowAlert("Error", "Tracking ID is required to push the order.", "error", false, false, null, "", 2000);
+      return; 
+    }
+  
     const payload = {
-      order_id: [parseInt(rowData.order_id, 10)], // Parse and wrap in an array in one step
+      order_id: [parseInt(rowData.order_id, 10)], 
       product_id: rowData.items.map((item) => parseInt(item.item_id, 10)),
-      variation_id: rowData.items.map((item) =>
-        parseInt(item.variation_id, 10)
-      ),
+      variation_id: rowData.items.map((item) => parseInt(item.variation_id, 10)),
     };
     dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
       ShowAlert("Success", payload, "success", false, false, null, "", 1000);
@@ -268,8 +275,71 @@ function OrderTrackingNumberPending() {
     navigate("/ordersystem_in_china");
   };
 
+  // const handleSelectedPush = async () => {
+  //   console.log(selectedItems, "selectedItems");
+  //   const selectedOrderIds = selectedItems.map((item) =>
+  //     parseInt(item.order_id, 10)
+  //   );
+  //   const allProductIds = selectedItems.flatMap(
+  //     (item) =>
+  //       item.items?.map((subItem) => parseInt(subItem.item_id, 10)) || []
+  //   );
+  //   const allVariationIds = selectedItems.flatMap(
+  //     (item) =>
+  //       item.items?.map((subItem) => parseInt(subItem.variation_id, 10)) || []
+  //   );
+
+  //   const hasItemsInSystem = selectedItems.some(
+  //     (item) => item.exist_item === "1"
+  //   );
+
+  //   if (hasItemsInSystem) {
+  //     ShowAlert(
+  //       "",
+  //       "This order has items available in P1 system China",
+  //       "error",
+  //       false,
+  //       false,
+  //       null,
+  //       "",
+  //       1000
+  //     );
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     order_id: selectedOrderIds,
+  //     product_id: allProductIds,
+  //     variation_id: allVariationIds,
+  //   };
+
+  //   dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
+  //     ShowAlert("Success", payload, "success", false, false, null, "", 1000);
+  //   });
+  //   // Deselect all items
+  //   setSelectedItemIds([]);
+  //   setSelectedItems([]);
+  //   navigate("/ordersystem_in_china");
+  // };
+
   const handleSelectedPush = async () => {
     console.log(selectedItems, "selectedItems");
+  
+    // ✅ Check if no items are selected
+    if (selectedItems.length === 0) {
+      ShowAlert(
+        "Error",
+        "Please select at least one item before pushing the order.",
+        "error",
+        false,
+        false,
+        null,
+        "",
+        2000
+      );
+      return;
+    }
+  
     const selectedOrderIds = selectedItems.map((item) =>
       parseInt(item.order_id, 10)
     );
@@ -281,11 +351,10 @@ function OrderTrackingNumberPending() {
       (item) =>
         item.items?.map((subItem) => parseInt(subItem.variation_id, 10)) || []
     );
-
+  
     const hasItemsInSystem = selectedItems.some(
       (item) => item.exist_item === "1"
     );
-
     if (hasItemsInSystem) {
       ShowAlert(
         "",
@@ -299,13 +368,35 @@ function OrderTrackingNumberPending() {
       );
       return;
     }
-
+  
+    // ✅ Improved check for valid tracking IDs (trims and checks for non-empty string)
+    const hasInvalidTrackingId = selectedItems.some((item) =>
+      item.items.some(
+        (subItem) =>
+          !subItem.tracking_id || subItem.tracking_id.trim() === "" || subItem.tracking_id === "0"
+      )
+    );
+    if (hasInvalidTrackingId) {
+      ShowAlert(
+        "Error",
+        "All selected items must have a valid Tracking ID to push the order.",
+        "error",
+        false,
+        false,
+        null,
+        "",
+        2000
+      );
+      return;
+    }
+  
     const payload = {
       order_id: selectedOrderIds,
       product_id: allProductIds,
       variation_id: allVariationIds,
     };
-
+  
+    //   Dispatch push action
     dispatch(PushTrackOrder({ payload })).then(({ payload }) => {
       ShowAlert("Success", payload, "success", false, false, null, "", 1000);
     });
@@ -568,7 +659,12 @@ function OrderTrackingNumberPending() {
     dispatch(
       setCurrentPage({ tableId: "OrderTrackingNumberPending", page: value })
     );
+    // dispatch(setCurrentPage(value));
+    dispatch(
+      setCurrentPage({ tableId: "OrderTrackingNumberPending", page: value })
+    );
   };
+
 
   const radios = [
     { name: "English", value: "En" },
