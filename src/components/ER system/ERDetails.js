@@ -119,6 +119,10 @@ const ERDetails = () => {
       field: "product_name",
       headerName: t("POManagement.ProductName"),
       flex: 1,
+       renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
     },
     {
       field: "product_image",

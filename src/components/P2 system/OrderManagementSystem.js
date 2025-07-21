@@ -310,7 +310,12 @@ function OrderManagementSystem() {
         );
       },
     },
-    { field: "product_name", headerName: "Product names", flex: 1 },
+    { field: "product_name", headerName: "Product names", flex: 1,
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
+    },
     {
       field: "variation_value",
       headerName: "Variation values",
@@ -448,7 +453,12 @@ function OrderManagementSystem() {
         factories.find((factory) => factory.id === prams.row.factory_id)
           ?.factory_name,
     },
-    { field: "product_name", headerName: "Product names", flex: 1 },
+    { field: "product_name", headerName: "Product names", flex: 1,
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
+    },
     {
       field: "product_image",
       headerName: "Product images",
@@ -533,7 +543,12 @@ function OrderManagementSystem() {
         factories.find((factory) => factory.id === prams.row.factory_id)
           ?.factory_name,
     },
-    { field: "product_name", headerName: "Product names", flex: 1 },
+    { field: "product_name", headerName: "Product names", flex: 1,
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
+    },
     {
       field: "product_image",
       headerName: "Product images",

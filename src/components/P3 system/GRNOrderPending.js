@@ -168,6 +168,10 @@ function GRNOrderPending() {
       headerName: "product Name",
       flex: 1,
       className: " d-flex justify-content-center align-items-center",
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
     },
     {
       field: "order_ids",

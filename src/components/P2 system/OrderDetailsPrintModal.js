@@ -346,6 +346,10 @@ const OrderDetailsPrintModal = ({
       headerName: "Product Name",
       flex: 1,
       renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
+      renderCell: (params) => {
         return (
           <div className="wrap-text" style={{ fontSize: "1rem" }}>
             {params.value}

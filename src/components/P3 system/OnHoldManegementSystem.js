@@ -254,6 +254,10 @@ function OnHoldManegementSystem() {
       headerName: "product name",
       flex: 1,
       className: " d-flex justify-content-center align-items-center",
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
     },
     {
       field: "product_image",
@@ -380,6 +384,10 @@ function OnHoldManegementSystem() {
       headerName: "product Name",
       flex: 1,
       className: " d-flex justify-content-center align-items-center",
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
     },
     {
       field: "order_ids",
@@ -434,6 +442,9 @@ function OnHoldManegementSystem() {
                 type="number"
                 value={params.row.received_quantity}
                 placeholder="0"
+                min="0"
+                max={params.row.quantity}
+                step="1"
                 onChange={(e) => handleRecievedQtyChange(e, params.row)}
                 style={{
                   textAlign: "center",
@@ -777,11 +788,26 @@ function OnHoldManegementSystem() {
   };
 
   const handleRecievedQtyChange = (index, event) => {
-    if (index.target.value >= 0 && index.target.value <= event.quantity) {
+    const newValue = parseInt(index.target.value) || 0;
+    const maxQuantity = parseInt(event.quantity) || 0;
+    
+    // Allow values from 0 to maxQuantity
+    if (newValue >= 0 && newValue <= maxQuantity) {
       const updatedRecivedQtyData = poTableData.map((item) => {
         if (item.product_id === event.product_id) {
           if (item.variation_id == event.variation_id) {
-            return { ...item, received_quantity: index.target.value };
+            return { ...item, received_quantity: newValue };
+          }
+        }
+        return item;
+      });
+      setPoTableData(updatedRecivedQtyData);
+    } else if (newValue > maxQuantity) {
+      // If user enters a value higher than max, set it to max
+      const updatedRecivedQtyData = poTableData.map((item) => {
+        if (item.product_id === event.product_id) {
+          if (item.variation_id == event.variation_id) {
+            return { ...item, received_quantity: maxQuantity };
           }
         }
         return item;

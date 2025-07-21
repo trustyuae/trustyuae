@@ -128,7 +128,12 @@ function AllProductList() {
 
   const columns = [
     { field: "product_id", headerName: "Product ID", flex: 1 },
-    { field: "product_name", headerName: "Product Name", flex: 1 },
+    { field: "product_name", headerName: "Product Name", flex: 1,
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
+     },
     {
       field: "factory_image",
       headerName: "Factory Image",

@@ -24,6 +24,7 @@ import {
   setCurrentPage,
 } from "../../Redux2/slices/PaginationSlice";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import * as XLSX from 'xlsx';
 
 function CompletedOrderSystem() {
   const inputRef = useRef(null);
@@ -259,6 +260,62 @@ function CompletedOrderSystem() {
     // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
   }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
 
+  const exportToExcel = () => {
+    // Create an array to hold all items from all orders
+    const excelData = orders.flatMap(order => {
+      // Map each item in the order to a row
+      return order.items.map(item => ({
+        'Date': order.start_date,
+        'Order ID': order.order_id,
+        'Customer Name': order.customer_name,
+        'Contact No': order.contact_no || 'N/A',
+        'Shipping Address': order.customer_shipping_address || 'N/A',
+        'Shipping Country': getCountryName(order.shipping_country),
+        'Order Status': order.order_status,
+        'Completed Date': order.end_date,
+        'Product ID': item.item_id,
+        'Product Name': item.product_name,
+        'Quantity': item.quantity,
+        'Variation ID': item.variation_id,
+        'Dispatch Type': item.dispatch_type || 'N/A',
+        'Tracking ID': item.tracking_id || 'No Tracking ID',
+        'Product Image': item.product_image || 'No Image',
+        'Dispatch Image': item.dispatch_image || 'No Image'
+      }));
+    });
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    
+    // Set column widths
+    const wscols = [
+      {wch: 12}, // Date
+      {wch: 10}, // Order ID
+      {wch: 20}, // Customer Name
+      {wch: 15}, // Contact No
+      {wch: 40}, // Shipping Address
+      {wch: 15}, // Shipping Country
+      {wch: 15}, // Order Status
+      {wch: 12}, // Completed Date
+      {wch: 10}, // Product ID
+      {wch: 30}, // Product Name
+      {wch: 8},  // Quantity
+      {wch: 12}, // Variation ID
+      {wch: 15}, // Dispatch Type
+      {wch: 15}, // Tracking ID
+      {wch: 50}, // Product Image
+      {wch: 50}  // Dispatch Image
+    ];
+    ws['!cols'] = wscols;
+    
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Completed Orders");
+    
+    // Generate Excel file
+    XLSX.writeFile(wb, `Completed_Orders_Page_${page}.xlsx`);
+  };
+
   return (
     <Container fluid className="py-3">
       <Box className="mb-4">
@@ -400,6 +457,16 @@ function CompletedOrderSystem() {
                 totalPages={totalPages}
                 handleChange={handleChange}
               />
+              <Box className="d-flex justify-content-end mt-3">
+                <Button 
+                  variant="success" 
+                  onClick={exportToExcel}
+                  className="d-flex align-items-center gap-2"
+                >
+                  <i className="fas fa-file-excel"></i>
+                  Export to Excel
+                </Button>
+              </Box>
             </div>
           ) : (
             <Alert

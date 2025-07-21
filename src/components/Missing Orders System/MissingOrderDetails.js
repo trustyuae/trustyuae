@@ -297,6 +297,10 @@ function MissingOrderDetails() {
       headerName: "Name",
       className: "order-details",
       flex: 1,
+      renderCell: (params) => {
+        const nameToShow = params.row.product_eng_name || params.row.product_name;
+        return nameToShow || "N/A"; // fallback if both are missing
+      },
     },
     {
       field: "variant_details",
