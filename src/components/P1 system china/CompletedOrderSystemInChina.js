@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { ButtonGroup, Card, Modal, Table, ToggleButton } from "react-bootstrap";
 import { clearStoreData, setCurrentPage } from "../../Redux2/slices/PaginationSlice";
 import * as XLSX from 'xlsx';
+import AxiosInstance from '../../utils/AxiosInstance';
 
 function CompletedOrderSystemInChina() {
   const inputRef = useRef(null);
@@ -47,6 +48,8 @@ function CompletedOrderSystemInChina() {
   ]);
   const [showTrackidModalOpen, setShowTrackidModalOpen] = useState(false);
   const [modalData, setModaldata] = useState([]);
+  const [exportPageCount, setExportPageCount] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
 
@@ -113,6 +116,8 @@ function CompletedOrderSystemInChina() {
       className: "complete-order-system-china",
       flex: 1,
     },
+    
+
     {
       field: "order_id",
       headerName: t("P1ChinaSystem.OrderId"),
@@ -287,40 +292,73 @@ function CompletedOrderSystemInChina() {
     fetchOrders();
   }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
 
-  const exportToExcel = () => {
-    // Create an array to hold all items from all orders
-    const excelData = orders.flatMap(order => {
-      // Map each item in the order to a row
-      return order.items.map(item => ({
-        'Date': order.start_date,
-        'Product ID': item.item_id,
-        'Product Name': item.product_name,
-        'Tracking ID': item.tracking_id || 'No Tracking ID',
-        'Order ID': order.order_id,
-        'Image URL': item.product_image || 'No Image'
-      }));
-    });
+  // Helper to fetch data for a specific page (use AxiosInstance)
+  const fetchPageData = async (pageNum) => {
+    let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=China&page=${pageNum}&per_page=${pageSize}`;
+    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
+    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+    if (completedEndDate)
+      apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
+    const response = await AxiosInstance.get(apiUrl);
+    return response.data.orders || [];
+  };
 
-    // Create worksheet
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    
-    // Set column widths
-    const wscols = [
-      {wch: 12}, // Date
-      {wch: 10}, // Product ID
-      {wch: 30}, // Product Name
-      {wch: 15}, // Tracking ID
-      {wch: 10}, // Order ID
-      {wch: 50}  // Image URL
-    ];
-    ws['!cols'] = wscols;
-    
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Completed Orders");
-    
-    // Generate Excel file
-    XLSX.writeFile(wb, `Completed_Orders_Page_${page}.xlsx`);
+  const exportToExcel = async () => {
+    if (isExporting) return;
+    let exportPages = parseInt(exportPageCount);
+    if (exportPageCount && (!exportPages || exportPages < 1)) {
+      alert('Please enter a valid page number greater than 0.');
+      return;
+    }
+    setIsExporting(true);
+    try {
+      let allOrders = orders;
+      if (exportPageCount && exportPages > 0) {
+        // Fetch all pages in parallel for speed
+        const fetchPromises = [];
+        for (let i = 1; i <= exportPages; i++) {
+          fetchPromises.push(fetchPageData(i));
+        }
+        const pagesResults = await Promise.all(fetchPromises);
+        let combinedOrders = [];
+        pagesResults.forEach(pageOrders => {
+          combinedOrders = combinedOrders.concat(pageOrders);
+        });
+        allOrders = combinedOrders.map((v, i) => ({ ...v, id: i }));
+      }
+      // Create an array to hold all items from all orders
+      const excelData = allOrders.flatMap(order => {
+        return order.items.map(item => ({
+          'Date': order.start_date,
+          'Product ID': item.item_id,
+          'Product Name': item.product_name,
+          'Tracking ID': item.tracking_id || 'No Tracking ID',
+          'Order ID': order.order_id,
+          'Image URL': item.product_image || 'No Image'
+        }));
+      });
+      // Create worksheet
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      // Set column widths
+      const wscols = [
+        {wch: 12}, // Date
+        {wch: 10}, // Product ID
+        {wch: 30}, // Product Name
+        {wch: 15}, // Tracking ID
+        {wch: 10}, // Order ID
+        {wch: 50}  // Image URL
+      ];
+      ws['!cols'] = wscols;
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Completed Orders");
+      // Generate Excel file
+      XLSX.writeFile(wb, exportPageCount && exportPages > 0 ? `Completed_Orders_China_Pages_1_to_${exportPages}.xlsx` : `Completed_Orders_China_Page_${page}.xlsx`);
+    } catch (err) {
+      alert('Export failed. Please try again.');
+      console.error(err);
+    }
+    setIsExporting(false);
   };
 
   return (
@@ -483,13 +521,23 @@ function CompletedOrderSystemInChina() {
                 handleChange={handleChange}
               />
               <Box className="d-flex justify-content-end mt-3">
+                <Form.Control
+                  type="number"
+                  min={1}
+                  placeholder="Pages"
+                  value={exportPageCount}
+                  onChange={e => setExportPageCount(e.target.value.replace(/^0+/, '').replace(/[^0-9]/g, ""))}
+                  style={{ width: 100, marginRight: 12 }}
+                  disabled={isExporting}
+                />
                 <Button 
                   variant="success" 
                   onClick={exportToExcel}
                   className="d-flex align-items-center gap-2"
+                  disabled={isExporting}
                 >
                   <i className="fas fa-file-excel"></i>
-                  {t("Export to Excel")}
+                  {isExporting ? t("Exporting...") : (exportPageCount ? t("Export") : t("Export to Excel"))}
                 </Button>
               </Box>
             </div>
@@ -524,7 +572,7 @@ function CompletedOrderSystemInChina() {
             <tbody>
               {modalData?.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.product_name || "N/A"}</td>
+                  <td>{item.product_eng_name || item.product_name || "N/A"}</td>
                   <td>{item.tracking_id || "N/A"}</td>
                   <td>
                     <img

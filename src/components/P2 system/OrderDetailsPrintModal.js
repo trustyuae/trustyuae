@@ -347,12 +347,9 @@ const OrderDetailsPrintModal = ({
       flex: 1,
       renderCell: (params) => {
         const nameToShow = params.row.product_eng_name || params.row.product_name;
-        return nameToShow || "N/A"; // fallback if both are missing
-      },
-      renderCell: (params) => {
         return (
           <div className="wrap-text" style={{ fontSize: "1rem" }}>
-            {params.value}
+            {nameToShow || "N/A"}
           </div>
         );
       },
@@ -443,7 +440,8 @@ const OrderDetailsPrintModal = ({
     } else {
       return {
         id: item.id,
-        product_name: item.id === "total" ? "Total:" : item.product_name,
+        product_name: item.id === "total" ? "Total:" : (item.product_eng_name || item.product_name),
+        product_eng_name: item.product_eng_name,
         quantity: item.quantity || 0,
         order_ids: Array.isArray(item.order_ids)
           ? item.order_ids.join(", ")

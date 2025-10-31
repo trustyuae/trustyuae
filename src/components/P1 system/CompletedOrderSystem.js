@@ -25,6 +25,7 @@ import {
 } from "../../Redux2/slices/PaginationSlice";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import * as XLSX from 'xlsx';
+import AxiosInstance from '../../utils/AxiosInstance';
 
 function CompletedOrderSystem() {
   const inputRef = useRef(null);
@@ -47,6 +48,8 @@ function CompletedOrderSystem() {
   ]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const loader = useSelector((state) => state?.orderSystem?.isLoading);
+  const [exportPageCount, setExportPageCount] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   const completedOrdersData = useSelector(
     (state) => state?.orderSystem?.completedOrders
@@ -122,7 +125,7 @@ function CompletedOrderSystem() {
   const columns = [
     {
       field: "start_date",
-      headerName: "Started Date",
+      headerName: "Order Place Date",
       className: "completed-order-system",
       flex: 1,
     },
@@ -260,60 +263,74 @@ function CompletedOrderSystem() {
     // }, [pageSize, page,searchOrderID, isReset,selectedDateRange,selectedCompletedDateRange]);
   }, [pageSize, page, searchOrderID, isReset, setSearchOrderID]);
 
-  const exportToExcel = () => {
-    // Create an array to hold all items from all orders
-    const excelData = orders.flatMap(order => {
-      // Map each item in the order to a row
-      return order.items.map(item => ({
-        'Date': order.start_date,
-        'Order ID': order.order_id,
-        'Customer Name': order.customer_name,
-        'Contact No': order.contact_no || 'N/A',
-        'Shipping Address': order.customer_shipping_address || 'N/A',
-        'Shipping Country': getCountryName(order.shipping_country),
-        'Order Status': order.order_status,
-        'Completed Date': order.end_date,
-        'Product ID': item.item_id,
-        'Product Name': item.product_name,
-        'Quantity': item.quantity,
-        'Variation ID': item.variation_id,
-        'Dispatch Type': item.dispatch_type || 'N/A',
-        'Tracking ID': item.tracking_id || 'No Tracking ID',
-        'Product Image': item.product_image || 'No Image',
-        'Dispatch Image': item.dispatch_image || 'No Image'
-      }));
-    });
+  // Helper to fetch data for a specific page (use AxiosInstance)
+  const fetchPageData = async (pageNum) => {
+    let apiUrl = `wp-json/custom-orders-completed/v1/completed-orders/?warehouse=&page=${pageNum}&per_page=${pageSize}`;
+    if (searchOrderID) apiUrl += `&orderid=${searchOrderID}`;
+    if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
+    if (completedEndDate)
+      apiUrl += `&completed_start_date=${completedStartDate}&completed_end_date=${completedEndDate}`;
+    const response = await AxiosInstance.get(apiUrl);
+    return response.data.orders || [];
+  };
 
-    // Create worksheet
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    
-    // Set column widths
-    const wscols = [
-      {wch: 12}, // Date
-      {wch: 10}, // Order ID
-      {wch: 20}, // Customer Name
-      {wch: 15}, // Contact No
-      {wch: 40}, // Shipping Address
-      {wch: 15}, // Shipping Country
-      {wch: 15}, // Order Status
-      {wch: 12}, // Completed Date
-      {wch: 10}, // Product ID
-      {wch: 30}, // Product Name
-      {wch: 8},  // Quantity
-      {wch: 12}, // Variation ID
-      {wch: 15}, // Dispatch Type
-      {wch: 15}, // Tracking ID
-      {wch: 50}, // Product Image
-      {wch: 50}  // Dispatch Image
-    ];
-    ws['!cols'] = wscols;
-    
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Completed Orders");
-    
-    // Generate Excel file
-    XLSX.writeFile(wb, `Completed_Orders_Page_${page}.xlsx`);
+  const exportToExcel = async () => {
+    if (isExporting) return;
+    let exportPages = parseInt(exportPageCount);
+    if (exportPageCount && (!exportPages || exportPages < 1)) {
+      alert('Please enter a valid page number greater than 0.');
+      return;
+    }
+    setIsExporting(true);
+    try {
+      let allOrders = orders;
+      if (exportPageCount && exportPages > 0) {
+        // Fetch all pages in parallel for speed
+        const fetchPromises = [];
+        for (let i = 1; i <= exportPages; i++) {
+          fetchPromises.push(fetchPageData(i));
+        }
+        const pagesResults = await Promise.all(fetchPromises);
+        let combinedOrders = [];
+        pagesResults.forEach(pageOrders => {
+          combinedOrders = combinedOrders.concat(pageOrders);
+        });
+        allOrders = combinedOrders.map((v, i) => ({ ...v, id: i }));
+      }
+      // Create an array to hold all items from all orders
+      const excelData = allOrders.flatMap(order => {
+        return order.items.map(item => ({
+          'Date': order.start_date,
+          'Order ID': order.order_id,
+          'Customer Name': order.customer_name,
+          'Contact No': order.contact_no || 'N/A',
+          'Shipping Address': order.customer_shipping_address || 'N/A',
+          'Shipping Country': getCountryName(order.shipping_country),
+          'Order Status': order.order_status,
+          'Completed Date': order.end_date,
+          'Product ID': item.item_id,
+          'Product Name': item.product_name,
+          'Quantity': item.quantity,
+          'Variation ID': item.variation_id,
+          'Dispatch Type': item.dispatch_type || 'N/A',
+          'Tracking ID': item.tracking_id || 'No Tracking ID',
+          'Product Image': item.product_image || 'No Image',
+          'Dispatch Image': item.dispatch_image || 'No Image'
+        }));
+      });
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      const wscols = [
+        {wch: 12}, {wch: 10}, {wch: 20}, {wch: 15}, {wch: 40}, {wch: 15}, {wch: 15}, {wch: 12}, {wch: 10}, {wch: 30}, {wch: 8}, {wch: 12}, {wch: 15}, {wch: 15}, {wch: 50}, {wch: 50}
+      ];
+      ws['!cols'] = wscols;
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Completed Orders");
+      XLSX.writeFile(wb, exportPageCount && exportPages > 0 ? `Completed_Orders_Pages_1_to_${exportPages}.xlsx` : `Completed_Orders_Page_${page}.xlsx`);
+    } catch (err) {
+      alert('Export failed. Please try again.');
+      console.error(err);
+    }
+    setIsExporting(false);
   };
 
   return (
@@ -458,13 +475,23 @@ function CompletedOrderSystem() {
                 handleChange={handleChange}
               />
               <Box className="d-flex justify-content-end mt-3">
+                <Form.Control
+                  type="number"
+                  min={1}
+                  placeholder="Pages"
+                  value={exportPageCount}
+                  onChange={e => setExportPageCount(e.target.value.replace(/^0+/, '').replace(/[^0-9]/g, ""))}
+                  style={{ width: 100, marginRight: 12 }}
+                  disabled={isExporting}
+                />
                 <Button 
                   variant="success" 
                   onClick={exportToExcel}
                   className="d-flex align-items-center gap-2"
+                  disabled={isExporting}
                 >
                   <i className="fas fa-file-excel"></i>
-                  Export to Excel
+                  {isExporting ? "Exporting..." : (exportPageCount ? "Export" : "Export to Excel")}
                 </Button>
               </Box>
             </div>

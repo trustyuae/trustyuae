@@ -435,7 +435,7 @@ function OrderTrackingNumberPending() {
     const filteredOrderData = selectedItems.map((order) => {
       return {
         "Order Id": order.order_id,
-        "Product Name": order.items.map((item) => item.product_name).join(", "),
+        "Product Name": order.items.map((item) => item.product_eng_name).join(", "),
         "Shipping Country": order.shipping_country,
         "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
       };
@@ -458,7 +458,7 @@ function OrderTrackingNumberPending() {
       {
         "Order Id": rowData.order_id,
         "Product Name": rowData.items
-          .map((item) => item.product_name)
+          .map((item) => item.product_eng_name)
           .join(", "),
         "Shipping Country": rowData.shipping_country,
         "Tracking ID": rowData.items.map((item) => item.tracking_id).join(", "),
@@ -526,7 +526,7 @@ function OrderTrackingNumberPending() {
       flex: 1,
       renderCell: (params) => {
         const productNames = params?.row?.items
-          ?.map((item) => item?.product_name)
+          ?.map((item) => item?.product_eng_name)
           .join(", ");
         return <div>{productNames}</div>;
       },

@@ -253,7 +253,7 @@ const OnHoldProductDetailsPrintModal = ({
           return {
             "Product ID": item?.product_id || "N/A",
             "variation ID": item?.variation_id || "N/A",
-            "Product Name": item?.product_name || "N/A",
+            "Product Name": item?.product_eng_name || item?.product_name || "N/A",
             "Quantity Ordered": item?.quantity || 0,
             "Image URL": item?.image || "N/A",
             "Order IDs": Array.isArray(item.order_ids)
@@ -383,7 +383,8 @@ const OnHoldProductDetailsPrintModal = ({
 
   const rows = poTableData.map((item) => ({
     id: item.id,
-    product_name: item.id === "total" ? "Total:" : item.product_name,
+    product_name:
+      item.id === "total" ? "Total:" : item.product_eng_name || item.product_name,
     quantity: item.quantity || 0,
     order_ids: Array.isArray(item.order_ids)
       ? item.order_ids.join(", ")

@@ -643,7 +643,7 @@ function OrderSystemInChina() {
                 };
                 return (
                   <tr key={index}>
-                    <td>{item.product_name || "N/A"}</td>
+                    <td>{item.product_eng_name || item.product_name || "N/A"}</td>
                     {/* <td>{item.tracking_id || "N/A"}</td> */}
                     <td>{getVariationContent()}</td>
                     <td>
