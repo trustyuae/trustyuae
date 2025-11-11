@@ -180,13 +180,13 @@ function OrderTrackingNumberPendingDetails() {
     setSelectedFileUrl(null);
   };
 
-  async function fetchOrder() {
+  const fetchOrder = useCallback(async () => {
     try {
-      dispatch(OrderTrackingDetailsChinaGet({ id: id }));
+      await dispatch(OrderTrackingDetailsChinaGet({ id }));
     } catch (error) {
       console.error(error);
     }
-  }
+  }, [dispatch, id]);
 
   const handleChange = (e) => {
     setMessage(e.target.value);
@@ -274,9 +274,11 @@ function OrderTrackingNumberPendingDetails() {
   };
 
   useEffect(() => {
+    setOrderDetails(null);
+    setOrderData([]);
+    setTableData([]);
     fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setMessage, setTableData, setOrderData]);
+  }, [fetchOrder]);
 
   const ImageModule = (url) => {
     setImageURL(url);

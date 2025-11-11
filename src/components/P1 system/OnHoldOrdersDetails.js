@@ -163,13 +163,13 @@ function OnHoldOrdersDetails() {
     setSelectedFileUrl(null);
   };
 
-  async function fetchOrder() {
+  const fetchOrder = useCallback(async () => {
     try {
-      dispatch(OnHoldOrderDetailsGet({ id }));
+      await dispatch(OnHoldOrderDetailsGet({ id }));
     } catch (error) {
       console.error(error);
     }
-  }
+  }, [dispatch, id]);
 
   const handleAddMessage = (e) => {
     e.preventDefault(); // Prevent default form submission if this is used in a form
@@ -195,9 +195,11 @@ function OnHoldOrdersDetails() {
   };
 
   useEffect(() => {
+    setOrderDetails(null);
+    setOrderData([]);
+    setTableData([]);
     fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setTableData, setOrderData]);
+  }, [fetchOrder]);
 
   const ImageModule = (url) => {
     setImageURL(url);

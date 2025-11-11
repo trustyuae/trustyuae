@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -94,17 +94,20 @@ function CompletedOrderDetails() {
     }
   }, [orderDetailsDataOrderId, completedOrderDetailsData]);
 
-  async function fetchOrder() {
+  const fetchOrder = useCallback(async () => {
     try {
-      dispatch(CompletedOrderDetailsGet(id));
+      await dispatch(CompletedOrderDetailsGet(id));
     } catch (error) {
       console.log(error);
     }
-  }
+  }, [dispatch, id]);
 
   useEffect(() => {
+    setOrderDetails(null);
+    setOrderData([]);
+    setTableData([]);
     fetchOrder();
-  }, []);
+  }, [fetchOrder]);
 
   const ImageModule = (url) => {
     setImageURL(url);

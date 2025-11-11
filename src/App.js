@@ -42,6 +42,7 @@ import OrderTrackingNumberPending from "./components/P1 system china/OrderTracki
 import OrderTrackingNumberPendingDetails from "./components/P1 system china/OrderTrackingNumberPendingDetails";
 import GRNManagement_OrderIds from "./components/P3 system/GRNManagement_OrderIds";
 import GRNOrderPending from "./components/P3 system/GRNOrderPending";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   return (
@@ -49,160 +50,162 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Login />} />
-          <Route element={<Layout />}>
-            <Route exact path="/ordersystem" element={<OrderSystem />} />
-            <Route exact path="/factory_form" element={<FactoryForm />} />
-            <Route
-              exact
-              path="/order_management_system"
-              element={<OrderManagementSystem />}
-            />
-            <Route exact path="/PO_details/:id" element={<PoDetails />} />
-            <Route
-              exact
-              path="/all_products_list"
-              element={<AllProductList />}
-            />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
+              <Route exact path="/ordersystem" element={<OrderSystem />} />
+              <Route exact path="/factory_form" element={<FactoryForm />} />
+              <Route
+                exact
+                path="/order_management_system"
+                element={<OrderManagementSystem />}
+              />
+              <Route exact path="/PO_details/:id" element={<PoDetails />} />
+              <Route
+                exact
+                path="/all_products_list"
+                element={<AllProductList />}
+              />
 
-            <Route
-              exact
-              path="/order_not_available"
-              element={<OrderNotAvailable />}
-            />
+              <Route
+                exact
+                path="/order_not_available"
+                element={<OrderNotAvailable />}
+              />
 
-            <Route exact path="/image_upload" element={<ImageUpload />} />
-            <Route exact path="/order_details/:id" element={<OrderDetails />} />
-            <Route exact path="/all_factory" element={<AllFactory />} />
+              <Route exact path="/image_upload" element={<ImageUpload />} />
+              <Route exact path="/order_details/:id" element={<OrderDetails />} />
+              <Route exact path="/all_factory" element={<AllFactory />} />
 
-            <Route
-              exact
-              path="/PO_ManagementSystem"
-              element={<POManagementSystem />}
-            />
-            <Route exact path="/GRN_Management" element={<GRNManagement />} />
-            <Route exact path="/GRN_Management_On_OrderIds" element={<GRNManagement_OrderIds />} />
-            <Route exact path="/GRN_View/:id" element={<GRNView />} />
-            <Route
-              exact
-              path="/On_Hold_Management/:grn_no/:id/:variation_id"
-              element={<OnHoldManagement />}
-            />
-            <Route
-              exact
-              path="/On_Hold_Manegement_System"
-              element={<OnHoldManegementSystem />}
-            />
-            <Route
-              exact
-              path="/GRN_Products_Pending_System"
-              element={<GRNOrderPending />}
-            />
-            <Route
-              exact
-              path="/ER_Management_System"
-              element={<ERManagement />}
-            />
-            <Route
-              exact
-              path="/Exchange_And_Return"
-              element={<ExchangeAndReturn />}
-            />
-            <Route exact path="/ER_details/:er_no" element={<ERDetails />} />
+              <Route
+                exact
+                path="/PO_ManagementSystem"
+                element={<POManagementSystem />}
+              />
+              <Route exact path="/GRN_Management" element={<GRNManagement />} />
+              <Route exact path="/GRN_Management_On_OrderIds" element={<GRNManagement_OrderIds />} />
+              <Route exact path="/GRN_View/:id" element={<GRNView />} />
+              <Route
+                exact
+                path="/On_Hold_Management/:grn_no/:id/:variation_id"
+                element={<OnHoldManagement />}
+              />
+              <Route
+                exact
+                path="/On_Hold_Manegement_System"
+                element={<OnHoldManegementSystem />}
+              />
+              <Route
+                exact
+                path="/GRN_Products_Pending_System"
+                element={<GRNOrderPending />}
+              />
+              <Route
+                exact
+                path="/ER_Management_System"
+                element={<ERManagement />}
+              />
+              <Route
+                exact
+                path="/Exchange_And_Return"
+                element={<ExchangeAndReturn />}
+              />
+              <Route exact path="/ER_details/:er_no" element={<ERDetails />} />
 
-            <Route
-              exact
-              path="/completed_order_system"
-              element={<CompletedOrderSystem />}
-            />
-            <Route
-              exact
-              path="/completed_order_details/:id"
-              element={<CompletedOrderDetails />}
-            />
-            <Route
-              exact
-              path="/reserve_orders_system"
-              element={<ReserveOrderSystem />}
-            />
-            <Route
-              exact
-              path="/on_hold_orders_system"
-              element={<OnHoldOrdersSystem />}
-            />
-            <Route
-              exact
-              path="/reserve_order_details/:id"
-              element={<ReserveOrderDetails />}
-            />
-            <Route
-              exact
-              path="/on_hold_order_details/:id"
-              element={<OnHoldOrdersDetails />}
-            />
+              <Route
+                exact
+                path="/completed_order_system"
+                element={<CompletedOrderSystem />}
+              />
+              <Route
+                exact
+                path="/completed_order_details/:id"
+                element={<CompletedOrderDetails />}
+              />
+              <Route
+                exact
+                path="/reserve_orders_system"
+                element={<ReserveOrderSystem />}
+              />
+              <Route
+                exact
+                path="/on_hold_orders_system"
+                element={<OnHoldOrdersSystem />}
+              />
+              <Route
+                exact
+                path="/reserve_order_details/:id"
+                element={<ReserveOrderDetails />}
+              />
+              <Route
+                exact
+                path="/on_hold_order_details/:id"
+                element={<OnHoldOrdersDetails />}
+              />
 
-            <Route
-              exact
-              path="/order_tracking_number_Pending"
-              element={<OrderTrackingNumberPending />}
-            />
+              <Route
+                exact
+                path="/order_tracking_number_Pending"
+                element={<OrderTrackingNumberPending />}
+              />
 
-            <Route
-              exact
-              path="/order_tracking_number_pending_details/:id"
-              element={<OrderTrackingNumberPendingDetails />}
-            />
+              <Route
+                exact
+                path="/order_tracking_number_pending_details/:id"
+                element={<OrderTrackingNumberPendingDetails />}
+              />
 
-            <Route
-              exact
-              path="/ordersystem_in_china"
-              element={<OrderSystemInChina />}
-            />
-            <Route
-              exact
-              path="/order_details_in_china/:id"
-              element={<OrderDetailsInChina />}
-            />
-            <Route
-              exact
-              path="/completed_order_system_in_china"
-              element={<CompletedOrderSystemInChina />}
-            />
-            <Route
-              exact
-              path="/completed_order_details_in_china/:id"
-              element={<CompletedOrderDetailsInChina />}
-            />
-            <Route
-              exact
-              path="/reserve_orders_system_in_china"
-              element={<ReserveOrderSystemInChina />}
-            />
-            <Route
-              exact
-              path="/on_hold_orders_system_in_china"
-              element={<OnHoldOrdersSystemInChina />}
-            />
-            <Route
-              exact
-              path="/reserve_order_details_in_china/:id"
-              element={<ReserveOrderdetailsInChina />}
-            />
-            <Route
-              exact
-              path="/on_hold_order_details_in_china/:id"
-              element={<OnHoldOrdersdetailsInChina />}
-            />
+              <Route
+                exact
+                path="/ordersystem_in_china"
+                element={<OrderSystemInChina />}
+              />
+              <Route
+                exact
+                path="/order_details_in_china/:id"
+                element={<OrderDetailsInChina />}
+              />
+              <Route
+                exact
+                path="/completed_order_system_in_china"
+                element={<CompletedOrderSystemInChina />}
+              />
+              <Route
+                exact
+                path="/completed_order_details_in_china/:id"
+                element={<CompletedOrderDetailsInChina />}
+              />
+              <Route
+                exact
+                path="/reserve_orders_system_in_china"
+                element={<ReserveOrderSystemInChina />}
+              />
+              <Route
+                exact
+                path="/on_hold_orders_system_in_china"
+                element={<OnHoldOrdersSystemInChina />}
+              />
+              <Route
+                exact
+                path="/reserve_order_details_in_china/:id"
+                element={<ReserveOrderdetailsInChina />}
+              />
+              <Route
+                exact
+                path="/on_hold_order_details_in_china/:id"
+                element={<OnHoldOrdersdetailsInChina />}
+              />
 
-            <Route
-              exact
-              path="/missing_orders_system"
-              element={<MissingOrderSystem />}
-            />
-            <Route
-              exact
-              path="/missing_order_details/:id"
-              element={<MissingOrderDetails />}
-            />
+              <Route
+                exact
+                path="/missing_orders_system"
+                element={<MissingOrderSystem />}
+              />
+              <Route
+                exact
+                path="/missing_order_details/:id"
+                element={<MissingOrderDetails />}
+              />
+            </Route>
           </Route>
         </Routes>
         <ToastContainer />

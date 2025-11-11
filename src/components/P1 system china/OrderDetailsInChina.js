@@ -239,13 +239,13 @@ function OrderDetailsInChina() {
     setSelectedFileUrl(null);
   };
 
-  async function fetchOrder() {
+  const fetchOrder = useCallback(async () => {
     try {
-      dispatch(OrderDetailsChinaGet({ id: id }));
+      await dispatch(OrderDetailsChinaGet({ id }));
     } catch (error) {
       console.error(error);
     }
-  }
+  }, [dispatch, id]);
 
   const handleChange = (e) => {
     setMessage(e.target.value);
@@ -360,9 +360,11 @@ function OrderDetailsInChina() {
   };
 
   useEffect(() => {
+    setOrderDetails(null);
+    setOrderData([]);
+    setTableData([]);
     fetchOrder();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setMessage, setTableData, setOrderData]);
+  }, [fetchOrder]);
 
   const ImageModule = (url) => {
     setImageURL(url);

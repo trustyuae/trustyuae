@@ -127,26 +127,50 @@ function OrderDetails() {
   }, []);
 
   useLayoutEffect(() => {
-    const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
-    setOrderData(oDetails);
+    // Check if we have order data
+    if (orderDetailsDataOrderId && orderDetailsData) {
+      const orderIdFromData = orderDetailsDataOrderId.order_id?.toString();
+      const currentOrderId = id?.toString();
+      
+      // Only update state if the order data matches the current order ID
+      if (orderIdFromData === currentOrderId) {
+        const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
+        setOrderData(oDetails || []);
 
-    if (orderDetailsDataOrderId) {
-      setOrderDetails(orderDetailsDataOrderId);
-      setOrderProcess(orderDetailsDataOrderId.order_process);
+        setOrderDetails(orderDetailsDataOrderId);
+        setOrderProcess(orderDetailsDataOrderId.order_process);
 
-      if (Array.isArray(orderDetailsDataOrderId.items)) {
-        const newData = orderDetailsDataOrderId.items.map(
-          (product, index1) => ({
-            ...product,
-            id: index1,
-          })
-        );
-        setTableData(newData);
-      } else {
-        console.warn("orderDetailsDataOrderId.items is not an array");
+        if (Array.isArray(orderDetailsDataOrderId.items)) {
+          const newData = orderDetailsDataOrderId.items.map(
+            (product, index1) => ({
+              ...product,
+              id: index1,
+            })
+          );
+          setTableData(newData);
+        } else {
+          console.warn("orderDetailsDataOrderId.items is not an array");
+          setTableData([]);
+        }
+      } else if (orderIdFromData && currentOrderId && orderIdFromData !== currentOrderId) {
+        // If data exists but doesn't match current ID, reset state (waiting for correct data)
+        // Only reset if we're not currently loading (to avoid flickering)
+        if (!loader) {
+          setOrderDetails(null);
+          setOrderProcess(null);
+          setTableData([]);
+          setOrderData([]);
+        }
       }
+    } else if (!orderDetailsData && id && !loader) {
+      // If no data exists but we have an ID and not loading, reset state
+      // (This handles the case where data failed to load or was cleared)
+      setOrderDetails(null);
+      setOrderProcess(null);
+      setTableData([]);
+      setOrderData([]);
     }
-  }, [orderDetailsData, orderDetailsDataOrderId]);
+  }, [orderDetailsData, orderDetailsDataOrderId, id, loader]);
 
   async function fetchOrder() {
     try {
@@ -235,10 +259,20 @@ function OrderDetails() {
     }
   };
 
+  // Reset selection-related state when order ID changes (but not order data - let useLayoutEffect handle that)
   useEffect(() => {
-    fetchOrder();
+    setSelectedItems([]);
+    setSelectedItemIds([]);
+    setSelectedFileUrl(null);
+    setSelectedFile(null);
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchOrder();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setTableData, setOrderData]);
+  }, [id]);
 
   const ImageModule = (url) => {
     setImageURL(url);

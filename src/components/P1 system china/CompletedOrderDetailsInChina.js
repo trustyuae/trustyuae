@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { MDBCol, MDBRow } from "mdb-react-ui-kit";
 import Container from "react-bootstrap/Container";
 import { useNavigate, useParams } from "react-router-dom";
@@ -109,13 +109,16 @@ function CompletedOrderDetailsInChina() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function fetchOrder() {
-    dispatch(CompletedOrderDetailsChinaGet(id));
-  }
+  const fetchOrder = useCallback(async () => {
+    await dispatch(CompletedOrderDetailsChinaGet(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
+    setOrderDetails(null);
+    setOrderData([]);
+    setTableData([]);
     fetchOrder();
-  }, []);
+  }, [fetchOrder]);
 
   const ImageModule = (url) => {
     setImageURL(url);
