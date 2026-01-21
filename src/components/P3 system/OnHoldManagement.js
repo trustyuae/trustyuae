@@ -64,7 +64,7 @@ function OnHoldManagement() {
 
   async function fetchProductOrderDetails() {
     // let apiUrl = `wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/`;
-    let apiUrl = `wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}`;
+    let apiUrl = `wp-json/on-hold-product/v1/product-in-grn/${params.id}/${params.grn_no}/${params.variation_id}?page=${page}&per_page=${pageSize}`;
     dispatch(
       GetProductOrderDetails({
         apiUrl: `${apiUrl}`,
@@ -72,6 +72,7 @@ function OnHoldManagement() {
     ).then(({ payload }) => {
       if (payload) {
         setProductOverallData(payload);
+        setTotalPages(Number(payload.total_pages) || 1);
         let data = payload?.records?.map((v, i) => ({
           ...v,
           id: i,
@@ -116,7 +117,7 @@ function OnHoldManagement() {
   useEffect(() => {
     fetchProductOrderDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id, params.grn_no, params.variation_id]);
+  }, [params.id, params.grn_no, params.variation_id, page, pageSize]);
 
   const handleOrderPerp = async () => {
     // debugger
@@ -306,7 +307,7 @@ function OnHoldManagement() {
 
   const handlePageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
-    setPage(e.target.value);
+    setPage(1);
   };
 
   console.log(productData, "productData from onhold management system");
@@ -450,7 +451,7 @@ function OnHoldManagement() {
         <MDBCol md="12" className="d-flex justify-content-end">
           {productData?.length === 0 ? (
             <Button variant="success" disabled onClick={handleOrderStock}>
-              Send For InStock
+              erggergerInStock
             </Button>
           ) : (
             <Button variant="success" onClick={handleOrderPerp}>

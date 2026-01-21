@@ -409,16 +409,35 @@ function OrderTrackingNumberPending() {
   const downloadExcel = async () => {
     console.log(orders, "orders from downloadexcel");
     console.log(selectedItems, "selectedItems from downloadexcel");
+    console.log(tempTrackIds, "tempTrackIds from downloadexcel");
+    
+    // Log yellow rows (exist_item === "1") to debug
+    const yellowRows = orders.filter((order) => order.exist_item === "1");
+    const greenRows = orders.filter((order) => order.exist_item === "0");
+    console.log("Yellow rows count:", yellowRows.length, yellowRows);
+    console.log("Green rows count:", greenRows.length, greenRows);
+    console.log("Total orders:", orders.length);
+    
+    // Include ALL orders regardless of exist_item value
     const filteredOrderData = orders
-      .filter((order) => order.exist_item === "0")
       .map((order) => {
+        // Get tracking ID from tempTrackIds first, then fall back to order items
+        const trackId = tempTrackIds[order.id] || order.items[0]?.tracking_id || "";
+        const trackingIdValue = trackId !== "0" ? trackId : "";
+        
         return {
           "Order Id": order.order_id,
+          "Name": order.customer_name || "",
+          "Address": order.customer_shipping_address || "",
+          "City": order.emirates_add || "",
+          "Phone": order.contact_no || "",
+          "Short Address Code": order.address_code || "",
           "Product Name": order.items
-            .map((item) => item.product_name)
+            .map((item) => item.product_eng_name)
             .join(", "),
           "Shipping Country": order.shipping_country,
-          "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
+          "Tracking ID": trackingIdValue,
+          "Exist Item": order.exist_item || "0", // Add this to debug
         };
       });
 
@@ -435,6 +454,11 @@ function OrderTrackingNumberPending() {
     const filteredOrderData = selectedItems.map((order) => {
       return {
         "Order Id": order.order_id,
+        "Name": order.customer_name || "",
+        "Address": order.customer_shipping_address || "",
+        "City": order.emirates_add || "",
+        "Phone": order.contact_no || "",
+        "Short Address Code": order.address_code || "",
         "Product Name": order.items.map((item) => item.product_eng_name).join(", "),
         "Shipping Country": order.shipping_country,
         "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
@@ -457,6 +481,11 @@ function OrderTrackingNumberPending() {
     const filteredOrderData = [
       {
         "Order Id": rowData.order_id,
+        "Name": rowData.customer_name || "",
+        "Address": rowData.customer_shipping_address || "",
+        "City": rowData.emirates_add || "",
+        "Phone": rowData.contact_no || "",
+        "Short Address Code": rowData.address_code || "",
         "Product Name": rowData.items
           .map((item) => item.product_eng_name)
           .join(", "),

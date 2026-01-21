@@ -49,35 +49,43 @@ const Login = () => {
     }
 
     if (isValid) {
+      const getRedirectPath = (role) => {
+        switch (role) {
+          case "administrator":
+          case "packing_assistant":
+          case "operation_assistant":
+            return "/ordersystem";
+          case "factory_coordinator":
+            return "/ordersystem_in_china";
+          case "customer_support":
+            return "/order_not_available";
+          default:
+            return null;
+        }
+      };
       try {
         dispatch(loginUser({ username, password })).then(({ payload }) => {
           if (payload && payload?.token) {
+            const redirectPath = getRedirectPath(
+              payload?.user_data?.user_role
+            );
             ShowAlert(
               "Success",
               payload.message,
               "success",
-              true,
               false,
-              "OK"
-            ).then((result) => {
-              if (result.isConfirmed) {
-                switch (payload?.user_data?.user_role) {
-                  case "administrator":
-                  case "packing_assistant":
-                  case "operation_assistant":
-                    navigate("/ordersystem");
-                    break;
-                  case "factory_coordinator":
-                    navigate("/ordersystem_in_china");
-                    break;
-                  case "customer_support":
-                    navigate("/order_not_available");
-                    break;
-                  default:
-                    console.log("Unknown role");
-                }
-              }
-            });
+              false,
+              null,
+              null,
+              2000
+            );
+            if (redirectPath) {
+              setTimeout(() => {
+                navigate(redirectPath);
+              }, 2000);
+            } else {
+              console.log("Unknown role");
+            }
           } else {
             console.log("User role is undefined or missing in the payload");
           }
