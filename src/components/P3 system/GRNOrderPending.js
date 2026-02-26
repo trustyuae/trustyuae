@@ -123,12 +123,12 @@ function GRNOrderPending() {
   };
 
   const poColumns = [
-    {
-      field: "date",
-      headerName: "Date Created",
-      flex: 1,
-      className: " d-flex justify-content-center align-items-center",
-    },
+    // {
+    //   field: "date",
+    //   headerName: "Date Created",
+    //   flex: 1,
+    //   className: " d-flex justify-content-center align-items-center",
+    // },
     {
       field: "product_id",
       headerName: "product id",
@@ -138,25 +138,27 @@ function GRNOrderPending() {
     {
       field: "image",
       headerName: "product image",
-      flex: 0.5,
+      flex: 1.5,
       className: " d-flex justify-content-center align-items-center",
       renderCell: (params) => (
         <Box
-          className="h-100 w-100 d-flex align-items-center"
+          className="h-100 w-100 d-flex align-items-center justify-content-center"
           onClick={() => ImageModule(params.value)}
         >
           <Avatar
             src={params.value || require("../../assets/default.png")}
             alt="Product Image"
             sx={{
-              height: "45px",
-              width: "45px",
+              height: "120px",
+              width: "120px",
               borderRadius: "2px",
               margin: "0 auto",
+              cursor: "pointer",
               "& .MuiAvatar-img": {
-                height: "90%",
+                height: "100%",
                 width: "100%",
                 borderRadius: "2px",
+                objectFit: "contain",
               },
             }}
           />
@@ -176,7 +178,7 @@ function GRNOrderPending() {
     {
       field: "order_ids",
       headerName: "Order ID's",
-      flex: 1,
+      flex: 0.7,
       className: "d-flex justify-content-center align-items-center",
       renderCell: (params) => {
         const orders = params?.row?.order_ids?.map((order) => order).join(", ");
@@ -186,7 +188,7 @@ function GRNOrderPending() {
     {
       field: "variation_values",
       headerName: "Variation Values",
-      flex: 1.5,
+      flex: 0.8,
       renderCell: renderVariationValuesPoColumn,
     },
     {
@@ -390,7 +392,8 @@ function GRNOrderPending() {
                     pageSize={pageSize}
                     totalPages={totalPages}
                     handleChange={handleChange}
-                    rowHeight="auto"
+                    // Increase row height to roughly 3x the default
+                    rowHeight={150}
                     // showAllRows={true}
                     // getRowId={(row) => row.product_id + "-" + row.variation_id} // or another unique property
                     // hidePagination={true}

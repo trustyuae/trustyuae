@@ -23,7 +23,8 @@ const OnHoldProductDetailsPrintModal = ({
 
   const handleExport = async () => {
     setIsDownloadPdf(true);
-    const doc = new jsPDF();
+    // Create PDF in landscape orientation
+    const doc = new jsPDF("landscape", "mm", "a4");
     doc.setProperties({
       title: "Purchase Order Details",
       subject: "PO Details",
@@ -38,159 +39,318 @@ const OnHoldProductDetailsPrintModal = ({
     const pageWidth = doc.internal.pageSize.width;
     const textX = pageWidth / 2;
     const textY = 15;
-    doc.text(`POId: ${poId}`, textX, textY, { align: "center" });
-    doc.text(`Factory Name: ${factoryName}`, textX, textY + 7, {
+    doc.text(`POId: ${poId || "N/A"}`, textX, textY, { align: "center" });
+    doc.text(`Factory Name: ${factoryName || "N/A"}`, textX, textY + 7, {
       align: "center",
     });
 
-    const tableColumn = [
-      "Product ID",
-      "Product Image",
-      "Product Variations",
-      //   "Quantity Ordered",
-      "Order IDs",
-    ];
-    const tableRows = [];
-
+    // Group products by product_id and variation_value
+    const groupedProducts = {};
+    
     for (const item of poTableData) {
+      // Create a unique key based on product_id and variation_value
+      const variationKey = item?.variation_value 
+        ? (typeof item.variation_value === 'string' 
+            ? item.variation_value 
+            : JSON.stringify(item.variation_value))
+        : 'no_variation';
+      const groupKey = `${item.product_id}_${variationKey}`;
+      
+      if (!groupedProducts[groupKey]) {
+        groupedProducts[groupKey] = {
+          product_id: item.product_id,
+          product_name: item.product_eng_name || item.product_name || "N/A",
+          variation_value: item.variation_value,
+          image: item.factory_image || item.image,
+          order_ids: [],
+          quantity: 0,
+        };
+      }
+      
+      // Aggregate order_ids
+      if (item.order_ids) {
+        if (Array.isArray(item.order_ids)) {
+          groupedProducts[groupKey].order_ids.push(...item.order_ids);
+        } else if (typeof item.order_ids === 'string') {
+          // Handle comma-separated string
+          const ids = item.order_ids.split(',').map(id => id.trim()).filter(id => id);
+          groupedProducts[groupKey].order_ids.push(...ids);
+        }
+      }
+      
+      // Sum quantities
+      groupedProducts[groupKey].quantity += item.quantity || 0;
+    }
+
+    // Remove duplicate order IDs and sort
+    Object.keys(groupedProducts).forEach(key => {
+      groupedProducts[key].order_ids = [...new Set(groupedProducts[key].order_ids)]
+        .sort((a, b) => {
+          const numA = parseInt(a) || 0;
+          const numB = parseInt(b) || 0;
+          return numA - numB;
+        });
+    });
+
+    // Get all product keys
+    const productKeys = Object.keys(groupedProducts);
+    const totalProducts = productKeys.length;
+
+    // Process each grouped product - one per page
+    for (let productIndex = 0; productIndex < productKeys.length; productIndex++) {
+      const groupKey = productKeys[productIndex];
+      const product = groupedProducts[groupKey];
+      
+      // Add new page for each product (except the first one)
+      if (productIndex > 0) {
+        doc.addPage();
+      }
+
+      // Get current page number for this product
+      const currentPageNumber = productIndex + 1;
+
+      // Add header on each page
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`POId: ${poId || "N/A"}`, textX, textY, { align: "center" });
+      doc.text(`Factory Name: ${factoryName || "N/A"}`, textX, textY + 7, {
+        align: "center",
+      });
+      
+      // Load image
       let imgData = defaultImage;
-      if (item?.factory_image || item?.image) {
+      if (product.image) {
         try {
-          imgData = await loadImageToDataURL(
-            item?.factory_image || item?.image
-          );
+          imgData = await loadImageToDataURL(product.image);
         } catch (error) {
           console.error("Error loading image:", error);
           imgData = defaultImage;
         }
       }
 
-      let productName = "";
-      if (item?.variation_value) {
+      // Format variation if exists
+      let variationText = "";
+      if (product.variation_value) {
         try {
-          const variationValue = JSON.parse(item.variation_value);
-          productName = Object.keys(variationValue)
-            .map((key) => `${key}: ${variationValue[key]}`)
-            .join(", ");
+          const variationValue = typeof product.variation_value === 'string' 
+            ? JSON.parse(product.variation_value) 
+            : product.variation_value;
+          
+          if (variationValue && typeof variationValue === 'object' && Object.keys(variationValue).length > 0) {
+            variationText = Object.keys(variationValue)
+              .map((key) => `${key}: ${variationValue[key]}`)
+              .join(", ");
+          }
         } catch (error) {
-          console.error("Error parsing variation_value:", error);
+          // If parsing fails, check if it's a valid string (not null/undefined)
+          if (product.variation_value && 
+              product.variation_value !== "null" && 
+              product.variation_value !== "undefined" &&
+              product.variation_value !== null &&
+              product.variation_value !== undefined) {
+            variationText = product.variation_value;
+          }
         }
       }
 
-      tableRows.push([
-        item.product_id || "N/A",
-        { image: imgData, width: 48 },
-        productName || "N/A",
-        item.quantity || 0,
-        item.order_ids?.join(", ") || "N/A",
-      ]);
-    }
+      // Format product name - remove any "- null" suffix and only add variation if it exists
+      let fullProductName = product.product_name || product.product_eng_name || "N/A";
+      
+      // Remove "- null" or " - null" from product name if it exists
+      fullProductName = fullProductName.replace(/\s*-\s*null\s*$/i, "").trim();
+      
+      // Only add variation if it's not empty and not null/undefined
+      if (variationText && 
+          variationText.trim() !== "" && 
+          variationText !== "null" && 
+          variationText !== "undefined" &&
+          variationText !== null &&
+          variationText !== undefined) {
+        fullProductName = `${fullProductName} - ${variationText}`;
+      }
 
-    const startY = textY + 15; // Initial startY position
+      // Format order IDs - one per line
+      const orderIdsText = product.order_ids.length > 0 
+        ? product.order_ids.join("\n") 
+        : "N/A";
 
-    autoTable(doc, {
-      startY: startY,
-      headStyles: {
-        fillColor: [71, 183, 223],
-        textColor: [255, 255, 255],
-        fontSize: 12,
-        fontStyle: "bold",
-        halign: "center",
-      },
-      bodyStyles: {
-        textColor: [0, 0, 0],
-        fontSize: 10,
-        halign: "center",
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245],
-      },
-      rowPageBreak: "avoid",
-      rowHeight: 80,
-      columnStyles: {
-        0: {
-          cellWidth: 30,
+      // Create horizontal table with 4 columns
+      const tableColumn = [
+        "Product Image",
+        "Product Name",
+        "Quantity Ordered",
+        "Order IDs",
+      ];
+
+      // Calculate column widths based on page width (landscape - more width available)
+      const availableWidth = pageWidth - 40; // Leave margins
+      const columnWidths = {
+        0: availableWidth * 0.40,  // Product Image: 40%
+        1: availableWidth * 0.30,  // Product Name: 30%
+        2: availableWidth * 0.15,  // Quantity: 15%
+        3: availableWidth * 0.15,  // Order IDs: 15%
+      };
+
+      // Create table with single product row
+      // Use empty strings for columns we'll draw manually to prevent double rendering
+      const tableRows = [
+        [
+          { image: imgData, width: 100 },
+          "", // Empty - will be drawn manually in didDrawCell
+          product.quantity.toString(),
+          orderIdsText,
+        ],
+      ];
+
+      const startY = textY + 15;
+
+      autoTable(doc, {
+        startY: startY,
+        headStyles: {
+          fillColor: [71, 183, 223],
+          textColor: [255, 255, 255],
+          fontSize: 12,
+          fontStyle: "bold",
           halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
-        },
-        1: {
-          cellWidth: 52,
-          halign: "middle",
           valign: "middle",
-          cellPadding: 2,
-          minCellHeight: 38,
         },
-        2: {
-          cellWidth: 40,
-          halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
+        bodyStyles: {
+          textColor: [0, 0, 0],
+          fontSize: 10,
+          halign: "left",
+          valign: "top",
         },
-        3: {
-          cellWidth: 30,
-          halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
+        alternateRowStyles: {
+          fillColor: [245, 245, 245],
         },
-        4: {
-          cellWidth: 48,
-          halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
+        didParseCell: (data) => {
+          // Set minimum row height to accommodate image
+          if (data.section === 'body' && data.column.index === 0) {
+            data.row.height = Math.max(data.row.height || 0, 120);
+          }
         },
-      },
-
-      head: [tableColumn],
-      body: tableRows,
-      didDrawCell: (data) => {
-        if (
-          data?.column?.index === 1 &&
-          data?.cell?.section === "body" &&
-          data.cell.raw?.image
-        ) {
-          const imgWidth = data?.cell?.raw?.width || 40;
-          const imgHeight =
-            data?.cell?.height - data?.cell?.padding("vertical");
-          doc.addImage(
-            data?.cell?.raw?.image,
-            "PNG",
-            data?.cell?.x + data?.cell?.padding("left"),
-            data.cell.y + data.cell.padding("top"),
-            imgWidth,
-            imgHeight
-          );
-        }
-      },
-      margin: {
-        top: 10,
-        bottom: 10,
-        left: (pageWidth - tableColumn.length * 40) / 2,
-        right: (pageWidth - tableColumn.length * 40) / 2,
-      },
-      theme: "grid",
-      tableWidth: "auto",
-      columnWidth: "wrap",
-      styles: {
-        lineWidth: 0.5,
-        lineColor: [0, 0, 0],
-      },
-      addPageContent: function (data) {
-        const totalPages = doc.internal.getNumberOfPages();
-        const pageHeight =
-          doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-        const text = `Page ${data.pageNumber} of ${totalPages}`;
-        const textWidth =
-          (doc.getStringUnitWidth(text) * doc.internal.getFontSize()) /
-          doc.internal.scaleFactor;
-        const textX = (pageWidth - textWidth) / 2;
-        doc.text(textX, pageHeight - 10, text);
-      },
-    });
+        columnStyles: {
+          0: {
+            cellWidth: columnWidths[0],
+            halign: "center",
+            valign: "middle",
+            cellPadding: { top: 10, bottom: 10, left: 10, right: 10 },
+          },
+          1: {
+            cellWidth: columnWidths[1],
+            halign: "left",
+            valign: "middle",
+            cellPadding: { top: 10, bottom: 10, left: 10, right: 10 },
+          },
+          2: {
+            cellWidth: columnWidths[2],
+            halign: "center",
+            valign: "middle",
+            cellPadding: { top: 10, bottom: 10, left: 5, right: 5 },
+          },
+          3: {
+            cellWidth: columnWidths[3],
+            halign: "center",
+            valign: "middle",
+            cellPadding: { top: 10, bottom: 10, left: 5, right: 5 },
+            minCellHeight: 50,
+          },
+        },
+        head: [tableColumn],
+        body: tableRows,
+        didDrawCell: (data) => {
+          // Column 0: Draw Product Image only
+          if (data.column.index === 0 && data.cell.section === "body") {
+            const cellContent = data.cell.raw;
+            
+            // Check if cell content is an object with image property
+            if (cellContent && typeof cellContent === 'object' && cellContent.image) {
+              // Calculate available space in cell
+              const cellPaddingLeft = data.cell.padding("left");
+              const cellPaddingRight = data.cell.padding("right");
+              const cellPaddingTop = data.cell.padding("top");
+              const cellPaddingBottom = data.cell.padding("bottom");
+              const availableWidth = data.cell.width - cellPaddingLeft - cellPaddingRight;
+              const availableHeight = data.cell.height - cellPaddingTop - cellPaddingBottom;
+              
+              // Set image size to fit within cell (max 100px, but respect cell boundaries)
+              const maxImageSize = Math.min(cellContent.width || 100, 100, availableHeight, availableWidth);
+              const imgWidth = maxImageSize;
+              const imgHeight = imgWidth; // Keep it square
+              
+              // Calculate positions - center image both horizontally and vertically
+              const imgX = data.cell.x + (data.cell.width - imgWidth) / 2;
+              const imgY = data.cell.y + (data.cell.height - imgHeight) / 2;
+              
+              // Draw image if it fits within cell boundaries
+              if (imgWidth > 0 && imgHeight > 0 && 
+                  imgX + imgWidth <= data.cell.x + data.cell.width - cellPaddingRight &&
+                  imgY + imgHeight <= data.cell.y + data.cell.height - cellPaddingBottom) {
+                try {
+                  doc.addImage(
+                    cellContent.image,
+                    "PNG",
+                    imgX,
+                    imgY,
+                    imgWidth,
+                    imgHeight
+                  );
+                } catch (error) {
+                  console.error("Error adding image to PDF:", error);
+                }
+              }
+            }
+          }
+          
+          // Column 1: Draw Product Name text only
+          if (data.column.index === 1 && data.cell.section === "body") {
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            
+            const cellX = data.cell.x + data.cell.padding("left");
+            const cellY = data.cell.y + data.cell.height / 2;
+            const maxWidth = columnWidths[1] - data.cell.padding("horizontal");
+            
+            // Use fullProductName directly instead of cell content to avoid duplication
+            if (fullProductName && maxWidth > 0) {
+              const lines = doc.splitTextToSize(fullProductName, maxWidth);
+              // Calculate line height and center text vertically
+              const lineHeight = 5;
+              const totalTextHeight = lines.length * lineHeight;
+              const textStartY = cellY - totalTextHeight / 2 + lineHeight;
+              
+              doc.text(lines, cellX, textStartY, {
+                align: "left",
+              });
+            }
+          }
+        },
+        margin: {
+          top: 10,
+          bottom: 20,
+          left: 20,
+          right: 20,
+        },
+        theme: "grid",
+        tableWidth: "auto",
+        styles: {
+          lineWidth: 0.5,
+          lineColor: [0, 0, 0],
+        },
+        addPageContent: function (data) {
+          const pageHeight =
+            doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+          const text = `Page ${currentPageNumber} of ${totalProducts}`;
+          const textWidth =
+            (doc.getStringUnitWidth(text) * doc.internal.getFontSize()) /
+            doc.internal.scaleFactor;
+          const textX = (pageWidth - textWidth) / 2;
+          doc.text(textX, pageHeight - 10, text);
+        },
+      });
+    }
 
     doc.save("PoDetails-invoice.pdf");
     setIsDownloadPdf(false);
