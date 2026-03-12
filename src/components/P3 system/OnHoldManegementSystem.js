@@ -262,26 +262,29 @@ function OnHoldManegementSystem() {
     {
       field: "product_image",
       headerName: "product image",
-      flex: 1,
+      flex: 1.5, // Increased flex to give more width to image column
       type: "html",
       renderCell: (params) => (
         <Box
-          className="h-100 w-100 d-flex align-items-center"
+          className="h-100 w-100 d-flex align-items-center justify-content-center"
           onClick={() => ImageModule(params.value)}
+          sx={{
+            height: "100%",
+            width: "100%",
+            padding: "2px",
+          }}
         >
-          <Avatar
+          <Box
+            component="img"
             src={params.value || require("../../assets/default.png")}
             alt="Product Image"
             sx={{
-              height: "45px",
-              width: "45px",
+              height: "100%",
+              width: "100%",
               borderRadius: "2px",
-              margin: "0 auto",
-              "& .MuiAvatar-img": {
-                height: "90%",
-                width: "100%",
-                borderRadius: "2px",
-              },
+              cursor: "pointer",
+              objectFit: "cover",
+              display: "block",
             }}
           />
         </Box>
@@ -1093,7 +1096,7 @@ function OnHoldManegementSystem() {
                     pageSize={pageSize}
                     totalPages={totalPages}
                     handleChange={handleChange} // Pagination handler
-                    rowHeight="auto" // Auto-adjust row height
+                    rowHeight={150} // Match GRN Products Pending System row height
                   />
                   <MDBRow className="justify-content-end px-3 py-2">
                     {loading ? (

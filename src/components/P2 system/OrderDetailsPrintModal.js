@@ -23,7 +23,8 @@ const OrderDetailsPrintModal = ({
 
   const handleExport = async () => {
     setIsDownloadPdf(true);
-    const doc = new jsPDF();
+    // Create PDF in landscape orientation
+    const doc = new jsPDF("landscape", "mm", "a4");
     doc.setProperties({
       title: "Purchase Order Details",
       subject: "PO Details",
@@ -31,21 +32,21 @@ const OrderDetailsPrintModal = ({
       keywords: "PO, Purchase Order, Invoice",
     });
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
 
     const pageWidth = doc.internal.pageSize.width;
     const textX = pageWidth / 2;
     const textY = 15;
-    doc.text(`POId: ${poId}`, textX, textY, { align: "center" });
-    doc.text(`Factory Name: ${factoryName}`, textX, textY + 7, {
+    doc.text(`POId: ${poId || "N/A"}`, textX, textY, { align: "center" });
+    doc.text(`Factory Name: ${factoryName || "N/A"}`, textX, textY + 7, {
       align: "center",
     });
 
     const tableColumn = [
-      "Product ID",
       "Factory Image",
+      "Product ID",
       "Product Variations",
       "Quantity Ordered",
       "Order IDs",
@@ -78,12 +79,22 @@ const OrderDetailsPrintModal = ({
           }
         }
 
+        // Handle order_ids - check if it's an array, string, or other type
+        let orderIdsText = "N/A";
+        if (item.order_ids) {
+          if (Array.isArray(item.order_ids)) {
+            orderIdsText = item.order_ids.join(", ");
+          } else if (typeof item.order_ids === "string") {
+            orderIdsText = item.order_ids;
+          }
+        }
+
         tableRows.push([
+          { image: imgData, width: 100 }, // Width will be calculated to fill cell
           item.product_id || "N/A",
-          { image: imgData, width: 48 },
           productName || "N/A",
           item.quantity || 0,
-          item.order_ids?.join(", ") || "N/A",
+          orderIdsText,
         ]);
       }
     }
@@ -105,98 +116,140 @@ const OrderDetailsPrintModal = ({
 
     const startY = textY + 15; // Initial startY position
 
+    // Calculate column widths based on page width (landscape - more width available)
+    const availableWidth = pageWidth - 20; // Leave margins (10mm each side)
+    const columnWidths = {
+      0: availableWidth * 0.45,  // Factory Image: 35% (now first)
+      1: availableWidth * 0.12,  // Product ID: 12% (now second)
+      2: availableWidth * 0.15,  // Product Variations: 25%
+      3: availableWidth * 0.13,  // Quantity: 13%
+      4: availableWidth * 0.15,  // Order IDs: 15%
+    };
+
     autoTable(doc, {
       startY: startY,
       headStyles: {
-        fillColor: [71, 183, 223],
-        textColor: [255, 255, 255],
-        fontSize: 12,
-        fontStyle: "bold",
+        fillColor: [255, 255, 255], // White background instead of blue
+        textColor: [0, 0, 0], // Black text instead of white
+        fontSize: 9, // Smaller font size
+        fontStyle: "normal", // Normal instead of bold
         halign: "center",
+        valign: "middle",
+        cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding for headers
       },
       bodyStyles: {
         textColor: [0, 0, 0],
-        fontSize: 10,
-        halign: "center",
+        fontSize: 9, // Smaller font size
+        halign: "left",
+        valign: "top",
+        fontStyle: "normal", // Ensure normal font weight
       },
       alternateRowStyles: {
-        fillColor: [245, 245, 245],
+        fillColor: [255, 255, 255], // White background for all rows
       },
       rowPageBreak: "avoid",
-      rowHeight: 80,
+      didParseCell: (data) => {
+        // Set minimum row height to accommodate image
+        if (data.section === 'body' && data.column.index === 0) {
+          data.row.height = Math.max(data.row.height || 0, 150); // Increased height
+        }
+      },
       columnStyles: {
         0: {
-          cellWidth: 30,
+          cellWidth: columnWidths[0],
           halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
+          valign: "middle",
+          // No padding so the image can fully occupy the cell
+          cellPadding: { top: 0, bottom: 0, left: 0, right: 0 },
         },
         1: {
-          cellWidth: 52,
-          halign: "middle",
+          cellWidth: columnWidths[1],
+          halign: "center",
           valign: "middle",
-          cellPadding: 2,
-          minCellHeight: 38,
+          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
         },
         2: {
-          cellWidth: 40,
-          halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
+          cellWidth: columnWidths[2],
+          halign: "left",
+          valign: "middle",
+          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
         },
         3: {
-          cellWidth: 30,
+          cellWidth: columnWidths[3],
           halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
+          valign: "middle",
+          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
         },
         4: {
-          cellWidth: 48,
+          cellWidth: columnWidths[4],
           halign: "center",
-          valign: "center",
-          cellPadding: 2,
-          minCellHeight: 38,
+          valign: "middle",
+          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
+          minCellHeight: 50,
         },
       },
 
       head: [tableColumn],
       body: tableRows,
       didDrawCell: (data) => {
+        // Column 0: Draw Factory Image only (now first column)
         if (
-          data?.column?.index === 1 &&
+          data?.column?.index === 0 &&
           data?.cell?.section === "body" &&
           data.cell.raw?.image
         ) {
-          const imgWidth = data?.cell?.raw?.width || 40;
-          const imgHeight =
-            data?.cell?.height - data?.cell?.padding("vertical");
-          doc.addImage(
-            data?.cell?.raw?.image,
-            "PNG",
-            data?.cell?.x + data?.cell?.padding("left"),
-            data.cell.y + data.cell.padding("top"),
-            imgWidth,
-            imgHeight
-          );
+          const cellContent = data.cell.raw;
+          
+          // Calculate available space in cell
+          const cellPaddingLeft = data.cell.padding("left");
+          const cellPaddingRight = data.cell.padding("right");
+          const cellPaddingTop = data.cell.padding("top");
+          const cellPaddingBottom = data.cell.padding("bottom");
+          const availableWidth = data.cell.width - cellPaddingLeft - cellPaddingRight;
+          const availableHeight = data.cell.height - cellPaddingTop - cellPaddingBottom;
+          
+          // Fill the entire cell area
+          const imgWidth = Math.max(0, availableWidth);
+          const imgHeight = Math.max(0, availableHeight);
+
+          // Draw from the top-left inside padding (padding is 0 for this column)
+          const imgX = data.cell.x + cellPaddingLeft;
+          const imgY = data.cell.y + cellPaddingTop;
+          
+          // Draw image if it fits within cell boundaries
+          if (imgWidth > 0 && imgHeight > 0 && 
+              imgX + imgWidth <= data.cell.x + data.cell.width - cellPaddingRight &&
+              imgY + imgHeight <= data.cell.y + data.cell.height - cellPaddingBottom) {
+            try {
+              doc.addImage(
+                cellContent.image,
+                "PNG",
+                imgX,
+                imgY,
+                imgWidth,
+                imgHeight
+              );
+            } catch (error) {
+              console.error("Error adding image to PDF:", error);
+            }
+          }
         }
       },
       margin: {
-        top: 10,
-        bottom: 10,
-        left: (pageWidth - tableColumn.length * 40) / 2,
-        right: (pageWidth - tableColumn.length * 40) / 2,
+        top: 5, // Minimal top margin
+        bottom: 5, // Reduced bottom margin
+        left: 10, // Minimal left margin
+        right: 10, // Minimal right margin
       },
-      theme: "grid",
+      theme: "plain", // Smooth borders instead of grid
       tableWidth: "auto",
-      columnWidth: "wrap",
       styles: {
-        lineWidth: 0.5,
-        lineColor: [0, 0, 0],
+        lineWidth: 0.3, // Thinner lines for smoother appearance
+        lineColor: [200, 200, 200], // Soft greyish color instead of black
       },
       addPageContent: function (data) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9); // Smaller font size for page number
         const totalPages = doc.internal.getNumberOfPages();
         const pageHeight =
           doc.internal.pageSize.height || doc.internal.pageSize.getHeight();

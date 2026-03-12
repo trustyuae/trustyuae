@@ -32,8 +32,8 @@ const OnHoldProductDetailsPrintModal = ({
       keywords: "PO, Purchase Order, Invoice",
     });
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
 
     const pageWidth = doc.internal.pageSize.width;
@@ -110,8 +110,8 @@ const OnHoldProductDetailsPrintModal = ({
       const currentPageNumber = productIndex + 1;
 
       // Add header on each page
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
       doc.setTextColor(0, 0, 0);
       doc.text(`POId: ${poId || "N/A"}`, textX, textY, { align: "center" });
       doc.text(`Factory Name: ${factoryName || "N/A"}`, textX, textY + 7, {
@@ -184,10 +184,11 @@ const OnHoldProductDetailsPrintModal = ({
       ];
 
       // Calculate column widths based on page width (landscape - more width available)
-      const availableWidth = pageWidth - 40; // Leave margins
+      // Subtract margins: left 10 + right 10 = 20mm total
+      const availableWidth = pageWidth - 20; // Leave margins (10mm each side)
       const columnWidths = {
-        0: availableWidth * 0.40,  // Product Image: 40%
-        1: availableWidth * 0.30,  // Product Name: 30%
+        0: availableWidth * 0.50,  // Product Image: 50%
+        1: availableWidth * 0.20,  // Product Name: 25%
         2: availableWidth * 0.15,  // Quantity: 15%
         3: availableWidth * 0.15,  // Order IDs: 15%
       };
@@ -208,26 +209,28 @@ const OnHoldProductDetailsPrintModal = ({
       autoTable(doc, {
         startY: startY,
         headStyles: {
-          fillColor: [71, 183, 223],
-          textColor: [255, 255, 255],
-          fontSize: 12,
-          fontStyle: "bold",
+          fillColor: [255, 255, 255], // White background instead of blue
+          textColor: [0, 0, 0], // Black text instead of white
+          fontSize: 9, // Smaller font size
+          fontStyle: "normal", // Normal instead of bold
           halign: "center",
           valign: "middle",
+          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Reduced bottom padding for headers
         },
         bodyStyles: {
           textColor: [0, 0, 0],
-          fontSize: 10,
+          fontSize: 9, // Smaller font size
           halign: "left",
           valign: "top",
+          fontStyle: "normal", // Ensure normal font weight
         },
         alternateRowStyles: {
-          fillColor: [245, 245, 245],
+          fillColor: [255, 255, 255], // White background for all rows
         },
         didParseCell: (data) => {
           // Set minimum row height to accommodate image
           if (data.section === 'body' && data.column.index === 0) {
-            data.row.height = Math.max(data.row.height || 0, 120);
+            data.row.height = Math.max(data.row.height || 0, 150); // Increased height
           }
         },
         columnStyles: {
@@ -235,25 +238,26 @@ const OnHoldProductDetailsPrintModal = ({
             cellWidth: columnWidths[0],
             halign: "center",
             valign: "middle",
-            cellPadding: { top: 10, bottom: 10, left: 10, right: 10 },
+            // No padding so the image can fully occupy the cell
+            cellPadding: { top: 0, bottom: 0, left: 0, right: 0 },
           },
           1: {
             cellWidth: columnWidths[1],
             halign: "left",
             valign: "middle",
-            cellPadding: { top: 10, bottom: 10, left: 10, right: 10 },
+            cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Reduced bottom padding
           },
           2: {
             cellWidth: columnWidths[2],
             halign: "center",
             valign: "middle",
-            cellPadding: { top: 10, bottom: 10, left: 5, right: 5 },
+            cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Reduced bottom padding
           },
           3: {
             cellWidth: columnWidths[3],
             halign: "center",
             valign: "middle",
-            cellPadding: { top: 10, bottom: 10, left: 5, right: 5 },
+            cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Reduced bottom padding
             minCellHeight: 50,
           },
         },
@@ -274,14 +278,13 @@ const OnHoldProductDetailsPrintModal = ({
               const availableWidth = data.cell.width - cellPaddingLeft - cellPaddingRight;
               const availableHeight = data.cell.height - cellPaddingTop - cellPaddingBottom;
               
-              // Set image size to fit within cell (max 100px, but respect cell boundaries)
-              const maxImageSize = Math.min(cellContent.width || 100, 100, availableHeight, availableWidth);
-              const imgWidth = maxImageSize;
-              const imgHeight = imgWidth; // Keep it square
-              
-              // Calculate positions - center image both horizontally and vertically
-              const imgX = data.cell.x + (data.cell.width - imgWidth) / 2;
-              const imgY = data.cell.y + (data.cell.height - imgHeight) / 2;
+              // Fill the entire cell area (matches the red box in your screenshot)
+              const imgWidth = Math.max(0, availableWidth);
+              const imgHeight = Math.max(0, availableHeight);
+
+              // Draw from the top-left inside padding (padding is 0 for this column)
+              const imgX = data.cell.x + cellPaddingLeft;
+              const imgY = data.cell.y + cellPaddingTop;
               
               // Draw image if it fits within cell boundaries
               if (imgWidth > 0 && imgHeight > 0 && 
@@ -306,7 +309,7 @@ const OnHoldProductDetailsPrintModal = ({
           // Column 1: Draw Product Name text only
           if (data.column.index === 1 && data.cell.section === "body") {
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
+            doc.setFontSize(9); // Smaller font size
             doc.setTextColor(0, 0, 0);
             
             const cellX = data.cell.x + data.cell.padding("left");
@@ -328,18 +331,20 @@ const OnHoldProductDetailsPrintModal = ({
           }
         },
         margin: {
-          top: 10,
-          bottom: 20,
-          left: 20,
-          right: 20,
+          top: 5, // Minimal top margin
+          bottom: 5, // Reduced bottom margin
+          left: 10, // Minimal left margin
+          right: 10, // Minimal right margin
         },
-        theme: "grid",
+        theme: "plain", // Smooth borders instead of grid
         tableWidth: "auto",
         styles: {
-          lineWidth: 0.5,
-          lineColor: [0, 0, 0],
+          lineWidth: 0.3, // Thinner lines for smoother appearance
+          lineColor: [200, 200, 200], // Soft greyish color instead of black
         },
         addPageContent: function (data) {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9); // Smaller font size for page number
           const pageHeight =
             doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
           const text = `Page ${currentPageNumber} of ${totalProducts}`;
