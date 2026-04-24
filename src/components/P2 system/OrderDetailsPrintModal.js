@@ -46,8 +46,7 @@ const OrderDetailsPrintModal = ({
 
     const tableColumn = [
       "Factory Image",
-      "Product ID",
-      "Product Variations",
+      "Product Name",
       "Quantity Ordered",
       "Order IDs",
     ];
@@ -67,18 +66,6 @@ const OrderDetailsPrintModal = ({
           }
         }
 
-        let productName = "";
-        if (item?.variation_value) {
-          try {
-            const variationValue = JSON.parse(item.variation_value);
-            productName = Object.keys(variationValue)
-              .map((key) => `${key}: ${variationValue[key]}`)
-              .join(", ");
-          } catch (error) {
-            console.error("Error parsing variation_value:", error);
-          }
-        }
-
         // Handle order_ids - check if it's an array, string, or other type
         let orderIdsText = "N/A";
         if (item.order_ids) {
@@ -89,10 +76,12 @@ const OrderDetailsPrintModal = ({
           }
         }
 
+        // Get product name (only English name)
+        const fullProductName = item.product_eng_name || "";
+
         tableRows.push([
           { image: imgData, width: 100 }, // Width will be calculated to fill cell
-          item.product_id || "N/A",
-          productName || "N/A",
+          fullProductName,
           item.quantity || 0,
           orderIdsText,
         ]);
@@ -104,7 +93,7 @@ const OrderDetailsPrintModal = ({
       tableRows.push([
         {
           content: "Total:",
-          colSpan: 3, // Span across all columns
+          colSpan: 3, // Factory Image + Product Name + Quantity Ordered
           styles: { halign: "center", fontStyle: "bold" },
         },
         {
@@ -119,11 +108,10 @@ const OrderDetailsPrintModal = ({
     // Calculate column widths based on page width (landscape - more width available)
     const availableWidth = pageWidth - 20; // Leave margins (10mm each side)
     const columnWidths = {
-      0: availableWidth * 0.45,  // Factory Image: 35% (now first)
-      1: availableWidth * 0.12,  // Product ID: 12% (now second)
-      2: availableWidth * 0.15,  // Product Variations: 25%
-      3: availableWidth * 0.13,  // Quantity: 13%
-      4: availableWidth * 0.15,  // Order IDs: 15%
+      0: availableWidth * 0.48, // Factory Image
+      1: availableWidth * 0.2, // Product Name
+      2: availableWidth * 0.16, // Quantity Ordered
+      3: availableWidth * 0.16, // Order IDs
     };
 
     autoTable(doc, {
@@ -164,27 +152,21 @@ const OrderDetailsPrintModal = ({
         },
         1: {
           cellWidth: columnWidths[1],
-          halign: "center",
+          halign: "left",
           valign: "middle",
           cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
         },
         2: {
           cellWidth: columnWidths[2],
-          halign: "left",
+          halign: "center",
           valign: "middle",
-          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
+          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 },
         },
         3: {
           cellWidth: columnWidths[3],
           halign: "center",
           valign: "middle",
-          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
-        },
-        4: {
-          cellWidth: columnWidths[4],
-          halign: "center",
-          valign: "middle",
-          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 }, // Minimal padding
+          cellPadding: { top: 5, bottom: 2, left: 5, right: 5 },
           minCellHeight: 50,
         },
       },
