@@ -1,7 +1,7 @@
 import React, {
   useState,
   useEffect,
-  useRef,
+  // useRef,
   useCallback,
   useLayoutEffect,
 } from "react";
@@ -37,81 +37,81 @@ import {
   TextField,
   IconButton,
 } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
+// import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+// import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined";
-import Webcam from "react-webcam";
+// import Webcam from "react-webcam";
 import { useDispatch, useSelector } from "react-redux";
 import Form from "react-bootstrap/Form";
-import { CompressImage } from "../../utils/CompressImage";
+// import { CompressImage } from "../../utils/CompressImage";
 import DataTable from "../DataTable";
 import Loader from "../../utils/Loader";
 import dayjs from "dayjs";
 import ShowAlert from "../../utils/ShowAlert";
 import Swal from "sweetalert2";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import axiosInstance from "../../utils/AxiosInstance";
+// import axiosInstance from "../../utils/AxiosInstance";
 import { getUserData } from "../../utils/StorageUtils";
 import {
   AddMessageChina,
-  AttachmentFileUploadChina,
+  // AttachmentFileUploadChina,
   CustomItemSendToUAE,
   CustomOrderFinishChina,
   CustomOrderOHChina,
   InsertOrderPickupCancelChina,
   InsertOrderPickupChina,
   OrderDetailsChinaGet,
-  OverAllAttachmentFileUploadChina,
+  // OverAllAttachmentFileUploadChina,
   TrackingIDUpdate,
 } from "../../Redux2/slices/OrderSystemChinaSlice";
 import { useTranslation } from "react-i18next";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { useDropzone } from "react-dropzone";
+// import { useDropzone } from "react-dropzone";
 
 function OrderDetailsInChina() {
   const { id } = useParams();
-  const fileInputRef = useRef({});
-  const dropzoneRef = useRef(null);
+  // const fileInputRef = useRef({});
+  // const dropzoneRef = useRef(null);
   const { t, i18n } = useTranslation();
   const [lang, setLang] = useState("En");
   const [userData, setUserData] = useState(null);
   const [orderData, setOrderData] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const [selectedVariationId, setSelectedVariationId] = useState("");
+  // const [selectedVariationId, setSelectedVariationId] = useState("");
   const [orderDetails, setOrderDetails] = useState(null);
   const [orderProcess, setOrderProcess] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showAttachModal, setShowAttachModal] = useState(false);
+  // const [showAttachModal, setShowAttachModal] = useState(false);
   const [imageURL, setImageURL] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState("");
-  const [selectedFileUrl, setSelectedFileUrl] = useState(null);
-  const webcamRef = useRef(null);
+  // const [selectedFile, setSelectedFile] = useState("");
+  // const [selectedFileUrl, setSelectedFileUrl] = useState(null);
+  // const webcamRef = useRef(null);
   const [showMessageModal, setshowMessageModal] = useState(false);
   const [showMessageOHModal, setshowMessageOHModal] = useState(false);
-  const [showAttachmentModal, setShowAttachmentModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState("");
+  // const [showAttachmentModal, setShowAttachmentModal] = useState(false);
+  // const [selectedItemId, setSelectedItemId] = useState("");
   const [message, setMessage] = useState("");
   const [messageOH, setOHMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [attachmentZoom, setAttachmentZoom] = useState(false);
-  const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
+  // const [attachmentZoom, setAttachmentZoom] = useState(false);
+  // const [attachmentsubmitbtn, setAttachmentsubmitbtn] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedItemIds, setSelectedItemIds] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [uploadImageModalOpen, setUploadImageModalOpen] = useState(false);
+  // const [uploadImageModalOpen, setUploadImageModalOpen] = useState(false);
 
   const loader = useSelector((state) => state?.orderSystemChina?.isLoading);
-  if (!fileInputRef.current) {
-    fileInputRef.current = {};
-  }
-  fileInputRef.current[
-    selectedVariationId ? selectedVariationId : selectedItemId
-  ] = useRef(null);
+  // if (!fileInputRef.current) {
+  //   fileInputRef.current = {};
+  // }
+  // fileInputRef.current[
+  //   selectedVariationId ? selectedVariationId : selectedItemId
+  // ] = useRef(null);
 
   const AddInOnHold = useSelector(
     (state) => state?.orderSystemChina?.isLoading
@@ -216,28 +216,28 @@ function OrderDetailsInChina() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const capture = useCallback(() => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    setSelectedFileUrl(imageSrc);
-    setShowAttachModal(false);
-    fetch(imageSrc)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const uniqueFilename = `screenshot_${Date.now()}.jpg`;
-        const file = new File([blob], uniqueFilename, {
-          type: "image/jpeg",
-        });
-        setSelectedFile(file);
-      })
-      .catch((error) => {
-        console.error("Error converting data URL to file:", error);
-      });
-    setShowAttachmentModal(true);
-  }, [webcamRef]);
+  // const capture = useCallback(() => {
+  //   const imageSrc = webcamRef.current.getScreenshot();
+  //   setSelectedFileUrl(imageSrc);
+  //   setShowAttachModal(false);
+  //   fetch(imageSrc)
+  //     .then((res) => res.blob())
+  //     .then((blob) => {
+  //       const uniqueFilename = `screenshot_${Date.now()}.jpg`;
+  //       const file = new File([blob], uniqueFilename, {
+  //         type: "image/jpeg",
+  //       });
+  //       setSelectedFile(file);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error converting data URL to file:", error);
+  //     });
+  //   setShowAttachmentModal(true);
+  // }, [webcamRef]);
 
-  const retake = () => {
-    setSelectedFileUrl(null);
-  };
+  // const retake = () => {
+  //   setSelectedFileUrl(null);
+  // };
 
   const fetchOrder = useCallback(async () => {
     try {
@@ -375,96 +375,96 @@ function OrderDetailsInChina() {
     setShowModal(true);
   };
 
-  const handleFileInputChange = async (e, itemId, itemVariationId) => {
-    if (e.files[0]) {
-      const file = await CompressImage(e.files[0]);
-      const fr = new FileReader();
-      fr.onload = function () {
-        setSelectedFileUrl(fr.result);
-        setSelectedFile(file);
-        setShowAttachmentModal(true);
-        setUploadImageModalOpen(false);
-        setSelectedItemId(itemId);
-        setSelectedVariationId(itemVariationId);
-      };
-      fr.readAsDataURL(file);
-    }
-  };
+  // const handleFileInputChange = async (e, itemId, itemVariationId) => {
+  //   if (e.files[0]) {
+  //     const file = await CompressImage(e.files[0]);
+  //     const fr = new FileReader();
+  //     fr.onload = function () {
+  //       setSelectedFileUrl(fr.result);
+  //       setSelectedFile(file);
+  //       setShowAttachmentModal(true);
+  //       setUploadImageModalOpen(false);
+  //       setSelectedItemId(itemId);
+  //       setSelectedVariationId(itemVariationId);
+  //     };
+  //     fr.readAsDataURL(file);
+  //   }
+  // };
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: "image/*",
-    noClick: true,
-  });
+  // const { getRootProps, getInputProps } = useDropzone({
+  //   accept: "image/*",
+  //   noClick: true,
+  // });
 
-  const handleCancel = () => {
-    setSelectedFileUrl(null);
-    setSelectedFile(null);
-    setShowAttachmentModal(false);
-  };
-  const handleCancelImg = async (e) => {
-    Swal.fire({
-      title: "Are you sure you want to delete this image?",
-      icon: "question",
-      showConfirmButton: true,
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await axiosInstance.post(
-          `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}/?warehouse=China`,
-          {
-            variation_id: e.variation_id,
-            image_url: e.dispatch_image,
-          }
-        );
-        fetchOrder();
-      }
-    });
-  };
+  // const handleCancel = () => {
+  //   setSelectedFileUrl(null);
+  //   setSelectedFile(null);
+  //   setShowAttachmentModal(false);
+  // };
+  // const handleCancelImg = async (e) => {
+  //   Swal.fire({
+  //     title: "Are you sure you want to delete this image?",
+  //     icon: "question",
+  //     showConfirmButton: true,
+  //     showCancelButton: true,
+  //     confirmButtonText: "Yes",
+  //     cancelButtonText: "No",
+  //   }).then(async (result) => {
+  //     if (result.isConfirmed) {
+  //       await axiosInstance.post(
+  //         `wp-json/order-complete-attachment/v1/delete-attachment/${id}/${e.item_id}/?warehouse=China`,
+  //         {
+  //           variation_id: e.variation_id,
+  //           image_url: e.dispatch_image,
+  //         }
+  //       );
+  //       fetchOrder();
+  //     }
+  //   });
+  // };
 
-  const handleSubmitAttachment = async () => {
-    setAttachmentsubmitbtn(true);
-    try {
-      const { user_id } = userData ?? {};
-      if (selectedItemId) {
-        dispatch(
-          AttachmentFileUploadChina({
-            user_id: user_id,
-            order_id: id,
-            item_id: selectedItemId,
-            variation_id: selectedVariationId,
-            selectedFile: selectedFile,
-          })
-        );
-      } else {
-        dispatch(
-          OverAllAttachmentFileUploadChina({
-            order_id: orderDetailsDataOrderId?.order_id,
-            order_dispatch_image: selectedFile,
-          })
-        );
-      }
-      setShowAttachmentModal(false);
-      setSelectedFile(null);
-      const result = await ShowAlert(
-        "",
-        "Uploaded Successfully!",
-        "success",
-        null,
-        null,
-        null,
-        null,
-        2000
-      );
-      if (result.isConfirmed) handleCancel();
-      fetchOrder();
-      setAttachmentsubmitbtn(false);
-    } catch (error) {
-      console.error(error);
-      setAttachmentsubmitbtn(false);
-    }
-  };
+  // const handleSubmitAttachment = async () => {
+  //   setAttachmentsubmitbtn(true);
+  //   try {
+  //     const { user_id } = userData ?? {};
+  //     if (selectedItemId) {
+  //       dispatch(
+  //         AttachmentFileUploadChina({
+  //           user_id: user_id,
+  //           order_id: id,
+  //           item_id: selectedItemId,
+  //           variation_id: selectedVariationId,
+  //           selectedFile: selectedFile,
+  //         })
+  //       );
+  //     } else {
+  //       dispatch(
+  //         OverAllAttachmentFileUploadChina({
+  //           order_id: orderDetailsDataOrderId?.order_id,
+  //           order_dispatch_image: selectedFile,
+  //         })
+  //       );
+  //     }
+  //     setShowAttachmentModal(false);
+  //     setSelectedFile(null);
+  //     const result = await ShowAlert(
+  //       "",
+  //       "Uploaded Successfully!",
+  //       "success",
+  //       null,
+  //       null,
+  //       null,
+  //       null,
+  //       2000
+  //     );
+  //     if (result.isConfirmed) handleCancel();
+  //     fetchOrder();
+  //     setAttachmentsubmitbtn(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //     setAttachmentsubmitbtn(false);
+  //   }
+  // };
 
   const handleStartOrderProcess = async () => {
     const requestData = {
@@ -616,7 +616,7 @@ function OrderDetailsInChina() {
           className="h-100 w-100 d-flex align-items-center"
           onClick={() => {
             ImageModule(params?.value);
-            setAttachmentZoom(false);
+            // setAttachmentZoom(false);
           }}
         >
           <Avatar
@@ -655,6 +655,7 @@ function OrderDetailsInChina() {
       className: "order-details",
       type: "string",
     },
+    /* Attachment column + per-row upload UI — disabled temporarily (restore by removing this block comment)
     {
       field: "dispatch_image",
       headerName: "Attachment",
@@ -930,6 +931,7 @@ function OrderDetailsInChina() {
         }
       },
     },
+    */
   ];
 
   const handleCopy = (text) => {
@@ -1314,6 +1316,7 @@ function OrderDetailsInChina() {
               )}
             </Card>
           </Col>
+          {/* Overall order attachment card — disabled temporarily (paired with commented dispatch_image column)
           {tableData.some((data) => data.status_change === "1") ? (
             <Col sm={12} md={6}>
               <Card className="p-3 h-100">
@@ -1430,6 +1433,7 @@ function OrderDetailsInChina() {
               </Card>
             </Col>
           ) : null}
+          */}
         </Row>
         <Card className="p-3 mb-3">
           <Typography variant="h6" className="fw-bold mb-3">
@@ -1510,8 +1514,7 @@ function OrderDetailsInChina() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderDetails?.order_process == "started" &&
-            tableData?.some((data) => data.dispatch_image != "") ? (
+            orderDetails?.order_process == "started" ? (
               <>
                 <Button
                   variant="success"
@@ -1561,8 +1564,8 @@ function OrderDetailsInChina() {
                     variant="danger"
                     disabled={
                       orderDetails?.order_process != "started" ||
-                      userData?.user_id != orderDetails?.operation_user_id ||
-                      tableData?.some((data) => data.dispatch_image == "")
+                      userData?.user_id != orderDetails?.operation_user_id
+                      // || tableData?.some((data) => data.dispatch_image == "")
                     }
                     onClick={handleFinishButtonClick}
                   >
@@ -1573,6 +1576,7 @@ function OrderDetailsInChina() {
             )}
           </MDBCol>
         </MDBRow>
+        {/* Webcam attachment modal — disabled temporarily
         <Modal
           show={showAttachModal}
           onHide={() => setShowAttachModal(false)}
@@ -1603,6 +1607,7 @@ function OrderDetailsInChina() {
             </Box>
           </Modal.Body>
         </Modal>
+        */}
         <Modal
           show={showEditModal}
           // onHide={handleCloseEditModal}
@@ -1611,7 +1616,8 @@ function OrderDetailsInChina() {
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {attachmentZoom ? "Attached Image" : "Product Image"}
+              {/* {attachmentZoom ? "Attached Image" : "Product Image"} */}
+              Product Image
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -1692,6 +1698,7 @@ function OrderDetailsInChina() {
             </Box>
           </Modal.Body>
         </Modal>
+        {/* Attachment preview / submit modal — disabled temporarily
         <Modal
           show={showAttachmentModal}
           onHide={() => setShowAttachmentModal(false)}
@@ -1752,6 +1759,7 @@ function OrderDetailsInChina() {
             </Row>
           </Modal.Body>
         </Modal>
+        */}
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={1000} // Snackbar will auto-dismiss after 3 seconds
