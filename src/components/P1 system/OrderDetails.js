@@ -898,10 +898,11 @@ function OrderDetails() {
       ShowAlert("", String(msg), "success", null, null, null, null, 3000);
       setCsNoteBody("");
       setshowMessageModal(false);
-      const url = `wp-json/custom-cs-orders/v1/cs-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
-        id
-      )}`;
-      await dispatch(fetchCsOrders({ apiUrl: url }));
+      // const url = `wp-json/custom-cs-orders/v1/cs-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
+      //   id
+      // )}`;
+      // await dispatch(fetchCsOrders({ apiUrl: url }));
+        navigate("/customer_order_support");
     } catch (err) {
       ShowAlert("", String(err), "error", true);
     } finally {
@@ -1934,10 +1935,11 @@ function OrderDetails() {
       } else if (isProductionCsView) {
         navigate("/customer_support_production");
       } else {
-        const url = `wp-json/custom-cs-orders/v1/cs-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
-          id
-        )}`;
-        await dispatch(fetchCsOrders({ apiUrl: url }));
+        // const url = `wp-json/custom-cs-orders/v1/cs-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
+        //   id
+        // )}`;
+        // await dispatch(fetchCsOrders({ apiUrl: url }));
+        navigate("/customer_support_account");
       }
     } catch (err) {
       ShowAlert(
@@ -2115,10 +2117,12 @@ function OrderDetails() {
         null,
         3000
       );
-      const url = `wp-json/custom-account-orders/v1/account-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
-        id
-      )}`;
-      await dispatch(fetchAccountOrders({ apiUrl: url }));
+      // const url = `wp-json/custom-account-orders/v1/account-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
+      //   id
+      // )}`;
+      // await dispatch(fetchAccountOrders({ apiUrl: url }));
+
+          navigate("/customer_support_account");
     } catch (err) {
       ShowAlert(
         "",
@@ -2339,17 +2343,19 @@ function OrderDetails() {
       if (finishExOrderFileInputRef.current) {
         finishExOrderFileInputRef.current.value = "";
       }
-      if (isAccountCsView) {
-        const accountUrl = `wp-json/custom-account-orders/v1/account-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
-          id
-        )}`;
-        await dispatch(fetchAccountOrders({ apiUrl: accountUrl }));
-      } else {
-        const csUrl = `wp-json/custom-cs-orders/v1/cs-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
-          id
-        )}`;
-        await dispatch(fetchCsOrders({ apiUrl: csUrl }));
-      }
+      // if (isAccountCsView) {
+      //   const accountUrl = `wp-json/custom-account-orders/v1/account-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
+      //     id
+      //   )}`;
+      //   await dispatch(fetchAccountOrders({ apiUrl: accountUrl }));
+      // } else {
+      //   const csUrl = `wp-json/custom-cs-orders/v1/cs-orders/?page=1&per_page=1&order_id=${encodeURIComponent(
+      //     id
+      //   )}`;
+      //   await dispatch(fetchCsOrders({ apiUrl: csUrl }));
+      // }
+
+      navigate("/customer_support_account");
     } catch (error) {
       const msg =
         typeof error === "string"
