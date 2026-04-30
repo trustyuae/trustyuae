@@ -78,6 +78,26 @@ export const QuantityPoDetails = createAsyncThunk(
   }
 );
 
+/**
+ * Same endpoint as QuantityPoDetails: POST with body (GET is not registered — returns 404/405).
+ * See PoDetailsModal for payload shape.
+ */
+export const fetchPreOrderProductOrders = createAsyncThunk(
+  "P2System/fetchPreOrderProductOrders",
+  async ({ productId, payload }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-preorder-product/v1/pre-order-product-detail/${productId}`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching pre-order product orders:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const QuantityPoDetailsForModalInView = createAsyncThunk(
   "P2System/QuantityPoDetailsForModalInView",
   async ({ productId, variationId, poId }, { rejectWithValue }) => {
@@ -254,6 +274,32 @@ export const AssignFactoryToMultiProduct = createAsyncThunk(
     } catch (error) {
       console.error("Error assign factory:", error.message);
       return rejectWithValue(error.message);
+    }
+  }
+);
+
+/**
+ * POST JSON `custom-cs/v1/push-cs-order`.
+ * `payload`: { order_id, item_id, variation_id, note } — `note` is required by the UI (Order Management System).
+ */
+export const pushCsOrder = createAsyncThunk(
+  "P2System/pushCsOrder",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-cs/v1/push-cs-order`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      const data = error?.response?.data;
+      const msg =
+        (typeof data === "string" ? data : null) ||
+        data?.message ||
+        data?.data ||
+        error?.message ||
+        "Failed to push order to CS";
+      return rejectWithValue(typeof msg === "string" ? msg : String(msg));
     }
   }
 );

@@ -8,11 +8,13 @@ import p3SystemReducer from "../slices/P3SystemSlice";
 import productManagementReducer from "../slices/ProductManagementSlice";
 import userReducer from "../slices/UserSlice";
 import pagination from "../slices/PaginationSlice";
+import customerSupportReducer from "../slices/CustomerSupportSlice";
 
 export const rootReducer = combineReducers({
   factory: factoryReducer,
   erManagement: erManagementReducer,
   orderSystem: orderSystemReducer,
+  customerSupport: customerSupportReducer,
   orderSystemChina: orderSystemChinaReducer,
   p2System: p2SystemReducer,
   p3System: p3SystemReducer,

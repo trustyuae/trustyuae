@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -39,8 +39,10 @@ import {
   AddSchedulePO,
   AssignFactoryToMultiProduct,
   AssignFactoryToProduct,
+  fetchPreOrderProductOrders,
   ManualOrScheduledPoDetailsData,
   PoDetailsData,
+  pushCsOrder,
 } from "../../Redux2/slices/P2SystemSlice";
 import Swal from "sweetalert2";
 
@@ -100,6 +102,12 @@ function OrderManagementSystem() {
   const [imageId, setImageId] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedFactoryName, setSelectedFactoryName] = useState("");
+  const [pushToCsModalOpen, setPushToCsModalOpen] = useState(false);
+  const [selectedOrderIdForPush, setSelectedOrderIdForPush] = useState("");
+  const [pushToCsNote, setPushToCsNote] = useState("");
+  const [pushToCsOrderEntries, setPushToCsOrderEntries] = useState([]);
+  const [pushToCsOrdersLoading, setPushToCsOrdersLoading] = useState(false);
+  const [pushToCsSubmitting, setPushToCsSubmitting] = useState(false);
 
   const factoryData = useSelector((state) => state?.factory?.factories);
 
@@ -1176,6 +1184,231 @@ function OrderManagementSystem() {
     }
   };
 
+  const selectedRowCount =
+    activeKey === "against_PO"
+      ? selectedOrderIds.length
+      : activeKey === "manual_PO"
+      ? selectedManualOrderIds.length
+      : selectedScheduleOrderIds.length;
+
+  const canPushToCs = selectedRowCount === 1;
+
+  const pushToCsOrderOptions = useMemo(() => {
+    if (activeKey === "manual_PO") {
+      const ids = new Set();
+      selectedManualOrderDetails.forEach((row) => {
+        const oid =
+          row.order_id != null && row.order_id !== ""
+            ? String(row.order_id)
+            : row.product_id != null
+            ? String(row.product_id)
+            : null;
+        if (oid) ids.add(oid);
+      });
+      return Array.from(ids).map((id) => ({
+        value: id,
+        label: `Order ${id}`,
+      }));
+    }
+    if (activeKey === "scheduled_PO") {
+      const ids = new Set();
+      selectedScheduledOrderDetails.forEach((row) => {
+        const oid =
+          row.order_id != null && row.order_id !== ""
+            ? String(row.order_id)
+            : row.product_id != null
+            ? String(row.product_id)
+            : null;
+        if (oid) ids.add(oid);
+      });
+      return Array.from(ids).map((id) => ({
+        value: id,
+        label: `Order ${id}`,
+      }));
+    }
+    return [];
+  }, [activeKey, selectedManualOrderDetails, selectedScheduledOrderDetails]);
+
+  const pushToCsOrderSelectOptions =
+    activeKey === "against_PO" ? pushToCsOrderEntries : pushToCsOrderOptions;
+
+  useEffect(() => {
+    if (!pushToCsModalOpen) return;
+    const opts =
+      activeKey === "against_PO" ? pushToCsOrderEntries : pushToCsOrderOptions;
+    if (opts.length === 1) {
+      setSelectedOrderIdForPush(opts[0].value);
+    }
+  }, [
+    pushToCsModalOpen,
+    activeKey,
+    pushToCsOrderEntries,
+    pushToCsOrderOptions,
+  ]);
+
+  const handlePushToCS = () => {
+    if (!canPushToCs) return;
+    setSelectedOrderIdForPush("");
+    setPushToCsNote("");
+    setPushToCsOrderEntries([]);
+    setPushToCsModalOpen(true);
+
+    if (activeKey === "against_PO") {
+      const rowsToFetch = selectedAgainstOrderDetails.filter(
+        (r) => r.item_id != null && `${r.item_id}`.trim() !== ""
+      );
+      if (rowsToFetch.length === 0) {
+        setPushToCsOrdersLoading(false);
+        return;
+      }
+      setPushToCsOrdersLoading(true);
+      Promise.all(
+        rowsToFetch.map((row) => {
+          const productId = String(row.item_id);
+          const payload = {
+            factory_id: Number(row.factory_id) || 0,
+            variation_id: Number(row.variation_id) || 0,
+            product_name:
+              row.product_eng_name || row.product_name || "",
+          };
+          if (endDate) payload.end_date = endDate;
+          if (startDate) payload.start_date = startDate;
+          return dispatch(
+            fetchPreOrderProductOrders({ productId, payload })
+          ).unwrap();
+        })
+      )
+        .then((results) => {
+          const options = [];
+          results.forEach((data, rowIndex) => {
+            const row = rowsToFetch[rowIndex];
+            const itemId = String(data?.item_id ?? row.item_id);
+            const orders = data?.orders ?? [];
+            orders.forEach((o, idx) => {
+              options.push({
+                value: `${itemId}__${rowIndex}__${idx}__${o.order_id}`,
+                order_id: String(o.order_id),
+                quantity: o.quantity ?? "",
+                item_id: itemId,
+                variation_id: Number(row.variation_id) || 0,
+                label:
+                  rowsToFetch.length > 1
+                    ? `Item ${itemId} · Order ${o.order_id} (Qty: ${o.quantity})`
+                    : `Order ${o.order_id} (Qty: ${o.quantity})`,
+              });
+            });
+          });
+          setPushToCsOrderEntries(options);
+        })
+        .catch(() => {
+          ShowAlert(
+            "",
+            "Failed to load order details for the selected product(s).",
+            "error",
+            false,
+            false,
+            "",
+            "",
+            2000
+          );
+        })
+        .finally(() => setPushToCsOrdersLoading(false));
+    } else {
+      setPushToCsOrdersLoading(false);
+    }
+  };
+
+  const handleConfirmPushToCS = async () => {
+    if (!selectedOrderIdForPush) return;
+    const note = String(pushToCsNote ?? "").trim();
+    if (!note) {
+      ShowAlert(
+        "",
+        "Reason note is required.",
+        "warning",
+        false,
+        false,
+        "",
+        "",
+        2500
+      );
+      return;
+    }
+
+    let payload;
+    if (activeKey === "against_PO") {
+      const entry = pushToCsOrderEntries.find(
+        (e) => e.value === selectedOrderIdForPush
+      );
+      if (!entry) return;
+      payload = {
+        order_id: Number(entry.order_id),
+        item_id: Number(entry.item_id),
+        variation_id: Number(entry.variation_id ?? 0),
+        note,
+      };
+    } else if (activeKey === "manual_PO") {
+      const row = selectedManualOrderDetails[0];
+      if (!row) return;
+      payload = {
+        order_id: Number(selectedOrderIdForPush),
+        item_id: Number(row.product_id ?? row.item_id ?? 0),
+        variation_id: Number(row.variation_id ?? 0),
+        note,
+      };
+    } else if (activeKey === "scheduled_PO") {
+      const row = selectedScheduledOrderDetails[0];
+      if (!row) return;
+      payload = {
+        order_id: Number(selectedOrderIdForPush),
+        item_id: Number(row.product_id ?? row.item_id ?? 0),
+        variation_id: Number(row.variation_id ?? 0),
+        note,
+      };
+    } else {
+      return;
+    }
+
+    setPushToCsSubmitting(true);
+    try {
+      const data = await dispatch(pushCsOrder(payload)).unwrap();
+      const msg =
+        (typeof data === "string" ? data : null) ||
+        data?.message ||
+        data?.data ||
+        "Order pushed to customer support successfully.";
+      handleClosePushToCsModal();
+      Swal.fire({
+        title: "Push to CS",
+        text: typeof msg === "string" ? msg : JSON.stringify(msg),
+        icon: "success",
+        showConfirmButton: true,
+      });
+    } catch (err) {
+      ShowAlert(
+        "",
+        typeof err === "string" ? err : "Failed to push order to CS.",
+        "error",
+        false,
+        false,
+        "",
+        "",
+        2500
+      );
+    } finally {
+      setPushToCsSubmitting(false);
+    }
+  };
+
+  const handleClosePushToCsModal = () => {
+    setPushToCsModalOpen(false);
+    setSelectedOrderIdForPush("");
+    setPushToCsNote("");
+    setPushToCsOrderEntries([]);
+    setPushToCsOrdersLoading(false);
+    setPushToCsSubmitting(false);
+  };
+
   return (
     <Container
       fluid
@@ -1540,6 +1773,19 @@ function OrderManagementSystem() {
             <Button
               variant="outline-primary"
               className="me-2 fw-semibold"
+              disabled={!canPushToCs}
+              onClick={handlePushToCS}
+              title={
+                selectedRowCount > 1
+                  ? "Select only one order to use Push to CS"
+                  : undefined
+              }
+            >
+              Push to CS
+            </Button>
+            <Button
+              variant="outline-primary"
+              className="me-2 fw-semibold"
               onClick={handleSelectAll}
             >
               Select All Orders
@@ -1583,6 +1829,78 @@ function OrderManagementSystem() {
             <img src={imageURL} alt="Product" />
           </Card>
         </Modal.Body>
+      </Modal>
+
+      <Modal show={pushToCsModalOpen} onHide={handleClosePushToCsModal} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Push to CS</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {activeKey === "against_PO" && pushToCsOrdersLoading ? (
+            <Box className="d-flex justify-content-center py-4">
+              <Loader />
+            </Box>
+          ) : (
+            <>
+              <Form.Group className="mb-3">
+                <Form.Label>Order ID</Form.Label>
+                <Form.Select
+                  value={selectedOrderIdForPush}
+                  onChange={(e) => setSelectedOrderIdForPush(e.target.value)}
+                  disabled={pushToCsOrderSelectOptions.length === 0}
+                >
+                  <option value="">Select order ID</option>
+                  {pushToCsOrderSelectOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>
+                  Reason note <span className="text-danger">*</span>
+                </Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  placeholder="Enter why this order is being pushed to customer support"
+                  value={pushToCsNote}
+                  onChange={(e) => setPushToCsNote(e.target.value)}
+                  disabled={pushToCsSubmitting}
+                  required
+                />
+              </Form.Group>
+              {pushToCsOrderSelectOptions.length === 0 &&
+                !pushToCsOrdersLoading && (
+                  <Alert severity="warning" sx={{ py: 1 }}>
+                    No order IDs found for the current selection.
+                  </Alert>
+                )}
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={handleClosePushToCsModal}
+            disabled={pushToCsSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            disabled={
+              !selectedOrderIdForPush ||
+              !String(pushToCsNote ?? "").trim() ||
+              pushToCsOrdersLoading ||
+              pushToCsSubmitting
+            }
+            onClick={handleConfirmPushToCS}
+          >
+            {pushToCsSubmitting ? "Sending…" : "Confirm"}
+          </Button>
+        </Modal.Footer>
       </Modal>
     </Container>
   );

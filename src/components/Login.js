@@ -50,7 +50,8 @@ const Login = () => {
 
     if (isValid) {
       const getRedirectPath = (role) => {
-        switch (role) {
+        const normalizedRole = String(role ?? "").trim().toLowerCase();
+        switch (normalizedRole) {
           case "administrator":
           case "packing_assistant":
           case "operation_assistant":
@@ -58,7 +59,11 @@ const Login = () => {
           case "factory_coordinator":
             return "/ordersystem_in_china";
           case "customer_support":
-            return "/order_not_available";
+            return "/customer_order_support";
+          case "accountant":
+            return "/customer_support_account";
+          case "support_manager":
+            return "/customer_order_support";
           default:
             return null;
         }

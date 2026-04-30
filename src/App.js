@@ -38,6 +38,11 @@ import ReserveOrderdetailsInChina from "./components/P1 system china/ReserveOrde
 import OnHoldOrdersdetailsInChina from "./components/P1 system china/OnHoldOrdersdetailsInChina";
 import MissingOrderSystem from "./components/Missing Orders System/MissingOrderSystem";
 import MissingOrderDetails from "./components/Missing Orders System/MissingOrderDetails";
+import CustomerOrderSupport from "./components/Customer Support/CustomerOrderSupport";
+import CsPendingOrders from "./components/Customer Support/CsPendingOrders";
+import CustomerSupportAccount from "./components/Customer Support/CustomerSupportAccount";
+import CustomerSupportProduction from "./components/Customer Support/CustomerSupportProduction";
+import CustomerSupportCompleteOrders from "./components/Customer Support/CustomerSupportCompleteOrders";
 import OrderTrackingNumberPending from "./components/P1 system china/OrderTrackingNumberPending";
 import OrderTrackingNumberPendingDetails from "./components/P1 system china/OrderTrackingNumberPendingDetails";
 import GRNManagement_OrderIds from "./components/P3 system/GRNManagement_OrderIds";
@@ -193,6 +198,32 @@ function App() {
                 exact
                 path="/on_hold_order_details_in_china/:id"
                 element={<OnHoldOrdersdetailsInChina />}
+              />
+
+              <Route
+                exact
+                path="/customer_order_support"
+                element={<CustomerOrderSupport />}
+              />
+              <Route
+                exact
+                path="/customer_support_pending_orders"
+                element={<CsPendingOrders />}
+              />
+              <Route
+                exact
+                path="/customer_support_account"
+                element={<CustomerSupportAccount />}
+              />
+              <Route
+                exact
+                path="/customer_support_production"
+                element={<CustomerSupportProduction />}
+              />
+              <Route
+                exact
+                path="/customer_support_complete_orders"
+                element={<CustomerSupportCompleteOrders />}
               />
 
               <Route

@@ -108,8 +108,7 @@ const Sidebar = () => {
             </li>
           )}
           {(userType === "administrator" ||
-            userType === "operation_assistant" ||
-            userType === "customer_support") && (
+            userType === "operation_assistant") && (
             <li className="nav-item">
               <a
                 className="nav-link collapsed"
@@ -475,6 +474,129 @@ const Sidebar = () => {
             <span>Reserve Orders System</span>
           </Link>
         </li> */}
+              </ul>
+            </li>
+          )}
+
+          {(userType === "administrator" ||
+            userType === "operation_assistant" ||
+            userType === "accountant" ||
+            userType === "customer_support" ||
+            userType === "support_manager") && (
+            <li className="nav-item">
+              <a
+                className="nav-link collapsed"
+                data-bs-target="#customer-support-nav"
+                data-bs-toggle="collapse"
+                href="/"
+              >
+                <i className="bi bi-headset"></i>
+                <span>Customer Support</span>
+                <i className="bi bi-chevron-down ms-auto"></i>
+              </a>
+              <ul
+                id="customer-support-nav"
+                className={`nav-content ${
+                  userType === "accountant" ||
+                  userType === "customer_support" ||
+                  userType === "support_manager"
+                    ? "show"
+                    : "collapse "
+                } `}
+                data-bs-parent="#sidebar-nav"
+              >
+                {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
+                  userType === "customer_support" ||
+                  userType === "support_manager") && (
+                  <li>
+                    <Link
+                      to="/customer_order_support"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/customer_order_support"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Customer order support</span>
+                    </Link>
+                  </li>
+                )}
+                {userType === "customer_support" && (
+                  <li>
+                    <Link
+                      to="/customer_support_pending_orders"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/customer_support_pending_orders"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>CS Pending Orders</span>
+                    </Link>
+                  </li>
+                )}
+                {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
+                  userType === "accountant" ||
+                  userType === "support_manager") && (
+                  <li>
+                    <Link
+                      to="/customer_support_account"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/customer_support_account"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Account</span>
+                    </Link>
+                  </li>
+                )}
+                {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
+                  userType === "support_manager") && (
+                  <li>
+                    <Link
+                      to="/customer_support_production"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/customer_support_production"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Production</span>
+                    </Link>
+                  </li>
+                )}
+                {(userType === "administrator" ||
+                  userType === "operation_assistant" ||
+                  userType === "accountant" ||
+                  userType === "customer_support" ||
+                  userType === "support_manager") && (
+                  <li>
+                    <Link
+                      to="/customer_support_complete_orders"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/customer_support_complete_orders"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Complete orders</span>
+                    </Link>
+                  </li>
+                )}
               </ul>
             </li>
           )}
