@@ -44,13 +44,14 @@ import {
   fetchPreOrderProductOrders,
   ManualOrScheduledPoDetailsData,
   PoDetailsData,
+  BackFromCsData,
   pushCsOrder,
 } from "../../Redux2/slices/P2SystemSlice";
 import Swal from "sweetalert2";
 
 const EstimatedTime = ["1 week", "2 week", "3 week", "1 month", "Out of stock"];
 
-function OrderManagementSystem() {
+function BackFromCS() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -274,14 +275,20 @@ function OrderManagementSystem() {
       product_id: ProductIds,
       factory_id: selectedFactoryName,
     };
-    dispatch(AssignFactoryToMultiProduct({ payload })).then(({ payload }) => {
+    dispatch(AssignFactoryToMultiProduct({ payload })).then(({ payload, error }) => {
       setSelectedAgainstOrderDetails([]);
       setSelectedOrderIds([]);
       setSelectedFactoryName("");
-      if (payload) {
+      if (error) {
         Swal.fire({
-          title: payload.data.message,
-          icon: payload.status === 200 ? "success" : "error",
+          title: typeof payload === "string" ? payload : (payload?.message || "Failed to update factory"),
+          icon: "error",
+          showConfirmButton: true,
+        });
+      } else if (payload) {
+        Swal.fire({
+          title: payload?.data?.message || "Successfully updated factory",
+          icon: payload?.status === 200 || payload?.status === 201 ? "success" : "error",
           showConfirmButton: true,
         });
         fetchOrders();
@@ -674,16 +681,17 @@ function OrderManagementSystem() {
 
   const fetchOrders = async () => {
     try {
-      let apiUrl = `wp-json/custom-preorder-products/v1/pre-order/?&per_page=${pageSize}&page=${page}`;
+      let apiUrl = `wp-json/custom-csorder-products/v1/cs-back-order/?&per_page=${pageSize}&page=${page}`;
       if (endDate) apiUrl += `&start_date=${startDate}&end_date=${endDate}`;
       if (selectedFactory) apiUrl += `&factory_id=${selectedFactory}`;
-      dispatch(PoDetailsData(apiUrl)).then(({ payload }) => {
-        let data = payload?.pre_orders?.map((v, i) => ({
+      dispatch(BackFromCsData(apiUrl)).then(({ payload }) => {
+        let items = payload?.cs_back_orders || payload?.pre_orders || payload?.data || [];
+        let data = items.map((v, i) => ({
           ...v,
           id: i + currentStartIndex,
         }));
         setOrders(data);
-        setTotalPages(payload.total_pages);
+        setTotalPages(payload?.total_pages || 1);
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -1609,7 +1617,7 @@ function OrderManagementSystem() {
     >
       <Box className="mb-4">
         <Typography variant="h4" className="fw-semibold">
-          Order Management System
+          Back from CS
         </Typography>
       </Box>
       <Card>
@@ -1965,19 +1973,6 @@ function OrderManagementSystem() {
             <Button
               variant="outline-primary"
               className="me-2 fw-semibold"
-              disabled={!canPushToCs}
-              onClick={handlePushToCS}
-              title={
-                selectedRowCount > 1
-                  ? "Select only one order to use Push to CS"
-                  : undefined
-              }
-            >
-              Push to CS
-            </Button>
-            <Button
-              variant="outline-primary"
-              className="me-2 fw-semibold"
               onClick={handleSelectAll}
             >
               Select All Orders
@@ -2108,4 +2103,4 @@ function OrderManagementSystem() {
   );
 }
 
-export default OrderManagementSystem;
+export default BackFromCS;

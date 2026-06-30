@@ -406,6 +406,24 @@ function OrderTrackingNumberPending() {
     navigate("/ordersystem_in_china");
   };
 
+  const getProductExportName = (item) =>
+    item?.name_category || item?.product_eng_name || item?.product_name || "";
+
+  const setOrderExportColumnWidths = (worksheet) => {
+    worksheet["!cols"] = [
+      { wch: 12 },
+      { wch: 24 },
+      { wch: 45 },
+      { wch: 22 },
+      { wch: 16 },
+      { wch: 20 },
+      { wch: 70 },
+      { wch: 18 },
+      { wch: 24 },
+      { wch: 10 },
+    ];
+  };
+
   const downloadExcel = async () => {
     console.log(orders, "orders from downloadexcel");
     console.log(selectedItems, "selectedItems from downloadexcel");
@@ -421,9 +439,9 @@ function OrderTrackingNumberPending() {
     // Include ALL orders regardless of exist_item value
     const filteredOrderData = orders
       .map((order) => {
-        // Get tracking ID from tempTrackIds first, then fall back to order items
-        const trackId = tempTrackIds[order.id] || order.items[0]?.tracking_id || "";
-        const trackingIdValue = trackId !== "0" ? trackId : "";
+        const trackingIdValue = order.items
+          .map((item) => tempTrackIds[order.id] ?? item?.tracking_id ?? "")
+          .join(", ");
         
         return {
           "Order Id": order.order_id,
@@ -433,7 +451,7 @@ function OrderTrackingNumberPending() {
           "Phone": order.contact_no || "",
           "Short Address Code": order.address_code || "",
           "Product Name": order.items
-            .map((item) => item.product_eng_name)
+            .map(getProductExportName)
             .join(", "),
           "Shipping Country": order.shipping_country,
           "Tracking ID": trackingIdValue,
@@ -444,6 +462,7 @@ function OrderTrackingNumberPending() {
     const workbook = XLSX.utils.book_new();
 
     const worksheet = XLSX.utils.json_to_sheet(filteredOrderData);
+    setOrderExportColumnWidths(worksheet);
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Order Data");
 
@@ -459,7 +478,7 @@ function OrderTrackingNumberPending() {
         "City": order.emirates_add || "",
         "Phone": order.contact_no || "",
         "Short Address Code": order.address_code || "",
-        "Product Name": order.items.map((item) => item.product_eng_name).join(", "),
+        "Product Name": order.items.map(getProductExportName).join(", "),
         "Shipping Country": order.shipping_country,
         "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
       };
@@ -468,6 +487,7 @@ function OrderTrackingNumberPending() {
     const workbook = XLSX.utils.book_new();
 
     const worksheet = XLSX.utils.json_to_sheet(filteredOrderData);
+    setOrderExportColumnWidths(worksheet);
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Order Data");
 
@@ -487,7 +507,7 @@ function OrderTrackingNumberPending() {
         "Phone": rowData.contact_no || "",
         "Short Address Code": rowData.address_code || "",
         "Product Name": rowData.items
-          .map((item) => item.product_eng_name)
+          .map(getProductExportName)
           .join(", "),
         "Shipping Country": rowData.shipping_country,
         "Tracking ID": rowData.items.map((item) => item.tracking_id).join(", "),
@@ -497,6 +517,7 @@ function OrderTrackingNumberPending() {
     const workbook = XLSX.utils.book_new();
 
     const worksheet = XLSX.utils.json_to_sheet(filteredOrderData);
+    setOrderExportColumnWidths(worksheet);
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "Order Data");
 

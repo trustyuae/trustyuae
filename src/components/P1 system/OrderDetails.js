@@ -485,10 +485,10 @@ function OrderDetails() {
   const csDetailLoading = isAccountCsView
     ? accountOrdersLoading
     : isProductionCsView
-    ? productionOrdersLoading
-    : isCsCompletedView
-    ? isCsCompletedOrdersLoading
-    : csLoading;
+      ? productionOrdersLoading
+      : isCsCompletedView
+        ? isCsCompletedOrdersLoading
+        : csLoading;
 
   const csOrderDetail = useMemo(() => {
     if (!isCsView) return null;
@@ -504,8 +504,8 @@ function OrderDetails() {
     const list = isAccountCsView
       ? accountOrders
       : isProductionCsView
-      ? productionOrders
-      : csOrders;
+        ? productionOrders
+        : csOrders;
     if (!list?.length) return null;
     return (
       list.find((o) => String(o.order_id) === String(id)) || list[0] || null
@@ -757,7 +757,7 @@ function OrderDetails() {
     if (orderDetailsDataOrderId && orderDetailsData) {
       const orderIdFromData = orderDetailsDataOrderId.order_id?.toString();
       const currentOrderId = id?.toString();
-      
+
       // Only update state if the order data matches the current order ID
       if (orderIdFromData === currentOrderId) {
         const oDetails = orderDetailsData?.orders?.map((v, i) => ({ ...v, id: i }));
@@ -902,7 +902,7 @@ function OrderDetails() {
       //   id
       // )}`;
       // await dispatch(fetchCsOrders({ apiUrl: url }));
-        navigate("/customer_order_support");
+      navigate("/customer_order_support");
     } catch (err) {
       ShowAlert("", String(err), "error", true);
     } finally {
@@ -1365,7 +1365,7 @@ function OrderDetails() {
                   itemVariationId
                 );
               });
-              break; 
+              break;
             }
           }
         };
@@ -1432,8 +1432,8 @@ function OrderDetails() {
               >
                 <Card className="factory-card shadow-sm mb-0">
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" &&
-                  qty == avl_qty ? (
+                    orderProcess == "started" &&
+                    qty == avl_qty ? (
                     <Box
                       {...getRootProps()}
                       ref={dropzoneRef}
@@ -1762,30 +1762,30 @@ function OrderDetails() {
 
   const csItemColumns = [
     ...(csItemsTableRows.length > 1 &&
-    !isAccountCsView &&
-    !isCsCompletedView
+      !isAccountCsView &&
+      !isCsCompletedView
       ? [
-          {
-            field: "cs_select",
-            headerName: "Select order",
-            flex: 0.45,
-            minWidth: 120,
-            sortable: false,
-            className: "order-details",
-            renderCell: (params) => (
-              <Checkbox
-                checked={csSelectedLineRowId === params.row.id}
-                onChange={() => {
-                  setCsSelectedLineRowId((prev) =>
-                    prev === params.row.id ? null : params.row.id
-                  );
-                }}
-                size="small"
-                inputProps={{ "aria-label": "Select order line" }}
-              />
-            ),
-          },
-        ]
+        {
+          field: "cs_select",
+          headerName: "Select order",
+          flex: 0.45,
+          minWidth: 120,
+          sortable: false,
+          className: "order-details",
+          renderCell: (params) => (
+            <Checkbox
+              checked={csSelectedLineRowId === params.row.id}
+              onChange={() => {
+                setCsSelectedLineRowId((prev) =>
+                  prev === params.row.id ? null : params.row.id
+                );
+              }}
+              size="small"
+              inputProps={{ "aria-label": "Select order line" }}
+            />
+          ),
+        },
+      ]
       : []),
     ...csItemBaseColumns,
   ];
@@ -1808,7 +1808,7 @@ function OrderDetails() {
     const selected = getSelectedCsRow();
     return selected &&
       String(selected.pay_status ?? "").trim().toLowerCase() ===
-        pendingFinishExOrderPayStatus
+      pendingFinishExOrderPayStatus
       ? selected
       : matchRows[0] ?? null;
   }, [csItemsTableRows, csSelectedLineRowId, pendingFinishExOrderPayStatus]);
@@ -1900,18 +1900,18 @@ function OrderDetails() {
       const result = await dispatch(
         isProductionCsView
           ? pushProductionCs({
-              ticket_id: ticketId,
-              order_id: orderIdNum,
-              reason,
-              note,
-            })
+            ticket_id: ticketId,
+            order_id: orderIdNum,
+            reason,
+            note,
+          })
           : pushCsToAccount({
-              ticket_id: ticketId,
-              order_id: orderIdNum,
-              reason,
-              note,
-              category: csPushAccountCategory,
-            })
+            ticket_id: ticketId,
+            order_id: orderIdNum,
+            reason,
+            note,
+            category: csPushAccountCategory,
+          })
       ).unwrap();
       setShowCsPushAccountModal(false);
       setCsPushAccountReason("");
@@ -1920,9 +1920,9 @@ function OrderDetails() {
       ShowAlert(
         "",
         result?.message ||
-          (isProductionCsView
-            ? "Pushed to CS successfully."
-            : "Order pushed to account successfully."),
+        (isProductionCsView
+          ? "Pushed to CS successfully."
+          : "Order pushed to account successfully."),
         "success",
         null,
         null,
@@ -1947,8 +1947,8 @@ function OrderDetails() {
         typeof err === "string"
           ? err
           : isProductionCsView
-          ? "Failed to push to CS."
-          : "Failed to push order to account",
+            ? "Failed to push to CS."
+            : "Failed to push order to account",
         "error",
         true
       );
@@ -2122,7 +2122,7 @@ function OrderDetails() {
       // )}`;
       // await dispatch(fetchAccountOrders({ apiUrl: url }));
 
-          navigate("/customer_support_account");
+      navigate("/customer_support_account");
     } catch (err) {
       ShowAlert(
         "",
@@ -2144,7 +2144,7 @@ function OrderDetails() {
     const selected = getSelectedCsRow();
     const row =
       selected &&
-      String(selected.pay_status ?? "").trim().toLowerCase() === expectedPayStatus
+        String(selected.pay_status ?? "").trim().toLowerCase() === expectedPayStatus
         ? selected
         : matchRows[0] ?? null;
     const baseRaw = safeMoneyNumber(row?.final_amount);
@@ -2249,7 +2249,7 @@ function OrderDetails() {
     const selected = getSelectedCsRow();
     const row =
       selected &&
-      String(selected.pay_status ?? "").trim().toLowerCase() ===
+        String(selected.pay_status ?? "").trim().toLowerCase() ===
         expectedPayStatus
         ? selected
         : matchRows[0] ?? null;
@@ -2388,8 +2388,8 @@ function OrderDetails() {
     const raw = row?.extra_charge;
     const init =
       raw != null &&
-      raw !== "" &&
-      !Number.isNaN(Number(raw))
+        raw !== "" &&
+        !Number.isNaN(Number(raw))
         ? Number(raw).toFixed(2)
         : "";
     setAccountPayLinkExtraChargesInput(init);
@@ -3110,12 +3110,12 @@ function OrderDetails() {
                     isPendingCsReadonlyView
                       ? "/customer_support_pending_orders"
                       : isAccountCsView
-                      ? "/customer_support_account"
-                      : isProductionCsView
-                      ? "/customer_support_production"
-                      : isCsCompletedView
-                      ? "/customer_support_complete_orders"
-                      : "/customer_order_support"
+                        ? "/customer_support_account"
+                        : isProductionCsView
+                          ? "/customer_support_production"
+                          : isCsCompletedView
+                            ? "/customer_support_complete_orders"
+                            : "/customer_order_support"
                   )
                 }
               >
@@ -3359,7 +3359,7 @@ function OrderDetails() {
                 </div>
                 {((isAccountCsView && !isAccountRefundOrder) ||
                   isDefaultCustomerSupportView) &&
-                csExchangeDetailTableRows.length > 0 ? (
+                  csExchangeDetailTableRows.length > 0 ? (
                   <>
                     <Typography
                       variant="h6"
@@ -3377,165 +3377,196 @@ function OrderDetails() {
                   </>
                 ) : null}
                 <Box
-                  className={`d-flex ${
-                    isCsCompletedView ? "justify-content-start" : "justify-content-end"
-                  } align-items-center flex-wrap mt-3 pt-2 border-top`}
+                  className={`d-flex ${isCsCompletedView ? "justify-content-start" : "justify-content-end"
+                    } align-items-center flex-wrap mt-3 pt-2 border-top`}
                 >
                   <Box className="d-flex align-items-center gap-2">
-                    {isPendingCsReadonlyView ? null : isAccountCsView &&
-                      isAccountRefundOrder ? (
-                      <>
-                        <Button
-                          variant="outline-primary"
-                          className="fw-semibold"
-                          disabled={
-                            csDetailLoading ||
-                            finishRefundLoading ||
-                            exchangeCalculateLoading ||
-                            updateExchangeDataLoading
-                          }
-                          onClick={handleOpenFinishRefundModal}
-                        >
-                          {finishRefundLoading ? "…" : "Finish Refund"}
-                        </Button>
-                      </>
-                    ) : isAccountCsView &&
-                      showAccountExchangePayCustomerFinish ? (
-                      <Button
-                        variant="outline-primary"
-                        className="fw-semibold"
-                        type="button"
-                        disabled={
-                          csDetailLoading ||
-                          finishCollectCustomerLoading ||
-                          exchangeCalculateLoading ||
-                          updateExchangeDataLoading
+                    {(() => {
+                      const canOperate = 
+                        getOrderStartedBy(csOrderDetail) === userData?.user_login ||
+                        getOrderStartedBy(csOrderDetail) === userData?.username ||
+                        getOrderStartedBy(csOrderDetail) === userData?.name ||
+                        getOrderStartedBy(csOrderDetail) === userData?.user_role;
+
+                      if (isPendingCsReadonlyView) return null;
+
+                      if (isAccountCsView) {
+                        if (isAccountRefundOrder) {
+                          return (
+                            <Button
+                              variant="outline-primary"
+                              className="fw-semibold"
+                              disabled={
+                                csDetailLoading ||
+                                finishRefundLoading ||
+                                exchangeCalculateLoading ||
+                                updateExchangeDataLoading
+                              }
+                              onClick={handleOpenFinishRefundModal}
+                            >
+                              {finishRefundLoading ? "…" : "Finish Refund"}
+                            </Button>
+                          );
                         }
-                        onClick={handleFinishAccountPayCustomerExchange}
-                      >
-                        {finishCollectCustomerLoading ? "…" : "Finish"}
-                      </Button>
-                    ) : isAccountCsView &&
-                      showAccountPushToCsCollectCustomer ? (
-                      <Button
-                        variant="outline-primary"
-                        className="fw-semibold"
-                        type="button"
-                        disabled={
-                          csDetailLoading ||
-                          exchangeCalculateLoading ||
-                          updateExchangeDataLoading ||
-                          showAccountPayLinkModal ||
-                          accountPayLinkLoading
+                        if (showAccountExchangePayCustomerFinish) {
+                          return (
+                            <Button
+                              variant="outline-primary"
+                              className="fw-semibold"
+                              type="button"
+                              disabled={
+                                csDetailLoading ||
+                                finishCollectCustomerLoading ||
+                                exchangeCalculateLoading ||
+                                updateExchangeDataLoading
+                              }
+                              onClick={handleFinishAccountPayCustomerExchange}
+                            >
+                              {finishCollectCustomerLoading ? "…" : "Finish"}
+                            </Button>
+                          );
                         }
-                        onClick={handleOpenAccountPayLinkModal}
-                      >
-                        Push to CS
-                      </Button>
-                    ) : isAccountCsView ? null : isProductionCsView ? (
-                      <>
-                        <Button
-                          variant="outline-primary"
-                          className="fw-semibold"
-                          disabled={
-                            csPushAccountLoading ||
-                            csPushProductionLoading ||
-                            csDetailLoading ||
-                            pushToP2Loading
-                          }
-                          onClick={handleOpenPushToAccountModal}
-                        >
-                          Push to CS
-                        </Button>
-                        <Button
-                          variant="outline-primary"
-                          className="fw-semibold"
-                          disabled={csDetailLoading || pushToP2Loading}
-                          onClick={handleOpenPushToP2Modal}
-                        >
-                          {pushToP2Loading ? "…" : "Push to P2"}
-                        </Button>
-                      </>
-                    ) : isCsCompletedView ? (
-                      <Button
-                        variant="outline-primary"
-                        className="fw-semibold"
-                        type="button"
-                        disabled={csDetailLoading}
-                        onClick={handleOpenCompletedFinalNoteModal}
-                      >
-                        View Note
-                      </Button>
-                    ) : csDefaultSupportCollectCustomer ? (
-                      <Button
-                        variant="outline-primary"
-                        className="fw-semibold"
-                        disabled={
-                          finishCollectCustomerLoading ||
-                          csPushAccountLoading ||
-                          csPushProductionLoading ||
-                          csDetailLoading
+                        if (showAccountPushToCsCollectCustomer) {
+                          return (
+                            <Button
+                              variant="outline-primary"
+                              className="fw-semibold"
+                              type="button"
+                              disabled={
+                                csDetailLoading ||
+                                exchangeCalculateLoading ||
+                                updateExchangeDataLoading ||
+                                showAccountPayLinkModal ||
+                                accountPayLinkLoading
+                              }
+                              onClick={handleOpenAccountPayLinkModal}
+                            >
+                              Push to CS
+                            </Button>
+                          );
                         }
-                        onClick={handleFinishCollectCustomerDefaultCs}
-                      >
-                        {finishCollectCustomerLoading ? "…" : "Finish"}
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          variant="outline-primary"
-                          className="fw-semibold me-2"
-                          disabled={
-                            csPushAccountLoading ||
-                            csPushProductionLoading ||
-                            csDetailLoading ||
-                            pushToP2Loading
-                          }
-                          onClick={() => setshowMessageModal(true)}
-                        >
-                          Add Note
-                        </Button>
-                        <Button
-                          variant="outline-primary"
-                          className="fw-semibold"
-                          disabled={
-                            csPushAccountLoading ||
-                            csPushProductionLoading ||
-                            csDetailLoading ||
-                            pushToP2Loading
-                          }
-                          onClick={handleOpenPushToAccountModal}
-                        >
-                          Push to Account
-                        </Button>
-                        <Button
-                          variant="outline-primary"
-                          className="fw-semibold"
-                          disabled={
-                            csPushAccountLoading ||
-                            csPushProductionLoading ||
-                            csDetailLoading ||
-                            pushToP2Loading
-                          }
-                          onClick={handleOpenPushToProductionModal}
-                        >
-                          Push to Production
-                        </Button>
-                        <Button
-                          variant="outline-primary"
-                          className="fw-semibold"
-                          disabled={
-                            csPushAccountLoading ||
-                            csPushProductionLoading ||
-                            csDetailLoading ||
-                            pushToP2Loading
-                          }
-                          onClick={handleOpenPushToP2Modal}
-                        >
-                          {pushToP2Loading ? "…" : "Push to P2"}
-                        </Button>
-                      </>
-                    )}
+                        return null;
+                      }
+
+                      if (isProductionCsView) {
+                        return (
+                          <>
+                            <Button
+                              variant="outline-primary"
+                              className="fw-semibold me-2"
+                              disabled={
+                                csPushAccountLoading ||
+                                csPushProductionLoading ||
+                                csDetailLoading ||
+                                pushToP2Loading
+                              }
+                              onClick={handleOpenPushToAccountModal}
+                            >
+                              Push to CS
+                            </Button>
+                            <Button
+                              variant="outline-primary"
+                              className="fw-semibold"
+                              disabled={csDetailLoading || pushToP2Loading}
+                              onClick={handleOpenPushToP2Modal}
+                            >
+                              {pushToP2Loading ? "…" : "Push to P2"}
+                            </Button>
+                          </>
+                        );
+                      }
+
+                      if (isCsCompletedView) {
+                        return (
+                          <Button
+                            variant="outline-primary"
+                            className="fw-semibold"
+                            type="button"
+                            disabled={csDetailLoading}
+                            onClick={handleOpenCompletedFinalNoteModal}
+                          >
+                            View Note
+                          </Button>
+                        );
+                      }
+
+                      if (csDefaultSupportCollectCustomer) {
+                        if (!canOperate) return null;
+                        return (
+                          <Button
+                            variant="outline-primary"
+                            className="fw-semibold"
+                            disabled={
+                              finishCollectCustomerLoading ||
+                              csPushAccountLoading ||
+                              csPushProductionLoading ||
+                              csDetailLoading
+                            }
+                            onClick={handleFinishCollectCustomerDefaultCs}
+                          >
+                            {finishCollectCustomerLoading ? "…" : "Finish"}
+                          </Button>
+                        );
+                      }
+
+                      if (!canOperate) return null;
+                      return (
+                        <>
+                          <Button
+                            variant="outline-primary"
+                            className="fw-semibold me-2"
+                            disabled={
+                              csPushAccountLoading ||
+                              csPushProductionLoading ||
+                              csDetailLoading ||
+                              pushToP2Loading
+                            }
+                            onClick={() => setshowMessageModal(true)}
+                          >
+                            Add Note
+                          </Button>
+                          <Button
+                            variant="outline-primary"
+                            className="fw-semibold me-2"
+                            disabled={
+                              csPushAccountLoading ||
+                              csPushProductionLoading ||
+                              csDetailLoading ||
+                              pushToP2Loading
+                            }
+                            onClick={handleOpenPushToAccountModal}
+                          >
+                            Push to Account
+                          </Button>
+                          <Button
+                            variant="outline-primary"
+                            className="fw-semibold me-2"
+                            disabled={
+                              csPushAccountLoading ||
+                              csPushProductionLoading ||
+                              csDetailLoading ||
+                              pushToP2Loading
+                            }
+                            onClick={handleOpenPushToProductionModal}
+                          >
+                            Push to Production
+                          </Button>
+                          <Button
+                            variant="outline-primary"
+                            className="fw-semibold"
+                            disabled={
+                              csPushAccountLoading ||
+                              csPushProductionLoading ||
+                              csDetailLoading ||
+                              pushToP2Loading
+                            }
+                            onClick={handleOpenPushToP2Modal}
+                          >
+                            {pushToP2Loading ? "…" : "Push to P2"}
+                          </Button>
+                        </>
+                      );
+                    })()}
                   </Box>
                 </Box>
               </>
@@ -3579,287 +3610,287 @@ function OrderDetails() {
               </Box>
             ) : (
               <>
-            <Typography variant="subtitle1" className="fw-semibold mb-2">
-              Products
-            </Typography>
-            <Table
-              responsive
-              bordered
-              hover
-              size="sm"
-              className="mb-4"
-              style={{ tableLayout: "fixed", width: "100%" }}
-            >
-              <thead className="table-light">
-                <tr>
-                  <th style={{ width: "20%", maxWidth: 220 }}>
-                    {isDefaultCustomerSupportView ? "Product ID" : "Product name"}
-                  </th>
-                  <th style={{ width: "18%", maxWidth: 200 }}>
-                    {isDefaultCustomerSupportView
-                      ? "Variation ID"
-                      : "Variation"}
-                  </th>
-                  <th style={{ width: "34%" }}>Product link</th>
-                  <th style={{ width: "12%", maxWidth: 110 }}>Price</th>
-                  <th style={{ width: "10%", maxWidth: 96 }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td
-                    style={{
-                      width: "20%",
-                      maxWidth: 220,
-                      verticalAlign: "middle",
-                    }}
-                  >
-                    {isDefaultCustomerSupportView ? (
+                <Typography variant="subtitle1" className="fw-semibold mb-2">
+                  Products
+                </Typography>
+                <Table
+                  responsive
+                  bordered
+                  hover
+                  size="sm"
+                  className="mb-4"
+                  style={{ tableLayout: "fixed", width: "100%" }}
+                >
+                  <thead className="table-light">
+                    <tr>
+                      <th style={{ width: "20%", maxWidth: 220 }}>
+                        {isDefaultCustomerSupportView ? "Product ID" : "Product name"}
+                      </th>
+                      <th style={{ width: "18%", maxWidth: 200 }}>
+                        {isDefaultCustomerSupportView
+                          ? "Variation ID"
+                          : "Variation"}
+                      </th>
+                      <th style={{ width: "34%" }}>Product link</th>
+                      <th style={{ width: "12%", maxWidth: 110 }}>Price</th>
+                      <th style={{ width: "10%", maxWidth: 96 }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td
+                        style={{
+                          width: "20%",
+                          maxWidth: 220,
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        {isDefaultCustomerSupportView ? (
+                          <Form.Control
+                            type="text"
+                            inputMode="numeric"
+                            size="sm"
+                            placeholder="Enter product ID"
+                            value={replaceModalProductId}
+                            onChange={(e) =>
+                              setReplaceModalProductId(e.target.value)
+                            }
+                            onBlur={handleManualReplaceProductIdBlur}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                e.currentTarget.blur();
+                              }
+                            }}
+                            disabled={
+                              addProductCatalogLoading || addProductSelectionLoading
+                            }
+                          />
+                        ) : (
+                          <Form.Select
+                            size="sm"
+                            style={{ maxWidth: "100%" }}
+                            value={replaceModalProductId}
+                            onChange={handleReplaceModalProductChange}
+                            disabled={
+                              addProductCatalogLoading || addProductSelectionLoading
+                            }
+                          >
+                            <option value="">Select product</option>
+                            {addProductCatalog.map((p) => (
+                              <option
+                                key={String(p.product_id)}
+                                value={String(p.product_id)}
+                              >
+                                {p.product_name || `Product ${p.product_id}`}
+                              </option>
+                            ))}
+                          </Form.Select>
+                        )}
+                      </td>
+                      <td
+                        style={{
+                          width: "18%",
+                          maxWidth: 200,
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        <Form.Select
+                          size="sm"
+                          style={{ maxWidth: "100%" }}
+                          value={replaceModalVariationId}
+                          onChange={handleReplaceModalVariationChange}
+                          disabled={
+                            !String(replaceModalProductId ?? "").trim() ||
+                            addProductCatalogLoading ||
+                            addProductSelectionLoading ||
+                            !hasProductVariations(activeReplaceProduct) ||
+                            replaceVariationOptions.length === 0
+                          }
+                        >
+                          <option value="">
+                            {!String(replaceModalProductId ?? "").trim()
+                              ? isDefaultCustomerSupportView
+                                ? "Enter product ID first"
+                                : "Select product first"
+                              : !hasProductVariations(activeReplaceProduct) ||
+                                replaceVariationOptions.length === 0
+                                ? "No variations"
+                                : "Select variation"}
+                          </option>
+                          {replaceVariationOptions.map((v) => (
+                            <option key={v.id} value={v.id}>
+                              {v.label}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </td>
+                      <td
+                        style={{
+                          width: "34%",
+                          wordBreak: "break-all",
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        {replaceModalLink ? (
+                          <a
+                            href={replaceModalLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="small"
+                          >
+                            {replaceModalLink}
+                          </a>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
+                      </td>
+                      <td
+                        style={{
+                          width: "12%",
+                          maxWidth: 110,
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        {replaceModalPrice ? (
+                          replaceModalPrice
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
+                      </td>
+                      <td
+                        style={{
+                          width: "10%",
+                          maxWidth: 96,
+                          verticalAlign: "middle",
+                        }}
+                      >
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          type="button"
+                          disabled={
+                            exchangeCalculateLoading ||
+                            addProductSelectionLoading ||
+                            addProductCatalogLoading
+                          }
+                          onClick={handleReplaceExchangeAdd}
+                        >
+                          {exchangeCalculateLoading ? "…" : "Add"}
+                        </Button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </Table>
+                <Typography variant="subtitle1" className="fw-semibold mb-2">
+                  Payment
+                </Typography>
+                <Table responsive bordered hover size="sm">
+                  <thead className="table-light">
+                    <tr>
+                      <th>Amount</th>
+                      <th>Balance refund amount</th>
+                      <th>Extra charged amount</th>
+                      <th>Charges</th>
+                      <th>Final amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {exchangePaymentData ? (
+                      <tr>
+                        <td>
+                          {formatExchangeMoney(
+                            exchangePaymentData.new_price != null &&
+                              exchangePaymentData.quantity != null
+                              ? Number(exchangePaymentData.new_price) *
+                              Number(exchangePaymentData.quantity)
+                              : null
+                          )}
+                        </td>
+                        <td>
+                          {formatExchangeMoney(
+                            exchangePaymentData.ref_price_difference != null &&
+                              exchangePaymentData.ref_price_difference !== ""
+                              ? exchangePaymentData.ref_price_difference
+                              : exchangePaymentData.balance_amount
+                          )}
+                        </td>
+                        <td>
+                          {formatExchangeMoney(
+                            exchangePaymentData.ext_price_difference != null &&
+                              exchangePaymentData.ext_price_difference !== ""
+                              ? exchangePaymentData.ext_price_difference
+                              : exchangePaymentData.price_difference
+                          )}
+                        </td>
+                        <td>
+                          <Form.Control
+                            size="sm"
+                            type="number"
+                            inputMode="decimal"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={replaceModalManualCharges}
+                            onChange={(e) =>
+                              setReplaceModalManualCharges(e.target.value)
+                            }
+                            disabled={
+                              exchangeCalculateLoading || updateExchangeDataLoading
+                            }
+                          />
+                        </td>
+                        <td>
+                          {formatExchangeMoney(
+                            getExchangeFinalAmountFromDifferences(
+                              exchangePaymentData
+                            )
+                          )}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="text-center text-muted py-3">
+                          No data yet
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </Table>
+                <Typography variant="subtitle1" className="fw-semibold mb-2 mt-3">
+                  Reason and note
+                </Typography>
+                <Row className="g-3 align-items-start">
+                  <Col xs={12} md={6}>
+                    <Form.Group className="mb-0">
+                      <Form.Label className="fw-semibold">Reason</Form.Label>
                       <Form.Control
                         type="text"
-                        inputMode="numeric"
-                        size="sm"
-                        placeholder="Enter product ID"
-                        value={replaceModalProductId}
-                        onChange={(e) =>
-                          setReplaceModalProductId(e.target.value)
-                        }
-                        onBlur={handleManualReplaceProductIdBlur}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            e.currentTarget.blur();
-                          }
-                        }}
+                        placeholder="Enter reason"
+                        value={replaceModalReason}
+                        onChange={(e) => setReplaceModalReason(e.target.value)}
                         disabled={
-                          addProductCatalogLoading || addProductSelectionLoading
+                          updateExchangeDataLoading || exchangeCalculateLoading
                         }
                       />
-                    ) : (
-                      <Form.Select
-                        size="sm"
-                        style={{ maxWidth: "100%" }}
-                        value={replaceModalProductId}
-                        onChange={handleReplaceModalProductChange}
-                        disabled={
-                          addProductCatalogLoading || addProductSelectionLoading
-                        }
-                      >
-                        <option value="">Select product</option>
-                        {addProductCatalog.map((p) => (
-                          <option
-                            key={String(p.product_id)}
-                            value={String(p.product_id)}
-                          >
-                            {p.product_name || `Product ${p.product_id}`}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    )}
-                  </td>
-                  <td
-                    style={{
-                      width: "18%",
-                      maxWidth: 200,
-                      verticalAlign: "middle",
-                    }}
-                  >
-                    <Form.Select
-                      size="sm"
-                      style={{ maxWidth: "100%" }}
-                      value={replaceModalVariationId}
-                      onChange={handleReplaceModalVariationChange}
-                      disabled={
-                        !String(replaceModalProductId ?? "").trim() ||
-                        addProductCatalogLoading ||
-                        addProductSelectionLoading ||
-                        !hasProductVariations(activeReplaceProduct) ||
-                        replaceVariationOptions.length === 0
-                      }
-                    >
-                      <option value="">
-                        {!String(replaceModalProductId ?? "").trim()
-                          ? isDefaultCustomerSupportView
-                            ? "Enter product ID first"
-                            : "Select product first"
-                          : !hasProductVariations(activeReplaceProduct) ||
-                            replaceVariationOptions.length === 0
-                          ? "No variations"
-                          : "Select variation"}
-                      </option>
-                      {replaceVariationOptions.map((v) => (
-                        <option key={v.id} value={v.id}>
-                          {v.label}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </td>
-                  <td
-                    style={{
-                      width: "34%",
-                      wordBreak: "break-all",
-                      verticalAlign: "middle",
-                    }}
-                  >
-                    {replaceModalLink ? (
-                      <a
-                        href={replaceModalLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="small"
-                      >
-                        {replaceModalLink}
-                      </a>
-                    ) : (
-                      <span className="text-muted">—</span>
-                    )}
-                  </td>
-                  <td
-                    style={{
-                      width: "12%",
-                      maxWidth: 110,
-                      verticalAlign: "middle",
-                    }}
-                  >
-                    {replaceModalPrice ? (
-                      replaceModalPrice
-                    ) : (
-                      <span className="text-muted">—</span>
-                    )}
-                  </td>
-                  <td
-                    style={{
-                      width: "10%",
-                      maxWidth: 96,
-                      verticalAlign: "middle",
-                    }}
-                  >
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      type="button"
-                      disabled={
-                        exchangeCalculateLoading ||
-                        addProductSelectionLoading ||
-                        addProductCatalogLoading
-                      }
-                      onClick={handleReplaceExchangeAdd}
-                    >
-                      {exchangeCalculateLoading ? "…" : "Add"}
-                    </Button>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-            <Typography variant="subtitle1" className="fw-semibold mb-2">
-              Payment
-            </Typography>
-            <Table responsive bordered hover size="sm">
-              <thead className="table-light">
-                <tr>
-                  <th>Amount</th>
-                  <th>Balance refund amount</th>
-                  <th>Extra charged amount</th>
-                  <th>Charges</th>
-                  <th>Final amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {exchangePaymentData ? (
-                  <tr>
-                    <td>
-                      {formatExchangeMoney(
-                        exchangePaymentData.new_price != null &&
-                          exchangePaymentData.quantity != null
-                          ? Number(exchangePaymentData.new_price) *
-                              Number(exchangePaymentData.quantity)
-                          : null
-                      )}
-                    </td>
-                    <td>
-                      {formatExchangeMoney(
-                        exchangePaymentData.ref_price_difference != null &&
-                          exchangePaymentData.ref_price_difference !== ""
-                          ? exchangePaymentData.ref_price_difference
-                          : exchangePaymentData.balance_amount
-                      )}
-                    </td>
-                    <td>
-                      {formatExchangeMoney(
-                        exchangePaymentData.ext_price_difference != null &&
-                          exchangePaymentData.ext_price_difference !== ""
-                          ? exchangePaymentData.ext_price_difference
-                          : exchangePaymentData.price_difference
-                      )}
-                    </td>
-                    <td>
+                    </Form.Group>
+                  </Col>
+                  <Col xs={12} md={6}>
+                    <Form.Group className="mb-0">
+                      <Form.Label className="fw-semibold">Note</Form.Label>
                       <Form.Control
-                        size="sm"
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        value={replaceModalManualCharges}
-                        onChange={(e) =>
-                          setReplaceModalManualCharges(e.target.value)
-                        }
+                        as="textarea"
+                        rows={3}
+                        placeholder="Enter note"
+                        value={replaceModalNote}
+                        onChange={(e) => setReplaceModalNote(e.target.value)}
                         disabled={
-                          exchangeCalculateLoading || updateExchangeDataLoading
+                          updateExchangeDataLoading || exchangeCalculateLoading
                         }
                       />
-                    </td>
-                    <td>
-                      {formatExchangeMoney(
-                        getExchangeFinalAmountFromDifferences(
-                          exchangePaymentData
-                        )
-                      )}
-                    </td>
-                  </tr>
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="text-center text-muted py-3">
-                      No data yet
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-            <Typography variant="subtitle1" className="fw-semibold mb-2 mt-3">
-              Reason and note
-            </Typography>
-            <Row className="g-3 align-items-start">
-              <Col xs={12} md={6}>
-                <Form.Group className="mb-0">
-                  <Form.Label className="fw-semibold">Reason</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter reason"
-                    value={replaceModalReason}
-                    onChange={(e) => setReplaceModalReason(e.target.value)}
-                    disabled={
-                      updateExchangeDataLoading || exchangeCalculateLoading
-                    }
-                  />
-                </Form.Group>
-              </Col>
-              <Col xs={12} md={6}>
-                <Form.Group className="mb-0">
-                  <Form.Label className="fw-semibold">Note</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    placeholder="Enter note"
-                    value={replaceModalNote}
-                    onChange={(e) => setReplaceModalNote(e.target.value)}
-                    disabled={
-                      updateExchangeDataLoading || exchangeCalculateLoading
-                    }
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
+                    </Form.Group>
+                  </Col>
+                </Row>
               </>
             )}
           </Modal.Body>
@@ -3874,8 +3905,8 @@ function OrderDetails() {
               {updateExchangeDataLoading
                 ? "…"
                 : isDefaultCustomerSupportView
-                ? "Push to Account"
-                : "Done"}
+                  ? "Push to Account"
+                  : "Done"}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -4007,7 +4038,7 @@ function OrderDetails() {
             <Modal.Title>Finish order</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-          
+
             <Form.Group className="mb-3">
               <Form.Label className="fw-semibold">
                 Final amount <span className="text-danger">*</span>
@@ -4330,8 +4361,8 @@ function OrderDetails() {
                 {csPushAccountLoading
                   ? "Pushing..."
                   : isProductionCsView
-                  ? "Push to CS"
-                  : "Push to Account"}
+                    ? "Push to CS"
+                    : "Push to Account"}
               </Button>
             </Modal.Footer>
           </Modal>
@@ -4641,7 +4672,7 @@ function OrderDetails() {
               <Box className="d-flex">
                 <Box>
                   {userData?.user_id == orderDetails?.operation_user_id &&
-                  orderProcess == "started" ? (
+                    orderProcess == "started" ? (
                     <Button
                       variant="outline-danger"
                       className="p-1 me-2 bg-transparent text-danger"
@@ -4847,7 +4878,7 @@ function OrderDetails() {
                             <Card className="factory-card me-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderProcess == "started" ? (
                                 <>
                                   <Button
                                     className="bg-transparent border-0 text-black"
@@ -4877,7 +4908,7 @@ function OrderDetails() {
                             <Card className="factory-card ms-1 shadow-sm mb-0">
                               {userData?.user_id ==
                                 orderDetailsDataOrderId?.operation_user_id &&
-                              orderProcess == "started" ? (
+                                orderProcess == "started" ? (
                                 <Button
                                   className="bg-transparent border-0 text-black"
                                   onClick={() => setShowAttachModal(true)}
@@ -4988,8 +5019,8 @@ function OrderDetails() {
         <MDBRow>
           <MDBCol md="12" className="d-flex justify-content-end">
             {userData?.user_id == orderDetails?.operation_user_id &&
-            orderProcess == "started" &&
-            tableData?.some((data) => data.dispatch_image != "") ? (
+              orderProcess == "started" &&
+              tableData?.some((data) => data.dispatch_image != "") ? (
               <>
                 <Button
                   variant="success"

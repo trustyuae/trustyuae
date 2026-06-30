@@ -8,6 +8,7 @@ import OrderManagementSystem from "./components/P2 system/OrderManagementSystem"
 import PoDetails from "./components/P2 system/PoDetails";
 import AllProductList from "./components/Product management/AllProductList";
 import OrderNotAvailable from "./components/P2 system/OrderNotAvailable";
+import BackFromCS from "./components/P2 system/BackFromCS";
 import ImageUpload from "./components/ImageUpload";
 import OrderDetails from "./components/P1 system/OrderDetails";
 import AllFactory from "./components/factory Management/AllFactory";
@@ -75,6 +76,11 @@ function App() {
                 exact
                 path="/order_not_available"
                 element={<OrderNotAvailable />}
+              />
+              <Route
+                exact
+                path="/back_from_cs"
+                element={<BackFromCS />}
               />
 
               <Route exact path="/image_upload" element={<ImageUpload />} />

@@ -146,6 +146,23 @@ const Sidebar = () => {
                   userType === "operation_assistant") && (
                   <li>
                     <Link
+                      to="/back_from_cs"
+                      className={
+                        "nav-link underline" +
+                        (activeMenuItem === "/back_from_cs"
+                          ? " active"
+                          : "")
+                      }
+                    >
+                      <i className="bi bi-circle"></i>
+                      <span>Back from CS</span>
+                    </Link>
+                  </li>
+                )}
+                {(userType === "administrator" ||
+                  userType === "operation_assistant") && (
+                  <li>
+                    <Link
                       to="/PO_ManagementSystem"
                       className={
                         "nav-link underline" +

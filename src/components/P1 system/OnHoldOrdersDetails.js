@@ -530,7 +530,7 @@ function OnHoldOrdersDetails() {
       className: "order-details",
       type: "string",
     },
-    {
+    /* {
       field: "dispatch_image",
       headerName: "Attachment",
       flex: 1.5,
@@ -691,7 +691,7 @@ function OnHoldOrdersDetails() {
           );
         }
       },
-    },
+    }, */
   ];
 
   return (
@@ -773,7 +773,8 @@ function OnHoldOrdersDetails() {
         <Row className="mb-3">
           <Col
             sm={12}
-            md={tableData.some((data) => data.status_change === "1") ? 6 : 12}
+            md={12}
+            // md={tableData.some((data) => data.status_change === "1") ? 6 : 12}
           >
             <Card className="p-3 h-100">
               <Typography variant="h6" className="fw-bold mb-3">
@@ -890,7 +891,7 @@ function OnHoldOrdersDetails() {
               )}
             </Card>
           </Col>
-          {tableData.some((data) => data.status_change === "1") ? (
+          {/* {tableData.some((data) => data.status_change === "1") ? (
             <Col sm={12} md={6}>
               <Card className="p-3 h-100">
                 <Typography variant="h6" className="fw-bold mb-3">
@@ -972,7 +973,7 @@ function OnHoldOrdersDetails() {
                 )}
               </Card>
             </Col>
-          ) : null}
+          ) : null} */}
         </Row>
 
         <Card className="p-3 mb-3">
@@ -1087,7 +1088,14 @@ function OnHoldOrdersDetails() {
             >
               Send to P2 System
             </Button>
-            {tableData?.some((data) => data?.dispatch_image !== "") ? (
+            <Button
+              variant="danger"
+              disabled={userData?.user_id != orderDetails?.operation_user_id}
+              onClick={handleFinishButtonClick}
+            >
+              Finish
+            </Button>
+            {/* {tableData?.some((data) => data?.dispatch_image !== "") ? (
               <Button variant="danger" onClick={handleFinishButtonClick}>
                 Finish
               </Button>
@@ -1099,7 +1107,7 @@ function OnHoldOrdersDetails() {
               >
                 Finish
               </Button>
-            )}
+            )} */}
           </MDBCol>
         </MDBRow>
 

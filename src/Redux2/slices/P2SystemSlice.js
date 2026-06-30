@@ -20,6 +20,7 @@ const initialState = {
   ordersNotAvailableStatus: [],
   assignFactory: [],
   assignFactoryToMultiProd: [],
+  backFromCsData: [],
   error: null,
 };
 
@@ -31,6 +32,19 @@ export const PoDetailsData = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const BackFromCsData = createAsyncThunk(
+  "P2System/BackFromCsData",
+  async (apiUrl, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(apiUrl);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching back from CS data:", error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -332,6 +346,7 @@ const P2SystemSlice = createSlice({
       state.ordersNotAvailableStatus = [];
       state.assignFactory = [];
       state.assignFactoryToMultiProd = [];
+      state.backFromCsData = [];
       state.error = null;
     },
   },
@@ -345,6 +360,17 @@ const P2SystemSlice = createSlice({
         state.poDetailsData = action.payload;
       })
       .addCase(PoDetailsData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(BackFromCsData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(BackFromCsData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.backFromCsData = action.payload;
+      })
+      .addCase(BackFromCsData.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
