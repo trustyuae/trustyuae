@@ -12,8 +12,8 @@ const initialState = {
   grnView: [],
   productDetails: [],
   productOrderDetails: [],
-  productOrdersPrep: [],
   productOrdersStock: [],
+  pushToCSData: [],
   remark: [],
   allProducts: [],
   poProductData: [],
@@ -122,6 +122,22 @@ export const GetProductOrderDetails = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error("Error fetching factories:", error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const PushToCSInGRN = createAsyncThunk(
+  "P3System/PushToCSInGRN",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        `wp-json/custom-pushcs-grn/v1/grn-push-order/`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error pushing to CS:", error.message);
       return rejectWithValue(error.message);
     }
   }
@@ -331,6 +347,7 @@ const P3SystemSlice = createSlice({
       state.productOrderDetails = [];
       state.productOrdersPrep = [];
       state.productOrdersStock = [];
+      state.pushToCSData = [];
       state.remark = [];
       state.allProducts = [];
       state.poProductData = [];
@@ -429,6 +446,17 @@ const P3SystemSlice = createSlice({
         state.productOrdersPrep = action.payload;
       })
       .addCase(AddProductOrderForPre.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(PushToCSInGRN.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(PushToCSInGRN.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.pushToCSData = action.payload;
+      })
+      .addCase(PushToCSInGRN.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

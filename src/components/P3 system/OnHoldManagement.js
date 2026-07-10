@@ -22,6 +22,7 @@ import {
   AddProductOrderForStock,
   GetProductDetails,
   GetProductOrderDetails,
+  PushToCSInGRN,
 } from "../../Redux2/slices/P3SystemSlice";
 import Swal from "sweetalert2";
 
@@ -225,6 +226,105 @@ function OnHoldManagement() {
       }
     } else if (confirmation.isDismissed) {
       return;
+    }
+  };
+
+  const handlePushToCS = async () => {
+    if (selectedOrders.length === 0) {
+      await ShowAlert(
+        "Please select products to push to CS",
+        "",
+        "error",
+        false,
+        false,
+        "",
+        "",
+        "",
+        0
+      );
+      return;
+    }
+
+    const confirmation = await Swal.fire({
+      title: `Are you sure you want to push selected orders to CS?`,
+      icon: "question",
+      input: "textarea",
+      inputLabel: "Reason/Note",
+      inputPlaceholder: "Enter the reason here...",
+      inputValidator: (value) => {
+        if (!value) {
+          return "You need to enter a reason!";
+        }
+      },
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel",
+      allowOutsideClick: false, // Disable clicking outside
+      allowEscapeKey: false, // Disable escape key
+    });
+
+    if (confirmation.isConfirmed) {
+      const note = confirmation.value;
+      try {
+        let hasError = false;
+        let errorMessage = "Some orders failed to push to CS. Please check and try again.";
+        await Promise.all(
+          selectedOrders.map(async (order) => {
+            const payload = {
+              order_id: Number(order.order_id),
+              product_id: Number(params.id),
+              variation_id: params.variation_id == 0 ? "0" : params.variation_id,
+              grn_no: params.grn_no,
+              po_id: productOverallData.po_id,
+              note: note,
+            };
+            const res = await dispatch(PushToCSInGRN(payload));
+            if (
+              res.payload?.status !== "success" &&
+              res.payload?.status_code !== 200 &&
+              res.payload?.status !== true
+            ) {
+              hasError = true;
+              if (res.payload?.message) {
+                errorMessage = res.payload.message;
+              }
+            }
+          })
+        );
+
+        if (!hasError) {
+          ShowAlert(
+            "GRN pushed to CS successfully.",
+            "",
+            "success",
+            false,
+            false,
+            "",
+            "",
+            "",
+            1500
+          );
+          fetchProductOrderDetails();
+          setSelectedOrders([]);
+          setProductData((prevProductData) =>
+            prevProductData.map((row) => ({ ...row, isSelected: false }))
+          );
+        } else {
+          ShowAlert(
+            errorMessage,
+            "",
+            "error",
+            false,
+            false,
+            "",
+            "",
+            "",
+            2500
+          );
+        }
+      } catch (error) {
+        console.error("Error occurred:", error);
+      }
     }
   };
 
@@ -448,15 +548,20 @@ function OnHoldManagement() {
         </Card>
       </MDBRow>
       <MDBRow>
-        <MDBCol md="12" className="d-flex justify-content-end">
+        <MDBCol md="12" className="d-flex justify-content-end gap-2">
           {productData?.length === 0 ? (
             <Button variant="success" disabled onClick={handleOrderStock}>
               erggergerInStock
             </Button>
           ) : (
-            <Button variant="success" onClick={handleOrderPerp}>
-              Send for Preparation
-            </Button>
+            <>
+              <Button variant="outline-danger" onClick={handlePushToCS}>
+                Push to CS
+              </Button>
+              <Button variant="success" onClick={handleOrderPerp}>
+                Send for Preparation
+              </Button>
+            </>
           )}
         </MDBCol>
       </MDBRow>

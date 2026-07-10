@@ -360,6 +360,8 @@ function OrderDetails() {
   const [exchangePaymentData, setExchangePaymentData] = useState(null);
   /** Manual charge entered in Replace Product payment table. */
   const [replaceModalManualCharges, setReplaceModalManualCharges] = useState("");
+  /** Amount to remove from extra charged amount. */
+  const [replaceModalRemoveExtAmt, setReplaceModalRemoveExtAmt] = useState("");
   /** Replacement product permalink captured when exchange is calculated (for update-exchange-data). */
   const [exchangeExItemLink, setExchangeExItemLink] = useState("");
   /** True after Replace Product modal Done succeeds (`update-exchange-data`); required before Finish Order. */
@@ -666,12 +668,19 @@ function OrderDetails() {
       exc_item_name: item.exc_item_name ?? "",
       exc_variation: item.exc_variation ?? "",
       exc_amount: item.exc_amount ?? "",
-      exc_image: item.exc_image ?? "",
-      exc_quantity: item.exc_quantity ?? "",
+      exc_image: item.exc_image ?? item["exc_image,"] ?? "",
+      exc_quantity: item.exc_quantity ?? item.exc_qty ?? "",
     });
 
     if (isAccountCsView) {
       return raw.map((item, idx) => mapExc(item, idx));
+    }
+
+    if (isCsCompletedView) {
+      const excLines = raw.filter(
+        (item) => item.exc_item_id || item.exc_item_name || item.exc_amount
+      );
+      return excLines.map((item, idx) => mapExc(item, idx));
     }
 
     if (isDefaultCustomerSupportView) {
@@ -684,7 +693,7 @@ function OrderDetails() {
     }
 
     return [];
-  }, [isAccountCsView, isDefaultCustomerSupportView, csOrderDetail]);
+  }, [isAccountCsView, isCsCompletedView, isDefaultCustomerSupportView, csOrderDetail]);
 
   const activeReplaceProduct = useMemo(() => {
     if (replaceProductSnapshot) return replaceProductSnapshot;
@@ -2553,7 +2562,9 @@ function OrderDetails() {
         })
       ).unwrap();
       const p = pickProductFromAddProductPayload(data) || fromCatalog;
-      setReplaceProductSnapshot(p || null);
+      if (vid === "") {
+        setReplaceProductSnapshot(p || null);
+      }
       const prod = p || fromCatalog;
       if (prod && !hasProductVariations(prod)) {
         const { price, link } = pickPriceAndLinkFromProduct(prod, "");
@@ -2568,7 +2579,9 @@ function OrderDetails() {
         setReplaceModalPrice("");
       }
     } catch (err) {
-      setReplaceProductSnapshot(fromCatalog || null);
+      if (vid === "") {
+        setReplaceProductSnapshot(fromCatalog || null);
+      }
       ShowAlert(
         "",
         typeof err === "string" ? err : "Failed to load product.",
@@ -2801,6 +2814,12 @@ function OrderDetails() {
       calc.ext_price_difference != null && calc.ext_price_difference !== ""
         ? Number(calc.ext_price_difference)
         : Number(calc.price_difference ?? 0);
+    const removeExtAmtRaw = parseFloat(
+      String(replaceModalRemoveExtAmt ?? "")
+        .replace(/,/g, "")
+        .trim() || "0"
+    );
+    const finalExtraRaw = extraRaw - removeExtAmtRaw;
     const manualChargesRaw = parseFloat(
       String(replaceModalManualCharges ?? "")
         .replace(/,/g, "")
@@ -2811,10 +2830,11 @@ function OrderDetails() {
       return;
     }
     const finalRaw = getExchangeFinalAmountFromDifferences(calc);
-    const finalRawNum =
+    let finalRawNum =
       finalRaw != null && !Number.isNaN(Number(finalRaw))
         ? Number(finalRaw)
         : 0;
+    finalRawNum = finalRawNum - removeExtAmtRaw - manualChargesRaw;
     const exc_item_link = String(
       exchangeExItemLink || replaceModalLink || ""
     ).trim();
@@ -2842,8 +2862,9 @@ function OrderDetails() {
           exc_item_link,
           amount: roundExchangeApiMoney(amountRaw),
           balance_refund_amt: roundExchangeApiMoney(balanceRaw),
-          extra_charged_amt: roundExchangeApiMoney(extraRaw),
+          extra_charged_amt: roundExchangeApiMoney(finalExtraRaw),
           charges: roundExchangeApiMoney(manualChargesRaw),
+          rm_ext_amt: roundExchangeApiMoney(removeExtAmtRaw),
           final_amount: roundExchangeApiMoney(finalRawNum),
           category: "Exchange",
           module: "Account",
@@ -3311,6 +3332,26 @@ function OrderDetails() {
                         </Typography>
                       </Col>
                     </Row>
+                    <Row className="mb-2">
+                      <Col md={5}>
+                        <Typography
+                          variant="label"
+                          className="fw-semibold"
+                          sx={{ fontSize: 14 }}
+                        >
+                          Payment method
+                        </Typography>
+                      </Col>
+                      <Col md={7}>
+                        <Typography
+                          variant="label"
+                          className="fw-semibold text-secondary"
+                          sx={{ fontSize: 14 }}
+                        >
+                          : {csOrderDetail?.payment_method || ""}
+                        </Typography>
+                      </Col>
+                    </Row>
                     {isAccountCsView && (
                       <Row className="mb-2">
                         <Col md={5}>
@@ -3358,7 +3399,8 @@ function OrderDetails() {
                   />
                 </div>
                 {((isAccountCsView && !isAccountRefundOrder) ||
-                  isDefaultCustomerSupportView) &&
+                  isDefaultCustomerSupportView ||
+                  isCsCompletedView) &&
                   csExchangeDetailTableRows.length > 0 ? (
                   <>
                     <Typography
@@ -3374,6 +3416,26 @@ function OrderDetails() {
                         rowHeight={85}
                       />
                     </div>
+                    {(() => {
+                      const payLink = csOrderDetail?.items?.find(item => item.pay_link)?.pay_link;
+                      if (!payLink) return null;
+                      return (
+                        <div className="mt-3 text-start">
+                          <Button 
+                            variant="outline-danger" 
+                            className="fw-semibold rounded-0" 
+                            style={{ width: "250px", borderWidth: "2px" }}
+                            onClick={() => {
+                              navigator.clipboard.writeText(payLink)
+                                .then(() => ShowAlert("", "Pay link copied successfully!", "success", true))
+                                .catch(() => ShowAlert("", "Failed to copy link.", "error", true));
+                            }}
+                          >
+                            Copy Pay Link
+                          </Button>
+                        </div>
+                      );
+                    })()}
                   </>
                 ) : null}
                 <Box
@@ -3790,8 +3852,9 @@ function OrderDetails() {
                     <tr>
                       <th>Amount</th>
                       <th>Balance refund amount</th>
-                      <th>Extra charged amount</th>
                       <th>Charges</th>
+                      <th>Extra charged amount</th>
+                      <th>Remove ext amt</th>
                       <th>Final amount</th>
                     </tr>
                   </thead>
@@ -3816,14 +3879,6 @@ function OrderDetails() {
                           )}
                         </td>
                         <td>
-                          {formatExchangeMoney(
-                            exchangePaymentData.ext_price_difference != null &&
-                              exchangePaymentData.ext_price_difference !== ""
-                              ? exchangePaymentData.ext_price_difference
-                              : exchangePaymentData.price_difference
-                          )}
-                        </td>
-                        <td>
                           <Form.Control
                             size="sm"
                             type="number"
@@ -3842,15 +3897,41 @@ function OrderDetails() {
                         </td>
                         <td>
                           {formatExchangeMoney(
-                            getExchangeFinalAmountFromDifferences(
-                              exchangePaymentData
-                            )
+                            (exchangePaymentData.ext_price_difference != null &&
+                              exchangePaymentData.ext_price_difference !== ""
+                              ? Number(exchangePaymentData.ext_price_difference)
+                              : Number(exchangePaymentData.price_difference ?? 0)) -
+                            (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0)
+                          )}
+                        </td>
+                        <td>
+                          <Form.Control
+                            size="sm"
+                            type="number"
+                            inputMode="decimal"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            value={replaceModalRemoveExtAmt}
+                            onChange={(e) =>
+                              setReplaceModalRemoveExtAmt(e.target.value)
+                            }
+                            disabled={
+                              exchangeCalculateLoading || updateExchangeDataLoading
+                            }
+                          />
+                        </td>
+                        <td>
+                          {formatExchangeMoney(
+                            (Number(getExchangeFinalAmountFromDifferences(exchangePaymentData)) || 0) -
+                            (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0) -
+                            (parseFloat(String(replaceModalManualCharges || "0").replace(/,/g, "")) || 0)
                           )}
                         </td>
                       </tr>
                     ) : (
                       <tr>
-                        <td colSpan={5} className="text-center text-muted py-3">
+                        <td colSpan={6} className="text-center text-muted py-3">
                           No data yet
                         </td>
                       </tr>
@@ -3905,7 +3986,11 @@ function OrderDetails() {
               {updateExchangeDataLoading
                 ? "…"
                 : isDefaultCustomerSupportView
-                  ? "Push to Account"
+                  ? (exchangePaymentData && ((Number(getExchangeFinalAmountFromDifferences(exchangePaymentData)) || 0) -
+                      (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0) -
+                      (parseFloat(String(replaceModalManualCharges || "0").replace(/,/g, "")) || 0)) === 0
+                      ? "Push to p2"
+                      : "Push to Account")
                   : "Done"}
             </Button>
           </Modal.Footer>
