@@ -398,8 +398,13 @@ function OnHoldManegementSystem() {
       flex: 1,
       className: "d-flex justify-content-center align-items-center",
       renderCell: (params) => {
-        const orders = params?.row?.order_ids?.map((order) => order).join(", ");
-        return <Box>{orders}</Box>;
+        return (
+          <Box style={{ textAlign: "center", lineHeight: "1.2" }}>
+            {params?.row?.order_ids?.map((order, index) => (
+              <div key={index} style={{ margin: 0, padding: "2px 0" }}>{order}</div>
+            ))}
+          </Box>
+        );
       },
     },
     {

@@ -3448,6 +3448,7 @@ function OrderDetails() {
                         getOrderStartedBy(csOrderDetail) === userData?.user_login ||
                         getOrderStartedBy(csOrderDetail) === userData?.username ||
                         getOrderStartedBy(csOrderDetail) === userData?.name ||
+                        getOrderStartedBy(csOrderDetail) === `${userData?.first_name || ""} ${userData?.last_name || ""}`.trim() ||
                         getOrderStartedBy(csOrderDetail) === userData?.user_role;
 
                       if (isPendingCsReadonlyView) return null;

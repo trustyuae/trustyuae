@@ -21,6 +21,7 @@ import Loader from "../../utils/Loader";
 import dayjs from "dayjs"; 
 import CancelIcon from "@mui/icons-material/Cancel";
 import { setCurrentPage } from "../../Redux2/slices/PaginationSlice";
+import * as XLSX from "xlsx";
 
 function formatAccountOrderStatus(itemsByCategory) {
   if (!itemsByCategory || typeof itemsByCategory !== "object") return "—";
@@ -182,6 +183,54 @@ function CustomerSupportAccount() {
     setShowNoteModal(false);
     setNoteModalText("");
     setNoteModalOrderId(null);
+  };
+
+  const handleExportToExcel = () => {
+    const dataToExport = [];
+
+    orders.forEach((order) => {
+      const rawItems = getCsOrderLineItems(order);
+      if (!rawItems.length) return;
+
+      rawItems.forEach((item) => {
+        // Order Details (original item)
+        const nameToShow = item.product_eng_name || item.product_name || "N/A";
+        const variantDetails = item.variation_id != null && item.variation_id !== "" ? `Variation ID: ${item.variation_id}` : "—";
+        
+        // Exchange Details (if present)
+        const hasExchange = item.exc_item_id || item.exc_item_name || item.exc_amount;
+        const excNameToShow = item.exc_item_name || (hasExchange ? "N/A" : "");
+        const excVariantDetails = item.exc_variation != null && item.exc_variation !== "" ? `Variation ID: ${item.exc_variation}` : (hasExchange ? "—" : "");
+
+        dataToExport.push({
+          "Date": order.date_display,
+          "Customer Name": order.customer_name,
+          "Order ID": order.order_id,
+          "Order item id": item.product_id ?? item.item_id ?? "",
+          "Order product name": nameToShow,
+          "Order veriation details": variantDetails,
+          "Order price": item.price ?? "",
+          "Order Quantity": item.quantity || 1,
+          "Exchange item id": item.exc_item_id ?? "",
+          "Exchange item name": excNameToShow,
+          "exchange veriation details": excVariantDetails,
+          "exchange price": item.exc_amount ?? "",
+          "exchange quantity": hasExchange ? (item.exc_quantity ?? item.exc_qty ?? 1) : ""
+        });
+      });
+    });
+
+    const wb = XLSX.utils.book_new();
+
+    if (dataToExport.length > 0) {
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      XLSX.utils.book_append_sheet(wb, ws, "Account Orders");
+    } else {
+      const wsEmpty = XLSX.utils.json_to_sheet([{ Message: "No data available" }]);
+      XLSX.utils.book_append_sheet(wb, wsEmpty, "Data");
+    }
+
+    XLSX.writeFile(wb, "Customer_Support_Account_Orders.xlsx");
   };
 
   const columns = [
@@ -438,6 +487,14 @@ function CustomerSupportAccount() {
               </Form.Group>
             </Box>
             <Box className="d-flex">
+              <Button
+                variant="success"
+                className="mr-2 mx-1 w-auto d-flex align-items-center"
+                onClick={handleExportToExcel}
+                style={{ height: "fit-content" }}
+              >
+                Export Excel
+              </Button>
               <Form.Group className="d-flex mx-1 align-items-center">
                 <Form.Label className="fw-semibold mb-0 me-2">Page Size:</Form.Label>
                 <Form.Control
