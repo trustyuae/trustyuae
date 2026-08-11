@@ -44,6 +44,7 @@ import {
   clearStoreData,
   setCurrentPage,
 } from "../../Redux2/slices/PaginationSlice";
+import axiosInstance from "../../utils/AxiosInstance";
 
 function OrderTrackingNumberPending() {
   const dispatch = useDispatch();
@@ -424,7 +425,7 @@ function OrderTrackingNumberPending() {
     ];
   };
 
-  const downloadExcel = async () => {
+  const downloadExcel = () => {
     console.log(orders, "orders from downloadexcel");
     console.log(selectedItems, "selectedItems from downloadexcel");
     console.log(tempTrackIds, "tempTrackIds from downloadexcel");
@@ -437,27 +438,36 @@ function OrderTrackingNumberPending() {
     console.log("Total orders:", orders.length);
     
     // Include ALL orders regardless of exist_item value
-    const filteredOrderData = orders
-      .map((order) => {
-        const trackingIdValue = order.items
-          .map((item) => tempTrackIds[order.id] ?? item?.tracking_id ?? "")
-          .join(", ");
-        
-        return {
-          "Order Id": order.order_id,
-          "Name": order.customer_name || "",
-          "Address": order.customer_shipping_address || "",
-          "City": order.emirates_add || "",
-          "Phone": order.contact_no || "",
-          "Short Address Code": order.address_code || "",
-          "Product Name": order.items
-            .map(getProductExportName)
-            .join(", "),
-          "Shipping Country": order.shipping_country,
-          "Tracking ID": trackingIdValue,
-          "Exist Item": order.exist_item || "0", // Add this to debug
-        };
-      });
+    const filteredOrderData = orders.map((order) => {
+      const trackingIdValue = order.items
+        .map((item) => tempTrackIds[order.id] ?? item?.tracking_id ?? "")
+        .join(", ");
+      
+      const remain_item_count = order?.remain_item_count ?? "";
+      let name_categories = "";
+      if (order?.remain_item && Array.isArray(order.remain_item)) {
+        name_categories = order.remain_item.map(item => item.name_category).filter(Boolean).join("\n");
+      } else if (order?.name_category) {
+        name_categories = order.name_category;
+      }
+
+      return {
+        "Order Id": order.order_id,
+        "Name": order.customer_name || "",
+        "Address": order.customer_address || order.customer_shipping_address || "",
+        "City": order.customer_city || order.emirates_add || "",
+        "Phone": order.customer_phone || order.contact_no || "",
+        "Short Address Code": order.short_address_code || order.address_code || "",
+        "Product Name": order.items
+          .map(getProductExportName)
+          .join(", "),
+        "Shipping Country": order.shipping_country,
+        "Tracking ID": trackingIdValue,
+        "Exist Item": order.exist_item || "0", // Add this to debug
+        "Remain Item Count": remain_item_count,
+        "Name Category": name_categories,
+      };
+    });
 
     const workbook = XLSX.utils.book_new();
 
@@ -469,18 +479,28 @@ function OrderTrackingNumberPending() {
     XLSX.writeFile(workbook, "OrderTrackingData.xlsx");
   };
 
-  const downloadSelectedItemsExcel = async () => {
+  const downloadSelectedItemsExcel = () => {
     const filteredOrderData = selectedItems.map((order) => {
+      const remain_item_count = order?.remain_item_count ?? "";
+      let name_categories = "";
+      if (order?.remain_item && Array.isArray(order.remain_item)) {
+        name_categories = order.remain_item.map(item => item.name_category).filter(Boolean).join("\n");
+      } else if (order?.name_category) {
+        name_categories = order.name_category;
+      }
+
       return {
         "Order Id": order.order_id,
         "Name": order.customer_name || "",
-        "Address": order.customer_shipping_address || "",
-        "City": order.emirates_add || "",
-        "Phone": order.contact_no || "",
-        "Short Address Code": order.address_code || "",
+        "Address": order.customer_address || order.customer_shipping_address || "",
+        "City": order.customer_city || order.emirates_add || "",
+        "Phone": order.customer_phone || order.contact_no || "",
+        "Short Address Code": order.short_address_code || order.address_code || "",
         "Product Name": order.items.map(getProductExportName).join(", "),
         "Shipping Country": order.shipping_country,
         "Tracking ID": order.items.map((item) => item.tracking_id).join(", "),
+        "Remain Item Count": remain_item_count,
+        "Name Category": name_categories,
       };
     });
 
@@ -497,20 +517,30 @@ function OrderTrackingNumberPending() {
     setSelectedItems([]);
   };
 
-  const downloadExcelIndividual = async (rowData) => {
+  const downloadExcelIndividual = (rowData) => {
+    const remain_item_count = rowData?.remain_item_count ?? "";
+    let name_categories = "";
+    if (rowData?.remain_item && Array.isArray(rowData.remain_item)) {
+      name_categories = rowData.remain_item.map(item => item.name_category).filter(Boolean).join("\n");
+    } else if (rowData?.name_category) {
+      name_categories = rowData.name_category;
+    }
+
     const filteredOrderData = [
       {
         "Order Id": rowData.order_id,
         "Name": rowData.customer_name || "",
-        "Address": rowData.customer_shipping_address || "",
-        "City": rowData.emirates_add || "",
-        "Phone": rowData.contact_no || "",
-        "Short Address Code": rowData.address_code || "",
+        "Address": rowData.customer_address || rowData.customer_shipping_address || "",
+        "City": rowData.customer_city || rowData.emirates_add || "",
+        "Phone": rowData.customer_phone || rowData.contact_no || "",
+        "Short Address Code": rowData.short_address_code || rowData.address_code || "",
         "Product Name": rowData.items
           .map(getProductExportName)
           .join(", "),
         "Shipping Country": rowData.shipping_country,
         "Tracking ID": rowData.items.map((item) => item.tracking_id).join(", "),
+        "Remain Item Count": remain_item_count,
+        "Name Category": name_categories,
       },
     ];
 

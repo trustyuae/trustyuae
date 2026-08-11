@@ -206,6 +206,7 @@ function CustomerSupportAccount() {
           "Date": order.date_display,
           "Customer Name": order.customer_name,
           "Order ID": order.order_id,
+          "Order status": order.order_status,
           "Order item id": item.product_id ?? item.item_id ?? "",
           "Order product name": nameToShow,
           "Order veriation details": variantDetails,
