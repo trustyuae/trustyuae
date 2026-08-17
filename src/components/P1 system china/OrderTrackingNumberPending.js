@@ -588,6 +588,13 @@ function OrderTrackingNumberPending() {
       ),
     },
     {
+      field: "pushchina_date",
+      headerName: "Push Date",
+      className: "order-system-track",
+      flex: 1,
+      renderCell: (params) => params.row.pushchina_date || "-",
+    },
+    {
       field: "date",
       headerName: t("POManagement.Date"),
       className: "order-system-track",
