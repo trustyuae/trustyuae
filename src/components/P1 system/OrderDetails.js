@@ -2819,12 +2819,12 @@ function OrderDetails() {
         .replace(/,/g, "")
         .trim() || "0"
     );
-    const finalExtraRaw = extraRaw - removeExtAmtRaw;
     const manualChargesRaw = parseFloat(
       String(replaceModalManualCharges ?? "")
         .replace(/,/g, "")
         .trim() || "0"
     );
+    const finalExtraRaw = extraRaw - removeExtAmtRaw + manualChargesRaw;
     if (Number.isNaN(manualChargesRaw)) {
       ShowAlert("", "Invalid charges amount.", "warning", true);
       return;
@@ -2834,7 +2834,7 @@ function OrderDetails() {
       finalRaw != null && !Number.isNaN(Number(finalRaw))
         ? Number(finalRaw)
         : 0;
-    finalRawNum = finalRawNum - removeExtAmtRaw - manualChargesRaw;
+    finalRawNum = finalRawNum - removeExtAmtRaw + manualChargesRaw;
     const exc_item_link = String(
       exchangeExItemLink || replaceModalLink || ""
     ).trim();
@@ -3902,7 +3902,8 @@ function OrderDetails() {
                               exchangePaymentData.ext_price_difference !== ""
                               ? Number(exchangePaymentData.ext_price_difference)
                               : Number(exchangePaymentData.price_difference ?? 0)) -
-                            (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0)
+                            (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0) +
+                            (parseFloat(String(replaceModalManualCharges || "0").replace(/,/g, "")) || 0)
                           )}
                         </td>
                         <td>
@@ -3925,7 +3926,7 @@ function OrderDetails() {
                         <td>
                           {formatExchangeMoney(
                             (Number(getExchangeFinalAmountFromDifferences(exchangePaymentData)) || 0) -
-                            (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0) -
+                            (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0) +
                             (parseFloat(String(replaceModalManualCharges || "0").replace(/,/g, "")) || 0)
                           )}
                         </td>
@@ -3988,7 +3989,7 @@ function OrderDetails() {
                 ? "…"
                 : isDefaultCustomerSupportView
                   ? (exchangePaymentData && ((Number(getExchangeFinalAmountFromDifferences(exchangePaymentData)) || 0) -
-                      (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0) -
+                      (parseFloat(String(replaceModalRemoveExtAmt || "0").replace(/,/g, "")) || 0) +
                       (parseFloat(String(replaceModalManualCharges || "0").replace(/,/g, "")) || 0)) === 0
                       ? "Push to p2"
                       : "Push to Account")
